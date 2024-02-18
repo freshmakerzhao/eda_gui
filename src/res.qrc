@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/keywords.txt</file>
+        <file>resource/JetBrainsMonoNL-Bold.ttf</file>
+    </qresource>
+</RCC>
