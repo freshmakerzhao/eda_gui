@@ -2,10 +2,8 @@
 #define TASKVIEW_H
 
 #include <QWidget>
+#include <QGridLayout>
 
-namespace Ui {
-class TaskView;
-}
 
 class TaskView : public QWidget
 {
@@ -16,7 +14,7 @@ public:
     ~TaskView();
 
 private:
-    Ui::TaskView *ui;
+
 };
 
 #endif // TASKVIEW_H

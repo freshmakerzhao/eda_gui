@@ -1,17 +1,17 @@
 #include "taskview.h"
-#include "ui_taskview.h"
 
 #include <QTreeWidget>
 
 TaskView::TaskView(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::TaskView)
 {
-    ui->setupUi(this);
-
-    ui->treeWidget->setColumnCount(1);
-    ui->treeWidget->setHeaderHidden(true);
-    QTreeWidgetItem* synthesisItem = new QTreeWidgetItem(ui->treeWidget, QStringList() << "Synthesis");
+    QTreeWidget *treeWidget = new QTreeWidget(this);
+    QGridLayout *layout = new QGridLayout(this);
+    layout->addWidget(treeWidget);
+    layout->setMargin(0);
+    treeWidget->setColumnCount(1);
+    treeWidget->setHeaderHidden(true);
+    QTreeWidgetItem* synthesisItem = new QTreeWidgetItem(treeWidget, QStringList() << "Synthesis");
     synthesisItem->setIcon(0, QIcon("")); // 在QIcon("")放置图标地址:/QIcon.ico
 
     QTreeWidgetItem* synthesisChild1 = new QTreeWidgetItem(synthesisItem, QStringList() << "view report");
@@ -20,7 +20,7 @@ TaskView::TaskView(QWidget *parent)
     QTreeWidgetItem* synthesisChild2 = new QTreeWidgetItem(synthesisItem, QStringList() << "export blif");
     synthesisChild2->setIcon(0, QIcon(""));
 
-    QTreeWidgetItem* implementationItem = new QTreeWidgetItem(ui->treeWidget, QStringList() << "Implementation");
+    QTreeWidgetItem* implementationItem = new QTreeWidgetItem(treeWidget, QStringList() << "Implementation");
     implementationItem->setIcon(0, QIcon(""));
 
     QTreeWidgetItem* implementationChild1 = new QTreeWidgetItem(implementationItem, QStringList() << "view report");
@@ -32,17 +32,17 @@ TaskView::TaskView(QWidget *parent)
     QTreeWidgetItem* implementationChild3 = new QTreeWidgetItem(implementationItem, QStringList() << "only route");
     implementationChild3->setIcon(0, QIcon(""));
 
-    QTreeWidgetItem* timingAnalysisItem = new QTreeWidgetItem(ui->treeWidget, QStringList() << "Timing Analysis");
+    QTreeWidgetItem* timingAnalysisItem = new QTreeWidgetItem(treeWidget, QStringList() << "Timing Analysis");
     timingAnalysisItem->setIcon(0, QIcon(""));
 
-    QTreeWidgetItem* editSettingsItem = new QTreeWidgetItem(ui->treeWidget, QStringList() << "Edit Settings");
+    QTreeWidgetItem* editSettingsItem = new QTreeWidgetItem(treeWidget, QStringList() << "Edit Settings");
     editSettingsItem->setIcon(0, QIcon(""));
 
-    ui->treeWidget->expandAll();
+    treeWidget->expandAll();
 
 }
 
 TaskView::~TaskView()
 {
-    delete ui;
+
 }

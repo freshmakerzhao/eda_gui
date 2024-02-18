@@ -2,16 +2,18 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMenuBar>
 
-#include "taskview.h"
+#include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDockWidget>
+
 #include "projectnavigator.h"
+#include "taskview.h"
+#include "infowidget.h"
 #include "chipplanner.h"
-
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
-QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
@@ -21,45 +23,51 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void receiveFilePath(const QString &path);
 
 private slots:
-    void on_Open_triggered();
+    void onNewTriggered();
+    void onOpenTriggered();
+    void onOpenProjectTriggered();
+    void onSaveTriggered();
 
-    void on_Save_triggered();
+    void onCutTriggered();
+    void onCopyTriggered();
+    void onPasteTriggered();
+    void onUndoTriggered();
+    void onRedoTriggered();
 
-    void on_tabWidget_tabCloseRequested(int index);
+    void onChipPlannerTriggered();
 
-    void on_New_triggered();
-
-    void on_Open_Project_triggered();
-
-    void on_Chip_Planner_triggered();
-
-    void on_Cut_triggered();
-
-    void on_Copy_triggered();
-
-    void on_Paste_triggered();
-
-    void on_Undo_triggered();
-
-    void on_Redo_triggered();
-
-// protected:
-//     void closeEvent(QCloseEvent *event) override;
+    void onTabWidgetTabCloseRequested(int index);
 
 private:
-    void createEditorTab(QString fileName);
-
+    void createEditorTab(const QString& path);
     void refreshActionState();
+
+    QMenuBar *menuBar;
+    QMenu *fileMenu;
+    QMenu *editMenu;
+
+    QAction *newAction;
+    QAction *openAction;
+    QAction *openProjectAction;
+    QAction *saveAction;
+    QAction *cutAction;
+    QAction *copyAction;
+    QAction *pasteAction;
+    QAction *undoAction;
+    QAction *redoAction;
+
+    QAction *chipPlannerAction;
+
+    QToolBar *toolbar;
+    QTabWidget *tabWidget;
 
     TaskView *taskView;
     ProjectNavigator *projectNavigator;
+    InfoWidget *infoWidget;
     ChipPlanner chipPlanner;
-
-    Ui::MainWindow *ui;
-
-public slots:
-    void receiveFilePath(const QString &path);
 };
 #endif // MAINWINDOW_H

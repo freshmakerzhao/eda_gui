@@ -69,18 +69,18 @@ Editor::~Editor()
 
 }
 
-void Editor::openFile(QString path)
-{
-    m_path = path;
-    QFile file(path);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        this->setText(in.readAll());
-        file.close();
-    }
+// void Editor::openFile(QString path)
+// {
+//     m_path = path;
+//     QFile file(path);
+//     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//         QTextStream in(&file);
+//         this->setText(in.readAll());
+//         file.close();
+//     }
 
-    initSaveState();
-}
+//     initSaveState();
+// }
 
 bool Editor::saveFile()
 {

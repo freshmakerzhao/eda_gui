@@ -1,5 +1,4 @@
 #include "projectwizard.h"
-#include "ui_projectwizard.h"
 
 #include <QMessageBox>
 #include <QVBoxLayout>
@@ -13,10 +12,7 @@
 
 ProjectWizard::ProjectWizard(QWidget *parent)
     : QWizard(parent)
-    , ui(new Ui::ProjectWizard)
 {
-    ui->setupUi(this);
-
     setPage(Page_Init, new InitPage);
     setPage(Page_AddSources, new AddSourcesPage);
     setPage(Page_AddConstraints, new AddConstraintsPage);
@@ -27,7 +23,7 @@ ProjectWizard::ProjectWizard(QWidget *parent)
 
 ProjectWizard::~ProjectWizard()
 {
-    delete ui;
+
 }
 
 void ProjectWizard::accept()   // 重写accept(),完成创建工程文件夹功能

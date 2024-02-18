@@ -24,7 +24,7 @@ public:
     ~Editor();
 
 public:
-    void openFile(QString path);
+    // void openFile(QString path);
     bool saveFile();
     void setFilePath(QString path);
     bool checkSaved();

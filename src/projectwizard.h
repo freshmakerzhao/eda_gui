@@ -6,10 +6,6 @@
 #include <QDebug>
 #include <QLabel>
 
-namespace Ui {
-class ProjectWizard;
-}
-
 class ProjectWizard : public QWizard
 {
     Q_OBJECT
@@ -30,7 +26,7 @@ signals:
     void wizardAccepted(const QString &path);
 
 private:
-    Ui::ProjectWizard *ui;
+
 };
 
 class InitPage : public QWizardPage {

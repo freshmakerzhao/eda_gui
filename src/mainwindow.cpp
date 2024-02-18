@@ -1,54 +1,119 @@
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
 
-#include <QDebug>
-#include <QFileDialog>
-#include <QMessageBox>
-
-#include "projectwizard.h"
 #include "editor.h"
-#include "infowidget.h"
+#include "projectwizard.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
 {
     qDebug() << "[Main Window] Constructing...";
-    ui->setupUi(this);
-    this->setCentralWidget(ui->tabWidget);
+    this->resize(1600, 900);
+
+    menuBar = new QMenuBar(this);
+    this->setMenuBar(menuBar);
+    fileMenu = menuBar->addMenu("File");
+    editMenu = menuBar->addMenu("Edit");
+
+    newAction = new QAction("New", this);
+    openAction = new QAction("Open", this);
+    openProjectAction = new QAction("Open Project", this);
+    saveAction = new QAction("Save", this);
+    fileMenu->addActions({newAction, openAction, openProjectAction, saveAction});
+
+    connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
+    connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
+    connect(openProjectAction, &QAction::triggered, this, &MainWindow::onOpenProjectTriggered);
+    connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
+
+    cutAction = new QAction("Cut", this);
+    copyAction = new QAction("Copy", this);
+    pasteAction = new QAction("Paste", this);
+    undoAction = new QAction("Undo", this);
+    redoAction = new QAction("Redo", this);
+    editMenu->addActions({cutAction, copyAction, pasteAction, undoAction, redoAction});
+
+    connect(cutAction, &QAction::triggered, this, &MainWindow::onCutTriggered);
+    connect(copyAction, &QAction::triggered, this, &MainWindow::onCopyTriggered);
+    connect(pasteAction, &QAction::triggered, this, &MainWindow::onPasteTriggered);
+    connect(undoAction, &QAction::triggered, this, &MainWindow::onUndoTriggered);
+    connect(redoAction, &QAction::triggered, this, &MainWindow::onRedoTriggered);
+
+    chipPlannerAction = new QAction("ChipPlanner", this);
+    connect(chipPlannerAction, &QAction::triggered, this, &MainWindow::onChipPlannerTriggered);
+
+    toolbar = new QToolBar("Tools", this);
+    toolbar->addActions({newAction, openAction, saveAction, cutAction, copyAction, pasteAction, undoAction, redoAction, chipPlannerAction});
+    addToolBar(toolbar);
+
+    tabWidget = new QTabWidget(this);
+    tabWidget->setTabsClosable(true);
+    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested);
+    this->setCentralWidget(tabWidget);
     refreshActionState();
 
     projectNavigator = new ProjectNavigator(this);
-    ui->ProjectDockWidget->setWidget(projectNavigator);
+    QDockWidget *navigator = new QDockWidget(this);
+    navigator->setWindowTitle("Project Navigator");
+    navigator->setWidget(projectNavigator);
+    addDockWidget(Qt::LeftDockWidgetArea, navigator);
 
     taskView = new TaskView(this);
-    ui->TaskDockWidget->setWidget(taskView);
+    QDockWidget *task = new QDockWidget(this);
+    task->setWindowTitle("Tasks");
+    task->setWidget(taskView);
+    addDockWidget(Qt::LeftDockWidgetArea, task);
 
-    InfoWidget *infoWidget = new InfoWidget(this);
-    ui->InfoDockWidget->setWidget(infoWidget);
+    infoWidget = new InfoWidget(this);
+    QDockWidget *info = new QDockWidget(this);
+    info->setWindowTitle("Information");
+    info->setWidget(infoWidget);
+    addDockWidget(Qt::BottomDockWidgetArea, info);
+
 
     connect(projectNavigator, &ProjectNavigator::sendFilePath, this, &MainWindow::receiveFilePath);
-
 }
 
 MainWindow::~MainWindow()
 {
     qDebug() << "[Main Window] Distructing...";
-    delete ui;
 }
 
-void MainWindow::on_Open_triggered()
+void MainWindow::receiveFilePath(const QString &path)
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open File");
+    qDebug() << path;
     createEditorTab(path);
-
     refreshActionState();
 }
 
-
-void MainWindow::on_Save_triggered()
+void MainWindow::onNewTriggered()
 {
-    Editor *m_editor = (Editor*) ui->tabWidget->currentWidget();
+    ProjectWizard *projectWizard = new ProjectWizard(this);
+    projectWizard->show();
+    connect(projectWizard, &ProjectWizard::wizardAccepted, projectNavigator, &ProjectNavigator::refreshItems);
+}
+
+void MainWindow::onOpenTriggered()
+{
+    QString path = QFileDialog::getOpenFileName(this, "Open File");
+    createEditorTab(path);
+    refreshActionState();
+}
+
+void MainWindow::onOpenProjectTriggered()
+{
+    QString folder = QFileDialog::getExistingDirectory(this, "Select Folder", QDir::homePath());
+    if(folder.isEmpty()) {// 取消打开文件夹
+        return;
+    }
+    // qDebug() << folder;
+
+    projectNavigator->refreshItems(folder);
+
+}
+
+void MainWindow::onSaveTriggered()
+{
+    Editor *m_editor = (Editor*) tabWidget->currentWidget();
 
     if(m_editor) {
         if(m_editor->saveFile()) {
@@ -60,65 +125,57 @@ void MainWindow::on_Save_triggered()
     refreshActionState();
 }
 
-void MainWindow::createEditorTab(QString path)
+void MainWindow::onCutTriggered()
 {
-    if(path.isEmpty()) {// 取消打开文件
-        return;
+    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
+    if (m_editor) {
+        m_editor->cut();
     }
-
-    QFile file(path); // 打开文件
-    if(!file.open(QIODevice::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, "警告", "无法打开此文件，报错信息：\n" + file.errorString());
-        return;
-    }
-
-    for(int i = 0; i < ui->tabWidget->count(); ++i) {
-        if(ui->tabWidget->widget(i)->property("filePath").toString() == path) {
-            ui->tabWidget->setCurrentIndex(i);
-            return;
-        }
-    }
-
-    QTextStream in(&file);
-    QString text = in.readAll();
-
-    Editor *m_editor = new Editor(this); // 创建对象
-    m_editor->setText(text);// 放置文本
-    m_editor->setFilePath(path); // 设置文件路径
-    m_editor->initSaveState(); // 初始化保存状态
-    m_editor->setProperty("filePath", path);
-    ui->tabWidget->addTab(m_editor, QFileInfo(path).fileName()); // 添加tab
-    ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1); // 设置当前文件的索引
-
-    file.close();
-
-
 }
 
-void MainWindow::refreshActionState()
+void MainWindow::onCopyTriggered()
 {
-    bool state = ui->tabWidget->count() > 0;
-    ui->Undo->setEnabled(state);
-    ui->Redo->setEnabled(state);
-    ui->Cut->setEnabled(state);
-    ui->Copy->setEnabled(state);
-    ui->Paste->setEnabled(state);
-    ui->Save->setEnabled(state);
+    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
+    if (m_editor) {
+        m_editor->copy();
+    }
 }
 
-void MainWindow::receiveFilePath(const QString &path)
+void MainWindow::onPasteTriggered()
 {
-    qDebug() << path;
-    createEditorTab(path);
-    refreshActionState();
+    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
+    if (m_editor) {
+        m_editor->paste();
+    }
 }
 
-void MainWindow::on_tabWidget_tabCloseRequested(int index)
+void MainWindow::onUndoTriggered()
 {
-    qDebug() << "Tab index " << index;
-    Editor *m_editor = qobject_cast<Editor*>(ui->tabWidget->widget(index));
+    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
+    if (m_editor) {
+        m_editor->undo();
+    }
+}
+
+void MainWindow::onRedoTriggered()
+{
+    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
+    if (m_editor) {
+        m_editor->redo();
+    }
+}
+
+void MainWindow::onChipPlannerTriggered()
+{
+    chipPlanner.show();
+}
+
+void MainWindow::onTabWidgetTabCloseRequested(int index)
+{
+    // qDebug() << "Tab index " << index;
+    Editor *m_editor = qobject_cast<Editor*>(tabWidget->widget(index));
     if(!m_editor->checkSaved()) {
-        QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "您还没有保存文档！是否保存？",
+        QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "文件未保存！是否保存？",
                                                                 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
         if (btn == QMessageBox::Yes) {
             if(m_editor->saveFile()) {
@@ -131,105 +188,55 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
             return;
         }
     }
-    ui->tabWidget->removeTab(index);
+    tabWidget->removeTab(index);
     delete m_editor;
-    refreshActionState();
-}
-
-
-void MainWindow::on_New_triggered()
-{
-    ProjectWizard *projectWizard = new ProjectWizard(this);
-    projectWizard->show();
-
-    /*已将创建文件夹功能交给ProjectWizard处理
-    QString folderPath = QFileDialog::getExistingDirectory(nullptr, "Select folder path", QDir::homePath());
-    qDebug() << folderPath;
-    if (!folderPath.isEmpty()) {
-        QString folderName = QInputDialog::getText(nullptr, "Create Folder", "Enter folder name");
-        QDir dir(folderPath);
-
-        if (dir.mkdir(folderName)) {
-            dir.cd(folderName);
-            dir.mkdir("doc");
-            dir.mkdir("ip");
-            dir.mkdir("constrains");
-            dir.mkdir("sources");
-            qDebug() << "Folders created successfully";
-        } else {
-            qDebug() << "Failed to create folder";
-        }
-    }
-    */
-    connect(projectWizard, &ProjectWizard::wizardAccepted, projectNavigator, &ProjectNavigator::refreshItems);
-    // projectNavigator->refreshItems(projectWizard->projectPath);
 
     refreshActionState();
 }
 
-
-void MainWindow::on_Open_Project_triggered()
+void MainWindow::createEditorTab(const QString& path)
 {
-    QString folder = QFileDialog::getExistingDirectory(this, "Select Folder", QDir::homePath());
-    if(folder.isEmpty()) {// 取消打开文件夹
+    if(path.isEmpty()) {// 取消打开文件
         return;
     }
-    // qDebug() << folder;
 
-    projectNavigator->refreshItems(folder);
+    QFile file(path); // 打开文件
+    if(!file.open(QIODevice::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this, "警告", "无法打开此文件，报错信息：\n" + file.errorString());
+        return;
+    }
+
+    for(int i = 0; i < tabWidget->count(); ++i) {
+        if(tabWidget->widget(i)->property("filePath").toString() == path) {
+            tabWidget->setCurrentIndex(i);
+            return;
+        }
+    }
+
+    QTextStream in(&file);
+    QString text = in.readAll();
+
+    Editor *m_editor = new Editor(this); // 创建对象
+    m_editor->setText(text);// 放置文本
+    m_editor->setFilePath(path); // 设置文件路径
+    m_editor->initSaveState(); // 初始化保存状态
+    m_editor->setProperty("filePath", path);
+    tabWidget->addTab(m_editor, QFileInfo(path).fileName()); // 添加tab
+    tabWidget->setCurrentIndex(tabWidget->count() - 1); // 设置当前文件的索引
+
+    file.close();
 
     refreshActionState();
 }
 
-
-void MainWindow::on_Chip_Planner_triggered()
+void MainWindow::refreshActionState()
 {
-    chipPlanner.show();
+    bool state = tabWidget->count() > 0;
+    saveAction->setEnabled(state);
+    cutAction->setEnabled(state);
+    copyAction->setEnabled(state);
+    pasteAction->setEnabled(state);
+    undoAction->setEnabled(state);
+    redoAction->setEnabled(state);
+
 }
-
-
-void MainWindow::on_Cut_triggered()
-{
-    Editor *m_editor  = (Editor*) ui->tabWidget->currentWidget();
-    if (m_editor) {
-        m_editor->cut();
-    }
-}
-
-
-void MainWindow::on_Copy_triggered()
-{
-    Editor *m_editor  = (Editor*) ui->tabWidget->currentWidget();
-    if (m_editor) {
-        m_editor->copy();
-    }
-}
-
-
-void MainWindow::on_Paste_triggered()
-{
-    Editor *m_editor  = (Editor*) ui->tabWidget->currentWidget();
-    if (m_editor) {
-        m_editor->paste();
-    }
-}
-
-
-void MainWindow::on_Undo_triggered()
-{
-    Editor *m_editor  = (Editor*) ui->tabWidget->currentWidget();
-    if (m_editor) {
-        m_editor->undo();
-    }
-}
-
-
-void MainWindow::on_Redo_triggered()
-{
-    Editor *m_editor  = (Editor*) ui->tabWidget->currentWidget();
-    if (m_editor) {
-        m_editor->redo();
-    }
-}
-
-

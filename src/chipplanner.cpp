@@ -1,13 +1,14 @@
 #include "chipplanner.h"
-#include "ui_chipplanner.h"
-
-#include <QToolBar>
 
 ChipPlanner::ChipPlanner(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::ChipPlanner)
 {
-    ui->setupUi(this);
+    this->resize(1280, 720);
+    QMenuBar *menuBar = new QMenuBar(this);
+    this->setMenuBar(menuBar);
+    QMenu *fileMenu = menuBar->addMenu("File");
+    QMenu *editMenu = menuBar->addMenu("Edit");
+
     QToolBar *toolbar = new QToolBar("ToolBar", this);
     toolbar->setOrientation(Qt::Vertical);
     addToolBar(Qt::LeftToolBarArea, toolbar);
@@ -25,5 +26,5 @@ ChipPlanner::ChipPlanner(QWidget *parent)
 
 ChipPlanner::~ChipPlanner()
 {
-    delete ui;
+
 }

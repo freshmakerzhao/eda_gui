@@ -1,5 +1,4 @@
 #include "projectnavigator.h"
-#include "ui_projectnavigator.h"
 
 #include <QFileInfo>
 #include <QFileDialog>
@@ -9,62 +8,70 @@
 
 ProjectNavigator::ProjectNavigator(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::ProjectNavigator)
 {
-    ui->setupUi(this);
-    ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    treeWidget = new QTreeWidget(this);
+    QGridLayout *layout = new QGridLayout(this);
+    layout->addWidget(treeWidget);
+    layout->setMargin(0);
 
-    QObject::connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked, this, &ProjectNavigator::clickedFile);
+    treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    QObject::connect(treeWidget, &QTreeWidget::itemDoubleClicked, this, &ProjectNavigator::clickedFile);
 
 
-    QObject::connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested, [&](const QPoint &pos){
+    QObject::connect(treeWidget, &QTreeWidget::customContextMenuRequested, [&](const QPoint &pos){
         QMenu contextMenu;
         QAction addFileAction("Add File");
         QAction deleteFileAction("Delete File");
-        QString path = ui->treeWidget->currentItem()->data(0, Qt::UserRole).toString();
-        QFile tmp(path);
-        if (QFileInfo(tmp).isDir() || ui->treeWidget->currentItem() == rootItem) {
-            contextMenu.addAction(&addFileAction);
-            QObject::connect(&addFileAction, &QAction::triggered, [&](){
-                QString filePath = QFileDialog::getOpenFileName(nullptr, "Add File", "", "All Files (*.*)");
-                QFile file(filePath);
-                file.open(QIODevice::ReadOnly | QIODevice::Text);
-                file.close();
+        if (treeWidget->currentItem() != nullptr) {
+            QString path = treeWidget->currentItem()->data(0, Qt::UserRole).toString();
+            QFile tmp(path);
+            if (QFileInfo(tmp).isDir() || treeWidget->currentItem() == rootItem) {
+                contextMenu.addAction(&addFileAction);
+                QObject::connect(&addFileAction, &QAction::triggered, [&](){
+                    QString filePath = QFileDialog::getOpenFileName(nullptr, "Add File", "", "All Files (*.*)");
+                    QFile file(filePath);
+                    file.open(QIODevice::ReadOnly | QIODevice::Text);
+                    file.close();
 
-                QTreeWidgetItem *newItem = new QTreeWidgetItem(rootItem);
-                newItem->setText(0, QFileInfo(file).fileName());
-                newItem->setData(0, Qt::UserRole, file.fileName());
-                ui->treeWidget->expandAll();
-            });
+                    QTreeWidgetItem *newItem = new QTreeWidgetItem(rootItem);
+                    newItem->setText(0, QFileInfo(file).fileName());
+                    newItem->setData(0, Qt::UserRole, file.fileName());
+                });
+            } else {
+                contextMenu.addAction(&deleteFileAction);
+                QObject::connect(&deleteFileAction, &QAction::triggered, [&](){
+                    if(treeWidget->currentItem() != rootItem){
+                        QFile file(treeWidget->currentItem()->text(0));
+                        file.remove();
+                        delete treeWidget->currentItem();
+                    }
+
+                });
+            }
         } else {
-            contextMenu.addAction(&deleteFileAction);
-            QObject::connect(&deleteFileAction, &QAction::triggered, [&](){
-                if(ui->treeWidget->currentItem() != rootItem){
-                    QFile file(ui->treeWidget->currentItem()->text(0));
-                    file.remove();
-                    delete ui->treeWidget->currentItem();
-                }
-                ui->treeWidget->expandAll();
-            });
+            qDebug() << "Empty";
         }
-        contextMenu.exec(ui->treeWidget->mapToGlobal(pos));
+
+        treeWidget->expandAll();
+        contextMenu.exec(treeWidget->mapToGlobal(pos));
     });
 
-    ui->treeWidget->setColumnCount(1);
-    ui->treeWidget->setHeaderHidden(true);
-    ui->treeWidget->expandAll();
+    treeWidget->setColumnCount(1);
+    treeWidget->setHeaderHidden(true);
+    treeWidget->expandAll();
 }
 
 ProjectNavigator::~ProjectNavigator()
 {
-    delete ui;
+
 }
 
 void ProjectNavigator::refreshItems(const QString &path)
 {
     QFile file(path);
     QQueue<QPair<QString, QTreeWidgetItem*>> queue;
-    QTreeWidgetItem *topLevelItem = new QTreeWidgetItem(ui->treeWidget);
+    QTreeWidgetItem *topLevelItem = new QTreeWidgetItem(treeWidget);
     rootItem = topLevelItem;
     topLevelItem->setText(0, QFileInfo(file).fileName());
     queue.enqueue(QPair<QString, QTreeWidgetItem*>(path, topLevelItem));
@@ -85,7 +92,7 @@ void ProjectNavigator::refreshItems(const QString &path)
         }
     }
 
-    ui->treeWidget->expandAll();
+    treeWidget->expandAll();
 }
 
 void ProjectNavigator::clickedFile(QTreeWidgetItem *item)

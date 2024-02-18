@@ -6,10 +6,9 @@
 #define INFOWIDGET_H
 
 #include <QWidget>
+#include <QTabWidget>
+#include <QGridLayout>
 
-namespace Ui {
-class InfoWidget;
-}
 
 class InfoWidget : public QWidget
 {
@@ -20,7 +19,7 @@ public:
     ~InfoWidget();
 
 private:
-    Ui::InfoWidget *ui;
+
 };
 
 #endif // INFOWIDGET_H

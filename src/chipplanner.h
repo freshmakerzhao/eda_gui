@@ -2,10 +2,8 @@
 #define CHIPPLANNER_H
 
 #include <QMainWindow>
-
-namespace Ui {
-class ChipPlanner;
-}
+#include <QMenuBar>
+#include <QToolBar>
 
 class ChipPlanner : public QMainWindow
 {
@@ -16,7 +14,7 @@ public:
     ~ChipPlanner();
 
 private:
-    Ui::ChipPlanner *ui;
+
 };
 
 #endif // CHIPPLANNER_H

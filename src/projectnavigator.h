@@ -6,10 +6,8 @@
 #include <QTreeWidgetItem>
 #include <QMenu>
 #include <QMouseEvent>
+#include <QGridLayout>
 
-namespace Ui {
-class ProjectNavigator;
-}
 
 class ProjectNavigator : public QWidget
 {
@@ -24,8 +22,7 @@ public slots:
 
     void clickedFile(QTreeWidgetItem *item);
 private:
-
-    Ui::ProjectNavigator *ui;
+    QTreeWidget *treeWidget;
 
     QTreeWidgetItem *rootItem;
 
