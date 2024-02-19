@@ -7,6 +7,13 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QGridLayout>
+#include <QSet>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QDir>
+#include <QQueue>
+#include <QPair>
+#include "projectwizard.h"
 
 
 class ProjectNavigator : public QWidget
@@ -21,10 +28,24 @@ public slots:
     void refreshItems(const QString &path);
 
     void clickedFile(QTreeWidgetItem *item);
+
+    void showContextMenu(const QPoint &pos);
+
+    void closeProjectAction();
+
+    void addSourcesAction();
+
+    void addConstraintsAction();
+
+    void deleteFileAction();
+
 private:
     QTreeWidget *treeWidget;
 
-    QTreeWidgetItem *rootItem;
+    QSet<QString> projectNode;
+
+
+    // QTreeWidgetItem *rootItem;
 
 signals:
     void sendFilePath(const QString &path);

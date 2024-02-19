@@ -2,75 +2,78 @@
 #define PROJECTWIZARD_H
 
 #include <QWizard>
+#include <QWizardPage>
 #include <QLineEdit>
-#include <QDebug>
 #include <QLabel>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QVBoxLayout>
+#include <QFileDialog>
+#include <QFile>
+#include <QDir>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QDialogButtonBox>
+#include <QDebug>
 
 class ProjectWizard : public QWizard
 {
     Q_OBJECT
-
 public:
-    explicit ProjectWizard(QWidget *parent = nullptr);
-    ~ProjectWizard();
+    ProjectWizard(QWidget *parent = nullptr);
 
-    enum {Page_Init, Page_AddSources, Page_AddConstraints, Page_Summary};
+private slots:
+    void onFinish();
 
-    void accept() override;
-
-    QString projectName;
-    QString projectPath;
-
-public slots:
 signals:
     void wizardAccepted(const QString &path);
 
-private:
-
-};
-
-class InitPage : public QWizardPage {
-    Q_OBJECT
-
 public:
-    InitPage(QWidget *parent = 0);
-
-private:
-
+    QStringList sourcesFilesList;
+    QStringList constrainsFilesList;
 };
 
-class AddSourcesPage : public QWizardPage {
+class ProjectNamePage : public QWizardPage
+{
     Q_OBJECT
-
 public:
-    AddSourcesPage(QWidget *parent = 0);
-
-private:
-
+    ProjectNamePage(QWidget *parent = nullptr);
 };
 
-class AddConstraintsPage : public QWizardPage {
+class AddSourcesPage : public QWizardPage
+{
     Q_OBJECT
-
 public:
-    AddConstraintsPage(QWidget *parent = 0);
+    AddSourcesPage(QWidget *parent = nullptr);
 
 private:
+    QListWidget *filesListWidget;
+
+private slots:
+    void onAddFiles();
+    void onRemoveFiles();
+    void updateFilesList(const QStringList &files);
+
+signals:
+    void filesListUpdated(const QStringList &files);
 };
 
-
-class SummaryPage : public QWizardPage {
+class AddConstrainsPage : public QWizardPage
+{
     Q_OBJECT
-
 public:
-    SummaryPage(QWidget *parent = 0);
-
-    void initializePage() override;
+    AddConstrainsPage(QWidget *parent = nullptr);
 
 private:
-    QLabel *namelabel;
-    QLabel *prjnamelabel;
-    QLabel *pathlabel;
-    QLabel *prjpathlabel;
+    QListWidget *filesListWidget;
+
+private slots:
+    void onAddFiles();
+    void onRemoveFiles();
+    void updateFilesList(const QStringList &files);
+
+signals:
+    void filesListUpdated(const QStringList &files);
 };
+
 #endif // PROJECTWIZARD_H
