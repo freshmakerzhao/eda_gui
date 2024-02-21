@@ -87,7 +87,7 @@ void ProjectNavigator::showContextMenu(const QPoint &pos) {
     QMenu contextMenu;
     QAction closeProject("Close Project");
     QAction addSources("Add Sources");
-    QAction addConstraints("Add Constraints");
+    QAction addConstraints("Add Constrains");
     QAction deleteFileAction("Delete File");
     if (treeWidget->currentItem() == nullptr) {
         qDebug() << "No projects";

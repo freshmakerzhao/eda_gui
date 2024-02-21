@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     redoAction = new QAction("Redo", this);
     editMenu->addActions({cutAction, copyAction, pasteAction, undoAction, redoAction});
 
+    // 编辑器按钮绑定
     connect(cutAction, &QAction::triggered, this, &MainWindow::onCutTriggered);
     connect(copyAction, &QAction::triggered, this, &MainWindow::onCopyTriggered);
     connect(pasteAction, &QAction::triggered, this, &MainWindow::onPasteTriggered);
@@ -47,29 +48,29 @@ MainWindow::MainWindow(QWidget *parent)
 
     tabWidget = new QTabWidget(this);
     tabWidget->setTabsClosable(true);
-    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested);
+    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested); // 关闭编辑器
     this->setCentralWidget(tabWidget);
     refreshActionState();
 
     projectNavigator = new ProjectNavigator(this);
-    QDockWidget *navigator = new QDockWidget(this);
-    navigator->setWindowTitle("Project Navigator");
-    navigator->setWidget(projectNavigator);
-    addDockWidget(Qt::LeftDockWidgetArea, navigator);
+    QDockWidget *leftDock1 = new QDockWidget(this);
+    leftDock1->setWindowTitle("Project Navigator");
+    leftDock1->setWidget(projectNavigator);
+    addDockWidget(Qt::LeftDockWidgetArea, leftDock1);
 
     taskView = new TaskView(this);
-    QDockWidget *task = new QDockWidget(this);
-    task->setWindowTitle("Tasks");
-    task->setWidget(taskView);
-    addDockWidget(Qt::LeftDockWidgetArea, task);
+    QDockWidget *leftDock2 = new QDockWidget(this);
+    leftDock2->setWindowTitle("Tasks");
+    leftDock2->setWidget(taskView);
+    addDockWidget(Qt::LeftDockWidgetArea, leftDock2);
 
     infoWidget = new InfoWidget(this);
-    QDockWidget *info = new QDockWidget(this);
-    info->setWindowTitle("Information");
-    info->setWidget(infoWidget);
-    addDockWidget(Qt::BottomDockWidgetArea, info);
+    QDockWidget *bottomDock = new QDockWidget(this);
+    bottomDock->setWindowTitle("Information");
+    bottomDock->setWidget(infoWidget);
+    addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
-
+    // 从projectNavigator获取文件路径，在编辑器打开
     connect(projectNavigator, &ProjectNavigator::sendFilePath, this, &MainWindow::receiveFilePath);
 }
 
@@ -129,7 +130,11 @@ void MainWindow::onCutTriggered()
 {
     Editor *m_editor  = (Editor*) tabWidget->currentWidget();
     if (m_editor) {
-        m_editor->cut();
+        if (m_editor->isReadOnly()) {
+            QMessageBox::warning(this, "警告", "该文件处于只读模式");
+        } else{
+            m_editor->cut();
+        }
     }
 }
 
@@ -145,7 +150,11 @@ void MainWindow::onPasteTriggered()
 {
     Editor *m_editor  = (Editor*) tabWidget->currentWidget();
     if (m_editor) {
-        m_editor->paste();
+        if (m_editor->isReadOnly()) {
+            QMessageBox::warning(this, "警告", "该文件处于只读模式");
+        } else{
+            m_editor->paste();
+        }
     }
 }
 
@@ -153,7 +162,11 @@ void MainWindow::onUndoTriggered()
 {
     Editor *m_editor  = (Editor*) tabWidget->currentWidget();
     if (m_editor) {
-        m_editor->undo();
+        if (m_editor->isReadOnly()) {
+            QMessageBox::warning(this, "警告", "该文件处于只读模式");
+        } else{
+            m_editor->undo();
+        }
     }
 }
 
@@ -161,7 +174,11 @@ void MainWindow::onRedoTriggered()
 {
     Editor *m_editor  = (Editor*) tabWidget->currentWidget();
     if (m_editor) {
-        m_editor->redo();
+        if (m_editor->isReadOnly()) {
+            QMessageBox::warning(this, "警告", "该文件处于只读模式");
+        } else{
+            m_editor->redo();
+        }
     }
 }
 

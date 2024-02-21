@@ -11,9 +11,13 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QDir>
+#include <QTextStream>
+#include <QTableWidget>
+#include <QHeaderView>
 #include <QListWidget>
 #include <QMessageBox>
 #include <QDialogButtonBox>
+#include <QTimer>
 #include <QDebug>
 
 class ProjectWizard : public QWizard
@@ -31,6 +35,8 @@ signals:
 public:
     QStringList sourcesFilesList;
     QStringList constrainsFilesList;
+    QString device;
+    QString package;
 };
 
 class ProjectNamePage : public QWizardPage
@@ -74,6 +80,20 @@ private slots:
 
 signals:
     void filesListUpdated(const QStringList &files);
+};
+
+class DefaultPartPage :  public QWizardPage
+{
+    Q_OBJECT
+public:
+    DefaultPartPage(QWidget *parent = nullptr);
+
+private:
+    QTableWidget *tableWidget;
+
+private slots:
+    void selectPart(int row, int column);
+
 };
 
 #endif // PROJECTWIZARD_H

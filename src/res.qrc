@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>resource/keywords.txt</file>
         <file>resource/JetBrainsMonoNL-Bold.ttf</file>
+        <file>resource/parts.yaml</file>
     </qresource>
 </RCC>

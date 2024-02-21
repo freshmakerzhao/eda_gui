@@ -2,12 +2,14 @@
 
 ProjectWizard::ProjectWizard(QWidget *parent) : QWizard(parent)
 {
+    setWizardStyle(QWizard::ModernStyle);
     addPage(new ProjectNamePage);
     addPage(new AddSourcesPage);
     addPage(new AddConstrainsPage);
+    addPage(new DefaultPartPage);
     connect(this, &QWizard::accepted, this, &ProjectWizard::onFinish);
 
-    resize(800, 600);
+    resize(900, 600);
 
     setAttribute(Qt::WA_DeleteOnClose);
 }
@@ -42,6 +44,8 @@ void ProjectWizard::onFinish()
     {
         QFile::copy(file, projectPath + "/" + projectName + "/constrains/" + QFileInfo(file).fileName());
     }
+
+    qDebug() << "Device: " << device << ", Package: " << package; // 输出到控制台
 
     emit wizardAccepted(projectPath + '/' + projectName);
 }
@@ -91,16 +95,18 @@ AddSourcesPage::AddSourcesPage(QWidget *parent) : QWizardPage(parent)
     // 将文件列表注册为QStringList以便与QWizard的字段交互
     registerField("addsourcesFilesList", filesListWidget, "selectedItems", SIGNAL(itemSelectionChanged()));
 
-    QPushButton *addFilesButton = new QPushButton("Add Files");
+    QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &AddSourcesPage::onAddFiles);
 
-    QPushButton *removeButton = new QPushButton("Remove Files");
+    QPushButton *removeButton = new QPushButton("Remove Files");removeButton->setFixedSize(160, 45);
     connect(removeButton, &QPushButton::clicked, this, &AddSourcesPage::onRemoveFiles);
 
-    QGridLayout *layout = new QGridLayout;
+    QVBoxLayout *layout = new QVBoxLayout;
+    QHBoxLayout *layout1 = new QHBoxLayout;
     layout->addWidget(filesListWidget);
-    layout->addWidget(addFilesButton);
-    layout->addWidget(removeButton);
+    layout1->addWidget(addFilesButton);
+    layout1->addWidget(removeButton);
+    layout->addLayout(layout1);
     setLayout(layout);
 }
 
@@ -150,16 +156,18 @@ AddConstrainsPage::AddConstrainsPage(QWidget *parent) : QWizardPage(parent)
     // 将文件列表注册为QStringList以便与QWizard的字段交互
     registerField("addconstrainsFilesList", filesListWidget, "selectedItems", SIGNAL(itemSelectionChanged()));
 
-    QPushButton *addFilesButton = new QPushButton("Add Files");
+    QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &AddConstrainsPage::onAddFiles);
 
-    QPushButton *removeButton = new QPushButton("Remove Files");
+    QPushButton *removeButton = new QPushButton("Remove Files");removeButton->setFixedSize(160, 45);
     connect(removeButton, &QPushButton::clicked, this, &AddConstrainsPage::onRemoveFiles);
 
-    QGridLayout *layout = new QGridLayout;
+    QVBoxLayout *layout = new QVBoxLayout;
+    QHBoxLayout *layout1 = new QHBoxLayout;
     layout->addWidget(filesListWidget);
-    layout->addWidget(addFilesButton);
-    layout->addWidget(removeButton);
+    layout1->addWidget(addFilesButton);
+    layout1->addWidget(removeButton);
+    layout->addLayout(layout1);
     setLayout(layout);
 }
 
@@ -193,4 +201,76 @@ void AddConstrainsPage::onRemoveFiles()
 void AddConstrainsPage::updateFilesList(const QStringList &files)
 {
     filesListWidget->addItems(files);
+}
+
+DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
+{
+    setTitle("Default Part");
+    setSubTitle("Choose a default part for your project.");
+
+    // 读取parts.yaml文件
+    QFile file(":/resource/parts.yaml");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "parts.yaml load fail";
+    }
+
+    QTextStream in(&file);
+    QStringList lines;
+    while (!in.atEnd()) {
+        lines.append(in.readLine());
+    }
+    file.close();
+
+    tableWidget = new QTableWidget(this);
+    tableWidget->setColumnCount(4);
+    QStringList headers = {"part", "device", "package", "speedgrade"};
+    tableWidget->setHorizontalHeaderLabels(headers);
+
+    // 解析文件内容并添加到QTableWidget
+    int row = 0;
+    for (int i = 0; i < lines.size(); ++i) {
+        QString line = lines.at(i);
+        if (line.startsWith("xc7")) {
+            QString part = line.section(':', 0, 0).trimmed();
+            tableWidget->insertRow(row);
+            tableWidget->setItem(row, 0, new QTableWidgetItem(part));
+
+            for (int j = i + 1; j < lines.size(); ++j) {
+                QString nextLine = lines.at(j);
+                if (nextLine.startsWith("  device:")) {
+                    QString device = nextLine.section(':', 1).trimmed();
+                    tableWidget->setItem(row, 1, new QTableWidgetItem(device));
+                } else if (nextLine.startsWith("  package:")) {
+                    QString package = nextLine.section(':', 1).trimmed();
+                    tableWidget->setItem(row, 2, new QTableWidgetItem(package));
+                } else if (nextLine.startsWith("  speedgrade:")) {
+                    QString speedgrade = nextLine.section(':', 1).trimmed();
+                    tableWidget->setItem(row, 3, new QTableWidgetItem(speedgrade));
+                    break;
+                }
+            }
+            row++;
+        }
+    }
+
+    // 设置第一列宽度自适应
+    tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    // 将同一行标记为选中状态
+    tableWidget->setSelectionBehavior ( QAbstractItemView::SelectRows); //设置选择行为，以行为单位
+    tableWidget->setSelectionMode ( QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+
+    QObject::connect(tableWidget, &QTableWidget::cellClicked, this, DefaultPartPage::selectPart);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(tableWidget);
+}
+
+void DefaultPartPage::selectPart(int row, int column) {
+    QTableWidgetItem* deviceItem = tableWidget->item(row, 0); // 获取选中行的device
+    QTableWidgetItem* packageItem = tableWidget->item(row, 1); // 获取选中行的package
+    if (deviceItem && packageItem) {
+        ProjectWizard* wizard = qobject_cast<ProjectWizard*>(this->wizard());
+        wizard->device = deviceItem->text(); // 将device参数发送给ProjectWizard
+        wizard->package = packageItem->text(); // 将package参数发送给ProjectWizard
+    }
 }

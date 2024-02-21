@@ -43,8 +43,8 @@ private slots:
     void onTabWidgetTabCloseRequested(int index);
 
 private:
-    void createEditorTab(const QString& path);
-    void refreshActionState();
+    void createEditorTab(const QString& path); // 创建编辑器Tab
+    void refreshActionState();                 // 更新编辑器按钮状态
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
