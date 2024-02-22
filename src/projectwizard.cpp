@@ -221,56 +221,56 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     }
     file.close();
 
-    tableWidget = new QTableWidget(this);
-    tableWidget->setColumnCount(4);
+    tableView = new QTableView(this);
+    QStandardItemModel *model = new QStandardItemModel(0, 4, this);
+    tableView->setModel(model);
     QStringList headers = {"part", "device", "package", "speedgrade"};
-    tableWidget->setHorizontalHeaderLabels(headers);
+    model->setHorizontalHeaderLabels(headers);
 
-    // 解析文件内容并添加到QTableWidget
     int row = 0;
     for (int i = 0; i < lines.size(); ++i) {
         QString line = lines.at(i);
         if (line.startsWith("xc7")) {
             QString part = line.section(':', 0, 0).trimmed();
-            tableWidget->insertRow(row);
-            tableWidget->setItem(row, 0, new QTableWidgetItem(part));
+            model->setItem(row, 0, new QStandardItem(part));
 
             for (int j = i + 1; j < lines.size(); ++j) {
                 QString nextLine = lines.at(j);
                 if (nextLine.startsWith("  device:")) {
                     QString device = nextLine.section(':', 1).trimmed();
-                    tableWidget->setItem(row, 1, new QTableWidgetItem(device));
+                    model->setItem(row, 1, new QStandardItem(device));
                 } else if (nextLine.startsWith("  package:")) {
                     QString package = nextLine.section(':', 1).trimmed();
-                    tableWidget->setItem(row, 2, new QTableWidgetItem(package));
+                    model->setItem(row, 2, new QStandardItem(package));
                 } else if (nextLine.startsWith("  speedgrade:")) {
                     QString speedgrade = nextLine.section(':', 1).trimmed();
-                    tableWidget->setItem(row, 3, new QTableWidgetItem(speedgrade));
+                    model->setItem(row, 3, new QStandardItem(speedgrade));
                     break;
                 }
             }
             row++;
         }
     }
-
-    // 设置第一列宽度自适应
-    tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    // 设置整个表格为只读
+    tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // 设置宽度自适应
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     // 将同一行标记为选中状态
-    tableWidget->setSelectionBehavior ( QAbstractItemView::SelectRows); //设置选择行为，以行为单位
-    tableWidget->setSelectionMode ( QAbstractItemView::SingleSelection); //设置选择模式，选择单行
-
-    QObject::connect(tableWidget, &QTableWidget::cellClicked, this, DefaultPartPage::selectPart);
-
+    tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
+    tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+    QObject::connect(tableView, &QTableView::clicked, this, &DefaultPartPage::selectPart);
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(tableWidget);
+    layout->addWidget(tableView);
 }
 
-void DefaultPartPage::selectPart(int row, int column) {
-    QTableWidgetItem* deviceItem = tableWidget->item(row, 0); // 获取选中行的device
-    QTableWidgetItem* packageItem = tableWidget->item(row, 1); // 获取选中行的package
+void DefaultPartPage::selectPart(const QModelIndex &index) {
+    QStandardItemModel *model = qobject_cast<QStandardItemModel*>(tableView->model());
+    QStandardItem *deviceItem = model->item(index.row(), 1); // 获取选中行的device
+    QStandardItem *packageItem = model->item(index.row(), 2); // 获取选中行的package
     if (deviceItem && packageItem) {
-        ProjectWizard* wizard = qobject_cast<ProjectWizard*>(this->wizard());
+        ProjectWizard *wizard = qobject_cast<ProjectWizard*>(this->wizard());
         wizard->device = deviceItem->text(); // 将device参数发送给ProjectWizard
         wizard->package = packageItem->text(); // 将package参数发送给ProjectWizard
     }
 }
+

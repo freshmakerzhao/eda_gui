@@ -12,7 +12,8 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
-#include <QTableWidget>
+#include <QTableView>
+#include <QStandardItemModel>
 #include <QHeaderView>
 #include <QListWidget>
 #include <QMessageBox>
@@ -89,10 +90,10 @@ public:
     DefaultPartPage(QWidget *parent = nullptr);
 
 private:
-    QTableWidget *tableWidget;
+    QTableView *tableView;
 
 private slots:
-    void selectPart(int row, int column);
+    void selectPart(const QModelIndex &index);
 
 };
 
