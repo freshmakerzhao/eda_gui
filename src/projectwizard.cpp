@@ -2,6 +2,8 @@
 
 ProjectWizard::ProjectWizard(QWidget *parent) : QWizard(parent)
 {
+    qDebug() << "[Project Wizard] Constructing...";
+    setWindowTitle("Wizard");
     setWizardStyle(QWizard::ModernStyle);
     addPage(new ProjectNamePage);
     addPage(new AddSourcesPage);
@@ -12,6 +14,11 @@ ProjectWizard::ProjectWizard(QWidget *parent) : QWizard(parent)
     resize(900, 600);
 
     setAttribute(Qt::WA_DeleteOnClose);
+}
+
+ProjectWizard::~ProjectWizard()
+{
+    qDebug() << "[Project Wizard] Distructing...";
 }
 
 void ProjectWizard::onFinish()
@@ -112,7 +119,7 @@ AddSourcesPage::AddSourcesPage(QWidget *parent) : QWizardPage(parent)
 
 void AddSourcesPage::onAddFiles()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.v)");
     if (!files.isEmpty())
     {
         ProjectWizard* wizard = qobject_cast<ProjectWizard*>(this->wizard());
@@ -173,7 +180,7 @@ AddConstrainsPage::AddConstrainsPage(QWidget *parent) : QWizardPage(parent)
 
 void AddConstrainsPage::onAddFiles()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.xdc)");
     if (!files.isEmpty())
     {
         ProjectWizard* wizard = qobject_cast<ProjectWizard*>(this->wizard());

@@ -1,11 +1,14 @@
 #include "editor.h"
+#include "mainwindow.h"
 
 
 Editor::Editor(QWidget *parent)
     : QsciScintilla(parent)
 {
-    // textChanged
-    connect(this, &QsciScintilla::textChanged, this, &Editor::refreshSaveState);
+    qDebug() << "[Editor] Constructing...";
+
+    // updateActionState
+    connect(this, &QsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
 
     this->setCaretWidth(10); // 光标宽度
 
@@ -23,13 +26,13 @@ Editor::Editor(QWidget *parent)
     this->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     this->setMarginWidth(2, 20);
     // 设置折叠提示按钮
-    this->setMarginMarkerMask(1, QsciScintilla::SC_MASK_FOLDERS);
-    this->setMarginType(1, QsciScintilla::SymbolMargin);
-    this->setMarginSensitivity(1, true);
-    this->setMarginWidth(1, 20);
-    this->setMarginMarkerMask(1, 0x00200000);
+    // this->setMarginMarkerMask(1, QsciScintilla::SC_MASK_FOLDERS);
+    // this->setMarginType(1, QsciScintilla::SymbolMargin);
+    // this->setMarginSensitivity(1, true);
+    // this->setMarginWidth(1, 20);
+    // this->setMarginMarkerMask(1, 0x00200000);
     // 创建词法分析器
-    textLexer = new QsciLexerVerilog;
+    textLexer = new QsciLexerVerilog(this);
     textLexer->setFont(font);
     apis = new QsciAPIs(textLexer);
 
@@ -66,21 +69,27 @@ Editor::Editor(QWidget *parent)
 
 Editor::~Editor()
 {
-
+    qDebug() << "[Editor] Distructing...";
+    delete apis;
 }
 
-// void Editor::openFile(QString path)
-// {
-//     m_path = path;
-//     QFile file(path);
-//     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-//         QTextStream in(&file);
-//         this->setText(in.readAll());
-//         file.close();
-//     }
-
-//     initSaveState();
-// }
+bool Editor::openFile(QString path)
+{
+    m_path = path;
+    QFile file(path);
+    if (!QFileInfo(file).isFile()) {
+        return false;
+    }
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Warning", "Cannot open file:\n" + file.errorString());
+        return false;
+    }
+    QTextStream in(&file);
+    this->setText(in.readAll());
+    file.close();
+    this->setModified(false);
+    return true;
+}
 
 bool Editor::saveFile()
 {
@@ -91,6 +100,7 @@ bool Editor::saveFile()
             QTextStream out(&file);
             out << this->text();
             file.close();
+            this->setModified(false);
             return true;
         }
     }
@@ -98,19 +108,26 @@ bool Editor::saveFile()
     return false;
 }
 
+bool Editor::saveAsFile()
+{
+    QString path = QFileDialog::getSaveFileName(this, "另存文件");
+    QFile file(path);
+    // 处理另存为文件异常
+    if (!file.open(QIODevice::WriteOnly | QFile::Text)) {
+        QMessageBox::warning(this, "Warning", "Cannot write file:\n" + file.errorString());
+        return false;
+    }
+    m_path = path;
+    QTextStream out(&file);
+    out << this->text();
+    file.close();
+    this->setModified(false);
+    return true;
+}
+
 void Editor::setFilePath(QString path)
 {
     m_path = path;
-}
-
-bool Editor::checkSaved()
-{
-    return isSaved;
-}
-
-void Editor::initSaveState()
-{
-    isSaved = true;
 }
 
 void Editor::contextMenuEvent(QContextMenuEvent *event)
@@ -122,13 +139,11 @@ void Editor::contextMenuEvent(QContextMenuEvent *event)
     connect(readOnlyAction, &QAction::triggered, this, [this, readOnlyAction](){
         setReadOnly(!isReadOnly());
         readOnlyAction->setChecked(isReadOnly()); // 设置按钮的选中状态
+        // pMainWindow->updateActionState();
+        MainWindow::instance()->updateActionState();
     });
     menu->addAction(readOnlyAction);
     menu->exec(event->globalPos());
     delete menu;
 }
 
-void Editor::refreshSaveState()
-{
-    isSaved = false;
-}

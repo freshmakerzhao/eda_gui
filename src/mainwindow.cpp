@@ -2,15 +2,29 @@
 
 #include "editor.h"
 #include "projectwizard.h"
+#include "projectnavigator.h"
+#include "taskview.h"
+#include "infowidget.h"
+#include "processmanager.h"
+
+// MainWindow *pMainWindow;
+MainWindow *MainWindow::instance()
+{
+    static MainWindow *m_instance = nullptr;
+    if (!m_instance) {
+        m_instance = new MainWindow;
+    }
+    return m_instance;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     qDebug() << "[Main Window] Constructing...";
+    setAttribute(Qt::WA_DeleteOnClose);
     this->resize(1600, 900);
 
-    menuBar = new QMenuBar(this);
-    this->setMenuBar(menuBar);
+    menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
     fileMenu = menuBar->addMenu("File");
     editMenu = menuBar->addMenu("Edit");
 
@@ -18,20 +32,22 @@ MainWindow::MainWindow(QWidget *parent)
     openAction = new QAction("Open", this);
     openProjectAction = new QAction("Open Project", this);
     saveAction = new QAction("Save", this);
-    fileMenu->addActions({newAction, openAction, openProjectAction, saveAction});
+    saveasAction = new QAction("Save As", this);
+    fileMenu->addActions({newAction, openAction, openProjectAction}), fileMenu->addSeparator();
+    fileMenu->addActions({saveAction, saveasAction});
 
     connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
     connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
     connect(openProjectAction, &QAction::triggered, this, &MainWindow::onOpenProjectTriggered);
     connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
+    connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
 
     cutAction = new QAction("Cut", this);
     copyAction = new QAction("Copy", this);
     pasteAction = new QAction("Paste", this);
-    undoAction = new QAction("Undo", this);
-    redoAction = new QAction("Redo", this);
-    editMenu->addActions({cutAction, copyAction, pasteAction, undoAction, redoAction});
-
+    undoAction = new QAction("Undo", this), redoAction = new QAction("Redo", this);
+    editMenu->addActions({cutAction, copyAction, pasteAction}), editMenu->addSeparator();
+    editMenu->addActions({undoAction, redoAction});
     // 编辑器按钮绑定
     connect(cutAction, &QAction::triggered, this, &MainWindow::onCutTriggered);
     connect(copyAction, &QAction::triggered, this, &MainWindow::onCopyTriggered);
@@ -43,35 +59,35 @@ MainWindow::MainWindow(QWidget *parent)
     connect(chipPlannerAction, &QAction::triggered, this, &MainWindow::onChipPlannerTriggered);
 
     toolbar = new QToolBar("Tools", this);
-    toolbar->addActions({newAction, openAction, saveAction, cutAction, copyAction, pasteAction, undoAction, redoAction, chipPlannerAction});
+    toolbar->addActions({newAction, openAction, saveAction}), toolbar->addSeparator();
+    toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
+    toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
+    toolbar->addActions({chipPlannerAction});
     addToolBar(toolbar);
 
     tabWidget = new QTabWidget(this);
-    tabWidget->setTabsClosable(true);
+    connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabWidgetCurrentChanged);
+    tabWidget->setMovable(true), tabWidget->setTabsClosable(true);
     connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested); // 关闭编辑器
     this->setCentralWidget(tabWidget);
-    refreshActionState();
+    updateActionState();
 
-    projectNavigator = new ProjectNavigator(this);
+    // projectNavigator = new ProjectNavigator(this);
     QDockWidget *leftDock1 = new QDockWidget(this);
-    leftDock1->setWindowTitle("Project Navigator");
-    leftDock1->setWidget(projectNavigator);
+    leftDock1->setWindowTitle("Project Navigator"), leftDock1->setWidget(ProjectNavigator::instance());
     addDockWidget(Qt::LeftDockWidgetArea, leftDock1);
 
-    taskView = new TaskView(this);
     QDockWidget *leftDock2 = new QDockWidget(this);
-    leftDock2->setWindowTitle("Tasks");
-    leftDock2->setWidget(taskView);
+    leftDock2->setWindowTitle("Tasks"), leftDock2->setWidget(TaskView::instance(this));
     addDockWidget(Qt::LeftDockWidgetArea, leftDock2);
 
-    infoWidget = new InfoWidget(this);
     QDockWidget *bottomDock = new QDockWidget(this);
-    bottomDock->setWindowTitle("Information");
-    bottomDock->setWidget(infoWidget);
+    bottomDock->setWindowTitle("Information"), bottomDock->setWidget(InfoWidget::instance());
     addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
     // 从projectNavigator获取文件路径，在编辑器打开
-    connect(projectNavigator, &ProjectNavigator::sendFilePath, this, &MainWindow::receiveFilePath);
+    // connect(ProjectNavigator::instance(), &ProjectNavigator::sendFilePath, this, &MainWindow::receiveFilePath);
+
 }
 
 MainWindow::~MainWindow()
@@ -79,136 +95,16 @@ MainWindow::~MainWindow()
     qDebug() << "[Main Window] Distructing...";
 }
 
-void MainWindow::receiveFilePath(const QString &path)
+void MainWindow::updateActionState()
 {
-    qDebug() << path;
-    createEditorTab(path);
-    refreshActionState();
-}
-
-void MainWindow::onNewTriggered()
-{
-    ProjectWizard *projectWizard = new ProjectWizard(this);
-    projectWizard->show();
-    connect(projectWizard, &ProjectWizard::wizardAccepted, projectNavigator, &ProjectNavigator::refreshItems);
-}
-
-void MainWindow::onOpenTriggered()
-{
-    QString path = QFileDialog::getOpenFileName(this, "Open File");
-    createEditorTab(path);
-    refreshActionState();
-}
-
-void MainWindow::onOpenProjectTriggered()
-{
-    QString folder = QFileDialog::getExistingDirectory(this, "Select Folder", QDir::homePath());
-    if(folder.isEmpty()) {// 取消打开文件夹
-        return;
-    }
-    // qDebug() << folder;
-
-    projectNavigator->refreshItems(folder);
-
-}
-
-void MainWindow::onSaveTriggered()
-{
-    Editor *m_editor = (Editor*) tabWidget->currentWidget();
-
-    if(m_editor) {
-        if(m_editor->saveFile()) {
-            qDebug() << "Save Success";
-            // TODO
-        }
-    }
-
-    refreshActionState();
-}
-
-void MainWindow::onCutTriggered()
-{
-    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
-    if (m_editor) {
-        if (m_editor->isReadOnly()) {
-            QMessageBox::warning(this, "警告", "该文件处于只读模式");
-        } else{
-            m_editor->cut();
-        }
-    }
-}
-
-void MainWindow::onCopyTriggered()
-{
-    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
-    if (m_editor) {
-        m_editor->copy();
-    }
-}
-
-void MainWindow::onPasteTriggered()
-{
-    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
-    if (m_editor) {
-        if (m_editor->isReadOnly()) {
-            QMessageBox::warning(this, "警告", "该文件处于只读模式");
-        } else{
-            m_editor->paste();
-        }
-    }
-}
-
-void MainWindow::onUndoTriggered()
-{
-    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
-    if (m_editor) {
-        if (m_editor->isReadOnly()) {
-            QMessageBox::warning(this, "警告", "该文件处于只读模式");
-        } else{
-            m_editor->undo();
-        }
-    }
-}
-
-void MainWindow::onRedoTriggered()
-{
-    Editor *m_editor  = (Editor*) tabWidget->currentWidget();
-    if (m_editor) {
-        if (m_editor->isReadOnly()) {
-            QMessageBox::warning(this, "警告", "该文件处于只读模式");
-        } else{
-            m_editor->redo();
-        }
-    }
-}
-
-void MainWindow::onChipPlannerTriggered()
-{
-    chipPlanner.show();
-}
-
-void MainWindow::onTabWidgetTabCloseRequested(int index)
-{
-    // qDebug() << "Tab index " << index;
-    Editor *m_editor = qobject_cast<Editor*>(tabWidget->widget(index));
-    if(!m_editor->checkSaved()) {
-        QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "文件未保存！是否保存？",
-                                                                QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-        if (btn == QMessageBox::Yes) {
-            if(m_editor->saveFile()) {
-                qDebug() << "Save Success";
-                // TODO
-            }
-
-        } else if (btn == QMessageBox::Cancel) {
-            // 对话框的关闭按钮是与QMessageBox::question里面最后一个值绑定的
-            return;
-        }
-    }
-    tabWidget->removeTab(index);
-    delete m_editor;
-
-    refreshActionState();
+    Editor *editor = (Editor*) tabWidget->currentWidget();
+    saveAction->setEnabled(editor != nullptr);
+    saveasAction->setEnabled(editor != nullptr);
+    cutAction->setEnabled(editor != nullptr && !editor->isReadOnly());
+    copyAction->setEnabled(editor != nullptr);
+    pasteAction->setEnabled(editor != nullptr && !editor->isReadOnly());
+    undoAction->setEnabled(editor != nullptr && editor->isUndoAvailable());
+    redoAction->setEnabled(editor != nullptr && editor->isRedoAvailable());
 }
 
 void MainWindow::createEditorTab(const QString& path)
@@ -217,43 +113,216 @@ void MainWindow::createEditorTab(const QString& path)
         return;
     }
 
-    QFile file(path); // 打开文件
-    if(!file.open(QIODevice::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, "警告", "无法打开此文件，报错信息：\n" + file.errorString());
-        return;
-    }
-
-    for(int i = 0; i < tabWidget->count(); ++i) {
+    for (int i = 0; i < tabWidget->count(); ++i) { // 不重复打开文件
         if(tabWidget->widget(i)->property("filePath").toString() == path) {
             tabWidget->setCurrentIndex(i);
             return;
         }
     }
 
-    QTextStream in(&file);
-    QString text = in.readAll();
-
-    Editor *m_editor = new Editor(this); // 创建对象
-    m_editor->setText(text);// 放置文本
-    m_editor->setFilePath(path); // 设置文件路径
-    m_editor->initSaveState(); // 初始化保存状态
-    m_editor->setProperty("filePath", path);
-    tabWidget->addTab(m_editor, QFileInfo(path).fileName()); // 添加tab
+    Editor *editor = new Editor(this); // 创建对象
+    editor->setProperty("filePath", path);
+    if (!editor->openFile(path)) {
+        delete editor;
+        return;
+    }
+    tabWidget->addTab(editor, QFileInfo(path).fileName()); // 添加tab
     tabWidget->setCurrentIndex(tabWidget->count() - 1); // 设置当前文件的索引
 
-    file.close();
-
-    refreshActionState();
+    updateActionState();
 }
 
-void MainWindow::refreshActionState()
-{
-    bool state = tabWidget->count() > 0;
-    saveAction->setEnabled(state);
-    cutAction->setEnabled(state);
-    copyAction->setEnabled(state);
-    pasteAction->setEnabled(state);
-    undoAction->setEnabled(state);
-    redoAction->setEnabled(state);
+// void MainWindow::receiveFilePath(const QString &path)
+// {
+//     // qDebug() << path;
+//     createEditorTab(path);
+//     updateActionState();
+// }
 
+void MainWindow::onNewTriggered()
+{
+    ProjectWizard *projectWizard = new ProjectWizard(this);
+    projectWizard->show();
+    connect(projectWizard, &ProjectWizard::wizardAccepted, ProjectNavigator::instance(), &ProjectNavigator::updateItems);
+}
+
+void MainWindow::onOpenTriggered()
+{
+    QString path = QFileDialog::getOpenFileName(this, "Open File");
+    createEditorTab(path);
+    // updateActionState();
+}
+
+void MainWindow::onOpenProjectTriggered()
+{
+    QString path = QFileDialog::getExistingDirectory(this, "Open Project", QDir::homePath());
+    if(path.isEmpty()) { // 取消打开文件夹
+        return;
+    }
+
+    ProjectNavigator::instance()->updateItems(path); // 更新项目视图
+
+}
+
+void MainWindow::onSaveTriggered()
+{
+    Editor *editor = (Editor*) tabWidget->currentWidget();
+
+    if(editor) {
+        if(editor->saveFile()) {
+            qDebug() << "Save Success";
+            // TODO
+        }
+    }
+
+    updateActionState();
+}
+
+void MainWindow::onSaveAsTriggered()
+{
+    Editor *editor = (Editor*) tabWidget->currentWidget();
+    if(editor) {
+        if(editor->saveAsFile()) {
+            qDebug() << "Save_As Success";
+            // TODO
+        }
+    }
+}
+
+void MainWindow::onCutTriggered()
+{
+    Editor *editor  = (Editor*) tabWidget->currentWidget();
+    if (editor) {
+        editor->cut();
+    }
+}
+
+void MainWindow::onCopyTriggered()
+{
+    Editor *editor  = (Editor*) tabWidget->currentWidget();
+    if (editor) {
+        editor->copy();
+    }
+}
+
+void MainWindow::onPasteTriggered()
+{
+    Editor *editor  = (Editor*) tabWidget->currentWidget();
+    if (editor) {
+        editor->paste();
+    }
+}
+
+void MainWindow::onUndoTriggered()
+{
+    Editor *editor  = (Editor*) tabWidget->currentWidget();
+    if (editor) {
+        editor->undo();
+    }
+}
+
+void MainWindow::onRedoTriggered()
+{
+    Editor *editor  = (Editor*) tabWidget->currentWidget();
+    if (editor) {
+        editor->redo();
+    }
+}
+
+void MainWindow::onChipPlannerTriggered()
+{
+    chipPlanner.show();
+}
+
+void MainWindow::onTabWidgetCurrentChanged(int index)
+{
+    Q_UNUSED(index);
+    updateActionState();
+}
+
+void MainWindow::onTabWidgetTabCloseRequested(int index)
+{
+    // qDebug() << "Tab index " << index;
+    Editor *editor = qobject_cast<Editor*>(tabWidget->widget(index));
+    if (editor->isModified()) {
+        qDebug() << "File" << index << "has been Modified";
+        QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "The document has been modified.\n"
+                                                                                 "Do you want to save your changes?",
+                                                                QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+        if (btn == QMessageBox::Yes) {
+            if(editor->saveFile()) {
+                qDebug() << "Save Success";
+                // TODO
+            }
+        } else if (btn == QMessageBox::Cancel) {
+            // 对话框的关闭按钮是与QMessageBox::question里面最后一个值绑定的
+            return;
+        }
+    }
+    tabWidget->removeTab(index);
+    delete editor;
+
+    updateActionState();
+}
+
+void MainWindow::streamProcessOutput()
+{
+    QProcess* process = ProcessManager::instance().getProcess();
+    QByteArray output = process->readAllStandardOutput();
+    QByteArray errorOutput = process->readAllStandardError();
+
+    QTextCodec *tc = QTextCodec::codecForName("GBK");
+    QString outputStr = tc->toUnicode(output);
+    QString errorOutputStr = tc->toUnicode(errorOutput);
+    if (process->error() == QProcess::UnknownError) {
+        // 没有错误发生，输出 output
+        // logTextEdit->appendPlainText(outputStr);
+        InfoWidget::instance()->appendMsg(outputStr); // 发送到InfoWidget
+    } else {
+        // 发生错误，输出 errorOutput
+        // logTextEdit->appendPlainText(errorOutputStr);
+        InfoWidget::instance()->appendMsg(errorOutputStr);
+    }
+    QCoreApplication::processEvents(); // 刷新终端
+}
+
+void MainWindow::configOutputSignals(const QString &phase)
+{
+    // 清空已绑定的信号
+    ProcessManager::instance().getProcess()->disconnect();
+    // 合并channel
+    ProcessManager::instance().getProcess()->setProcessChannelMode(QProcess::MergedChannels);
+    // 绑定 readyReadStandardOutput 信号，有输出则显示在窗口中
+    connect(ProcessManager::instance().getProcess(), &QProcess::readyReadStandardOutput, this, &MainWindow::streamProcessOutput);
+    // 绑定 finished 信号，执行结束后触发
+    connect(ProcessManager::instance().getProcess(), QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),[=](int exitCode, QProcess::ExitStatus exitStatus) {
+        qDebug() << exitCode;
+        qDebug() << exitStatus;
+        qDebug() << phase + " over";
+        // 显示信息弹窗
+        // exitCode 为0表示正常执行并成功退出
+        if (exitCode == 0) {
+            QMessageBox::information(nullptr, "提示", phase + " 完成！");
+        } else {
+            QMessageBox::critical(nullptr, "错误", phase + " 执行失败！");
+        }
+    });
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    for (int i = 0; i < tabWidget->count(); ++i) {
+        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
+        if (editor->isModified()) {
+            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
+                                                                                     " are you sure you want to close?",
+                                                                    QMessageBox::Yes | QMessageBox::No);
+            if (btn == QMessageBox::Yes) {
+                event->accept();
+            } else {
+                event->ignore();
+            }
+            break;
+        }
+    }
 }

@@ -14,7 +14,11 @@ public:
     ~ChipPlanner();
 
 private:
+    QMenuBar *menuBar;
+    QMenu *fileMenu;
+    QMenu *editMenu;
 
+    QToolBar *toolbar;
 };
 
 #endif // CHIPPLANNER_H

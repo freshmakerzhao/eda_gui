@@ -13,19 +13,21 @@
 #include <QDir>
 #include <QQueue>
 #include <QPair>
-#include "projectwizard.h"
 
+#include <mainwindow.h>
 
 class ProjectNavigator : public QWidget
 {
     Q_OBJECT
 
 public:
+    static ProjectNavigator *instance(QWidget *parent = nullptr);
+
     explicit ProjectNavigator(QWidget *parent = nullptr);
     ~ProjectNavigator();
 
 public slots:
-    void refreshItems(const QString &path);
+    void updateItems(const QString &path);
 
     void clickedFile(QTreeWidgetItem *item);
 
@@ -39,16 +41,16 @@ public slots:
 
     void deleteFileAction();
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
 private:
     QTreeWidget *treeWidget;
 
     QSet<QString> projectNode;
 
-
-    // QTreeWidgetItem *rootItem;
-
-signals:
-    void sendFilePath(const QString &path);
+// signals:
+//     void sendFilePath(const QString &path);
 
 
 };

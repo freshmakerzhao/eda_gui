@@ -13,7 +13,7 @@
 #include "Qsci/qsciscintilla.h" // QsciScintilla本体
 #include "Qsci/qsciapis.h"      // 自动补全的apis
 #include <qscilexerverilog.h>   // Verilog词法分析器
-#include <qscilexervhdl.h>      // VHDL词法分析器(未启用)
+// #include <qscilexervhdl.h>      // VHDL词法分析器(未启用)
 
 
 class Editor : public QsciScintilla
@@ -24,24 +24,19 @@ public:
     ~Editor();
 
 public:
-    // void openFile(QString path);
+    bool openFile(QString path);
     bool saveFile();
+    bool saveAsFile();
     void setFilePath(QString path);
-    bool checkSaved();
-    void initSaveState(); // 初始化保存状态
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
-private slots:
-    void refreshSaveState();
-
 private:
-    QsciLexer *textLexer;
+    QsciLexerVerilog *textLexer;
     QsciAPIs *apis;
 
     QString m_path;
-    bool isSaved = false;
 };
 
 #endif // EDITOR_H

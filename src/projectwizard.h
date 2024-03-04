@@ -26,6 +26,7 @@ class ProjectWizard : public QWizard
     Q_OBJECT
 public:
     ProjectWizard(QWidget *parent = nullptr);
+    ~ProjectWizard();
 
 private slots:
     void onFinish();

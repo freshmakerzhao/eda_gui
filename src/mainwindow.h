@@ -4,15 +4,13 @@
 #include <QMainWindow>
 #include <QMenuBar>
 
-#include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDockWidget>
+#include <QTextCodec>
+#include <QCoreApplication>
 
-#include "projectnavigator.h"
-#include "taskview.h"
-#include "infowidget.h"
 #include "chipplanner.h"
 
 class MainWindow : public QMainWindow
@@ -20,17 +18,23 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    static MainWindow *instance();
+
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-public slots:
-    void receiveFilePath(const QString &path);
+    void updateActionState();                 // 更新编辑器按钮状态
+    void createEditorTab(const QString& path); // 创建编辑器Tab
+
+// public slots:
+//     void receiveFilePath(const QString &path);
 
 private slots:
     void onNewTriggered();
     void onOpenTriggered();
     void onOpenProjectTriggered();
     void onSaveTriggered();
+    void onSaveAsTriggered();
 
     void onCutTriggered();
     void onCopyTriggered();
@@ -40,11 +44,10 @@ private slots:
 
     void onChipPlannerTriggered();
 
+    void onTabWidgetCurrentChanged(int index);
     void onTabWidgetTabCloseRequested(int index);
 
 private:
-    void createEditorTab(const QString& path); // 创建编辑器Tab
-    void refreshActionState();                 // 更新编辑器按钮状态
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
@@ -54,6 +57,7 @@ private:
     QAction *openAction;
     QAction *openProjectAction;
     QAction *saveAction;
+    QAction *saveasAction;
     QAction *cutAction;
     QAction *copyAction;
     QAction *pasteAction;
@@ -65,9 +69,18 @@ private:
     QToolBar *toolbar;
     QTabWidget *tabWidget;
 
-    TaskView *taskView;
-    ProjectNavigator *projectNavigator;
-    InfoWidget *infoWidget;
     ChipPlanner chipPlanner;
+
+    void streamProcessOutput();
+
+    // 配置输出和完成信号槽
+    void configOutputSignals(const QString &phase);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 };
+
+// extern MainWindow *pMainWindow;
+
 #endif // MAINWINDOW_H

@@ -4,12 +4,12 @@ ChipPlanner::ChipPlanner(QWidget *parent)
     : QMainWindow(parent)
 {
     this->resize(1280, 720);
-    QMenuBar *menuBar = new QMenuBar(this);
+    menuBar = new QMenuBar(this);
     this->setMenuBar(menuBar);
-    QMenu *fileMenu = menuBar->addMenu("File");
-    QMenu *editMenu = menuBar->addMenu("Edit");
+    fileMenu = menuBar->addMenu("File");
+    editMenu = menuBar->addMenu("Edit");
 
-    QToolBar *toolbar = new QToolBar("ToolBar", this);
+    toolbar = new QToolBar("ToolBar", this);
     toolbar->setOrientation(Qt::Vertical);
     addToolBar(Qt::LeftToolBarArea, toolbar);
     QAction *a1 = new QAction("A1", this);

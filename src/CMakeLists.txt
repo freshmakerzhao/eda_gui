@@ -34,6 +34,7 @@ set(PROJECT_SOURCES
     projectnavigator.cpp
     projectwizard.cpp
     taskview.cpp
+    processmanager.cpp
 )
 
 # Add header files
@@ -45,6 +46,7 @@ set(PROJECT_HEADERS
     projectnavigator.h
     projectwizard.h
     taskview.h
+    processmanager.h
     ./Qsci/qsciscintilla.h
     ./Qsci/qsciscintillabase.h
     ./Qsci/qscilexercpp.h

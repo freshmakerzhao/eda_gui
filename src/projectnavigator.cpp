@@ -1,9 +1,20 @@
 #include "projectnavigator.h"
 
+ProjectNavigator *ProjectNavigator::instance(QWidget *parent)
+{
+    static ProjectNavigator *m_instance = nullptr;
+    if (!m_instance) {
+        m_instance = new ProjectNavigator(parent);
+    }
+    return m_instance;
+}
+
 ProjectNavigator::ProjectNavigator(QWidget *parent)
     : QWidget(parent)
 {
+    qDebug() << "[ProjectNavigator] Constructing...";
     treeWidget = new QTreeWidget(this);
+    treeWidget->viewport()->installEventFilter(this);
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(treeWidget);
     layout->setMargin(0);
@@ -23,10 +34,10 @@ ProjectNavigator::ProjectNavigator(QWidget *parent)
 
 ProjectNavigator::~ProjectNavigator()
 {
-
+    qDebug() << "[ProjectNavigator] Distructing...";
 }
 
-void ProjectNavigator::refreshItems(const QString &path)
+void ProjectNavigator::updateItems(const QString &path)
 {
     // 检查路径是否在projectNode集合中
     if (!projectNode.contains(path)) {
@@ -35,17 +46,15 @@ void ProjectNavigator::refreshItems(const QString &path)
     }
 
     // 刷新ui->treeWidget
-    if (treeWidget->topLevelItemCount() > 0) {
-        for (int i = 0; i < treeWidget->topLevelItemCount(); ++i) {
-            QTreeWidgetItem* item = treeWidget->topLevelItem(i);
-            delete item; // 清空树形控件中的项目
-        }
+    while (treeWidget->topLevelItemCount() > 0) {
+        QTreeWidgetItem* item = treeWidget->takeTopLevelItem(treeWidget->topLevelItemCount() - 1);
+        // qDebug() << "idx:" << treeWidget->topLevelItemCount();
+        delete item; // 清空树形控件中的项目
     }
-
 
     for(auto it = projectNode.begin(); it != projectNode.end(); ++it) {
         QString element = *it;
-        // qDebug() << element;
+        // qDebug() << "node:" <<element;
 
         QTreeWidgetItem *topLevelItem = new QTreeWidgetItem(treeWidget);
         topLevelItem->setText(0, QFileInfo(element).fileName());
@@ -76,11 +85,11 @@ void ProjectNavigator::refreshItems(const QString &path)
 void ProjectNavigator::clickedFile(QTreeWidgetItem *item)
 {
     QString path = item->data(0, Qt::UserRole).toString();
-    QFile file(path);
-    if(QFileInfo(file).isFile()) {
-        emit sendFilePath(path);
-    }
-
+    MainWindow::instance()->createEditorTab(path);
+    // QFile file(path);
+    // if(QFileInfo(file).isFile()) {
+    //     // emit sendFilePath(path);
+    // }
 }
 
 void ProjectNavigator::showContextMenu(const QPoint &pos) {
@@ -128,7 +137,7 @@ void ProjectNavigator::addSourcesAction()
             QFile::copy(file, addSourcesPath + QFileInfo(file).fileName());
         }
     }
-    refreshItems(path);
+    updateItems(path);
 }
 
 void ProjectNavigator::addConstraintsAction()
@@ -142,7 +151,7 @@ void ProjectNavigator::addConstraintsAction()
             QFile::copy(file, constrainsPath + QFileInfo(file).fileName());
         }
     }
-    refreshItems(path);
+    updateItems(path);
 }
 
 void ProjectNavigator::deleteFileAction()
@@ -151,6 +160,27 @@ void ProjectNavigator::deleteFileAction()
     file.remove();
     delete treeWidget->currentItem();
     treeWidget->expandAll();
+}
+
+bool ProjectNavigator::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == treeWidget->viewport())
+    {
+        //点击树的空白,取消选中
+        if (event->type() == QEvent::MouseButtonPress)
+        {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if (mouseEvent->buttons() & Qt::LeftButton)
+            {
+                QModelIndex index = treeWidget->indexAt(mouseEvent->pos());
+                if (!index.isValid())
+                {
+                    treeWidget->setCurrentIndex(QModelIndex());
+                }
+            }
+        }
+    }
+    return QObject::eventFilter(obj, event);
 }
 
 
