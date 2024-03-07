@@ -17,6 +17,8 @@ InfoWidget::InfoWidget(QWidget *parent)
     QGridLayout *layout = new QGridLayout(this);
     layout->setMargin(0);
     layout->addWidget(tabWidget);
+    csl = new QPlainTextEdit(this);
+    tabWidget->addTab(csl, "Tcl Console");
     msg = new QPlainTextEdit(this), msg->setReadOnly(true);
     tabWidget->addTab(msg, "Messages");
     log = new QPlainTextEdit(this), log->setReadOnly(true);

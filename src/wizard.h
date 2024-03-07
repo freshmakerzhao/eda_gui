@@ -1,5 +1,5 @@
-#ifndef PROJECTWIZARD_H
-#define PROJECTWIZARD_H
+#ifndef WIZARD_H
+#define WIZARD_H
 
 #include <QWizard>
 #include <QWizardPage>
@@ -21,24 +21,25 @@
 #include <QTimer>
 #include <QDebug>
 
-class ProjectWizard : public QWizard
+#include "project.h"
+
+class Wizard : public QWizard
 {
     Q_OBJECT
 public:
-    ProjectWizard(QWidget *parent = nullptr);
-    ~ProjectWizard();
+    Wizard(QWidget *parent = nullptr);
+    ~Wizard();
 
 private slots:
     void onFinish();
 
-signals:
-    void wizardAccepted(const QString &path);
-
 public:
     QStringList sourcesFilesList;
     QStringList constrainsFilesList;
-    QString device;
-    QString package;
+    QString part;
+
+private:
+    Project *project;
 };
 
 class ProjectNamePage : public QWizardPage
@@ -63,7 +64,7 @@ private slots:
     void updateFilesList(const QStringList &files);
 
 signals:
-    void filesListUpdated(const QStringList &files);
+    void filesListUpdatedSignal(const QStringList &files);
 };
 
 class AddConstrainsPage : public QWizardPage
@@ -81,7 +82,7 @@ private slots:
     void updateFilesList(const QStringList &files);
 
 signals:
-    void filesListUpdated(const QStringList &files);
+    void filesListUpdatedSignal(const QStringList &files);
 };
 
 class DefaultPartPage :  public QWizardPage
@@ -98,4 +99,4 @@ private slots:
 
 };
 
-#endif // PROJECTWIZARD_H
+#endif // WIZARD_H

@@ -1,13 +1,12 @@
 #include "mainwindow.h"
 
 #include "editor.h"
-#include "projectwizard.h"
-#include "projectnavigator.h"
+#include "wizard.h"
+#include "navigator.h"
 #include "taskview.h"
 #include "infowidget.h"
 #include "processmanager.h"
 
-// MainWindow *pMainWindow;
 MainWindow *MainWindow::instance()
 {
     static MainWindow *m_instance = nullptr;
@@ -74,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // projectNavigator = new ProjectNavigator(this);
     QDockWidget *leftDock1 = new QDockWidget(this);
-    leftDock1->setWindowTitle("Project Navigator"), leftDock1->setWidget(ProjectNavigator::instance());
+    leftDock1->setWindowTitle("Project Navigator"), leftDock1->setWidget(Navigator::instance());
     addDockWidget(Qt::LeftDockWidgetArea, leftDock1);
 
     QDockWidget *leftDock2 = new QDockWidget(this);
@@ -85,8 +84,6 @@ MainWindow::MainWindow(QWidget *parent)
     bottomDock->setWindowTitle("Information"), bottomDock->setWidget(InfoWidget::instance());
     addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
-    // 从projectNavigator获取文件路径，在编辑器打开
-    // connect(ProjectNavigator::instance(), &ProjectNavigator::sendFilePath, this, &MainWindow::receiveFilePath);
 
 }
 
@@ -132,36 +129,34 @@ void MainWindow::createEditorTab(const QString& path)
     updateActionState();
 }
 
-// void MainWindow::receiveFilePath(const QString &path)
-// {
-//     // qDebug() << path;
-//     createEditorTab(path);
-//     updateActionState();
-// }
-
 void MainWindow::onNewTriggered()
 {
-    ProjectWizard *projectWizard = new ProjectWizard(this);
+    Wizard *projectWizard = new Wizard(this);
     projectWizard->show();
-    connect(projectWizard, &ProjectWizard::wizardAccepted, ProjectNavigator::instance(), &ProjectNavigator::updateItems);
 }
 
 void MainWindow::onOpenTriggered()
 {
     QString path = QFileDialog::getOpenFileName(this, "Open File");
     createEditorTab(path);
-    // updateActionState();
 }
 
 void MainWindow::onOpenProjectTriggered()
 {
-    QString path = QFileDialog::getExistingDirectory(this, "Open Project", QDir::homePath());
-    if(path.isEmpty()) { // 取消打开文件夹
-        return;
+    QFileDialog dialog(this);
+    dialog.setWindowTitle("Open Project");
+    dialog.setNameFilter("HPR Files (*.hpr)");
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    if (dialog.exec() != QDialog::Accepted) {
+        return; // 用户取消了操作
     }
-
-    ProjectNavigator::instance()->updateItems(path); // 更新项目视图
-
+    QString path = dialog.selectedFiles().value(0, "");
+    if (!path.isEmpty()) {
+        // 执行打开.hpr文件的逻辑
+        Project *project = new Project;
+        project->openProject(path);
+        Navigator::instance()->loadFile(project);
+    }
 }
 
 void MainWindow::onSaveTriggered()

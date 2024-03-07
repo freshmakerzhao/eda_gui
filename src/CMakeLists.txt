@@ -31,8 +31,9 @@ set(PROJECT_SOURCES
     infowidget.cpp
     main.cpp
     mainwindow.cpp
-    projectnavigator.cpp
-    projectwizard.cpp
+    navigator.cpp
+    project.cpp
+    wizard.cpp
     taskview.cpp
     processmanager.cpp
 )
@@ -43,8 +44,9 @@ set(PROJECT_HEADERS
     editor.h
     infowidget.h
     mainwindow.h
-    projectnavigator.h
-    projectwizard.h
+    navigator.h
+    project.h
+    wizard.h
     taskview.h
     processmanager.h
     ./Qsci/qsciscintilla.h
@@ -64,7 +66,7 @@ set(PROJECT_RESOURCES
 add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
-    ${PROJECT_RESOURCES}
+    ${PROJECT_RESOURCES} 
 )
 
 # Link the Qt5 Widgets library and the QScintilla library to the executable

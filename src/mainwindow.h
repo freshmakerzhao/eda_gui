@@ -26,9 +26,6 @@ public:
     void updateActionState();                 // 更新编辑器按钮状态
     void createEditorTab(const QString& path); // 创建编辑器Tab
 
-// public slots:
-//     void receiveFilePath(const QString &path);
-
 private slots:
     void onNewTriggered();
     void onOpenTriggered();
@@ -80,7 +77,5 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 };
-
-// extern MainWindow *pMainWindow;
 
 #endif // MAINWINDOW_H

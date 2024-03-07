@@ -8,32 +8,38 @@
 #include <QMouseEvent>
 #include <QGridLayout>
 #include <QSet>
+#include <QVector>
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QDir>
 #include <QQueue>
 #include <QPair>
 
-#include <mainwindow.h>
+#include "project.h"
 
-class ProjectNavigator : public QWidget
+class Navigator : public QWidget
 {
     Q_OBJECT
 
 public:
-    static ProjectNavigator *instance(QWidget *parent = nullptr);
+    static Navigator *instance(QWidget *parent = nullptr);
 
-    explicit ProjectNavigator(QWidget *parent = nullptr);
-    ~ProjectNavigator();
+    explicit Navigator(QWidget *parent = nullptr);
+    ~Navigator();
+
+    void loadFile(Project *project);
 
 public slots:
-    void updateItems(const QString &path);
+    // void updateItems(const QString &path);
+
 
     void clickedFile(QTreeWidgetItem *item);
 
     void showContextMenu(const QPoint &pos);
 
     void closeProjectAction();
+
+    void setActiveProjectAction();
 
     void addSourcesAction();
 
@@ -45,14 +51,11 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
-    QTreeWidget *treeWidget;
+    QTreeWidget *navTree;
 
-    QSet<QString> projectNode;
+    // QSet<QString> projectNode;
 
-// signals:
-//     void sendFilePath(const QString &path);
-
-
+    QVector<QString> pn;
 };
 
 #endif // PROJECTNAVIGATOR_H

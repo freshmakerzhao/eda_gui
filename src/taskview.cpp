@@ -13,15 +13,15 @@ TaskView::TaskView(QWidget *parent)
     : QWidget(parent)
 {
     qDebug() << "[TaskView] Constructing...";
-    navTree = new QTreeWidget(this);
-    navTree->viewport()->installEventFilter(this); //事件过滤
+    taskTree = new QTreeWidget(this);
+    taskTree->viewport()->installEventFilter(this); //事件过滤
     QGridLayout *layout = new QGridLayout(this);
-    layout->addWidget(navTree);
+    layout->addWidget(taskTree);
     layout->setMargin(0);
-    navTree->setColumnCount(1);
-    navTree->setHeaderHidden(true);
+    taskTree->setColumnCount(1);
+    taskTree->setHeaderHidden(true);
     // ================== 综合 ==================
-    QTreeWidgetItem *synthItem = new QTreeWidgetItem(navTree, QStringList() << "Synthesis");
+    QTreeWidgetItem *synthItem = new QTreeWidgetItem(taskTree, QStringList() << "Synthesis");
     synthItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
     QTreeWidgetItem *synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run");
     synthRunItem->setIcon(0, QIcon(""));
@@ -29,7 +29,7 @@ TaskView::TaskView(QWidget *parent)
     QTreeWidgetItem *synthReportItem = new QTreeWidgetItem(synthItem, QStringList() << "Report");
     synthReportItem->setIcon(0, QIcon(""));
     // ================== imp ==================
-    QTreeWidgetItem *impItem = new QTreeWidgetItem(navTree, QStringList() << "Implementation");
+    QTreeWidgetItem *impItem = new QTreeWidgetItem(taskTree, QStringList() << "Implementation");
     impItem->setIcon(0, QIcon(""));
     // pack_place_route
     QTreeWidgetItem *impAllItem = new QTreeWidgetItem(impItem, QStringList() << "Run Implementation");
@@ -47,7 +47,7 @@ TaskView::TaskView(QWidget *parent)
     // 查看 Pack 日志
     impPackReportItem->setIcon(0, QIcon(""));
     // ================== 码流及可视化 ==================
-    QTreeWidgetItem *proItem = new QTreeWidgetItem(navTree, QStringList() << "Program and Debug");
+    QTreeWidgetItem *proItem = new QTreeWidgetItem(taskTree, QStringList() << "Program and Debug");
     proItem->setIcon(0, QIcon(""));
     QTreeWidgetItem *proNetlistViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate NetlistView");
     proNetlistViewItem->setIcon(0, QIcon(""));
@@ -58,7 +58,7 @@ TaskView::TaskView(QWidget *parent)
     QTreeWidgetItem *proDownloadBitItem = new QTreeWidgetItem(proItem, QStringList() << "Download Bit");
     proDownloadBitItem->setIcon(0, QIcon(""));
 
-    QObject::connect(navTree, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
+    QObject::connect(taskTree, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
         // 双击触发
         if (item == synthRunItem) {
             // runSynth();
@@ -96,7 +96,7 @@ TaskView::TaskView(QWidget *parent)
         }
     });
 
-    navTree->expandAll();
+    taskTree->expandAll();
 
 }
 
@@ -107,7 +107,7 @@ TaskView::~TaskView()
 
 bool TaskView::eventFilter(QObject *obj, QEvent *event)
 {
-    if (obj == navTree->viewport())
+    if (obj == taskTree->viewport())
     {
         //点击树的空白,取消选中
         if (event->type() == QEvent::MouseButtonPress)
@@ -115,10 +115,10 @@ bool TaskView::eventFilter(QObject *obj, QEvent *event)
             QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
             if (mouseEvent->buttons() & Qt::LeftButton)
             {
-                QModelIndex index = navTree->indexAt(mouseEvent->pos());
+                QModelIndex index = taskTree->indexAt(mouseEvent->pos());
                 if (!index.isValid())
                 {
-                    navTree->setCurrentIndex(QModelIndex());
+                    taskTree->setCurrentIndex(QModelIndex());
                 }
             }
         }

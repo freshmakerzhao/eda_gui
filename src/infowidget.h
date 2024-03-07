@@ -25,6 +25,7 @@ public:
     void appendMsg(const QString& str);
 
 private:
+    QPlainTextEdit *csl;
     QPlainTextEdit *msg;
     QPlainTextEdit *log;
     QPlainTextEdit *rpt;

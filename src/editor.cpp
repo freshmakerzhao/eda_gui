@@ -15,7 +15,7 @@ Editor::Editor(QWidget *parent)
     // 加载字体文件
     QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
     // 创建字体
-    QFont font("JetBrains Mono NL", 11);
+    QFont font("JetBrains Mono NL", 10);
     // 设置行号字体
     this->setMarginsFont(font);
     // 设置显示行号
@@ -25,12 +25,6 @@ Editor::Editor(QWidget *parent)
     // 设置折叠选项
     this->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     this->setMarginWidth(2, 20);
-    // 设置折叠提示按钮
-    // this->setMarginMarkerMask(1, QsciScintilla::SC_MASK_FOLDERS);
-    // this->setMarginType(1, QsciScintilla::SymbolMargin);
-    // this->setMarginSensitivity(1, true);
-    // this->setMarginWidth(1, 20);
-    // this->setMarginMarkerMask(1, 0x00200000);
     // 创建词法分析器
     textLexer = new QsciLexerVerilog(this);
     textLexer->setFont(font);
@@ -110,7 +104,16 @@ bool Editor::saveFile()
 
 bool Editor::saveAsFile()
 {
-    QString path = QFileDialog::getSaveFileName(this, "另存文件");
+    QFileDialog dialog(this);
+    dialog.setWindowTitle("Save As");
+    dialog.selectFile("untitled.v");
+    dialog.setNameFilter("Verilog Source Files (*.v)");
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    if (dialog.exec() != QDialog::Accepted) {
+        return false; // 用户取消了另存为操作
+    }
+
+    QString path = dialog.selectedFiles().value(0, "");
     QFile file(path);
     // 处理另存为文件异常
     if (!file.open(QIODevice::WriteOnly | QFile::Text)) {
