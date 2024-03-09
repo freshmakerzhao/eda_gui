@@ -1,6 +1,5 @@
 #include "navigator.h"
 #include "mainwindow.h"
-#include "taskview.h"
 
 Navigator *Navigator::instance(QWidget *parent)
 {
@@ -9,6 +8,159 @@ Navigator *Navigator::instance(QWidget *parent)
         m_instance = new Navigator(parent);
     }
     return m_instance;
+}
+
+void Navigator::loadFile(Project *proj)
+{
+    /*如果加载的是同一个工程,刷新工程文件表,否则运行新进程,在新进程加载工程*/
+    if(p != nullptr) { // 已加载工程
+        if (p != proj) { // 已加载的是其他工程
+            // 获取程序路径
+            QString programPath = QCoreApplication::applicationFilePath();
+            // 创建一个新进程
+            QProcess *process = new QProcess();
+            // 传入新打开工程路径
+            QString hprfile = proj->path +  "/" + proj->name + ".hpr";
+            qDebug() << hprfile;
+            // 启动程序本身
+            process->start(programPath, QStringList() << hprfile);
+            return;
+        }
+    } else { // 未加载工程
+        p = proj;
+    }
+//    TaskView::instance()->sourceList = project->sourcePathList;
+    QTreeWidgetItem *nameItem = new QTreeWidgetItem(navTree);
+    nameItem->setText(0, proj->name);
+    QTreeWidgetItem *sourceItem = new QTreeWidgetItem(nameItem);
+    sourceItem->setText(0, "sources");
+    foreach (const QString &file, proj->sourceList) {
+        QTreeWidgetItem *sourcefile = new QTreeWidgetItem(sourceItem);
+        sourcefile->setText(0, QFileInfo(file).fileName());
+        sourcefile->setData(0, Qt::UserRole, QFileInfo(file).filePath());
+    }
+    QTreeWidgetItem *constraintsItem = new QTreeWidgetItem(nameItem);
+    constraintsItem->setText(0, "constraints");
+    foreach (const QString &file, proj->constraintList) {
+        QTreeWidgetItem *constraintsfile = new QTreeWidgetItem(constraintsItem);
+        constraintsfile->setText(0, QFileInfo(file).fileName());
+        constraintsfile->setData(0, Qt::UserRole, QFileInfo(file).filePath());
+    }
+    // TODO:Load doc, ip
+    QTreeWidgetItem *docItem = new QTreeWidgetItem(nameItem);
+    docItem->setText(0, "doc");
+
+    QTreeWidgetItem *ipItem = new QTreeWidgetItem(nameItem);
+    ipItem->setText(0, "ip");
+}
+
+void Navigator::clickedFile(QTreeWidgetItem *item)
+{
+    QString path = item->data(0, Qt::UserRole).toString();
+    MainWindow::instance()->createEditorTab(path);
+}
+
+void Navigator::showContextMenu(const QPoint &pos) {
+    QMenu contextMenu;
+    QAction closeProject("Close Project");
+    QAction addSources("Add Sources");
+    QAction addConstraints("Add Constraints");
+    QAction deleteFileAction("Delete File");
+    if (navTree->currentItem() == nullptr) {
+        qDebug() << "Empty Item";
+        return;
+    }
+    if (navTree->currentItem()->parent() == nullptr) {
+        contextMenu.addAction(&closeProject);
+        connect(&closeProject, &QAction::triggered, this, &Navigator::closeProjectAction);
+        contextMenu.addAction(&addSources);
+        connect(&addSources, &QAction::triggered, this, &Navigator::addSourcesAction);
+        contextMenu.addAction(&addConstraints);
+        connect(&addConstraints, &QAction::triggered, this, &Navigator::addConstraintsAction);
+    } else if (QFileInfo(navTree->currentItem()->data(0, Qt::UserRole).toString()).isFile()) {
+        contextMenu.addAction(&deleteFileAction);
+        connect(&deleteFileAction, &QAction::triggered, this, &Navigator::deleteFileAction);
+
+    }
+    contextMenu.exec(navTree->mapToGlobal(pos));
+}
+
+void Navigator::closeProjectAction()
+{
+    delete navTree->currentItem();
+    delete p;
+    p = nullptr;
+}
+
+void Navigator::addSourcesAction()
+{
+    QString path = p->path;
+    qDebug() << path;
+    QString addSourcesPath = path + "/sources/";
+    qDebug() << "addSources path:" << addSourcesPath;
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
+    if (!files.isEmpty()) {
+        foreach (const QString &file, files) {
+            QFile::copy(file, addSourcesPath + QFileInfo(file).fileName());
+            p->sourceList.append(addSourcesPath + QFileInfo(file).fileName());
+        }
+    }
+    p->makeProject();
+    delete navTree->topLevelItem(0);
+    loadFile(p);
+}
+
+void Navigator::addConstraintsAction()
+{
+    QString path = p->path;
+    QString constrainsPath = path + "/constraints/";
+    qDebug() << "constraints path:" << constrainsPath;
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
+    if (!files.isEmpty()) {
+        foreach (const QString &file, files) {
+            QFile::copy(file, constrainsPath + QFileInfo(file).fileName());
+            p->constraintList.append(constrainsPath + QFileInfo(file).fileName());
+        }
+    }
+    p->makeProject();
+    delete navTree->topLevelItem(0);
+    loadFile(p);
+}
+
+void Navigator::deleteFileAction()
+{
+    QString path = navTree->currentItem()->data(0, Qt::UserRole).toString();
+    QFileInfo fileInfo(path);
+    QString folderName = fileInfo.dir().dirName();
+    qDebug() << folderName;
+    if (folderName == "sources") {
+        p->sourceList.removeOne(path);
+    } else if (folderName == "constraints") {
+        p->constraintList.removeOne(path);
+    }
+
+    QFile file(navTree->currentItem()->text(0));
+    file.remove();
+    delete navTree->currentItem();
+    p->makeProject();
+    // loadFile(p);
+}
+
+bool Navigator::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == navTree->viewport()) {
+        //点击树的空白,取消选中
+        if (event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if (mouseEvent->buttons() & Qt::LeftButton) {
+                QModelIndex index = navTree->indexAt(mouseEvent->pos());
+                if (!index.isValid()) {
+                    navTree->setCurrentIndex(QModelIndex());
+                }
+            }
+        }
+    }
+    return QObject::eventFilter(obj, event);
 }
 
 Navigator::Navigator(QWidget *parent)
@@ -31,163 +183,10 @@ Navigator::Navigator(QWidget *parent)
 
     navTree->setColumnCount(1);
     navTree->setHeaderHidden(true);
-    // navTree->expandAll();
 }
 
 Navigator::~Navigator()
 {
     qDebug() << "[Navigator] Distructing...";
 }
-
-void Navigator::loadFile(Project *project)
-{
-    // 检查工程是否已打开
-    if (pn.contains(project->path)) {
-        QMessageBox::question(this, "Warning", "This Project is already open!",
-                                                                QMessageBox::Yes);
-        return;
-    }
-    pn.push_back(project->path);
-    TaskView::instance()->sourceList = project->sourcePathList;
-    QTreeWidgetItem *nameItem = new QTreeWidgetItem(navTree);
-    nameItem->setText(0, project->name);
-    QTreeWidgetItem *sourceItem = new QTreeWidgetItem(nameItem);
-    sourceItem->setText(0, "sources");
-    foreach (const QString &file, project->sourcePathList) {
-        QTreeWidgetItem *sourcefile = new QTreeWidgetItem(sourceItem);
-        sourcefile->setText(0, QFileInfo(file).fileName());
-        sourcefile->setData(0, Qt::UserRole, QFileInfo(file).filePath());
-    }
-    QTreeWidgetItem *constrainsItem = new QTreeWidgetItem(nameItem);
-    constrainsItem->setText(0, "constrains");
-    foreach (const QString &file, project->constraintPathList) {
-        QTreeWidgetItem *constrainsfile = new QTreeWidgetItem(constrainsItem);
-        constrainsfile->setText(0, QFileInfo(file).fileName());
-        constrainsfile->setData(0, Qt::UserRole, QFileInfo(file).filePath());
-    }
-    // TODO:Load doc, ip
-    QTreeWidgetItem *docItem = new QTreeWidgetItem(nameItem);
-    docItem->setText(0, "doc");
-
-    QTreeWidgetItem *ipItem = new QTreeWidgetItem(nameItem);
-    ipItem->setText(0, "ip");
-}
-
-void Navigator::clickedFile(QTreeWidgetItem *item)
-{
-    QString path = item->data(0, Qt::UserRole).toString();
-    MainWindow::instance()->createEditorTab(path);
-}
-
-void Navigator::showContextMenu(const QPoint &pos) {
-    QMenu contextMenu;
-    QAction closeProject("Close Project");
-    QAction addSources("Add Sources");
-    QAction addConstraints("Add Constrains");
-    QAction deleteFileAction("Delete File");
-    QAction setActiveProject("Set As Active Project");
-    if (navTree->currentItem() == nullptr) {
-        qDebug() << "Empty Item";
-        return;
-    }
-    if (navTree->currentItem()->parent() == nullptr) {
-        contextMenu.addAction(&closeProject);
-        connect(&closeProject, &QAction::triggered, this, &Navigator::closeProjectAction);
-        contextMenu.addAction(&setActiveProject);
-        connect(&setActiveProject, &QAction::triggered, this, &Navigator::setActiveProjectAction);
-        contextMenu.addAction(&addSources);
-        connect(&addSources, &QAction::triggered, this, &Navigator::addSourcesAction);
-        contextMenu.addAction(&addConstraints);
-        connect(&addConstraints, &QAction::triggered, this, &Navigator::addConstraintsAction);
-    } else if (QFileInfo(navTree->currentItem()->data(0, Qt::UserRole).toString()).isFile()) {
-        contextMenu.addAction(&deleteFileAction);
-        connect(&deleteFileAction, &QAction::triggered, this, &Navigator::deleteFileAction);
-
-    }
-    contextMenu.exec(navTree->mapToGlobal(pos));
-}
-
-void Navigator::closeProjectAction()
-{
-    auto it = std::find(pn.begin(), pn.end(), navTree->currentItem()->data(0, Qt::UserRole).toString());
-    if (it != pn.end()) {
-        pn.erase(it);
-    }
-    delete navTree->currentItem();
-}
-
-void Navigator::setActiveProjectAction()
-{
-    // 取消之前已加粗的项目
-    for (int i = 0; i < navTree->topLevelItemCount(); ++i) {
-        QTreeWidgetItem *item = navTree->topLevelItem(i);
-        QFont font = item->font(0);
-        font.setBold(false);
-        item->setFont(0, font);
-    }
-
-    QTreeWidgetItem *item = navTree->currentItem();
-    QFont font = item->font(0);
-    font.setBold(true);
-    item->setFont(0, font);
-}
-
-void Navigator::addSourcesAction()
-{
-    QString path = navTree->currentItem()->data(0, Qt::UserRole).toString();
-    qDebug() << "path:" << path;
-    QString addSourcesPath = path + "/sources/";
-    qDebug() << "addSources path:" << addSourcesPath;
-    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, addSourcesPath + QFileInfo(file).fileName());
-        }
-    }
-    // updateItems(path);
-}
-
-void Navigator::addConstraintsAction()
-{
-    QString path = navTree->currentItem()->data(0, Qt::UserRole).toString();
-    QString constrainsPath = path + "/constrains/";
-    qDebug() << "constrains path:" << constrainsPath;
-    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, constrainsPath + QFileInfo(file).fileName());
-        }
-    }
-    // updateItems(path);
-}
-
-void Navigator::deleteFileAction()
-{
-    QFile file(navTree->currentItem()->text(0));
-    file.remove();
-    delete navTree->currentItem();
-    // navTree->expandAll();
-}
-
-bool Navigator::eventFilter(QObject *obj, QEvent *event)
-{
-    if (obj == navTree->viewport())
-    {
-        //点击树的空白,取消选中
-        if (event->type() == QEvent::MouseButtonPress)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            if (mouseEvent->buttons() & Qt::LeftButton)
-            {
-                QModelIndex index = navTree->indexAt(mouseEvent->pos());
-                if (!index.isValid())
-                {
-                    navTree->setCurrentIndex(QModelIndex());
-                }
-            }
-        }
-    }
-    return QObject::eventFilter(obj, event);
-}
-
 

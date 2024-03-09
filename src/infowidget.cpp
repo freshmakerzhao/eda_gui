@@ -9,6 +9,11 @@ InfoWidget *InfoWidget::instance(QWidget *parent)
     return m_instance;
 }
 
+void InfoWidget::appendMsg(const QString &str)
+{
+    msg->appendPlainText(str);
+}
+
 InfoWidget::InfoWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -32,7 +37,3 @@ InfoWidget::~InfoWidget()
     qDebug() << "[InfoWidget] Distructing...";
 }
 
-void InfoWidget::appendMsg(const QString &str)
-{
-    msg->appendPlainText(str);
-}

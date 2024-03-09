@@ -12,6 +12,23 @@ TaskView *TaskView::instance(QWidget *parent)
     return m_instance;
 }
 
+bool TaskView::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == taskTree->viewport()) {
+        //点击树的空白,取消选中
+        if (event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if (mouseEvent->buttons() & Qt::LeftButton) {
+                QModelIndex index = taskTree->indexAt(mouseEvent->pos());
+                if (!index.isValid()) {
+                    taskTree->setCurrentIndex(QModelIndex());
+                }
+            }
+        }
+    }
+    return QObject::eventFilter(obj, event);
+}
+
 TaskView::TaskView(QWidget *parent)
     : QWidget(parent)
 {
@@ -60,6 +77,7 @@ TaskView::TaskView(QWidget *parent)
     proBitViewItem->setIcon(0, QIcon(""));
     QTreeWidgetItem *proDownloadBitItem = new QTreeWidgetItem(proItem, QStringList() << "Download Bit");
     proDownloadBitItem->setIcon(0, QIcon(""));
+
     QObject::connect(taskTree, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
         // 双击触发
         if (item == synthRunItem) {
@@ -105,27 +123,6 @@ TaskView::TaskView(QWidget *parent)
 TaskView::~TaskView()
 {
     qDebug() << "[TaskView] Distructing...";
-}
-
-bool TaskView::eventFilter(QObject *obj, QEvent *event)
-{
-    if (obj == taskTree->viewport())
-    {
-        //点击树的空白,取消选中
-        if (event->type() == QEvent::MouseButtonPress)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            if (mouseEvent->buttons() & Qt::LeftButton)
-            {
-                QModelIndex index = taskTree->indexAt(mouseEvent->pos());
-                if (!index.isValid())
-                {
-                    taskTree->setCurrentIndex(QModelIndex());
-                }
-            }
-        }
-    }
-    return QObject::eventFilter(obj, event);
 }
 
 // 执行综合阶段

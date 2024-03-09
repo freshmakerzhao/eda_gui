@@ -9,7 +9,7 @@ Wizard::Wizard(QWidget *parent) : QWizard(parent)
     setWizardStyle(QWizard::ModernStyle);
     addPage(new ProjectNamePage);
     addPage(new AddSourcesPage);
-    addPage(new AddConstrainsPage);
+    addPage(new AddConstraintPage);
     addPage(new DefaultPartPage);
     connect(this, &QWizard::accepted, this, &Wizard::onFinish);
 
@@ -34,7 +34,7 @@ void Wizard::onFinish()
     if (dir.mkdir(projectName)) {
         dir.cd(projectName);
         dir.mkdir("sources");
-        dir.mkdir("constrains");
+        dir.mkdir("constraints");
         dir.mkdir("doc");
         dir.mkdir("ip");   
         qDebug() << "Folders Created Successfully";
@@ -48,13 +48,13 @@ void Wizard::onFinish()
         QFile::copy(file, projectPath + "/" + projectName + "/sources/" + QFileInfo(file).fileName());
     }
     // 复制文件列表中的文件到项目文件夹constrains
-    foreach (const QString &file, constrainsFilesList) {
-        QFile::copy(file, projectPath + "/" + projectName + "/constrains/" + QFileInfo(file).fileName());
+    foreach (const QString &file, constraintFilesList) {
+        QFile::copy(file, projectPath + "/" + projectName + "/constraints/" + QFileInfo(file).fileName());
     }
 
-    project = new Project(projectName, projectPath, part);
-    project->sourcePathList = sourcesFilesList;
-    project->constraintPathList = constrainsFilesList;
+    project = new Project(projectName, projectPath + "/" + projectName, part);
+    project->sourceList = sourcesFilesList;
+    project->constraintList = constraintFilesList;
     project->makeProject();
     Navigator::instance()->loadFile(project);
 }
@@ -150,13 +150,13 @@ void AddSourcesPage::updateFilesList(const QStringList &files)
     filesListWidget->addItems(files);
 }
 
-AddConstrainsPage::AddConstrainsPage(QWidget *parent) : QWizardPage(parent)
+AddConstraintPage::AddConstraintPage(QWidget *parent) : QWizardPage(parent)
 {
-    connect(this, &AddConstrainsPage::filesListUpdatedSignal, this, &AddConstrainsPage::updateFilesList);
+    connect(this, &AddConstraintPage::filesListUpdatedSignal, this, &AddConstraintPage::updateFilesList);
 
     setTitle("Add Constrains");
     setSubTitle("Specify or create constraint files for physical and "
-                "timing constrains.");
+                "timing constraints.");
 
     filesListWidget = new QListWidget;
     filesListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -165,10 +165,10 @@ AddConstrainsPage::AddConstrainsPage(QWidget *parent) : QWizardPage(parent)
     // registerField("addconstrainsFilesList", filesListWidget, "selectedItems", SIGNAL(itemSelectionChanged()));
 
     QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
-    connect(addFilesButton, &QPushButton::clicked, this, &AddConstrainsPage::onAddFiles);
+    connect(addFilesButton, &QPushButton::clicked, this, &AddConstraintPage::onAddFiles);
 
     QPushButton *removeButton = new QPushButton("Remove Files");removeButton->setFixedSize(160, 45);
-    connect(removeButton, &QPushButton::clicked, this, &AddConstrainsPage::onRemoveFiles);
+    connect(removeButton, &QPushButton::clicked, this, &AddConstraintPage::onRemoveFiles);
 
     QVBoxLayout *layout = new QVBoxLayout;
     QHBoxLayout *btnLayout = new QHBoxLayout;
@@ -179,21 +179,21 @@ AddConstrainsPage::AddConstrainsPage(QWidget *parent) : QWizardPage(parent)
     setLayout(layout);
 }
 
-void AddConstrainsPage::onAddFiles()
+void AddConstraintPage::onAddFiles()
 {
     QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.xdc)");
     if (!files.isEmpty())
     {
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->constrainsFilesList.append(files);  // 将选择的文件追加到列表中
-        for (int i = 0; i < wizard->constrainsFilesList.size(); ++i) {
-            qDebug() << wizard->constrainsFilesList.at(i);
+        wizard->constraintFilesList.append(files);  // 将选择的文件追加到列表中
+        for (int i = 0; i < wizard->constraintFilesList.size(); ++i) {
+            qDebug() << wizard->constraintFilesList.at(i);
         }
         emit filesListUpdatedSignal(files); // 发送信号
     }
 }
 
-void AddConstrainsPage::onRemoveFiles()
+void AddConstraintPage::onRemoveFiles()
 {
     QList<QListWidgetItem*> selectedItems = filesListWidget->selectedItems();
     for (QListWidgetItem* item : selectedItems)
@@ -202,11 +202,11 @@ void AddConstrainsPage::onRemoveFiles()
         filesListWidget->takeItem(row);
         // 从constrainsFilesList中移除对应项
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->constrainsFilesList.removeAt(row);
+        wizard->constraintFilesList.removeAt(row);
     }
 }
 
-void AddConstrainsPage::updateFilesList(const QStringList &files)
+void AddConstraintPage::updateFilesList(const QStringList &files)
 {
     filesListWidget->addItems(files);
 }
@@ -271,6 +271,14 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     layout->addWidget(tableView);
 }
 
+bool DefaultPartPage::isComplete() const
+{
+    if (tableView->selectionModel()->selectedIndexes().isEmpty()) {
+        return false; // 不满足条件，禁止进入下一步
+    }
+    return true;
+}
+
 void DefaultPartPage::selectPart(const QModelIndex &index) {
     QStandardItemModel *model = qobject_cast<QStandardItemModel*>(tableView->model());
     QStandardItem *partItem = model->item(index.row(), 0); // 获取part
@@ -278,5 +286,6 @@ void DefaultPartPage::selectPart(const QModelIndex &index) {
         Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
         wizard->part = partItem->text();
     }
+    completeChanged();
 }
 

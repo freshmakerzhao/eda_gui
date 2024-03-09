@@ -35,7 +35,7 @@ private slots:
 
 public:
     QStringList sourcesFilesList;
-    QStringList constrainsFilesList;
+    QStringList constraintFilesList;
     QString part;
 
 private:
@@ -67,11 +67,11 @@ signals:
     void filesListUpdatedSignal(const QStringList &files);
 };
 
-class AddConstrainsPage : public QWizardPage
+class AddConstraintPage : public QWizardPage
 {
     Q_OBJECT
 public:
-    AddConstrainsPage(QWidget *parent = nullptr);
+    AddConstraintPage(QWidget *parent = nullptr);
 
 private:
     QListWidget *filesListWidget;
@@ -90,6 +90,9 @@ class DefaultPartPage :  public QWizardPage
     Q_OBJECT
 public:
     DefaultPartPage(QWidget *parent = nullptr);
+
+protected:
+    bool isComplete()  const override;
 
 private:
     QTableView *tableView;

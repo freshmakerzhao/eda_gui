@@ -16,82 +16,6 @@ MainWindow *MainWindow::instance()
     return m_instance;
 }
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-{
-    qDebug() << "[Main Window] Constructing...";
-    setAttribute(Qt::WA_DeleteOnClose);
-    this->resize(1600, 900);
-
-    menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
-    fileMenu = menuBar->addMenu("File");
-    editMenu = menuBar->addMenu("Edit");
-
-    newAction = new QAction("New", this);
-    openAction = new QAction("Open", this);
-    openProjectAction = new QAction("Open Project", this);
-    saveAction = new QAction("Save", this);
-    saveasAction = new QAction("Save As", this);
-    fileMenu->addActions({newAction, openAction, openProjectAction}), fileMenu->addSeparator();
-    fileMenu->addActions({saveAction, saveasAction});
-
-    connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
-    connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
-    connect(openProjectAction, &QAction::triggered, this, &MainWindow::onOpenProjectTriggered);
-    connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
-    connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
-
-    cutAction = new QAction("Cut", this);
-    copyAction = new QAction("Copy", this);
-    pasteAction = new QAction("Paste", this);
-    undoAction = new QAction("Undo", this), redoAction = new QAction("Redo", this);
-    editMenu->addActions({cutAction, copyAction, pasteAction}), editMenu->addSeparator();
-    editMenu->addActions({undoAction, redoAction});
-    // 编辑器按钮绑定
-    connect(cutAction, &QAction::triggered, this, &MainWindow::onCutTriggered);
-    connect(copyAction, &QAction::triggered, this, &MainWindow::onCopyTriggered);
-    connect(pasteAction, &QAction::triggered, this, &MainWindow::onPasteTriggered);
-    connect(undoAction, &QAction::triggered, this, &MainWindow::onUndoTriggered);
-    connect(redoAction, &QAction::triggered, this, &MainWindow::onRedoTriggered);
-
-    chipPlannerAction = new QAction("ChipPlanner", this);
-    connect(chipPlannerAction, &QAction::triggered, this, &MainWindow::onChipPlannerTriggered);
-
-    toolbar = new QToolBar("Tools", this);
-    toolbar->addActions({newAction, openAction, saveAction}), toolbar->addSeparator();
-    toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
-    toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
-    toolbar->addActions({chipPlannerAction});
-    addToolBar(toolbar);
-
-    tabWidget = new QTabWidget(this);
-    connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabWidgetCurrentChanged);
-    tabWidget->setMovable(true), tabWidget->setTabsClosable(true);
-    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested); // 关闭编辑器
-    this->setCentralWidget(tabWidget);
-    updateActionState();
-
-    // projectNavigator = new ProjectNavigator(this);
-    QDockWidget *leftDock1 = new QDockWidget(this);
-    leftDock1->setWindowTitle("Project Navigator"), leftDock1->setWidget(Navigator::instance());
-    addDockWidget(Qt::LeftDockWidgetArea, leftDock1);
-
-    QDockWidget *leftDock2 = new QDockWidget(this);
-    leftDock2->setWindowTitle("Tasks"), leftDock2->setWidget(TaskView::instance(this));
-    addDockWidget(Qt::LeftDockWidgetArea, leftDock2);
-
-    QDockWidget *bottomDock = new QDockWidget(this);
-    bottomDock->setWindowTitle("Information"), bottomDock->setWidget(InfoWidget::instance());
-    addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
-
-
-}
-
-MainWindow::~MainWindow()
-{
-    qDebug() << "[Main Window] Distructing...";
-}
-
 void MainWindow::updateActionState()
 {
     Editor *editor = (Editor*) tabWidget->currentWidget();
@@ -153,9 +77,9 @@ void MainWindow::onOpenProjectTriggered()
     QString path = dialog.selectedFiles().value(0, "");
     if (!path.isEmpty()) {
         // 执行打开.hpr文件的逻辑
-        Project *project = new Project;
-        project->openProject(path);
-        Navigator::instance()->loadFile(project);
+        Project *proj = new Project;
+        proj->openProject(path);
+        Navigator::instance()->loadFile(proj);
     }
 }
 
@@ -229,6 +153,27 @@ void MainWindow::onChipPlannerTriggered()
     chipPlanner.show();
 }
 
+void MainWindow::onDocumentationTriggered()
+{
+    documentationBox.setText("Features to be developed");
+    documentationBox.show();
+}
+
+void MainWindow::onAboutTriggered()
+{
+    aboutDialog.setFixedSize(640, 480);
+    aboutDialog.setWindowTitle("About Software");
+    QLabel *label = new QLabel(&aboutDialog);
+    label->setText("<html><h2>About Software</h2"
+                   "<p>© 2024 Power by HybrdChip</p>"
+                   "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a>"
+                   "</p></html>");
+    label->setTextFormat(Qt::RichText);
+    label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    label->setOpenExternalLinks(true);
+    aboutDialog.show();
+}
+
 void MainWindow::onTabWidgetCurrentChanged(int index)
 {
     Q_UNUSED(index);
@@ -258,6 +203,106 @@ void MainWindow::onTabWidgetTabCloseRequested(int index)
     delete editor;
 
     updateActionState();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    for (int i = 0; i < tabWidget->count(); ++i) {
+        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
+        if (editor->isModified()) {
+            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
+                                                                                     " are you sure you want to close?",
+                                                                    QMessageBox::Yes | QMessageBox::No);
+            if (btn == QMessageBox::Yes) {
+                event->accept();
+            } else {
+                event->ignore();
+            }
+            break;
+        }
+    }
+}
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+{
+    qDebug() << "[Main Window] Constructing...";
+    setAttribute(Qt::WA_DeleteOnClose);
+    this->resize(1600, 900);
+    // =================== MENUBAR ====================
+    menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
+    fileMenu = menuBar->addMenu("File");
+    editMenu = menuBar->addMenu("Edit");
+    helpMenu = menuBar->addMenu("Help");
+    // ===================== FILE ======================
+    newAction = new QAction("New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    openAction = new QAction("Open", this);
+    openProjectAction = new QAction("Open Project", this);
+    saveAction = new QAction("Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+    saveasAction = new QAction("Save As", this);
+    fileMenu->addActions({newAction, openAction, openProjectAction}), fileMenu->addSeparator();
+    fileMenu->addActions({saveAction, saveasAction});
+    // ================= 文件按钮绑定 ====================
+    connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
+    connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
+    connect(openProjectAction, &QAction::triggered, this, &MainWindow::onOpenProjectTriggered);
+    connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
+    connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
+    // ===================== EDIT ======================
+    cutAction = new QAction("Cut", this);
+    copyAction = new QAction("Copy", this);
+    pasteAction = new QAction("Paste", this);
+    undoAction = new QAction("Undo", this), redoAction = new QAction("Redo", this);
+    editMenu->addActions({cutAction, copyAction, pasteAction}), editMenu->addSeparator();
+    editMenu->addActions({undoAction, redoAction});
+    // ================== 编辑器按钮绑定 ==================
+    connect(cutAction, &QAction::triggered, this, &MainWindow::onCutTriggered);
+    connect(copyAction, &QAction::triggered, this, &MainWindow::onCopyTriggered);
+    connect(pasteAction, &QAction::triggered, this, &MainWindow::onPasteTriggered);
+    connect(undoAction, &QAction::triggered, this, &MainWindow::onUndoTriggered);
+    connect(redoAction, &QAction::triggered, this, &MainWindow::onRedoTriggered);
+    // ===================== HELP ======================
+    documentation = new QAction("Documentation", this);
+    aboutAction = new QAction("About", this);
+    helpMenu->addActions({documentation, aboutAction});
+    connect(documentation, &QAction::triggered, this, &MainWindow::onDocumentationTriggered);
+    connect(aboutAction, &QAction::triggered, this, &MainWindow::onAboutTriggered);
+    // ================= CHIP PLANNER ==================
+    chipPlannerAction = new QAction("ChipPlanner", this);
+    connect(chipPlannerAction, &QAction::triggered, this, &MainWindow::onChipPlannerTriggered);
+    // =================== TOOLBAR =====================
+    toolbar = new QToolBar("Tools", this);
+    toolbar->addActions({newAction, openAction, saveAction}), toolbar->addSeparator();
+    toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
+    toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
+    toolbar->addActions({chipPlannerAction});
+    addToolBar(toolbar);
+    // ================= EDITOR TAB ====================
+    tabWidget = new QTabWidget(this);
+    connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabWidgetCurrentChanged);
+    tabWidget->setMovable(true), tabWidget->setTabsClosable(true);
+    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested); // 关闭编辑器
+    this->setCentralWidget(tabWidget);
+    updateActionState();
+    // ===================== DOCK =====================
+    QDockWidget *leftDock1 = new QDockWidget(this);
+    leftDock1->setWindowTitle("Project Navigator"), leftDock1->setWidget(Navigator::instance());
+    addDockWidget(Qt::LeftDockWidgetArea, leftDock1);
+
+    QDockWidget *leftDock2 = new QDockWidget(this);
+    leftDock2->setWindowTitle("Tasks"), leftDock2->setWidget(TaskView::instance());
+    addDockWidget(Qt::LeftDockWidgetArea, leftDock2);
+
+    QDockWidget *bottomDock = new QDockWidget(this);
+    bottomDock->setWindowTitle("Information"), bottomDock->setWidget(InfoWidget::instance());
+    addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
+
+
+}
+
+MainWindow::~MainWindow()
+{
+    qDebug() << "[Main Window] Distructing...";
 }
 
 void MainWindow::streamProcessOutput()
@@ -302,22 +347,4 @@ void MainWindow::configOutputSignals(const QString &phase)
             QMessageBox::critical(nullptr, "错误", phase + " 执行失败！");
         }
     });
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    for (int i = 0; i < tabWidget->count(); ++i) {
-        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
-        if (editor->isModified()) {
-            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
-                                                                                     " are you sure you want to close?",
-                                                                    QMessageBox::Yes | QMessageBox::No);
-            if (btn == QMessageBox::Yes) {
-                event->accept();
-            } else {
-                event->ignore();
-            }
-            break;
-        }
-    }
 }
