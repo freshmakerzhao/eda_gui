@@ -10,6 +10,7 @@
 #include <QDockWidget>
 #include <QTextCodec>
 #include <QCoreApplication>
+#include <QSharedPointer>
 
 #include "chipplanner.h"
 
@@ -19,9 +20,6 @@ class MainWindow : public QMainWindow
 
 public:
     static MainWindow *instance();
-
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
 
     void updateActionState();                 // 更新编辑器按钮状态
     void createEditorTab(const QString& path); // 创建编辑器Tab
@@ -39,16 +37,26 @@ private slots:
     void onUndoTriggered();
     void onRedoTriggered();
 
+
     void onChipPlannerTriggered();
+
+    void onDocumentationTriggered();
+    void onAboutTriggered();
 
     void onTabWidgetCurrentChanged(int index);
     void onTabWidgetTabCloseRequested(int index);
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 private:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QMenu *editMenu;
+    QMenu *helpMenu;
 
     QAction *newAction;
     QAction *openAction;
@@ -61,6 +69,9 @@ private:
     QAction *undoAction;
     QAction *redoAction;
 
+    QAction *documentation;
+    QAction *aboutAction;
+
     QAction *chipPlannerAction;
 
     QToolBar *toolbar;
@@ -68,14 +79,12 @@ private:
 
     ChipPlanner chipPlanner;
 
-    void streamProcessOutput();
+    QMessageBox documentationBox;
+    QDialog aboutDialog;
 
+    void streamProcessOutput();
     // 配置输出和完成信号槽
     void configOutputSignals(const QString &phase);
-
-protected:
-    void closeEvent(QCloseEvent *event) override;
-
 };
 
 #endif // MAINWINDOW_H

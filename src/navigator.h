@@ -14,6 +14,7 @@
 #include <QDir>
 #include <QQueue>
 #include <QPair>
+#include <QProcess>
 
 #include "project.h"
 
@@ -24,22 +25,15 @@ class Navigator : public QWidget
 public:
     static Navigator *instance(QWidget *parent = nullptr);
 
-    explicit Navigator(QWidget *parent = nullptr);
-    ~Navigator();
-
-    void loadFile(Project *project);
+    void loadFile(Project *proj);
 
 public slots:
-    // void updateItems(const QString &path);
-
 
     void clickedFile(QTreeWidgetItem *item);
 
     void showContextMenu(const QPoint &pos);
 
     void closeProjectAction();
-
-    void setActiveProjectAction();
 
     void addSourcesAction();
 
@@ -51,11 +45,12 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
+    Navigator(QWidget *parent = nullptr);
+    ~Navigator();
+
     QTreeWidget *navTree;
 
-    // QSet<QString> projectNode;
-
-    QVector<QString> pn;
+    Project *p = nullptr;
 };
 
 #endif // PROJECTNAVIGATOR_H

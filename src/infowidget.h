@@ -19,12 +19,12 @@ class InfoWidget : public QWidget
 public:
     static InfoWidget *instance(QWidget *parent = nullptr);
 
-    explicit InfoWidget(QWidget *parent = nullptr);
-    ~InfoWidget();
-
     void appendMsg(const QString& str);
 
 private:
+    InfoWidget(QWidget *parent = nullptr);
+    ~InfoWidget();
+
     QPlainTextEdit *csl;
     QPlainTextEdit *msg;
     QPlainTextEdit *log;

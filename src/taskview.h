@@ -15,13 +15,13 @@ class TaskView : public QWidget
 public:
     static TaskView *instance(QWidget *parent = nullptr);
 
-    explicit TaskView(QWidget *parent = nullptr);
-    ~TaskView();
-
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
+    TaskView(QWidget *parent = nullptr);
+    ~TaskView();
+
     QTreeWidget *taskTree;
 
 };

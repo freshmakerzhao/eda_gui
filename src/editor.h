@@ -24,10 +24,10 @@ public:
     ~Editor();
 
 public:
-    bool openFile(QString path);
+    bool openFile(const QString path);
     bool saveFile();
     bool saveAsFile();
-    void setFilePath(QString path);
+    // void setFilePath(const QString path);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;

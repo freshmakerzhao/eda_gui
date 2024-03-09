@@ -17,13 +17,11 @@ public:
     bool makeProject();
     bool openProject(const QString &path);
 
-    QString name;
-    QString path;
-    QStringList sourcePathList;
-    QStringList constraintPathList;
+    QString name; // 工程名称
+    QString path; // 工程路径(绝对)
+    QStringList sourceList;
+    QStringList constraintList;
     QString part;
-
-
 };
 
 #endif // PROJECT_H

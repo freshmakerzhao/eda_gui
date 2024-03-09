@@ -67,7 +67,7 @@ Editor::~Editor()
     delete apis;
 }
 
-bool Editor::openFile(QString path)
+bool Editor::openFile(const QString path)
 {
     m_path = path;
     QFile file(path);
@@ -128,10 +128,10 @@ bool Editor::saveAsFile()
     return true;
 }
 
-void Editor::setFilePath(QString path)
-{
-    m_path = path;
-}
+// void Editor::setFilePath(const QString path)
+// {
+//     m_path = path;
+// }
 
 void Editor::contextMenuEvent(QContextMenuEvent *event)
 {

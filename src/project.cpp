@@ -10,13 +10,25 @@ Project::Project(QString name, QString path, QString part)
 
 bool Project::makeProject()
 {
-    QString filePath = this->path;
-    QFile file(filePath + "/" + name + "/" + name + ".hpr");
+    QString hprfile = this->path +  "/" + name + ".hpr";
+    QFile file(hprfile);
+    if(!file.remove()) { // 删除已有hpr文件
+        qDebug() << "remove error:" << file.errorString();
+    }
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug() << "无法创建XML文件";
-        return -1;
+        return false;
     }
 
+    // ================== Debug ==================
+    qDebug() << "sourceList";
+    for (const QString& source : sourceList) {
+        qDebug() << " " << source;
+    }
+    qDebug() << "constraintList";
+    for (const QString& constraint : constraintList) {
+        qDebug() << " " << constraint;
+    }
     // 创建XML写入器
     QXmlStreamWriter xmlWriter(&file);
     xmlWriter.setAutoFormatting(true);
@@ -24,43 +36,47 @@ bool Project::makeProject()
 
     // 写入XML内容
     xmlWriter.writeStartElement("root");
+    // ================== 写入工程名称 ==================
     xmlWriter.writeAttribute("Name", "Project");
-    xmlWriter.writeAttribute("Val", this->name);
-    for (const QString& s_path : sourcePathList) {
-        xmlWriter.writeTextElement("sourcePath", s_path);
+    xmlWriter.writeAttribute("Val", this->name);  
+    // ================== 写入资源列表路径 ==================
+    for (const QString& source : sourceList) {
+        QString relative = "/sources/" + QFileInfo(source).fileName();
+        xmlWriter.writeTextElement("sourcePath", relative);
     }
-    qDebug() << "Source Path List:";
-    for (const QString& c_path : constraintPathList) {
-        xmlWriter.writeTextElement("constraintPath", c_path);
+    for (const QString& constraint : constraintList) {
+        QString relative = "/constraints/" + QFileInfo(constraint).fileName();
+        xmlWriter.writeTextElement("constraintPath", relative);
     }
+    // ================== 写入Part ==================
     xmlWriter.writeStartElement("Option");
     xmlWriter.writeAttribute("Name", "Part");
     xmlWriter.writeAttribute("Val", this->part);
-    xmlWriter.writeEndElement();
+
 
     xmlWriter.writeEndElement();
-
+    xmlWriter.writeEndElement();
     xmlWriter.writeEndDocument();
 
-    // 关闭文件
     file.close();
-    return false;
+    return true;
 }
 
 bool Project::openProject(const QString &path)
 {
+    // this->sourceList.clear();
+    // this->constraintList.clear();
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "无法打开XML文件";
-        return -1;
+        return false;
     }
+    this->path = QFileInfo(path).path();
+    QString basePath = this->path;
     // 创建XML读取器
     QXmlStreamReader xmlReader(&file);
 
     // 解析XML内容
-    QStringList sourceTmp;
-    QStringList constraintTmp;
-
     while (!xmlReader.atEnd() && !xmlReader.hasError()) {
         QXmlStreamReader::TokenType token = xmlReader.readNext();
 
@@ -68,22 +84,25 @@ bool Project::openProject(const QString &path)
             QStringRef elementName = xmlReader.name();
             if (elementName == "sourcePath") {
                 xmlReader.readNext();
-                QString relativePath = xmlReader.text().toString();
-                sourceTmp.append(relativePath);
+                // QString absolute = QDir(basePath).absoluteFilePath(xmlReader.text().toString());
+                // QString relative = xmlReader.text().toString();
+                QString absolute = basePath + xmlReader.text().toString();
+                this->sourceList.append(absolute);
             } else if (elementName == "constraintPath") {
                 xmlReader.readNext();
-                QString relativePath = xmlReader.text().toString();
-                constraintTmp.append(relativePath);
+                // QString absolute = QDir(basePath).absoluteFilePath(xmlReader.text().toString());
+                QString absolute = basePath + xmlReader.text().toString();
+                this->constraintList.append(absolute);
             } else if (elementName == "Option") {
                 QXmlStreamAttributes attributes = xmlReader.attributes();
                 // QString xname = attributes.value("Name").toString();
-                QString xval = attributes.value("Val").toString();
-                this->part = xval;
+                QString val = attributes.value("Val").toString();
+                this->part = val;
             } else if (elementName == "root") {
                 QXmlStreamAttributes attributes = xmlReader.attributes();
                 // QString xname = attributes.value("Name").toString();
-                QString xval = attributes.value("Val").toString();
-                this->name = xval;
+                QString val = attributes.value("Val").toString();
+                this->name = val;
             }
         }
     }
@@ -91,22 +110,22 @@ bool Project::openProject(const QString &path)
     // 检查XML解析是否成功
     if (xmlReader.hasError()) {
         qDebug() << "解析XML文件时发生错误：" << xmlReader.errorString();
-        return -1;
+        return false;
     }
 
     // 输出解析结果
     qDebug() << "Project Name" << this->name;
     qDebug() << "Part Val:" << this->part;
-    qDebug() << "Source Path List:";
-    for (const QString& path : sourceTmp) {
-        qDebug() << path;
+    qDebug() << "=======================================";
+    qDebug() << "Source Path List:======================";
+    for (const QString& source : this->sourceList) {
+        qDebug() << " " << source;
     }
-    sourcePathList = sourceTmp;
-    qDebug() << "Source Path List:";
-    for (const QString& path : constraintTmp) {
-        qDebug() << path;
+    qDebug() << "Constrain Path List:===================";
+    for (const QString& constraint : this->constraintList) {
+        qDebug() << " " << constraint;
     }
-    constraintPathList = constraintTmp;
+    qDebug() << "=======================================";
     // 关闭文件
     file.close();
     return true;
