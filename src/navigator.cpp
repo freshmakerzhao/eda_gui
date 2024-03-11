@@ -1,5 +1,6 @@
 #include "navigator.h"
 #include "mainwindow.h"
+#include "taskview.h"
 
 Navigator *Navigator::instance(QWidget *parent)
 {
@@ -47,7 +48,7 @@ void Navigator::loadFile(Project *project)
         return;
     }
     pn.push_back(project->path);
-
+    TaskView::instance()->sourceList = project->sourcePathList;
     QTreeWidgetItem *nameItem = new QTreeWidgetItem(navTree);
     nameItem->setText(0, project->name);
     QTreeWidgetItem *sourceItem = new QTreeWidgetItem(nameItem);
@@ -134,6 +135,7 @@ void Navigator::setActiveProjectAction()
 void Navigator::addSourcesAction()
 {
     QString path = navTree->currentItem()->data(0, Qt::UserRole).toString();
+    qDebug() << "path:" << path;
     QString addSourcesPath = path + "/sources/";
     qDebug() << "addSources path:" << addSourcesPath;
     QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");

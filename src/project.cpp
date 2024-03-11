@@ -22,7 +22,7 @@ bool Project::makeProject()
     xmlWriter.setAutoFormatting(true);
     xmlWriter.writeStartDocument();
 
-    // 写入XML内容
+    // 写入sourcePath
     xmlWriter.writeStartElement("root");
     xmlWriter.writeAttribute("Name", "Project");
     xmlWriter.writeAttribute("Val", this->name);
@@ -30,6 +30,8 @@ bool Project::makeProject()
         xmlWriter.writeTextElement("sourcePath", s_path);
     }
     qDebug() << "Source Path List:";
+
+    // 写入constraintPath
     for (const QString& c_path : constraintPathList) {
         xmlWriter.writeTextElement("constraintPath", c_path);
     }
