@@ -15,7 +15,10 @@ class TaskView : public QWidget
 public:
     static TaskView *instance(QWidget *parent = nullptr);
 
-    QStringList sourceList;
+//    QStringList sourceList;
+    // 存储设计与约束文件
+    QList<QString> sourcePathList;
+    QList<QString> constraintPathList;
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 

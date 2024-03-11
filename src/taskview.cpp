@@ -127,13 +127,16 @@ TaskView::~TaskView()
 
 // 执行综合阶段
 void TaskView::runSynth() {
+
+    // TODO 执行前判断source与constraint文件是否存在
+    // TODO source不存在不能执行
+    // TODO constraint文件不存在弹出提示框
+
     QString family = "xc7";
     std::string GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
     std::string GLOBAL_ARCH_NAME = "xc7a50t_test";
     std::string GLOBAL_PART_NAME = "xc7a35tfgg484-2";
     std::string projectPath = "E:/workspace/demo_files/00_multi_demo";
-    QList<QString> constraintPathList = {"E:/workspace/demo_files/00_multi_demo/top.xdc"};
-    QList<QString> sourcePathList = {"E:/workspace/demo_files/00_multi_demo/top.v"};
     QString topName = "top";
     // 初始化环境
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,GLOBAL_ARCH_NAME,GLOBAL_PART_NAME,constraintPathList,topName);
@@ -162,8 +165,6 @@ void TaskView::buildPack() {
     std::string GLOBAL_ARCH_NAME = "xc7a50t_test";
     std::string GLOBAL_PART_NAME = "xc7a35tfgg484-2";
     std::string projectPath = "E:/workspace/demo_files/00_multi_demo";
-    QList<QString> constraintPathList = {"E:/workspace/demo_files/00_multi_demo/top.xdc"};
-    QList<QString> sourcePathList = {"E:/workspace/demo_files/00_multi_demo/top.v"};
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,GLOBAL_ARCH_NAME,GLOBAL_PART_NAME,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateImpPackCommands(GLOBAL_PART_NAME,projectPath);
@@ -189,8 +190,6 @@ void TaskView::buildPlace(int mode) {
     std::string GLOBAL_ARCH_NAME = "xc7a50t_test";
     std::string GLOBAL_PART_NAME = "xc7a35tfgg484-2";
     std::string projectPath = "E:/workspace/demo_files/00_multi_demo";
-    QList<QString> constraintPathList = {"E:/workspace/demo_files/00_multi_demo/top.xdc"};
-    QList<QString> sourcePathList = {"E:/workspace/demo_files/00_multi_demo/top.v"};
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,GLOBAL_ARCH_NAME,GLOBAL_PART_NAME,constraintPathList,topName);
     std::string script;
@@ -241,8 +240,6 @@ void TaskView::buildRoute() {
     std::string GLOBAL_ARCH_NAME = "xc7a50t_test";
     std::string GLOBAL_PART_NAME = "xc7a35tfgg484-2";
     std::string projectPath = "E:/workspace/demo_files/00_multi_demo";
-    QList<QString> constraintPathList = {"E:/workspace/demo_files/00_multi_demo/top.xdc"};
-    QList<QString> sourcePathList = {"E:/workspace/demo_files/00_multi_demo/top.v"};
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,GLOBAL_ARCH_NAME,GLOBAL_PART_NAME,constraintPathList,topName);
 
@@ -265,8 +262,6 @@ void TaskView::buildBit(int mode) {
     std::string GLOBAL_ARCH_NAME = "xc7a50t_test";
     std::string GLOBAL_PART_NAME = "xc7a35tfgg484-2";
     std::string projectPath = "E:/workspace/demo_files/00_multi_demo";
-    QList<QString> constraintPathList = {"E:/workspace/demo_files/00_multi_demo/top.xdc"};
-    QList<QString> sourcePathList = {"E:/workspace/demo_files/00_multi_demo/top.v"};
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,GLOBAL_ARCH_NAME,GLOBAL_PART_NAME,constraintPathList,topName);
     if (mode == 1) {
@@ -297,8 +292,6 @@ void TaskView::downloadBit() {
     std::string GLOBAL_ARCH_NAME = "xc7a50t_test";
     std::string GLOBAL_PART_NAME = "xc7a35tfgg484-2";
     std::string projectPath = "E:/workspace/demo_files/00_multi_demo";
-    QList<QString> constraintPathList = {"E:/workspace/demo_files/00_multi_demo/top.xdc"};
-    QList<QString> sourcePathList = {"E:/workspace/demo_files/00_multi_demo/top.v"};
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,GLOBAL_ARCH_NAME,GLOBAL_PART_NAME,constraintPathList,topName);
 
