@@ -27,7 +27,6 @@ public:
     bool openFile(const QString path);
     bool saveFile();
     bool saveAsFile();
-    // void setFilePath(const QString path);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
@@ -35,7 +34,6 @@ protected:
 private:
     QsciLexerVerilog *textLexer;
     QsciAPIs *apis;
-
     QString m_path;
 };
 

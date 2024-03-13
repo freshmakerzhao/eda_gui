@@ -1,15 +1,15 @@
-#include "taskview.h"
+#include "taskmanager.h"
 
-TaskView *TaskView::instance(QWidget *parent)
+TaskManager *TaskManager::instance(QWidget *parent)
 {
-    static TaskView *m_instance = nullptr;
+    static TaskManager *m_instance = nullptr;
     if (!m_instance) {
-        m_instance = new TaskView(parent);
+        m_instance = new TaskManager(parent);
     }
     return m_instance;
 }
 
-bool TaskView::eventFilter(QObject *obj, QEvent *event)
+bool TaskManager::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == taskTree->viewport()) {
         //点击树的空白,取消选中
@@ -26,10 +26,10 @@ bool TaskView::eventFilter(QObject *obj, QEvent *event)
     return QObject::eventFilter(obj, event);
 }
 
-TaskView::TaskView(QWidget *parent)
+TaskManager::TaskManager(QWidget *parent)
     : QWidget(parent)
 {
-    qDebug() << "[TaskView] Constructing...";
+    qDebug() << "[TaskManager] Constructing...";
     taskTree = new QTreeWidget(this);
     taskTree->viewport()->installEventFilter(this); //事件过滤
     QGridLayout *layout = new QGridLayout(this);
@@ -117,8 +117,8 @@ TaskView::TaskView(QWidget *parent)
 
 }
 
-TaskView::~TaskView()
+TaskManager::~TaskManager()
 {
-    qDebug() << "[TaskView] Distructing...";
+    qDebug() << "[TaskManager] Distructing...";
 }
 

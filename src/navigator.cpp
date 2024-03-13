@@ -57,6 +57,7 @@ void Navigator::loadFile(Project *proj)
 void Navigator::clickedFile(QTreeWidgetItem *item)
 {
     QString path = item->data(0, Qt::UserRole).toString();
+    qDebug() << "Navigator:: open " << path;
     MainWindow::instance()->createEditorTab(path);
 }
 
@@ -65,7 +66,7 @@ void Navigator::showContextMenu(const QPoint &pos) {
     QAction closeProject("Close Project");
     QAction addSources("Add Sources");
     QAction addConstraints("Add Constraints");
-    QAction deleteFileAction("Delete File");
+    QAction deleteFileAction("Remove...");
     if (navTree->currentItem() == nullptr) {
         qDebug() << "Empty Item";
         return;
@@ -79,7 +80,7 @@ void Navigator::showContextMenu(const QPoint &pos) {
         connect(&addConstraints, &QAction::triggered, this, &Navigator::addConstraintsAction);
     } else if (QFileInfo(navTree->currentItem()->data(0, Qt::UserRole).toString()).isFile()) {
         contextMenu.addAction(&deleteFileAction);
-        connect(&deleteFileAction, &QAction::triggered, this, &Navigator::deleteFileAction);
+        connect(&deleteFileAction, &QAction::triggered, this, &Navigator::removeFileAction);
 
     }
     contextMenu.exec(navTree->mapToGlobal(pos));
@@ -127,7 +128,7 @@ void Navigator::addConstraintsAction()
     loadFile(p);
 }
 
-void Navigator::deleteFileAction()
+void Navigator::removeFileAction()
 {
     QString path = navTree->currentItem()->data(0, Qt::UserRole).toString();
     QFileInfo fileInfo(path);
@@ -143,7 +144,6 @@ void Navigator::deleteFileAction()
     file.remove();
     delete navTree->currentItem();
     p->makeProject();
-    // loadFile(p);
 }
 
 bool Navigator::eventFilter(QObject *obj, QEvent *event)

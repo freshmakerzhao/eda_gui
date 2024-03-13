@@ -3,7 +3,7 @@
 #include "editor.h"
 #include "wizard.h"
 #include "navigator.h"
-#include "taskview.h"
+#include "taskmanager.h"
 #include "infowidget.h"
 #include "processmanager.h"
 
@@ -59,13 +59,13 @@ void MainWindow::onNewTriggered()
     projectWizard->show();
 }
 
-void MainWindow::onOpenTriggered()
+void MainWindow::onOpenFileTriggered()
 {
     QString path = QFileDialog::getOpenFileName(this, "Open File");
     createEditorTab(path);
 }
 
-void MainWindow::onOpenProjectTriggered()
+void MainWindow::onOpenTriggered()
 {
     QFileDialog dialog(this);
     dialog.setWindowTitle("Open Project");
@@ -162,15 +162,25 @@ void MainWindow::onDocumentationTriggered()
 void MainWindow::onAboutTriggered()
 {
     aboutDialog.setFixedSize(640, 480);
+    aboutDialog.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint); // 删除问号，只保留关闭
     aboutDialog.setWindowTitle("About Software");
-    QLabel *label = new QLabel(&aboutDialog);
-    label->setText("<html><h2>About Software</h2"
+    QLabel *textLabel = new QLabel(&aboutDialog);
+    textLabel->setText("<html><h2>About Software</h2"
                    "<p>© 2024 Power by HybrdChip</p>"
                    "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a>"
                    "</p></html>");
-    label->setTextFormat(Qt::RichText);
-    label->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    label->setOpenExternalLinks(true);
+    textLabel->setTextFormat(Qt::RichText);
+    textLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    textLabel->setOpenExternalLinks(true);
+
+    QLabel *imageLabel = new QLabel(&aboutDialog);
+    QPixmap image(":/resource/logo.png");
+    imageLabel->setPixmap(image.scaled(500, 300));
+    imageLabel->setAlignment(Qt::AlignCenter);
+    QVBoxLayout layout(&aboutDialog);
+
+    layout.addWidget(textLabel);
+    layout.addWidget(imageLabel);
     aboutDialog.show();
 }
 
@@ -228,6 +238,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     qDebug() << "[Main Window] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
+    this->setWindowIcon(QIcon(":/resource/icon.png"));
     this->resize(1600, 900);
     // =================== MENUBAR ====================
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
@@ -236,16 +247,16 @@ MainWindow::MainWindow(QWidget *parent)
     helpMenu = menuBar->addMenu("Help");
     // ===================== FILE ======================
     newAction = new QAction("New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-    openAction = new QAction("Open", this);
-    openProjectAction = new QAction("Open Project", this);
+    openAction = new QAction("Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    openFileAction = new QAction("Open File", this);
     saveAction = new QAction("Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     saveasAction = new QAction("Save As", this);
-    fileMenu->addActions({newAction, openAction, openProjectAction}), fileMenu->addSeparator();
+    fileMenu->addActions({newAction, openAction, openFileAction}), fileMenu->addSeparator();
     fileMenu->addActions({saveAction, saveasAction});
     // ================= 文件按钮绑定 ====================
     connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
+    connect(openFileAction, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
     connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
-    connect(openProjectAction, &QAction::triggered, this, &MainWindow::onOpenProjectTriggered);
     connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
     connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
     // ===================== EDIT ======================
@@ -290,7 +301,7 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::LeftDockWidgetArea, leftDock1);
 
     QDockWidget *leftDock2 = new QDockWidget(this);
-    leftDock2->setWindowTitle("Tasks"), leftDock2->setWidget(TaskView::instance());
+    leftDock2->setWindowTitle("Tasks"), leftDock2->setWidget(TaskManager::instance());
     addDockWidget(Qt::LeftDockWidgetArea, leftDock2);
 
     QDockWidget *bottomDock = new QDockWidget(this);

@@ -39,7 +39,7 @@ public slots:
 
     void addConstraintsAction();
 
-    void deleteFileAction();
+    void removeFileAction();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

@@ -24,6 +24,13 @@ set(QSCINTILLA_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 include_directories(${QSCINTILLA_INCLUDE_DIR})
 link_directories(${QSCINTILLA_LIBRARY_DIR})
 
+# Include the YAML library
+set(YAML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp")
+set(YAML_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
+
+include_directories(${YAML_INCLUDE_DIR})
+link_directories(${YAML_LIBRARY_DIR})
+
 # Add source files
 set(PROJECT_SOURCES
     chipplanner.cpp
@@ -34,7 +41,7 @@ set(PROJECT_SOURCES
     navigator.cpp
     project.cpp
     wizard.cpp
-    taskview.cpp
+    taskmanager.cpp
     processmanager.cpp
 )
 
@@ -47,7 +54,7 @@ set(PROJECT_HEADERS
     navigator.h
     project.h
     wizard.h
-    taskview.h
+    taskmanager.h
     processmanager.h
     ./Qsci/qsciscintilla.h
     ./Qsci/qsciscintillabase.h
@@ -55,6 +62,7 @@ set(PROJECT_HEADERS
     ./Qsci/qscilexercustom.h
     ./Qsci/qscilexer.h
     ./Qsci/qsciabstractapis.h
+    ./yaml-cpp/yaml.h
 )
 
 # Add resource files
@@ -73,6 +81,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     qscintilla2_qt5
+    libyaml-cpp.a
 )
 
 # Specify installation paths (if required)

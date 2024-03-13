@@ -39,7 +39,7 @@ Editor::Editor(QWidget *parent)
             keywords.append(keyword);
         }
         file.close();
-        qDebug() << "keywords load success";
+        qDebug() << "keywords loaded successfully";
     }
 
     // 将关键词添加到自动完成列表
@@ -127,11 +127,6 @@ bool Editor::saveAsFile()
     this->setModified(false);
     return true;
 }
-
-// void Editor::setFilePath(const QString path)
-// {
-//     m_path = path;
-// }
 
 void Editor::contextMenuEvent(QContextMenuEvent *event)
 {

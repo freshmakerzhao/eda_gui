@@ -26,8 +26,8 @@ public:
 
 private slots:
     void onNewTriggered();
+    void onOpenFileTriggered();
     void onOpenTriggered();
-    void onOpenProjectTriggered();
     void onSaveTriggered();
     void onSaveAsTriggered();
 
@@ -60,7 +60,7 @@ private:
 
     QAction *newAction;
     QAction *openAction;
-    QAction *openProjectAction;
+    QAction *openFileAction;    
     QAction *saveAction;
     QAction *saveasAction;
     QAction *cutAction;

@@ -1,5 +1,5 @@
-#ifndef TASKVIEW_H
-#define TASKVIEW_H
+#ifndef TASKMANAGER_H
+#define TASKMANAGER_H
 
 #include <QTreeWidget>
 #include <QWidget>
@@ -8,22 +8,22 @@
 #include <QDebug>
 
 
-class TaskView : public QWidget
+class TaskManager : public QWidget
 {
     Q_OBJECT
 
 public:
-    static TaskView *instance(QWidget *parent = nullptr);
+    static TaskManager *instance(QWidget *parent = nullptr);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
-    TaskView(QWidget *parent = nullptr);
-    ~TaskView();
+    TaskManager(QWidget *parent = nullptr);
+    ~TaskManager();
 
     QTreeWidget *taskTree;
 
 };
 
-#endif // TASKVIEW_H
+#endif // TASKMANAGER_H

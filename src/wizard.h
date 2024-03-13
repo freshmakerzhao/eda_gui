@@ -19,6 +19,9 @@
 #include <QMessageBox>
 #include <QDialogButtonBox>
 #include <QTimer>
+#include <QSortFilterProxyModel>
+#include <QComboBox>
+#include <QFormLayout>
 #include <QDebug>
 
 #include "project.h"
@@ -60,6 +63,7 @@ private:
 
 private slots:
     void onAddFiles();
+    void onCreateFile();
     void onRemoveFiles();
     void updateFilesList(const QStringList &files);
 

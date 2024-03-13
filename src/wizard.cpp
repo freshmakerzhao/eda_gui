@@ -1,6 +1,7 @@
 #include "wizard.h"
 
 #include "navigator.h"
+#include <yaml-cpp/yaml.h>
 
 Wizard::Wizard(QWidget *parent) : QWizard(parent)
 {
@@ -43,20 +44,38 @@ void Wizard::onFinish()
         return;
     }
 
+    QString targetPath =  projectPath + "/" + projectName;
     // 复制文件列表中的文件到项目文件夹sources
     foreach (const QString &file, sourcesFilesList) {
-        QFile::copy(file, projectPath + "/" + projectName + "/sources/" + QFileInfo(file).fileName());
+        QFile::copy(file, targetPath + "/sources/" + QFileInfo(file).fileName());
     }
     // 复制文件列表中的文件到项目文件夹constrains
     foreach (const QString &file, constraintFilesList) {
-        QFile::copy(file, projectPath + "/" + projectName + "/constraints/" + QFileInfo(file).fileName());
+        QFile::copy(file, targetPath + "/constraints/" + QFileInfo(file).fileName());
     }
 
-    project = new Project(projectName, projectPath + "/" + projectName, part);
-    project->sourceList = sourcesFilesList;
-    project->constraintList = constraintFilesList;
+    // ======================== 记录复制文件后的文件位置 =========================
+    QStringList sourcetmp,constrainttmp;
+    for (const QString& source : sourcesFilesList) {
+        QString newPath =  targetPath + "/sources/" + QFileInfo(source).fileName();
+        sourcetmp.append(newPath);
+    }
+    for (const QString& constraint : constraintFilesList) {
+        QString newPath =  targetPath + "/constraints/" + QFileInfo(constraint).fileName();
+        constrainttmp.append(newPath);
+    }
+    // ============================= 生成工程 =================================
+    project = new Project(projectName, targetPath, part);
+    project->sourceList = sourcetmp;
+    project->constraintList = constrainttmp;
     project->makeProject();
     Navigator::instance()->loadFile(project);
+
+    // ============================= 清除缓存 =================================
+    QDir dircache("Cache");
+    if (!dircache.isEmpty()) {
+        dircache.removeRecursively();
+    }
 }
 
 ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
@@ -72,10 +91,9 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
     QLabel *pathLabel = new QLabel("Project path:");
     QLineEdit *pathLineEdit = new QLineEdit;
     QPushButton *browseButton = new QPushButton("Browse");
-    connect(browseButton, &QPushButton::clicked, [=](){
-        QString path = QFileDialog::getExistingDirectory(this, "Select Directory");
-        if (!path.isEmpty())
-        {
+    connect(browseButton, &QPushButton::clicked, [=]() {
+        QString path = QFileDialog::getExistingDirectory(this, "Select Directory", QDir::homePath());
+        if (!path.isEmpty()) {
             pathLineEdit->setText(path);
         }
     });
@@ -106,6 +124,9 @@ AddSourcesPage::AddSourcesPage(QWidget *parent) : QWizardPage(parent)
     QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &AddSourcesPage::onAddFiles);
 
+    QPushButton *createFileButton = new QPushButton("Create Files");createFileButton->setFixedSize(160, 45);
+    connect(createFileButton, &QPushButton::clicked, this, &AddSourcesPage::onCreateFile);
+
     QPushButton *removeButton = new QPushButton("Remove Files");removeButton->setFixedSize(160, 45);
     connect(removeButton, &QPushButton::clicked, this, &AddSourcesPage::onRemoveFiles);
 
@@ -113,6 +134,7 @@ AddSourcesPage::AddSourcesPage(QWidget *parent) : QWizardPage(parent)
     QHBoxLayout *btnLayout = new QHBoxLayout;
     layout->addWidget(filesListWidget);
     btnLayout->addWidget(addFilesButton);
+    btnLayout->addWidget(createFileButton);
     btnLayout->addWidget(removeButton);
     layout->addLayout(btnLayout);
     setLayout(layout);
@@ -130,6 +152,65 @@ void AddSourcesPage::onAddFiles()
         }
         emit filesListUpdatedSignal(files); // 发送信号
     }
+}
+
+void AddSourcesPage::onCreateFile()
+{
+    QDialog *dialog = new QDialog(this);
+    dialog->setFixedSize(320, 180);
+    dialog->setWindowTitle("Create Source File");
+    QComboBox *comboBox = new QComboBox(dialog);
+    comboBox->addItem("Verilog");
+
+    QFormLayout *formLayout = new QFormLayout(dialog);
+    formLayout->addRow("File type:", comboBox);
+
+    QLineEdit *lineEdit = new QLineEdit(dialog);
+    lineEdit->setClearButtonEnabled(true);
+    formLayout->addRow("File name:", lineEdit);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    formLayout->addRow(buttonBox);
+
+    connect(buttonBox, &QDialogButtonBox::accepted, [comboBox, lineEdit, dialog, this](){
+        QString fileType = comboBox->currentText();
+        QString fileName = lineEdit->text();
+
+        QString extension;
+        if (fileType == "Verilog") {
+            extension = ".v";
+        }
+        else {
+            // Handle other file types if needed
+        }
+
+        QDir directory("Cache");
+        if (!directory.exists()) {
+            directory.mkpath(".");
+        }
+
+        QString newFilePath = "Cache/" + fileName + extension;
+        QFile file(newFilePath);
+        if (file.open(QFile::WriteOnly | QFile::Truncate)) {
+            // File created successfully, do any additional processing here if needed
+            // QTextStream stream(&file);
+            file.close();
+        }
+        else {
+            // Failed to create file, handle error appropriately
+        }
+        QStringList tmp;
+        tmp.append(newFilePath);
+        emit filesListUpdatedSignal(tmp);
+        Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
+        wizard->sourcesFilesList.append(newFilePath);  // 将新建的文件追加到列表中
+        dialog->accept();
+    });
+
+    connect(buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+
+    dialog->setLayout(formLayout);
+    dialog->show();
 }
 
 void AddSourcesPage::onRemoveFiles()
@@ -216,49 +297,46 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     setTitle("Default Part");
     setSubTitle("Choose a default part for your project.");
 
-    // 读取parts.yaml文件
-    QFile file(":/resource/parts.yaml");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "parts.yaml load fail";
-    }
-
-    QTextStream in(&file);
-    QStringList lines;
-    while (!in.atEnd()) {
-        lines.append(in.readLine());
-    }
-    file.close();
-
     tableView = new QTableView(this);
+    tableView->verticalHeader()->setVisible(false); // 不显示行号
     QStandardItemModel *model = new QStandardItemModel(0, 4, this);
     tableView->setModel(model);
     QStringList headers = {"part", "device", "package", "speedgrade"};
     model->setHorizontalHeaderLabels(headers);
 
-    int row = 0;
-    for (int i = 0; i < lines.size(); ++i) {
-        QString line = lines.at(i);
-        if (line.startsWith("xc7")) {
-            QString part = line.section(':', 0, 0).trimmed();
-            model->setItem(row, 0, new QStandardItem(part));
+    QFile file(":/resource/parts.yaml");
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        // 从资源读取YAML文件内容
+        QTextStream in(&file);
+        QString yamlData = in.readAll();
 
-            for (int j = i + 1; j < lines.size(); ++j) {
-                QString nextLine = lines.at(j);
-                if (nextLine.startsWith("  device:")) {
-                    QString device = nextLine.section(':', 1).trimmed();
-                    model->setItem(row, 1, new QStandardItem(device));
-                } else if (nextLine.startsWith("  package:")) {
-                    QString package = nextLine.section(':', 1).trimmed();
-                    model->setItem(row, 2, new QStandardItem(package));
-                } else if (nextLine.startsWith("  speedgrade:")) {
-                    QString speedgrade = nextLine.section(':', 1).trimmed();
-                    model->setItem(row, 3, new QStandardItem(speedgrade));
-                    break;
-                }
+        // 使用yaml-cpp库解析YAML数据
+        try {
+            YAML::Node config = YAML::Load(yamlData.toStdString());
+            // 处理YAML数据
+            qDebug() << "YAML loaded successfully";
+            int row = 0;
+            for (auto it = config.begin(); it != config.end(); ++it) {
+                QString part = QString::fromStdString(it->first.as<std::string>());
+                QString device = QString::fromStdString(it->second["device"].as<std::string>());
+                QString package = QString::fromStdString(it->second["package"].as<std::string>());
+                QString speedgrade = QString::fromStdString(it->second["speedgrade"].as<std::string>());
+                model->setItem(row, 0, new QStandardItem(part));
+                model->setItem(row, 1, new QStandardItem(device));
+                model->setItem(row, 2, new QStandardItem(package));
+                model->setItem(row, 3, new QStandardItem(speedgrade));
+                row++;
             }
-            row++;
+        } catch (const YAML::ParserException& e) {
+            qDebug() << "Error parsing YAML: " << e.what();
+        } catch (const YAML::Exception& e) {
+            qDebug() << "YAML error: " << e.what();
         }
+        file.close();
+    } else {
+        qDebug() << "Error opening file";
     }
+
     // 设置整个表格为只读
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // 设置宽度自适应
@@ -267,12 +345,24 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
     tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
     QObject::connect(tableView, &QTableView::clicked, this, &DefaultPartPage::selectPart);
+
+    // Filter
+    // QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+    // proxyModel->setSourceModel(model);
+    // tableView->setModel(proxyModel);
+    // QLineEdit *lineEdit = new QLineEdit(this);
+    // connect(lineEdit, &QLineEdit::textChanged, [proxyModel](const QString &text){
+    //     proxyModel->setFilterFixedString(text);
+    // });
+
     QVBoxLayout *layout = new QVBoxLayout(this);
+    // layout->addWidget(lineEdit);
     layout->addWidget(tableView);
 }
 
 bool DefaultPartPage::isComplete() const
 {
+    // Part为必选项
     if (tableView->selectionModel()->selectedIndexes().isEmpty()) {
         return false; // 不满足条件，禁止进入下一步
     }
