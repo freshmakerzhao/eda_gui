@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(eda_gui)
+project(HybrdLink)
 
 # Set C++17 as required standard for the project
 set(CMAKE_CXX_STANDARD 17)
@@ -90,3 +90,9 @@ target_link_libraries(${PROJECT_NAME}
 
 # Specify installation paths (if required)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /opt/${PROJECT_NAME}/bin)
+
+set(app_WINRC appicon.rc)
+set_property(SOURCE app_win32.rc APPEND PROPERTY
+        OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/AppIcon.ico
+)
+

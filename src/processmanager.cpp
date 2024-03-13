@@ -1,6 +1,7 @@
 #include "processmanager.h"
 #include "utils/StringUtilities.h"
 #include "infowidget.h"
+#include "mainwindow.h"
 #include <QTextCodec>
 #include <QMessageBox>
 
@@ -141,9 +142,9 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     // 显示信息弹窗
     // exitCode 为0表示正常执行并成功退出
     if (exitCode == 0) {
-        QMessageBox::information(nullptr, this->curPhase + " Completed", this->curPhase + " successfully completed.");
+        QMessageBox::information(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
     } else {
-        QMessageBox::critical(nullptr, this->curPhase + " Failed", this->curPhase + " failed.");
+        QMessageBox::critical(MainWindow::instance(), this->curPhase + " Failed", this->curPhase + " failed.");
     }
 }
 

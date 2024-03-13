@@ -3,7 +3,7 @@
         <file>resource/keywords.txt</file>
         <file>resource/JetBrainsMonoNL-Bold.ttf</file>
         <file>resource/logo.png</file>
-        <file>resource/icon.jpg</file>
+        <file>resource/icon.png</file>
         <file>resource/parts.yaml</file>
     </qresource>
 </RCC>
