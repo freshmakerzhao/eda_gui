@@ -9,16 +9,23 @@ InfoWidget *InfoWidget::instance(QWidget *parent)
     return m_instance;
 }
 
-void InfoWidget::appendMsg(const QString &str)
-{
+void InfoWidget::appendMsg(const QString &str) {
     msg->appendPlainText(str);
+}
+
+void InfoWidget::appendLog(const QString &str) {
+    log->appendPlainText(str);
+}
+
+void InfoWidget::setCurrentPage(int index) {
+    tabWidget->setCurrentIndex(index);
 }
 
 InfoWidget::InfoWidget(QWidget *parent)
     : QWidget(parent)
 {
     qDebug() << "[InfoWidget] Constructing...";
-    QTabWidget *tabWidget = new QTabWidget(this);
+    tabWidget = new QTabWidget(this);
     QGridLayout *layout = new QGridLayout(this);
     layout->setMargin(0);
     layout->addWidget(tabWidget);

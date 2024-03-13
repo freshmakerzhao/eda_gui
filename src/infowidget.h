@@ -20,7 +20,10 @@ public:
     static InfoWidget *instance(QWidget *parent = nullptr);
 
     void appendMsg(const QString& str);
-
+    void appendLog(const QString& str);
+    // 指定激活index标签
+    void setCurrentPage(int index);
+    QTabWidget *tabWidget;
 private:
     InfoWidget(QWidget *parent = nullptr);
     ~InfoWidget();

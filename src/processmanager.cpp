@@ -1,5 +1,9 @@
 #include "processmanager.h"
 #include "utils/StringUtilities.h"
+#include "infowidget.h"
+#include <QTextCodec>
+#include <QMessageBox>
+
 ProcessManager& ProcessManager::instance()
 {
     static ProcessManager instance;
@@ -12,6 +16,7 @@ QProcess *ProcessManager::getProcess()
 }
 
 void ProcessManager::checkCall(const QString &phase, const QString &path, const QString &script) {
+    this->curPhase = phase;
     QStringList arguments;
     arguments << "/c" << script;
     process->terminate(); // 开始前先终止
@@ -21,6 +26,7 @@ void ProcessManager::checkCall(const QString &phase, const QString &path, const 
 }
 
 void ProcessManager::checkCallSpecific(const QString &phase, const QString &path, const QStringList& arguments) {
+    this->curPhase = phase;
     process->terminate(); // 开始前先终止
     configWorkPath(path);
     qDebug() << arguments;
@@ -50,11 +56,6 @@ void ProcessManager::initEnvironment(const QString& family,
                                              const QString& partName,
                                              QList<QString> constraintPathList,
                                              const QString& topName) {
-//    DEBUG
-//    QObject::connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),SLOT(finished(int,QProcess::ExitStatus)));
-//    QObject::connect(process,SIGNAL(readyRead()),this,SLOT(readyRead()));
-//    QObject::connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
-
     //synth env setting
     // 设置环境变量
     env = QProcessEnvironment::systemEnvironment();
@@ -113,30 +114,37 @@ void ProcessManager::initEnvironment(const QString& family,
     ProcessManager::instance().getProcess()->setProcessEnvironment(env);
 }
 
-void ProcessManager::finished(int exitCode,QProcess::ExitStatus exitStatus)
+// 实时回显数据
+void ProcessManager::handleReadyReadStandardOutput()
 {
-    qDebug()<<"finished";
+    // 获取标准输出
+    QByteArray output = process->readAllStandardOutput();
+    // 获取错误输出
+    QByteArray errorOutput = process->readAllStandardError();
+    QTextCodec *tc = QTextCodec::codecForName("GBK");
+    // 转码
+    QString outputStr = tc->toUnicode(output);
+    QString errorOutputStr = tc->toUnicode(errorOutput);
+    // 判断是否报错
+    if (process->error() == QProcess::UnknownError) {
+        // 没有错误发生，输出 output
+        InfoWidget::instance()->appendLog(outputStr);
+    } else {
+        // 发生错误，输出 errorOutput
+        InfoWidget::instance()->appendLog(errorOutputStr);
+    }
+}
 
-    qDebug()<<exitCode;// 被调用程序的main返回的int
-    qDebug()<<exitStatus;// QProcess::ExitStatus(NormalExit)
-    qDebug() <<"finished-output-readAll:";
-    qDebug()<<QString::fromLocal8Bit(process->readAll());// ""
-    qDebug()<<"finished-output-readAllStandardOutput:";
-    qDebug()<<QString::fromLocal8Bit(process->readAllStandardOutput());// ""
-}
-void ProcessManager::readyRead()
+// process执行结束后触发
+void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus)
 {
-    qDebug()<<"readyRead-readAll:";
-    qDebug()<<QString::fromLocal8Bit(process->readAll());// "hello it is ok!"
-    qDebug()<<"readyRead-readAllStandardOutput:";
-    qDebug()<<QString::fromLocal8Bit(process->readAllStandardOutput());// ""
-}
-void ProcessManager::readyReadStandardOutput()
-{
-    qDebug()<<"readyReadStandardOutput-readAll:";
-    qDebug()<<QString::fromLocal8Bit(process->readAll());// ""
-    qDebug()<<"readyReadStandardOutput-readAllStandardOutput:";
-    qDebug()<<QString::fromLocal8Bit(process->readAllStandardOutput());// ""
+    // 显示信息弹窗
+    // exitCode 为0表示正常执行并成功退出
+    if (exitCode == 0) {
+        QMessageBox::information(nullptr, this->curPhase + " Completed", this->curPhase + " successfully completed.");
+    } else {
+        QMessageBox::critical(nullptr, this->curPhase + " Failed", this->curPhase + " failed.");
+    }
 }
 
 /**
@@ -151,6 +159,10 @@ std::string ProcessManager::getProperty(const std::string& key){
 ProcessManager::ProcessManager()
 {
     process = new QProcess();
+    // readyReadStandardOutput 信号，有输出则显示在message中
+    connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(handleReadyReadStandardOutput()));
+    // finished 信号，process执行完毕后触发
+    connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
 }
 
 ProcessManager::~ProcessManager()

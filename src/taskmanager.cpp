@@ -83,21 +83,33 @@ TaskManager::TaskManager(QWidget *parent)
         // 双击触发
         if (item == synthRunItem) {
              runSynth();
+            // 激活 log 窗口
+            InfoWidget::instance()->setCurrentPage(2);
         } else if (item == synthReportItem) {
             // synthReport();
         } else if (item == impAllItem) {
             // pack place route全流程
              buildImp();
+            // 激活 log 窗口
+            InfoWidget::instance()->setCurrentPage(2);
         } else if (item == impPackItem) {
              buildPack();
+            // 激活 log 窗口
+            InfoWidget::instance()->setCurrentPage(2);
         } else if (item == impPackReportItem) {
             // impReport();
         } else if (item == impPlaceItem) {
              buildPlace(3);
+            // 激活 log 窗口
+            InfoWidget::instance()->setCurrentPage(2);
         } else if (item == impRouteItem) {
              buildRoute();
+            // 激活 log 窗口
+            InfoWidget::instance()->setCurrentPage(2);
         } else if (item == proBitItem) {
              buildBit(2);
+            // 激活 log 窗口
+            InfoWidget::instance()->setCurrentPage(2);
         } else if (item == proBitViewItem) {
             // if (frameView) {
             //     delete frameView;  // 删除现存的对象
@@ -114,6 +126,8 @@ TaskManager::TaskManager(QWidget *parent)
             // frameView->show();
         } else if (item == proDownloadBitItem) {
              downloadBit();
+            // 激活 log 窗口
+            InfoWidget::instance()->setCurrentPage(2);
         }
     });
 
@@ -133,7 +147,6 @@ void TaskManager::runSynth() {
     // TODO source不存在不能执行
     // TODO constraint文件不存在弹出提示框
     // TODO runs及synth路径是否存在
-    InfoWidget::instance()->appendMsg("123");
     QString family = "xc7";
     QString topName = "top";
     // 初始化环境
@@ -152,10 +165,7 @@ void TaskManager::runSynth() {
     for(const QString& sourcePath :sourcePathList){
         arguments << sourcePath;
     }
-
-    ProcessManager::instance().checkCallSpecific("synth", projectSynthPath, arguments);
-    // TODO 需要监听process的输出，打印到控制台
-//    showLog("synth success", "synth failed", false);
+    ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments);
 }
 
 void TaskManager::buildPack() {
@@ -163,14 +173,7 @@ void TaskManager::buildPack() {
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
-    qDebug() << QString::fromStdString(script);
-    const QString msgSuccess = "pack 启动成功";
-    const QString msgFail = "pack 启动失败";
-    const QString phase = "pack";
-//    configOutputSignals("pack");
-    ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-    // TODO 需要监听process的输出，打印到控制台
-//    showLog( msgSuccess, msgFail, false);
+    ProcessManager::instance().checkCall("Pack", projectImplPath, QString::fromStdString(script));
 }
 
 
@@ -186,24 +189,14 @@ void TaskManager::buildPlace(int mode) {
     // 生成top.ioplace
     if (mode == 1) {
         script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        const QString phase = "generateIOPlace";
-        const QString msgFail = "generateIOPlace 启动失败";
-        const QString msgSuccess = "generateIOPlace 启动成功";
-        ProcessManager::instance().checkCall(phase, projectPath, QString::fromStdString(script));
-        // TODO 需要监听process的输出，打印到控制台
+        ProcessManager::instance().checkCall("IOPlace Generation", projectPath, QString::fromStdString(script));
     }
 
     // 生成top.ioplace 与 constrains.place
     if (mode == 2) {
         script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-
         script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-
-        const QString phase = "generateConstraints";
-        const QString msgFail = "generateConstraints 启动失败";
-        const QString msgSuccess = "generateConstraints 启动成功";
-        ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-        // TODO 需要监听process的输出，打印到控制台
+        ProcessManager::instance().checkCall("Constraints Generation", projectImplPath, QString::fromStdString(script));
     }
 
     // 完成 vpr_place
@@ -211,11 +204,7 @@ void TaskManager::buildPlace(int mode) {
         script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
         script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
         script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
-        const QString phase = "place";
-        const QString msgFail = "place 启动失败";
-        const QString msgSuccess = "place 启动成功";
-        ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-        // TODO 需要监听process的输出，打印到控制台
+        ProcessManager::instance().checkCall("Place", projectImplPath, QString::fromStdString(script));
     }
 }
 
@@ -227,12 +216,7 @@ void TaskManager::buildRoute() {
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
 
     std::string script = CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
-
-    const QString phase = "Route";
-    const QString msgFail = "Route 启动失败";
-    const QString msgSuccess = "Route 启动成功";
-    ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-    // TODO 需要监听process的输出，打印到控制台
+    ProcessManager::instance().checkCall("Route", projectImplPath, QString::fromStdString(script));
 }
 
 // pack place route
@@ -241,12 +225,7 @@ void TaskManager::buildImp() {
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateImpementationCommands(projectSynthPath,archName);
-
-    const QString msgSuccess = "implementation 启动成功";
-    const QString msgFail = "implementation 启动失败";
-    const QString phase = "implementation";
-    ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-    // TODO 需要监听process的输出，打印到控制台
+    ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script));
 }
 
 // 生成bit流 阶段
@@ -258,34 +237,19 @@ void TaskManager::buildBit(int mode) {
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     if (mode == 1) {
         std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
-        const QString phase = "Generate_fasm";
-        const QString msgFail = "Generate_fasm 启动失败";
-        const QString msgSuccess = "Generate_fasm 启动成功";
-        ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-        // TODO 需要监听process的输出，打印到控制台
+        ProcessManager::instance().checkCall("Fasm Generation", projectImplPath, QString::fromStdString(script));
     }
     if (mode == 2) {
         std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
         script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%");
-        const QString phase = "Generate_bit";
-        const QString msgFail = "Generate_bit 启动失败";
-        const QString msgSuccess = "Generate_bit 启动成功";
-        ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-        // TODO 需要监听process的输出，打印到控制台
+        ProcessManager::instance().checkCall("Bitstream Generation", projectImplPath, QString::fromStdString(script));
     }
 }
-
 
 void TaskManager::downloadBit() {
     QString family = "xc7";
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-
     std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath,"digilent_hs3","top.bit");
-    const QString phase = "Download_bit";
-    const QString msgFail = "Download_bit 失败";
-    const QString msgSuccess = "Download_bit 成功";
-    qDebug() << QString::fromStdString(script);
-    ProcessManager::instance().checkCall(phase, projectImplPath, QString::fromStdString(script));
-    // TODO 需要监听process的输出，打印到控制台
+    ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script));
 }

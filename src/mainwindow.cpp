@@ -238,7 +238,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     qDebug() << "[Main Window] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
-    this->setWindowIcon(QIcon(":/resource/icon_2.jpg"));
+    this->setWindowIcon(QIcon(":/resource/icon.jpg"));
     this->resize(1600, 900);
     // =================== MENUBAR ====================
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);

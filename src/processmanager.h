@@ -35,11 +35,12 @@ public:
 
     void configWorkPath(const QString &path);
 
-
     // 进程环境变量
     QProcessEnvironment env;
     // 工程参数
     std::map<std::string, std::string> projectProperty;
+    // 当前执行的阶段
+    QString curPhase;
     /**
      * 初始化环境变量
      */
@@ -62,9 +63,8 @@ private:
     QProcess* process;
 
 private slots:
-    void finished(int exitCode,QProcess::ExitStatus exitStatus);
-    void readyRead();
-    void readyReadStandardOutput();
+    void handleFinished(int exitCode,QProcess::ExitStatus exitStatus);
+    void handleReadyReadStandardOutput();
 
 };
 

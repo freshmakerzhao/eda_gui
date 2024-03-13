@@ -11,7 +11,6 @@
 class TaskManager : public QWidget
 {
     Q_OBJECT
-
 public:
     static TaskManager *instance(QWidget *parent = nullptr);
 
