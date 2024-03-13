@@ -37,8 +37,23 @@ void Wizard::onFinish()
         dir.mkdir("sources");
         dir.mkdir("constraints");
         dir.mkdir("doc");
-        dir.mkdir("ip");   
-        qDebug() << "Folders Created Successfully";
+        dir.mkdir("ip");
+
+        // 创建runs文件夹
+        if (dir.mkdir("runs")) {
+            // cd进入runs文件夹
+            dir.cd("runs");
+            // 在runs文件夹内创建.works、impl和synth文件夹
+            dir.mkdir(".works"); // 记录中间过程，方便后续在此基础上继续执行
+            dir.mkdir("impl"); // pack place route
+            dir.mkdir("synth"); // synth
+            qDebug() << "Folders Created Successfully including runs/.works、runs/impl and runs/synth";
+        } else {
+            qDebug() << "Failed to create runs folder";
+        }
+
+        // 返回到原来的项目文件夹路径下
+        dir.cdUp();
     } else {
         qDebug() << "Folders Created Unsuccessfully";
         return;
@@ -65,7 +80,7 @@ void Wizard::onFinish()
         constrainttmp.append(newPath);
     }
     // ============================= 生成工程 =================================
-    project = new Project(projectName, targetPath, part);
+    project = new Project(projectName, targetPath, part, arch);
     project->sourceList = sourcetmp;
     project->constraintList = constrainttmp;
     project->makeProject();
@@ -301,7 +316,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView->verticalHeader()->setVisible(false); // 不显示行号
     QStandardItemModel *model = new QStandardItemModel(0, 4, this);
     tableView->setModel(model);
-    QStringList headers = {"part", "device", "package", "speedgrade"};
+    QStringList headers = {"part", "device", "package", "speedgrade", "arch"};
     model->setHorizontalHeaderLabels(headers);
 
     QFile file(":/resource/parts.yaml");
@@ -321,10 +336,12 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
                 QString device = QString::fromStdString(it->second["device"].as<std::string>());
                 QString package = QString::fromStdString(it->second["package"].as<std::string>());
                 QString speedgrade = QString::fromStdString(it->second["speedgrade"].as<std::string>());
+                QString archName = QString::fromStdString(it->second["arch"].as<std::string>());
                 model->setItem(row, 0, new QStandardItem(part));
                 model->setItem(row, 1, new QStandardItem(device));
                 model->setItem(row, 2, new QStandardItem(package));
                 model->setItem(row, 3, new QStandardItem(speedgrade));
+                model->setItem(row, 4, new QStandardItem(archName));
                 row++;
             }
         } catch (const YAML::ParserException& e) {
@@ -372,9 +389,11 @@ bool DefaultPartPage::isComplete() const
 void DefaultPartPage::selectPart(const QModelIndex &index) {
     QStandardItemModel *model = qobject_cast<QStandardItemModel*>(tableView->model());
     QStandardItem *partItem = model->item(index.row(), 0); // 获取part
+    QStandardItem *archItem = model->item(index.row(), 4); // 获取arch
     if (partItem) {
         Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
         wizard->part = partItem->text();
+        wizard->arch = archItem->text();
     }
     completeChanged();
 }

@@ -68,6 +68,10 @@ set(PROJECT_HEADERS
 # Add resource files
 set(PROJECT_RESOURCES
     res.qrc
+        utils/StringUtilities.cpp
+        utils/StringUtilities.h
+        utils/CommandBuilder.cpp
+        utils/CommandBuilder.h
 )
 
 # Tell CMake to create the executable

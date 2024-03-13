@@ -1,5 +1,6 @@
 #include "navigator.h"
 #include "mainwindow.h"
+#include "taskview.h"
 
 Navigator *Navigator::instance(QWidget *parent)
 {
@@ -29,6 +30,22 @@ void Navigator::loadFile(Project *proj)
     } else { // 未加载工程
         p = proj;
     }
+    // 存储设计文件与约束文件
+    TaskView::instance()->sourcePathList = proj->sourceList;
+    TaskView::instance()->constraintPathList = proj->constraintList;
+    // 存储路径
+    TaskView::instance()->projectSynthPath = proj->path + "/runs/synth";
+    TaskView::instance()->projectImplPath = proj->path + "/runs/impl";
+    TaskView::instance()->projectPath = proj->path;
+    // 存储partname
+    TaskView::instance()->partName = proj->part;
+    TaskView::instance()->archName = proj->arch;
+    TaskView::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
+
+
+    qDebug() << "[Navigatoe] loadFile...";
+    qDebug() << "[Navigatoe] proj->sourceList：" << proj->sourceList;
+    qDebug() << "[Navigatoe] proj->constraintList：" << proj->constraintList;
 
     QTreeWidgetItem *nameItem = new QTreeWidgetItem(navTree);
     nameItem->setText(0, proj->name);

@@ -128,6 +128,11 @@ bool Editor::saveAsFile()
     return true;
 }
 
+// void Editor::setFilePath(const QString path)
+// {
+//     m_path = path;
+// }
+
 void Editor::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createStandardContextMenu();
