@@ -4,6 +4,7 @@
         <file>resource/JetBrainsMonoNL-Bold.ttf</file>
         <file>resource/logo.png</file>
         <file>resource/icon.png</file>
+        <file>resource/icon_2.jpg</file>
         <file>resource/parts.yaml</file>
     </qresource>
 </RCC>

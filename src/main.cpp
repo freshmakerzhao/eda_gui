@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     QStringList args = a.arguments();
     splash.finish(MainWindow::instance()); // 启动画面结束
     MainWindow::instance()->show();
+    MainWindow::instance()->setWindowTitle("HybrdLink");
     // 如果有传递文件作为命令行参数
     if(args.size() > 1) {
         // 获取第一个文件路径
