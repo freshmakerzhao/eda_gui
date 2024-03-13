@@ -5,7 +5,8 @@
 #include <QDebug>
 
 class ProcessManager
-{
+        : public QObject {
+Q_OBJECT
 public:
     static ProcessManager& instance();
     QProcess *getProcess();
@@ -43,9 +44,9 @@ public:
      * 初始化环境变量
      */
     void initEnvironment(const QString& family,
-                         const std::string& resourcePath,
-                         const std::string& archName,
-                         const std::string& partname,
+                         const QString& resourcePath,
+                         const QString& archName,
+                         const QString& partname,
                          QList<QString> constraintPathList,
                          const QString& topName = "top");
     /**
@@ -54,11 +55,17 @@ public:
      * @return
      */
     std::string getProperty(const std::string& key);
+
 private:
     ProcessManager();
     ~ProcessManager();
-
     QProcess* process;
+
+private slots:
+    void finished(int exitCode,QProcess::ExitStatus exitStatus);
+    void readyRead();
+    void readyReadStandardOutput();
+
 };
 
 #endif // PROCESSMANAGER_H

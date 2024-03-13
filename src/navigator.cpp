@@ -33,6 +33,15 @@ void Navigator::loadFile(Project *proj)
     // 存储设计文件与约束文件
     TaskView::instance()->sourcePathList = proj->sourceList;
     TaskView::instance()->constraintPathList = proj->constraintList;
+    // 存储路径
+    TaskView::instance()->projectSynthPath = proj->path + "/runs/synth";
+    TaskView::instance()->projectImplPath = proj->path + "/runs/impl";
+    TaskView::instance()->projectPath = proj->path;
+    // 存储partname
+    TaskView::instance()->partName = proj->part;
+    TaskView::instance()->archName = proj->arch;
+    TaskView::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
+
 
     qDebug() << "[Navigatoe] loadFile...";
     qDebug() << "[Navigatoe] proj->sourceList：" << proj->sourceList;

@@ -36,8 +36,23 @@ void Wizard::onFinish()
         dir.mkdir("sources");
         dir.mkdir("constraints");
         dir.mkdir("doc");
-        dir.mkdir("ip");   
-        qDebug() << "Folders Created Successfully";
+        dir.mkdir("ip");
+
+        // 创建runs文件夹
+        if (dir.mkdir("runs")) {
+            // cd进入runs文件夹
+            dir.cd("runs");
+            // 在runs文件夹内创建.works、impl和synth文件夹
+            dir.mkdir(".works"); // 记录中间过程，方便后续在此基础上继续执行
+            dir.mkdir("impl"); // pack place route
+            dir.mkdir("synth"); // synth
+            qDebug() << "Folders Created Successfully including runs/.works、runs/impl and runs/synth";
+        } else {
+            qDebug() << "Failed to create runs folder";
+        }
+
+        // 返回到原来的项目文件夹路径下
+        dir.cdUp();
     } else {
         qDebug() << "Folders Created Unsuccessfully";
         return;
@@ -52,7 +67,7 @@ void Wizard::onFinish()
         QFile::copy(file, projectPath + "/" + projectName + "/constraints/" + QFileInfo(file).fileName());
     }
 
-    project = new Project(projectName, projectPath + "/" + projectName, part);
+    project = new Project(projectName, projectPath + "/" + projectName, part, arch);
     project->sourceList = sourcesFilesList;
     project->constraintList = constraintFilesList;
     project->makeProject();
@@ -232,7 +247,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView = new QTableView(this);
     QStandardItemModel *model = new QStandardItemModel(0, 4, this);
     tableView->setModel(model);
-    QStringList headers = {"part", "device", "package", "speedgrade"};
+    QStringList headers = {"part", "device", "package", "speedgrade", "arch"};
     model->setHorizontalHeaderLabels(headers);
 
     int row = 0;
@@ -253,6 +268,9 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
                 } else if (nextLine.startsWith("  speedgrade:")) {
                     QString speedgrade = nextLine.section(':', 1).trimmed();
                     model->setItem(row, 3, new QStandardItem(speedgrade));
+                } else if (nextLine.startsWith("  arch:")) {
+                    QString archName = nextLine.section(':', 1).trimmed();
+                    model->setItem(row, 4, new QStandardItem(archName));
                     break;
                 }
             }
@@ -282,9 +300,11 @@ bool DefaultPartPage::isComplete() const
 void DefaultPartPage::selectPart(const QModelIndex &index) {
     QStandardItemModel *model = qobject_cast<QStandardItemModel*>(tableView->model());
     QStandardItem *partItem = model->item(index.row(), 0); // 获取part
+    QStandardItem *archItem = model->item(index.row(), 4); // 获取arch
     if (partItem) {
         Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
         wizard->part = partItem->text();
+        wizard->arch = archItem->text();
     }
     completeChanged();
 }

@@ -16,15 +16,15 @@ class CommandBuilder {
 public:
 
     static CommandBuilder& instance();
-    std::string generateImpementationCommands(const std::string &partname,const std::string& projectPath);
-    std::string generateImpPackCommands(const std::string &partname,const std::string& projectPath);
-    std::string generateImpIOPlaceCommands(const std::string& pythonPath,const std::string& projectPath);
-    std::string generateImpConstrainsCommands(const std::string& pythonPath,const std::string& projectPath);
-    std::string generateImpPlaceCommands(const std::string &partname,const std::string& projectPath);
-    std::string generateImpRouteCommands(const std::string &partname,const std::string& projectPath);
-    std::string generateFasmCommands(const std::string &partname,const std::string& projectPath);
-    std::string generateBitCommands(const std::string& pythonPath,const std::string &projectPath);
-    std::string generateDownloadBitCommands(const std::string& digilentName,const std::string& projectPath,const std::string& bitName);
+    std::string generateImpPackCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName);
+    std::string generateImpIOPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath);
+    std::string generateImpConstrainsCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath);
+    std::string generateImpPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName);
+    std::string generateImpRouteCommands(const QString& projectSynthPath,const QString& archName);
+    std::string generateImpementationCommands(const QString& projectSynthPath,const QString& archName);
+    std::string generateFasmCommands(const QString& projectSynthPath,const QString& archName);
+    std::string generateBitCommands(const QString& projectImplPath,const std::string& pythonPath);
+    std::string generateDownloadBitCommands(const QString& projectImplPath, const std::string& digilentName,const std::string& bitName);
 
 private:
     CommandBuilder();

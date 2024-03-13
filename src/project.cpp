@@ -1,11 +1,12 @@
 #include "project.h"
 
 
-Project::Project(QString name, QString path, QString part)
+Project::Project(QString name, QString path, QString part, QString arch)
 {
     this->name = name;
     this->path = path;
     this->part = part;
+    this->arch = arch;
 }
 
 bool Project::makeProject()
@@ -53,6 +54,10 @@ bool Project::makeProject()
     xmlWriter.writeAttribute("Name", "Part");
     xmlWriter.writeAttribute("Val", this->part);
 
+    // ================== 写入Arch ==================
+    xmlWriter.writeStartElement("Option");
+    xmlWriter.writeAttribute("Name", "Arch");
+    xmlWriter.writeAttribute("Val", this->arch);
 
     xmlWriter.writeEndElement();
     xmlWriter.writeEndElement();
@@ -78,6 +83,7 @@ bool Project::openProject(const QString &path)
 
     // 解析XML内容
     while (!xmlReader.atEnd() && !xmlReader.hasError()) {
+        // 逐行解析
         QXmlStreamReader::TokenType token = xmlReader.readNext();
 
         if (token == QXmlStreamReader::StartElement) {
@@ -95,9 +101,17 @@ bool Project::openProject(const QString &path)
                 this->constraintList.append(absolute);
             } else if (elementName == "Option") {
                 QXmlStreamAttributes attributes = xmlReader.attributes();
-                // QString xname = attributes.value("Name").toString();
+                QString name = attributes.value("Name").toString();
                 QString val = attributes.value("Val").toString();
-                this->part = val;
+
+                if (!name.isEmpty()) {
+                    if (name == "Part") {
+                        this->part = val; 
+                    } else if (name == "Arch") {
+                        this->arch = val;
+                    }
+                    // 可以根据需要添加更多的条件分支
+                }
             } else if (elementName == "root") {
                 QXmlStreamAttributes attributes = xmlReader.attributes();
                 // QString xname = attributes.value("Name").toString();
@@ -116,6 +130,7 @@ bool Project::openProject(const QString &path)
     // 输出解析结果
     qDebug() << "Project Name" << this->name;
     qDebug() << "Part Val:" << this->part;
+    qDebug() << "Arch Val:" << this->arch;
     qDebug() << "=======================================";
     qDebug() << "Source Path List:======================";
     for (const QString& source : this->sourceList) {

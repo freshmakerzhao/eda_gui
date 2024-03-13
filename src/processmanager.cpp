@@ -1,6 +1,5 @@
 #include "processmanager.h"
 #include "utils/StringUtilities.h"
-
 ProcessManager& ProcessManager::instance()
 {
     static ProcessManager instance;
@@ -41,25 +40,30 @@ void ProcessManager::configWorkPath(const QString &path) {
  * @param family
  * @param resourcePath
  * @param archName
- * @param partname
+ * @param partName
  * @param constraintPathList
  * @param topName
  */
 void ProcessManager::initEnvironment(const QString& family,
-                                             const std::string& resourcePath,
-                                             const std::string& archName,
-                                             const std::string& partname,
+                                             const QString& resourcePath,
+                                             const QString& archName,
+                                             const QString& partName,
                                              QList<QString> constraintPathList,
                                              const QString& topName) {
+//    DEBUG
+//    QObject::connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),SLOT(finished(int,QProcess::ExitStatus)));
+//    QObject::connect(process,SIGNAL(readyRead()),this,SLOT(readyRead()));
+//    QObject::connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
+
     //synth env setting
     // 设置环境变量
     env = QProcessEnvironment::systemEnvironment();
 //    env.insert("F4PGA_SHARE_DIR","");
     env.insert("FPGA_FAM", family);
     env.insert("MAKELEVEL", "1");
-    QString libPathVpr = QString::fromStdString(StringUtilities::concatPath({resourcePath, "vpr", "lib"}));
-    QString libPathYosys = QString::fromStdString(StringUtilities::concatPath({resourcePath, "yosys", "lib"}));
-    QString libPathOpenFPGALoader = QString::fromStdString(StringUtilities::concatPath({resourcePath, "openFPGALoader", "lib"}));
+    QString libPathVpr = QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "vpr", "lib"}));
+    QString libPathYosys = QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "yosys", "lib"}));
+    QString libPathOpenFPGALoader = QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "openFPGALoader", "lib"}));
     QString envPath =  libPathVpr + ";" + libPathYosys + ";" + libPathOpenFPGALoader;
     env.insert("PATH", envPath);
 
@@ -68,45 +72,71 @@ void ProcessManager::initEnvironment(const QString& family,
     env.insert("OUT_JSON", "top.json");
     env.insert("OUT_SDC", "top.sdc");
     env.insert("OUT_SYNTH_V", "top_synth.v");
-    env.insert("PART_JSON", QString::fromStdString(StringUtilities::concatPath({resourcePath, "f4pga", "prjxray-db/artix7", partname, "part.json"})));
+    env.insert("PART_JSON", QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "f4pga", "prjxray-db/artix7", partName.toStdString(), "part.json"})));
     // python路径
-    env.insert("PYTHON3", QString::fromStdString(StringUtilities::concatPath({resourcePath, "common", "python", "python.exe"})));
+    env.insert("PYTHON3", QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "common", "python", "python.exe"})));
     env.insert("SYNTH_JSON", "top_io.json");
 //    env.insert("TARGET","arty_35");
-    env.insert("TECHMAP_PATH", QString::fromStdString(StringUtilities::concatPath({resourcePath, "f4pga", "techmaps", "xc7_vpr", "techmap"})));
+    env.insert("TECHMAP_PATH", QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "f4pga", "techmaps", "xc7_vpr", "techmap"})));
     // 顶层模块
     env.insert("TOP",topName);
     env.insert("USE_ROI", "FALSE");
-    env.insert("UTILS_PATH", QString::fromStdString(StringUtilities::concatPath({resourcePath, "f4pga", "scripts"})));
+    env.insert("UTILS_PATH", QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "f4pga", "scripts"})));
     // TODO: add all xdc files
     if (!constraintPathList.isEmpty()) {
         env.insert("INPUT_XDC_FILES", constraintPathList.first());
     }
 
-    env.insert("FIX_XC7_CARRY_PY", QString::fromStdString(StringUtilities::concatPath({resourcePath, "f4pga/scripts/fix_xc7_carry.py"})));
-    env.insert("YOSYS_SPLIT_INOUTS_PY", QString::fromStdString(StringUtilities::concatPath({resourcePath, "f4pga/scripts/yosys_split_inouts.py"})));
+    env.insert("FIX_XC7_CARRY_PY", QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "f4pga/scripts/fix_xc7_carry.py"})));
+    env.insert("YOSYS_SPLIT_INOUTS_PY", QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "f4pga/scripts/yosys_split_inouts.py"})));
 
     // vpr可执行文件
-    projectProperty["vpr_path"] = StringUtilities::concatPath({resourcePath, "vpr/bin/vpr.exe"});
+    projectProperty["vpr_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "vpr/bin/vpr.exe"});
     // openFPGALoader可执行文件
-    projectProperty["openFPGALoader_path"] = StringUtilities::concatPath({resourcePath, "openFPGALoader/bin/openFPGALoader.exe"});
+    projectProperty["openFPGALoader_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "openFPGALoader/bin/openFPGALoader.exe"});
     // 架构目录
-    projectProperty["arch_path"] = StringUtilities::concatPath({resourcePath, "f4pga/arch",archName});
+    projectProperty["arch_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "f4pga/arch",archName.toStdString()+"_test"});
     // create_ioplace路径
-    projectProperty["generate_ioplace_path"] = StringUtilities::concatPath({resourcePath, "f4pga/scripts/create_ioplace.py"});
+    projectProperty["generate_ioplace_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "f4pga/scripts/create_ioplace.py"});
     // create_place_constraints路径
-    projectProperty["generate_constraints_path"] = StringUtilities::concatPath({resourcePath, "f4pga/scripts/create_place_constraints.py"});
+    projectProperty["generate_constraints_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "f4pga/scripts/create_place_constraints.py"});
     // genfasm路径
-    projectProperty["generate_fasm_path"] = StringUtilities::concatPath({resourcePath, "vpr/bin/genfasm.exe"});
+    projectProperty["generate_fasm_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "vpr/bin/genfasm.exe"});
     // xcfasm路径
-    projectProperty["generate_bit_path"] = StringUtilities::concatPath({resourcePath, "f4pga/scripts/xcfasm"});
+    projectProperty["generate_bit_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "f4pga/scripts/xcfasm"});
     // prjxray-db路径
-    projectProperty["prjxray_db_path"] = StringUtilities::concatPath({resourcePath, "f4pga/prjxray-db"});
+    projectProperty["prjxray_db_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "f4pga/prjxray-db"});
     //fasm2bit
-    projectProperty["fasm2bit_path"] = StringUtilities::concatPath({resourcePath, "vpr/bin/xc7frames2bit.exe"});
+    projectProperty["fasm2bit_path"] = StringUtilities::concatPath({resourcePath.toStdString(), "vpr/bin/xc7frames2bit.exe"});
     // part名称
-    projectProperty["part_name"] = partname;
+    projectProperty["part_name"] = partName.toStdString();
     ProcessManager::instance().getProcess()->setProcessEnvironment(env);
+}
+
+void ProcessManager::finished(int exitCode,QProcess::ExitStatus exitStatus)
+{
+    qDebug()<<"finished";
+
+    qDebug()<<exitCode;// 被调用程序的main返回的int
+    qDebug()<<exitStatus;// QProcess::ExitStatus(NormalExit)
+    qDebug() <<"finished-output-readAll:";
+    qDebug()<<QString::fromLocal8Bit(process->readAll());// ""
+    qDebug()<<"finished-output-readAllStandardOutput:";
+    qDebug()<<QString::fromLocal8Bit(process->readAllStandardOutput());// ""
+}
+void ProcessManager::readyRead()
+{
+    qDebug()<<"readyRead-readAll:";
+    qDebug()<<QString::fromLocal8Bit(process->readAll());// "hello it is ok!"
+    qDebug()<<"readyRead-readAllStandardOutput:";
+    qDebug()<<QString::fromLocal8Bit(process->readAllStandardOutput());// ""
+}
+void ProcessManager::readyReadStandardOutput()
+{
+    qDebug()<<"readyReadStandardOutput-readAll:";
+    qDebug()<<QString::fromLocal8Bit(process->readAll());// ""
+    qDebug()<<"readyReadStandardOutput-readAllStandardOutput:";
+    qDebug()<<QString::fromLocal8Bit(process->readAllStandardOutput());// ""
 }
 
 /**
