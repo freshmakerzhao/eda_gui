@@ -125,7 +125,7 @@ TaskManager::TaskManager(QWidget *parent)
             // frameView->resize(1000, 800);
             // frameView->show();
         } else if (item == proDownloadBitItem) {
-             downloadBit();
+            downloadBit();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
         }
@@ -251,5 +251,6 @@ void TaskManager::downloadBit() {
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath,"digilent_hs3","top.bit");
+    qDebug() << "[TaskManager] script..." << QString::fromStdString(script);
     ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script));
 }
