@@ -16,6 +16,8 @@ set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS PrintSupport)
+find_package(Qt5 COMPONENTS OpenGL)
 
 # Include the QScintilla library
 set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Qsci")
@@ -43,6 +45,18 @@ set(PROJECT_SOURCES
     wizard.cpp
     taskmanager.cpp
     processmanager.cpp
+    json.hpp
+    utils/StringUtilities.cpp
+    utils/CommandBuilder.cpp
+    widgets/FrameView.cpp
+    grid/ChipGridOperations.cpp
+    grid/view.cpp
+    blocks/Blocks.cpp
+    blocks/Sites.cpp
+    blocks/SitesBlock.cpp
+    blocks/SitesSliceL.cpp
+    blocks/Tiles.cpp
+    base/Globals.cpp
 )
 
 # Add header files
@@ -63,15 +77,23 @@ set(PROJECT_HEADERS
     ./Qsci/qscilexer.h
     ./Qsci/qsciabstractapis.h
     ./yaml-cpp/yaml.h
+    utils/StringUtilities.h
+    utils/CommandBuilder.h
+    utils/FileHelper.h
+    grid/ChipGridOperations.h
+    grid/view.h
+    blocks/Blocks.h
+    blocks/Sites.h
+    blocks/SitesBlock.h
+    blocks/SitesSliceL.h
+    blocks/Tiles.h
+    entity/Cluster.h
+    base/Globals.h
 )
 
 # Add resource files
 set(PROJECT_RESOURCES
     res.qrc
-        utils/StringUtilities.cpp
-        utils/StringUtilities.h
-        utils/CommandBuilder.cpp
-        utils/CommandBuilder.h
 )
 
 # Tell CMake to create the executable
@@ -96,3 +118,14 @@ set_property(SOURCE app_win32.rc APPEND PROPERTY
         OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/AppIcon.ico
 )
 
+
+if (Qt5PrintSupport_FOUND)
+    target_link_libraries(${PROJECT_NAME} Qt5::PrintSupport)
+endif()
+
+if (Qt5OpenGL_FOUND)
+    target_link_libraries(${PROJECT_NAME} Qt5::OpenGL)
+endif()
+
+# 打包用
+#set(CMAKE_CXX_FLAGS "-mwindows")

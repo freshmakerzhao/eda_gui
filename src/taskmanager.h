@@ -26,8 +26,10 @@ public:
     QString projectImplPath;
     // part name
     QString partName;
-    // arch name
+    // arch name xc7a50t
     QString archName;
+    // arch 50t
+    QString arch;
     // arch name
     QString GLOBAL_RESOURCE_PATH;
 protected:
@@ -46,6 +48,7 @@ private:
     void buildImp();
     void buildBit(int mode);
     void downloadBit();
+    QWidget* gridView = nullptr;
 
 };
 

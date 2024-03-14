@@ -40,6 +40,7 @@ public:
     QStringList sourcesFilesList;
     QStringList constraintFilesList;
     QString part;
+    QString archName;
     QString arch;
 
 private:

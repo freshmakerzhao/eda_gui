@@ -1,12 +1,12 @@
 #include "project.h"
 
 
-Project::Project(QString name, QString path, QString part, QString arch)
-{
+Project::Project(QString name, QString path, QString part, QString arch, QString archName){
     this->name = name;
     this->path = path;
     this->part = part;
     this->arch = arch;
+    this->archName = archName;
 }
 
 bool Project::makeProject()
@@ -59,6 +59,11 @@ bool Project::makeProject()
     xmlWriter.writeAttribute("Name", "Arch");
     xmlWriter.writeAttribute("Val", this->arch);
 
+    // ================== 写入ArchName ==================
+    xmlWriter.writeStartElement("Option");
+    xmlWriter.writeAttribute("Name", "ArchName");
+    xmlWriter.writeAttribute("Val", this->archName);
+
     xmlWriter.writeEndElement();
     xmlWriter.writeEndElement();
     xmlWriter.writeEndDocument();
@@ -107,6 +112,8 @@ bool Project::openProject(const QString &path)
                 if (!name.isEmpty()) {
                     if (name == "Part") {
                         this->part = val; 
+                    } else if (name == "ArchName") {
+                        this->archName = val;
                     } else if (name == "Arch") {
                         this->arch = val;
                     }
@@ -130,6 +137,7 @@ bool Project::openProject(const QString &path)
     // 输出解析结果
     qDebug() << "Project Name" << this->name;
     qDebug() << "Part Val:" << this->part;
+    qDebug() << "ArchName Val:" << this->archName;
     qDebug() << "Arch Val:" << this->arch;
     qDebug() << "=======================================";
     qDebug() << "Source Path List:======================";

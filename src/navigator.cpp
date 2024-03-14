@@ -1,6 +1,7 @@
 #include "navigator.h"
 #include "mainwindow.h"
 #include "taskmanager.h"
+#include "utils/StringUtilities.h"
 
 Navigator *Navigator::instance(QWidget *parent)
 {
@@ -39,8 +40,12 @@ void Navigator::loadFile(Project *proj)
     TaskManager::instance()->projectPath = proj->path;
     // 存储partname
     TaskManager::instance()->partName = proj->part;
-    TaskManager::instance()->archName = proj->arch;
+    TaskManager::instance()->archName = proj->archName;
+    TaskManager::instance()->arch = proj->arch;
+    // 测试用
     TaskManager::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
+    // 打包用
+//    TaskManager::instance()->GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
 
 
     qDebug() << "[Navigatoe] loadFile...";

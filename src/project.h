@@ -12,7 +12,7 @@
 class Project
 {
 public:
-    Project(QString name = "", QString path = "", QString part = "", QString arch = "");
+    Project(QString name = "", QString path = "", QString part = "", QString arch = "", QString archName = "");
 
     bool makeProject();
     bool openProject(const QString &path);
@@ -22,6 +22,7 @@ public:
     QStringList sourceList;
     QStringList constraintList;
     QString part;
+    QString archName;
     QString arch;
 };
 

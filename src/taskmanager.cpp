@@ -1,8 +1,11 @@
+#include <QMessageBox>
 #include "taskmanager.h"
 #include "processmanager.h"
 #include "utils/StringUtilities.h"
 #include "utils/CommandBuilder.h"
 #include "infowidget.h"
+#include "widgets/FrameView.h"
+#include "mainwindow.h"
 
 TaskManager *TaskManager::instance(QWidget *parent)
 {
@@ -80,6 +83,11 @@ TaskManager::TaskManager(QWidget *parent)
     proDownloadBitItem->setIcon(0, QIcon(""));
 
     QObject::connect(taskTree, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
+        if (this->arch == ""){
+            // 用户未选择架构时
+            QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
+            return ;
+        }
         // 双击触发
         if (item == synthRunItem) {
              runSynth();
@@ -111,13 +119,18 @@ TaskManager::TaskManager(QWidget *parent)
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
         } else if (item == proBitViewItem) {
-            // if (frameView) {
-            //     delete frameView;  // 删除现存的对象
-            //     frameView = nullptr;  // 确保指针不再指向已删除的对象
-            // }
-            // frameView = new FrameView();
-            // frameView->resize(1000, 800);
-            // frameView->show();
+            qDebug() << "[TaskManager] arch " << this->arch;
+            std::string tileGridPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
+            std::string tileColorPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+            qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
+            qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
+            if (gridView) {
+                delete gridView;  // 删除现存的对象
+                gridView = nullptr;  // 确保指针不再指向已删除的对象
+            }
+            gridView = new FrameView(tileGridPath,tileColorPath);
+            gridView->resize(1000, 800);
+            gridView->show();
         } else if (item == proNetlistViewItem) {
             // if (!frameView) {
             //     frameView = new NetlistView();
@@ -251,6 +264,5 @@ void TaskManager::downloadBit() {
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath,"digilent_hs3","top.bit");
-    qDebug() << "[TaskManager] script..." << QString::fromStdString(script);
     ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script));
 }

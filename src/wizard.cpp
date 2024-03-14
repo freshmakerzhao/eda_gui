@@ -80,7 +80,7 @@ void Wizard::onFinish()
         constrainttmp.append(newPath);
     }
     // ============================= 生成工程 =================================
-    project = new Project(projectName, targetPath, part, arch);
+    project = new Project(projectName, targetPath, part, arch, archName);
     project->sourceList = sourcetmp;
     project->constraintList = constrainttmp;
     project->makeProject();
@@ -316,7 +316,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView->verticalHeader()->setVisible(false); // 不显示行号
     QStandardItemModel *model = new QStandardItemModel(0, 4, this);
     tableView->setModel(model);
-    QStringList headers = {"part", "device", "package", "speedgrade", "arch"};
+    QStringList headers = {"part", "device", "package", "speedgrade", "archName" , "arch"};
     model->setHorizontalHeaderLabels(headers);
 
     QFile file(":/resource/parts.yaml");
@@ -336,12 +336,14 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
                 QString device = QString::fromStdString(it->second["device"].as<std::string>());
                 QString package = QString::fromStdString(it->second["package"].as<std::string>());
                 QString speedgrade = QString::fromStdString(it->second["speedgrade"].as<std::string>());
-                QString archName = QString::fromStdString(it->second["arch"].as<std::string>());
+                QString archName = QString::fromStdString(it->second["archName"].as<std::string>());
+                QString arch = QString::fromStdString(it->second["arch"].as<std::string>());
                 model->setItem(row, 0, new QStandardItem(part));
                 model->setItem(row, 1, new QStandardItem(device));
                 model->setItem(row, 2, new QStandardItem(package));
                 model->setItem(row, 3, new QStandardItem(speedgrade));
                 model->setItem(row, 4, new QStandardItem(archName));
+                model->setItem(row, 5, new QStandardItem(arch));
                 row++;
             }
         } catch (const YAML::ParserException& e) {
@@ -361,6 +363,9 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     // 将同一行标记为选中状态
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
     tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+    // 隐藏第四 第五列 archName/arch 仅供程序使用，用户无需获取
+    tableView->setColumnHidden(4, true);
+    tableView->setColumnHidden(5, true);
     QObject::connect(tableView, &QTableView::clicked, this, &DefaultPartPage::selectPart);
 
     // Filter
@@ -389,10 +394,12 @@ bool DefaultPartPage::isComplete() const
 void DefaultPartPage::selectPart(const QModelIndex &index) {
     QStandardItemModel *model = qobject_cast<QStandardItemModel*>(tableView->model());
     QStandardItem *partItem = model->item(index.row(), 0); // 获取part
-    QStandardItem *archItem = model->item(index.row(), 4); // 获取arch
+    QStandardItem *archNameItem = model->item(index.row(), 4); // 获取archName
+    QStandardItem *archItem = model->item(index.row(), 5); // 获取arch
     if (partItem) {
         Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
         wizard->part = partItem->text();
+        wizard->archName = archNameItem->text();
         wizard->arch = archItem->text();
     }
     completeChanged();
