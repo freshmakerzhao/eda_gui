@@ -43,14 +43,14 @@ void Navigator::loadFile(Project *proj)
     TaskManager::instance()->archName = proj->archName;
     TaskManager::instance()->arch = proj->arch;
     // 测试用
-    TaskManager::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
+    // TaskManager::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
     // 打包用
-//    TaskManager::instance()->GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
+    TaskManager::instance()->GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
 
 
-    qDebug() << "[Navigatoe] loadFile...";
-    qDebug() << "[Navigatoe] proj->sourceList：" << proj->sourceList;
-    qDebug() << "[Navigatoe] proj->constraintList：" << proj->constraintList;
+    qDebug() << "[Navigator] loadFile...";
+    qDebug() << "[Navigator] proj->sourceList：" << proj->sourceList;
+    qDebug() << "[Navigator] proj->constraintList：" << proj->constraintList;
 
     QTreeWidgetItem *nameItem = new QTreeWidgetItem(navTree);
     nameItem->setText(0, proj->name);
@@ -79,7 +79,7 @@ void Navigator::loadFile(Project *proj)
 void Navigator::clickedFile(QTreeWidgetItem *item)
 {
     QString path = item->data(0, Qt::UserRole).toString();
-    qDebug() << "Navigator:: open " << path;
+    // qDebug() << "Navigator:: open " << path;
     MainWindow::instance()->createEditorTab(path);
 }
 
@@ -90,7 +90,7 @@ void Navigator::showContextMenu(const QPoint &pos) {
     QAction addConstraints("Add Constraints");
     QAction deleteFileAction("Remove...");
     if (navTree->currentItem() == nullptr) {
-        qDebug() << "Empty Item";
+        // qDebug() << "Empty Item";
         return;
     }
     if (navTree->currentItem()->parent() == nullptr) {

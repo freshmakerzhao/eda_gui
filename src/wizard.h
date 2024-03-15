@@ -18,10 +18,10 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QDialogButtonBox>
-#include <QTimer>
 #include <QSortFilterProxyModel>
 #include <QComboBox>
 #include <QFormLayout>
+#include <QToolBar>
 #include <QDebug>
 
 #include "project.h"

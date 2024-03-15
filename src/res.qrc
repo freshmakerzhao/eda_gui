@@ -5,5 +5,7 @@
         <file>resource/logo.png</file>
         <file>resource/icon.png</file>
         <file>resource/parts.yaml</file>
+        <file>resource/search.ico</file>
+        <file>resource/clean.ico</file>
     </qresource>
 </RCC>

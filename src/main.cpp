@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 
 #include "navigator.h"
-// #include "taskview.h"
+// #include "taskmanager.h"
 // #include "infowidget.h"
 #include "project.h"
 #include <QApplication>

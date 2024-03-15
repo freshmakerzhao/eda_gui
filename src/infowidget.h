@@ -1,7 +1,3 @@
-/*
-    编译结果显示区
-*/
-
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
@@ -9,6 +5,9 @@
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QPlainTextEdit>
+#include <QToolBar>
+#include <QInputDialog>
+#include <QMessageBox>
 #include <QDebug>
 
 

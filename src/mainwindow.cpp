@@ -56,7 +56,7 @@ void MainWindow::createEditorTab(const QString& path)
 void MainWindow::onNewTriggered()
 {
     Wizard *projectWizard = new Wizard(this);
-    projectWizard->show();
+    projectWizard->exec();
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -108,42 +108,27 @@ void MainWindow::onSaveAsTriggered()
     }
 }
 
-void MainWindow::onCutTriggered()
+void MainWindow::onEditTriggered()
 {
-    Editor *editor  = (Editor*) tabWidget->currentWidget();
-    if (editor) {
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (!action) {
+        return;
+    }
+
+    Editor *editor = qobject_cast<Editor*>(tabWidget->currentWidget());
+    if (!editor) {
+        return;
+    }
+
+    if (action == cutAction) {
         editor->cut();
-    }
-}
-
-void MainWindow::onCopyTriggered()
-{
-    Editor *editor  = (Editor*) tabWidget->currentWidget();
-    if (editor) {
+    } else if (action == copyAction) {
         editor->copy();
-    }
-}
-
-void MainWindow::onPasteTriggered()
-{
-    Editor *editor  = (Editor*) tabWidget->currentWidget();
-    if (editor) {
+    } else if (action == pasteAction) {
         editor->paste();
-    }
-}
-
-void MainWindow::onUndoTriggered()
-{
-    Editor *editor  = (Editor*) tabWidget->currentWidget();
-    if (editor) {
+    } else if (action == undoAction) {
         editor->undo();
-    }
-}
-
-void MainWindow::onRedoTriggered()
-{
-    Editor *editor  = (Editor*) tabWidget->currentWidget();
-    if (editor) {
+    } else if (action == redoAction) {
         editor->redo();
     }
 }
@@ -155,14 +140,23 @@ void MainWindow::onChipPlannerTriggered()
 
 void MainWindow::onDocumentationTriggered()
 {
-    documentationBox.setText("Features to be developed");
-    documentationBox.show();
+    QDialog documentationDialog(this);
+    documentationDialog.setFixedSize(640, 480);
+    documentationDialog.setWindowFlags(documentationDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    documentationDialog.setWindowTitle("Documentation");
+    QLabel *textLabel = new QLabel(&documentationDialog);
+    textLabel->setText("Features to be developed");
+
+    // TODO:load documentation
+
+    documentationDialog.exec();
 }
 
 void MainWindow::onAboutTriggered()
 {
+    QDialog aboutDialog(this);
     aboutDialog.setFixedSize(640, 480);
-    aboutDialog.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint); // 删除问号，只保留关闭
+    aboutDialog.setWindowFlags(aboutDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     aboutDialog.setWindowTitle("About Software");
     QLabel *textLabel = new QLabel(&aboutDialog);
     textLabel->setText("<html><h2>About Software</h2"
@@ -181,7 +175,7 @@ void MainWindow::onAboutTriggered()
 
     layout.addWidget(textLabel);
     layout.addWidget(imageLabel);
-    aboutDialog.show();
+    aboutDialog.exec();
 }
 
 void MainWindow::onTabWidgetCurrentChanged(int index)
@@ -195,7 +189,7 @@ void MainWindow::onTabWidgetTabCloseRequested(int index)
     // qDebug() << "Tab index " << index;
     Editor *editor = qobject_cast<Editor*>(tabWidget->widget(index));
     if (editor->isModified()) {
-        qDebug() << "File" << index << "has been Modified";
+        // qDebug() << "File" << index << "has been Modified";
         QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "The document has been modified.\n"
                                                                                  "Do you want to save your changes?",
                                                                 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
@@ -252,27 +246,32 @@ MainWindow::MainWindow(QWidget *parent)
     openFileAction = new QAction("Open File", this);
     saveAction = new QAction("Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     saveasAction = new QAction("Save As", this);
-    fileMenu->addActions({newAction, openAction, openFileAction}), fileMenu->addSeparator();
-    fileMenu->addActions({saveAction, saveasAction});
+    exitAction = new QAction("Exit", this), exitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F4));
+    fileMenu->addActions({newAction, openAction}), fileMenu->addSeparator();
+    fileMenu->addActions({openFileAction}), fileMenu->addSeparator();
+    fileMenu->addActions({saveAction, saveasAction}), fileMenu->addSeparator();
+    fileMenu->addActions({exitAction});
     // ================= 文件按钮绑定 ====================
     connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
     connect(openFileAction, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
     connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
     connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
     connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
+    connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     // ===================== EDIT ======================
-    cutAction = new QAction("Cut", this);
-    copyAction = new QAction("Copy", this);
-    pasteAction = new QAction("Paste", this);
-    undoAction = new QAction("Undo", this), redoAction = new QAction("Redo", this);
+    cutAction = new QAction("Cut", this), cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    copyAction = new QAction("Copy", this), copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    pasteAction = new QAction("Paste", this), pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    undoAction = new QAction("Undo", this), undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
+    redoAction = new QAction("Redo", this), redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
     editMenu->addActions({cutAction, copyAction, pasteAction}), editMenu->addSeparator();
     editMenu->addActions({undoAction, redoAction});
     // ================== 编辑器按钮绑定 ==================
-    connect(cutAction, &QAction::triggered, this, &MainWindow::onCutTriggered);
-    connect(copyAction, &QAction::triggered, this, &MainWindow::onCopyTriggered);
-    connect(pasteAction, &QAction::triggered, this, &MainWindow::onPasteTriggered);
-    connect(undoAction, &QAction::triggered, this, &MainWindow::onUndoTriggered);
-    connect(redoAction, &QAction::triggered, this, &MainWindow::onRedoTriggered);
+    connect(cutAction, &QAction::triggered, this, &MainWindow::onEditTriggered);
+    connect(copyAction, &QAction::triggered, this, &MainWindow::onEditTriggered);
+    connect(pasteAction, &QAction::triggered, this, &MainWindow::onEditTriggered);
+    connect(undoAction, &QAction::triggered, this, &MainWindow::onEditTriggered);
+    connect(redoAction, &QAction::triggered, this, &MainWindow::onEditTriggered);
     // ===================== HELP ======================
     documentation = new QAction("Documentation", this);
     aboutAction = new QAction("About", this);
@@ -287,7 +286,7 @@ MainWindow::MainWindow(QWidget *parent)
     toolbar->addActions({newAction, openAction, saveAction}), toolbar->addSeparator();
     toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
     toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
-    toolbar->addActions({chipPlannerAction});
+    // toolbar->addActions({chipPlannerAction});
     addToolBar(toolbar);
     // ================= EDITOR TAB ====================
     tabWidget = new QTabWidget(this);

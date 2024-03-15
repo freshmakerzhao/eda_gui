@@ -30,12 +30,7 @@ private slots:
     void onOpenTriggered();
     void onSaveTriggered();
     void onSaveAsTriggered();
-
-    void onCutTriggered();
-    void onCopyTriggered();
-    void onPasteTriggered();
-    void onUndoTriggered();
-    void onRedoTriggered();
+    void onEditTriggered();
 
 
     void onChipPlannerTriggered();
@@ -63,6 +58,7 @@ private:
     QAction *openFileAction;    
     QAction *saveAction;
     QAction *saveasAction;
+    QAction *exitAction;
     QAction *cutAction;
     QAction *copyAction;
     QAction *pasteAction;
@@ -78,9 +74,6 @@ private:
     QTabWidget *tabWidget;
 
     ChipPlanner chipPlanner;
-
-    QMessageBox documentationBox;
-    QDialog aboutDialog;
 
     void streamProcessOutput();
     // 配置输出和完成信号槽

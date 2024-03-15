@@ -97,7 +97,7 @@ set(PROJECT_RESOURCES
 )
 
 # Tell CMake to create the executable
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
     ${PROJECT_RESOURCES} 
