@@ -79,6 +79,7 @@ bool Editor::openFile(const QString path)
         return false;
     }
     QTextStream in(&file);
+    in.setCodec("UTF-8");   // Decoding files using UTF-8
     this->setText(in.readAll());
     file.close();
     this->setModified(false);
@@ -128,11 +129,6 @@ bool Editor::saveAsFile()
     return true;
 }
 
-// void Editor::setFilePath(const QString path)
-// {
-//     m_path = path;
-// }
-
 void Editor::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createStandardContextMenu();
@@ -142,7 +138,6 @@ void Editor::contextMenuEvent(QContextMenuEvent *event)
     connect(readOnlyAction, &QAction::triggered, this, [this, readOnlyAction](){
         setReadOnly(!isReadOnly());
         readOnlyAction->setChecked(isReadOnly()); // 设置按钮的选中状态
-        // pMainWindow->updateActionState();
         MainWindow::instance()->updateActionState();
     });
     menu->addAction(readOnlyAction);

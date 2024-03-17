@@ -171,23 +171,23 @@ void AddSourcesPage::onAddFiles()
 
 void AddSourcesPage::onCreateFile()
 {
-    QDialog *dialog = new QDialog(this);
-    dialog->setFixedSize(320, 180);
-    dialog->setWindowTitle("Create Source File");
-    QComboBox *comboBox = new QComboBox(dialog);
+    QDialog dialog(this);
+    dialog.setFixedSize(320, 180);
+    dialog.setWindowTitle("Create Source File");
+    QComboBox *comboBox = new QComboBox(&dialog);
     comboBox->addItem("Verilog");
 
-    QFormLayout *formLayout = new QFormLayout(dialog);
+    QFormLayout *formLayout = new QFormLayout(&dialog);
     formLayout->addRow("File type:", comboBox);
 
-    QLineEdit *lineEdit = new QLineEdit(dialog);
+    QLineEdit *lineEdit = new QLineEdit(&dialog);
     lineEdit->setClearButtonEnabled(true);
     formLayout->addRow("File name:", lineEdit);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     formLayout->addRow(buttonBox);
 
-    connect(buttonBox, &QDialogButtonBox::accepted, [comboBox, lineEdit, dialog, this](){
+    connect(buttonBox, &QDialogButtonBox::accepted, [comboBox, lineEdit, &dialog, this](){
         QString fileType = comboBox->currentText();
         QString fileName = lineEdit->text();
 
@@ -219,13 +219,11 @@ void AddSourcesPage::onCreateFile()
         emit filesListUpdatedSignal(tmp);
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
         wizard->sourcesFilesList.append(newFilePath);  // 将新建的文件追加到列表中
-        dialog->accept();
+        dialog.accept();
     });
 
-    connect(buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
-
-    dialog->setLayout(formLayout);
-    dialog->show();
+    connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    dialog.exec();
 }
 
 void AddSourcesPage::onRemoveFiles()
@@ -263,6 +261,9 @@ AddConstraintPage::AddConstraintPage(QWidget *parent) : QWizardPage(parent)
     QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &AddConstraintPage::onAddFiles);
 
+    QPushButton *createFileButton = new QPushButton("Create Files");createFileButton->setFixedSize(160, 45);
+    connect(createFileButton, &QPushButton::clicked, this, &AddConstraintPage::onCreateFile);
+
     QPushButton *removeButton = new QPushButton("Remove Files");removeButton->setFixedSize(160, 45);
     connect(removeButton, &QPushButton::clicked, this, &AddConstraintPage::onRemoveFiles);
 
@@ -270,6 +271,7 @@ AddConstraintPage::AddConstraintPage(QWidget *parent) : QWizardPage(parent)
     QHBoxLayout *btnLayout = new QHBoxLayout;
     layout->addWidget(filesListWidget);
     btnLayout->addWidget(addFilesButton);
+    btnLayout->addWidget(createFileButton);
     btnLayout->addWidget(removeButton);
     layout->addLayout(btnLayout);
     setLayout(layout);
@@ -287,6 +289,63 @@ void AddConstraintPage::onAddFiles()
         }
         emit filesListUpdatedSignal(files); // 发送信号
     }
+}
+
+void AddConstraintPage::onCreateFile()
+{
+    QDialog dialog(this);
+    dialog.setFixedSize(320, 180);
+    dialog.setWindowTitle("Create Constraint File");
+    QComboBox *comboBox = new QComboBox(&dialog);
+    comboBox->addItem("XDC");
+
+    QFormLayout *formLayout = new QFormLayout(&dialog);
+    formLayout->addRow("File type:", comboBox);
+
+    QLineEdit *lineEdit = new QLineEdit(&dialog);
+    lineEdit->setClearButtonEnabled(true);
+    formLayout->addRow("File name:", lineEdit);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    formLayout->addRow(buttonBox);
+
+    connect(buttonBox, &QDialogButtonBox::accepted, [comboBox, lineEdit, &dialog, this](){
+        QString fileType = comboBox->currentText();
+        QString fileName = lineEdit->text();
+
+        QString extension;
+        if (fileType == "XDC") {
+            extension = ".xdc";
+        }
+        else {
+            // Handle other file types if needed
+        }
+
+        QDir directory("Cache");
+        if (!directory.exists()) {
+            directory.mkpath(".");
+        }
+
+        QString newFilePath = "Cache/" + fileName + extension;
+        QFile file(newFilePath);
+        if (file.open(QFile::WriteOnly | QFile::Truncate)) {
+            // File created successfully, do any additional processing here if needed
+            // QTextStream stream(&file);
+            file.close();
+        }
+        else {
+            // Failed to create file, handle error appropriately
+        }
+        QStringList tmp;
+        tmp.append(newFilePath);
+        emit filesListUpdatedSignal(tmp);
+        Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
+        wizard->constraintFilesList.append(newFilePath);  // 将新建的文件追加到列表中
+        dialog.accept();
+    });
+
+    connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    dialog.exec();
 }
 
 void AddConstraintPage::onRemoveFiles()
