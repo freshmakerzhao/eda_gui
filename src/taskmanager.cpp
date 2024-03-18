@@ -237,7 +237,14 @@ void TaskManager::buildImp() {
     QString family = "xc7";
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    std::string script = CommandBuilder::instance().generateImpementationCommands(projectSynthPath,archName);
+    // pack
+    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
+    // place
+    script += " && " + CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
+    script += " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
+    script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
+    // route
+    script += " && " + CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
     ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script));
 }
 
