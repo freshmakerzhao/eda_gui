@@ -55,8 +55,8 @@ void MainWindow::createEditorTab(const QString& path)
 
 void MainWindow::onNewTriggered()
 {
-    Wizard *projectWizard = new Wizard(this);
-    projectWizard->exec();
+    Wizard wizard(this);
+    wizard.exec();
 }
 
 void MainWindow::onOpenFileTriggered()
@@ -243,18 +243,20 @@ MainWindow::MainWindow(QWidget *parent)
     // ===================== FILE ======================
     newAction = new QAction("New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     openAction = new QAction("Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    closeAction = new QAction("Close", this);
     openFileAction = new QAction("Open File", this);
     saveAction = new QAction("Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     saveasAction = new QAction("Save As", this);
     exitAction = new QAction("Exit", this), exitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F4));
-    fileMenu->addActions({newAction, openAction}), fileMenu->addSeparator();
+    fileMenu->addActions({newAction, openAction, closeAction}), fileMenu->addSeparator();
     fileMenu->addActions({openFileAction}), fileMenu->addSeparator();
     fileMenu->addActions({saveAction, saveasAction}), fileMenu->addSeparator();
     fileMenu->addActions({exitAction});
     // ================= 文件按钮绑定 ====================
     connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
-    connect(openFileAction, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
     connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
+    connect(closeAction, &QAction::triggered, Navigator::instance(), &Navigator::closeProjectAction);
+    connect(openFileAction, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
     connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
     connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);

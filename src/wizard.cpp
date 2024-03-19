@@ -15,8 +15,6 @@ Wizard::Wizard(QWidget *parent) : QWizard(parent)
     connect(this, &QWizard::accepted, this, &Wizard::onFinish);
 
     resize(900, 600);
-
-    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 Wizard::~Wizard()
@@ -428,16 +426,21 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     QObject::connect(tableView, &QTableView::clicked, this, &DefaultPartPage::selectPart);
 
     // Filter
-    // QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
-    // proxyModel->setSourceModel(model);
-    // tableView->setModel(proxyModel);
-    // QLineEdit *lineEdit = new QLineEdit(this);
-    // connect(lineEdit, &QLineEdit::textChanged, [proxyModel](const QString &text){
-    //     proxyModel->setFilterFixedString(text);
-    // });
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+    proxyModel->setSourceModel(model);
+    tableView->setModel(proxyModel);
+    QLineEdit *lineEdit = new QLineEdit(this);
+    lineEdit->setFixedSize(180, 30);
+    connect(lineEdit, &QLineEdit::textChanged, [proxyModel](const QString &text){
+        proxyModel->setFilterFixedString(text);
+    });
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    // layout->addWidget(lineEdit);
+
+    QFormLayout *formLayout = new QFormLayout;
+    formLayout->addRow("Filter:", lineEdit);
+    layout->addLayout(formLayout);
+
     layout->addWidget(tableView);
 }
 
@@ -451,16 +454,18 @@ bool DefaultPartPage::isComplete() const
 }
 
 void DefaultPartPage::selectPart(const QModelIndex &index) {
-    QStandardItemModel *model = qobject_cast<QStandardItemModel*>(tableView->model());
-    QStandardItem *partItem = model->item(index.row(), 0); // 获取part
-    QStandardItem *archNameItem = model->item(index.row(), 4); // 获取archName
-    QStandardItem *archItem = model->item(index.row(), 5); // 获取arch
-    if (partItem) {
+    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(tableView->model());
+    if (proxyModel) {
+        QModelIndex idx = proxyModel->mapToSource(index);
+
         Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->part = partItem->text();
-        wizard->archName = archNameItem->text();
-        wizard->arch = archItem->text();
+        wizard->part = idx.siblingAtColumn(0).data(Qt::DisplayRole).toString();     // 获取part
+        wizard->archName = idx.siblingAtColumn(4).data(Qt::DisplayRole).toString(); // 获取archName
+        wizard->arch = idx.siblingAtColumn(5).data(Qt::DisplayRole).toString();     // 获取arch
+
+        qDebug() << wizard->part << wizard->archName << wizard->arch;
     }
+
     completeChanged();
 }
 

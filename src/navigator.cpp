@@ -110,7 +110,7 @@ void Navigator::showContextMenu(const QPoint &pos) {
 
 void Navigator::closeProjectAction()
 {
-    delete navTree->currentItem();
+    delete navTree->topLevelItem(0);
     delete p;
     p = nullptr;
 }

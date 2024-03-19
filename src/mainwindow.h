@@ -55,7 +55,8 @@ private:
 
     QAction *newAction;
     QAction *openAction;
-    QAction *openFileAction;    
+    QAction *closeAction;
+    QAction *openFileAction;
     QAction *saveAction;
     QAction *saveasAction;
     QAction *exitAction;
