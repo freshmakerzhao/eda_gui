@@ -90,32 +90,34 @@ TaskManager::TaskManager(QWidget *parent)
         }
         // 双击触发
         if (item == synthRunItem) {
-             runSynth();
+            runSynth();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
+            InfoWidget::instance()->updateSynthItem(projectSynthPath);
         } else if (item == synthReportItem) {
             // synthReport();
         } else if (item == impAllItem) {
             // pack place route全流程
-             buildImp();
+            buildImp();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
+            InfoWidget::instance()->updateImplItem(projectImplPath);
         } else if (item == impPackItem) {
-             buildPack();
+            buildPack();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
         } else if (item == impPackReportItem) {
             // impReport();
         } else if (item == impPlaceItem) {
-             buildPlace(3);
+            buildPlace(3);
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
         } else if (item == impRouteItem) {
-             buildRoute();
+            buildRoute();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
         } else if (item == proBitItem) {
-             buildBit(2);
+            buildBit(2);
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
         } else if (item == proBitViewItem) {
