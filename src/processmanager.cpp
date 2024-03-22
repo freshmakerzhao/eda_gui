@@ -4,6 +4,10 @@
 #include "mainwindow.h"
 #include <QTextCodec>
 #include <QMessageBox>
+#include <iomanip>
+#include <chrono>
+#include <ctime>
+#include "utils/TimeUtilities.h"
 
 ProcessManager& ProcessManager::instance()
 {
@@ -27,12 +31,17 @@ void ProcessManager::checkCall(const QString &phase, const QString &path, const 
     process->start("cmd.exe", arguments);
 }
 
-void ProcessManager::checkCallSpecific(const QString &phase, const QString &path, const QStringList& arguments) {
+void ProcessManager::checkCallSpecific(const QString &phase, const QString &path, const QStringList& arguments , const QString &pName) {
     this->curPhase = phase;
     this->curProjectPath = path;
+    this->partName = pName;
     process->terminate(); // 开始前先终止
     configWorkPath(path);
     qDebug() << arguments;
+    // 记录开始执行的时间
+    this->startTime = TimeUtilities::getCurTimeAndFormat(); // 展示
+    this->startTimeForCal = TimeUtilities::getCurTime(); // 计算
+
     process->start("cmd.exe", arguments);
 }
 
@@ -158,14 +167,30 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     if (!remainingError.isEmpty()) {
         InfoWidget::instance()->appendLog(outputStr);
     }
+    // 结束时间
+    this->endTimeForCal = TimeUtilities::getCurTime();
+    // 持续时间
+    this->elapsedTime = TimeUtilities::calculateTimeDifference(startTimeForCal,endTimeForCal);
 
     // 显示信息弹窗
     // exitCode 为0表示正常执行并成功退出
     if (exitCode == 0) {
         QMessageBox::information(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
         if (this->curPhase == "Synthesis"){
-            // 综合结束后
-            InfoWidget::instance()->updateSynthItem(this->curProjectPath);
+            // 综合结束后，读取资源统计信息
+            InfoWidget::instance()->updateSynthItem(
+                    this->curProjectPath,
+                    this->curPhase + " Complete!",
+                    this->startTime,
+                    this->elapsedTime,
+                    this->partName);
+            // 跳转到资源展示窗口
+            InfoWidget::instance()->setCurrentPage(4);
+        } else if (this->curPhase == "Pack"){
+            // Pack结束后，读取资源统计信息
+            InfoWidget::instance()->updateImplItem(this->curProjectPath);
+            // 跳转到资源展示窗口
+            InfoWidget::instance()->setCurrentPage(4);
         }
     } else {
         QMessageBox::critical(MainWindow::instance(), this->curPhase + " Failed", this->curPhase + " failed.");

@@ -93,7 +93,7 @@ TaskManager::TaskManager(QWidget *parent)
             runSynth();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
-            InfoWidget::instance()->updateSynthItem(projectSynthPath);
+//            InfoWidget::instance()->updateSynthItem(projectSynthPath);
             // 激活 Design Runs 窗口
 //            InfoWidget::instance()->setCurrentPage(4);
         } else if (item == synthReportItem) {
@@ -182,7 +182,7 @@ void TaskManager::runSynth() {
     for(const QString& sourcePath :sourcePathList){
         arguments << sourcePath;
     }
-    ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments);
+    ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
 }
 
 void TaskManager::buildPack() {

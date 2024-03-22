@@ -31,7 +31,8 @@ public:
     void checkCallSpecific(
         const QString &phase,
         const QString &path,
-        const QStringList& arguments);
+        const QStringList& arguments,
+        const QString &pName);
 
     void configWorkPath(const QString &path);
 
@@ -43,6 +44,16 @@ public:
     QString curPhase;
     // 当前执行路径
     QString curProjectPath;
+    // 开始执行的时间（用于显示）
+    QString startTime;
+    // 开始执行的时间（用于计算）
+    std::chrono::system_clock::time_point startTimeForCal;
+    // 结束执行的时间（用于计算）
+    std::chrono::system_clock::time_point  endTimeForCal;
+    // 执行总用时（用于显示）
+    QString elapsedTime;
+    // partName
+    QString partName;
     /**
      * 初始化环境变量
      */

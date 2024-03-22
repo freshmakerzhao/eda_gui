@@ -28,7 +28,7 @@ public:
     void setCurrentPage(int index);
     QTabWidget *tabWidget;
 
-    void updateSynthItem(const QString synthPath);
+    void updateSynthItem(const QString synthPath, const QString status, const QString startTime, const QString Elapsed , const QString partName);
     void updateImplItem(const QString implPath);
 private:
     InfoWidget(QWidget *parent = nullptr);

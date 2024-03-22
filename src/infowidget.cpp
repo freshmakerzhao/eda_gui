@@ -21,8 +21,7 @@ void InfoWidget::setCurrentPage(int index) {
     tabWidget->setCurrentIndex(index);
 }
 
-void InfoWidget::updateSynthItem(const QString synthPath)
-{
+void InfoWidget::updateSynthItem(const QString synthPath, const QString status, const QString startTime, const QString Elapsed , const QString partName){
     // 解析资源使用报告
     QFile file(synthPath + "/synth_stat.json");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -55,10 +54,16 @@ void InfoWidget::updateSynthItem(const QString synthPath)
     }
     lut6Num = lutNum - muxf6Num; // LUT6
     bramNum = fifo18Num + (ranb18Num+1)/2 + ranb36Num; // BRAM
+
+    runsModel->setItem(0, 1, new QStandardItem(status)); // Status
     runsModel->setItem(0, 2, new QStandardItem(QString::number(lut6Num))); // LUT6
     runsModel->setItem(0, 3, new QStandardItem(QString::number(ffNum))); // ff
     runsModel->setItem(0, 4, new QStandardItem(QString::number(bramNum))); // BRAM
     runsModel->setItem(0, 5, new QStandardItem(QString::number(dspNum))); // dsp
+    runsModel->setItem(0, 6, new QStandardItem(startTime)); // 开始时间
+    runsModel->setItem(0, 7, new QStandardItem(Elapsed)); // 持续时间
+    runsModel->setItem(0, 8, new QStandardItem(partName)); // 封装名称
+
     // QStandardItemModel *model = new QStandardItemModel(1, 2);
     // model->setHorizontalHeaderItem(0, new QStandardItem("Key"));
     // model->setHorizontalHeaderItem(1, new QStandardItem("Value"));

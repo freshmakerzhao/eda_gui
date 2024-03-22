@@ -57,6 +57,7 @@ set(PROJECT_SOURCES
     blocks/SitesSliceL.cpp
     blocks/Tiles.cpp
     base/Globals.cpp
+    utils/TimeUtilities.cpp
 )
 
 # Add header files
@@ -89,6 +90,7 @@ set(PROJECT_HEADERS
     blocks/Tiles.h
     entity/Cluster.h
     base/Globals.h
+    utils/TimeUtilities.h
 )
 
 # Add resource files
