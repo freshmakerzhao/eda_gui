@@ -94,6 +94,8 @@ TaskManager::TaskManager(QWidget *parent)
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
             InfoWidget::instance()->updateSynthItem(projectSynthPath);
+            // 激活 Design Runs 窗口
+//            InfoWidget::instance()->setCurrentPage(4);
         } else if (item == synthReportItem) {
             // synthReport();
         } else if (item == impAllItem) {

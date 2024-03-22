@@ -41,6 +41,8 @@ public:
     std::map<std::string, std::string> projectProperty;
     // 当前执行的阶段
     QString curPhase;
+    // 当前执行路径
+    QString curProjectPath;
     /**
      * 初始化环境变量
      */

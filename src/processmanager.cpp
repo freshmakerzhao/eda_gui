@@ -18,6 +18,7 @@ QProcess *ProcessManager::getProcess()
 
 void ProcessManager::checkCall(const QString &phase, const QString &path, const QString &script) {
     this->curPhase = phase;
+    this->curProjectPath = path;
     QStringList arguments;
     arguments << "/c" << script;
     process->terminate(); // 开始前先终止
@@ -28,6 +29,7 @@ void ProcessManager::checkCall(const QString &phase, const QString &path, const 
 
 void ProcessManager::checkCallSpecific(const QString &phase, const QString &path, const QStringList& arguments) {
     this->curPhase = phase;
+    this->curProjectPath = path;
     process->terminate(); // 开始前先终止
     configWorkPath(path);
     qDebug() << arguments;
@@ -161,6 +163,10 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     // exitCode 为0表示正常执行并成功退出
     if (exitCode == 0) {
         QMessageBox::information(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
+        if (this->curPhase == "Synthesis"){
+            // 综合结束后
+            InfoWidget::instance()->updateSynthItem(this->curProjectPath);
+        }
     } else {
         QMessageBox::critical(MainWindow::instance(), this->curPhase + " Failed", this->curPhase + " failed.");
     }
