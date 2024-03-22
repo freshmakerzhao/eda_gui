@@ -23,6 +23,8 @@ public:
 
     void updateActionState();                 // 更新编辑器按钮状态
     void createEditorTab(const QString& path); // 创建编辑器Tab
+    bool cleanEditorTab();
+    bool saveAllFile();
 
 private slots:
     void onNewTriggered();

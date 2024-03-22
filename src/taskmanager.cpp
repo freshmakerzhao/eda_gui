@@ -86,7 +86,10 @@ TaskManager::TaskManager(QWidget *parent)
         if (this->arch == ""){
             // 用户未选择架构时
             QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
-            return ;
+            return;
+        }
+        if (!MainWindow::instance()->saveAllFile()) {
+            return;
         }
         // 双击触发
         if (item == synthRunItem) {

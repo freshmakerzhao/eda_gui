@@ -63,19 +63,6 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     runsModel->setItem(0, 6, new QStandardItem(startTime)); // 开始时间
     runsModel->setItem(0, 7, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(0, 8, new QStandardItem(partName)); // 封装名称
-
-    // QStandardItemModel *model = new QStandardItemModel(1, 2);
-    // model->setHorizontalHeaderItem(0, new QStandardItem("Key"));
-    // model->setHorizontalHeaderItem(1, new QStandardItem("Value"));
-    // int row = 0;
-    // for (auto it = object.begin(); it != object.end(); ++it) {
-    //     QStandardItem *keyItem = new QStandardItem(it.key());
-    //     QStandardItem *valueItem = new QStandardItem(QString::number(it.value().toInt()));
-    //     model->setItem(row, 0, keyItem);
-    //     model->setItem(row, 1, valueItem);
-    //     ++row;
-    // }
-    // treeView->setModel(model);
 }
 
 void InfoWidget::updateImplItem(const QString implPath)
@@ -163,13 +150,6 @@ InfoWidget::InfoWidget(QWidget *parent)
     runsModel->setHorizontalHeaderLabels(headers);
     runsView->setModel(runsModel);
     runsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // QStandardItem *synthItem = new QStandardItem;
-    // model->appendRow(synthItem);
-    // synthItem->setText("synth");
-    // QStandardItem *implItem = new QStandardItem;
-    // implItem->setText("impl");
-    // synthItem->appendRow(implItem);
-
     runsView->expandAll();
 }
 

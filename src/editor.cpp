@@ -52,12 +52,14 @@ Editor::Editor(QWidget *parent)
     this->setAutoCompletionSource(QsciScintilla::AcsAll);
     //设置大小写敏感
     this->setAutoCompletionCaseSensitivity(true);
-    //每输入3个字符就出现自动完成的提示
-    this->setAutoCompletionThreshold(3);
+    //每输入2个字符就出现自动完成的提示
+    this->setAutoCompletionThreshold(2);
     // 括号匹配
     this->setBraceMatching(QsciScintilla::SloppyBraceMatch);
     // 设置词法分析器
     this->setLexer(textLexer);
+    // EnCoding UTF-8
+    SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
 
 }
 
@@ -91,8 +93,16 @@ bool Editor::saveFile()
     QString path = m_path;
     if (!path.isEmpty()) {
         QFile file(path);
+        QFileInfo fileInfo(file);
+        if (!fileInfo.isWritable()) {
+            // 提示用户文件只读
+            QMessageBox::warning(MainWindow::instance(), "Warning",
+                                 "The file is read-only. Writing operation failed.");
+            return false;
+        }
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QTextStream out(&file);
+            out.setCodec("UTF-8");
             out << this->text();
             file.close();
             this->setModified(false);
@@ -107,8 +117,19 @@ bool Editor::saveAsFile()
 {
     QFileDialog dialog(this);
     dialog.setWindowTitle("Save As");
-    dialog.selectFile("untitled.v");
-    dialog.setNameFilter("Verilog Source Files (*.v)");
+
+    QFileInfo fileInfo(m_path);
+    // 获取文件的扩展名
+    QString extension = fileInfo.suffix();
+
+    if (extension == "v") {
+        dialog.selectFile("untitled.v");
+        dialog.setNameFilter("Verilog Source Files (*.v)");
+    } else if (extension == "xdc") {
+        dialog.selectFile("untitled.xdc");
+        dialog.setNameFilter("Xilinx Design Constraints (*.xdc)");
+    }
+
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     if (dialog.exec() != QDialog::Accepted) {
         return false; // 用户取消了另存为操作
@@ -123,6 +144,7 @@ bool Editor::saveAsFile()
     }
     m_path = path;
     QTextStream out(&file);
+    out.setCodec("UTF-8");
     out << this->text();
     file.close();
     this->setModified(false);

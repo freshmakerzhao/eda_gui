@@ -53,6 +53,56 @@ void MainWindow::createEditorTab(const QString& path)
     updateActionState();
 }
 
+bool MainWindow::cleanEditorTab()
+{
+    for (int i = 0; i < tabWidget->count(); ++i) {
+        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
+        if (editor->isModified()) {
+            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
+                                                                                     " are you sure you want to close?",
+                                                                    QMessageBox::Yes | QMessageBox::No);
+            if (btn == QMessageBox::No) {
+                return false;
+            } else {
+                break;
+            }
+        }
+    }
+
+    while (tabWidget->count() > 0) {
+        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(0));
+        delete editor;
+    }
+    return true;
+}
+
+bool MainWindow::saveAllFile()
+{
+    for (int i = 0; i < tabWidget->count(); ++i) {
+        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
+        if (editor->isModified()) {
+            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
+                                                                                     " are you sure you want to run?",
+                                                                    QMessageBox::Yes | QMessageBox::No);
+            if (btn == QMessageBox::No) {
+                return false;
+            } else {
+                break;
+            }
+        }
+    }
+
+    for (int i = 0; i < tabWidget->count(); ++i) {
+        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
+        if (editor->isModified()) {
+            if(!editor->saveFile()) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 void MainWindow::onNewTriggered()
 {
     Wizard wizard(this);
