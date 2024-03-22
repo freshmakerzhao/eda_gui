@@ -127,5 +127,9 @@ if (Qt5OpenGL_FOUND)
     target_link_libraries(${PROJECT_NAME} Qt5::OpenGL)
 endif()
 
-# 打包用
-#set(CMAKE_CXX_FLAGS "-mwindows")
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    # 如果是Release模式，添加-mwindows标志
+    set(CMAKE_CXX_FLAGS "-mwindows")
+endif()
+
+

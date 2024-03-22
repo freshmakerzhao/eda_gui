@@ -88,7 +88,7 @@ void Navigator::showContextMenu(const QPoint &pos) {
     QAction closeProject("Close Project");
     QAction addSources("Add Sources");
     QAction addConstraints("Add Constraints");
-    QAction deleteFileAction("Remove...");
+    QAction deleteFileAction("Remove File from Project");
     if (navTree->currentItem() == nullptr) {
         // qDebug() << "Empty Item";
         return;
