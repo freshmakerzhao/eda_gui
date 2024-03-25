@@ -20,7 +20,8 @@ public:
     void checkCall(
         const QString &phase,
         const QString &path,
-        const QString &script);
+        const QString &script,
+        const QString &pName);
 
     /**
      * 执行特殊命令（包含双引号、括号等字符时）

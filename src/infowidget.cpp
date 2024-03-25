@@ -31,42 +31,40 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     file.close();
     QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
     QJsonObject object = doc.object();
+    // 配置表格数据
     runsModel->setItem(0, 0, new QStandardItem(QString("synth")));
-    // 初始化个数
-    int lut6Num = 0 , lutNum = 0, muxf6Num = 0 , ffNum = 0 , bramNum = 0 , fifo18Num = 0 , ranb18Num = 0 , ranb36Num = 0 , dspNum = 0;
     for (auto it = object.begin(); it != object.end(); ++it) {
-//        QStandardItem *valueItem = new QStandardItem(QString::number(it.value().toInt()));
         if (it.key() == "$lut") {
-            lutNum += it.value().toInt();
+            lutNumSynth += it.value().toInt();
         } else if (it.key() == "MUXF6") {
-            muxf6Num += it.value().toInt();
+            muxf6NumSynth += it.value().toInt();
         } else if (it.key() == "FDRE_ZINI" || it.key() == "FDSE_ZINI" || it.key() == "FDCE_ZINI" || it.key() == "FDPE_ZINI") {
-            ffNum += it.value().toInt();
+            ffNumSynth += it.value().toInt();
         } else if (it.key() == "FIFO18E1_VPR") {
-            fifo18Num += it.value().toInt();
+            fifo18NumSynth += it.value().toInt();
         } else if (it.key() == "RAMB18E1_VPR") {
-            ranb18Num += it.value().toInt();
+            ranb18NumSynth += it.value().toInt();
         } else if (it.key() == "RAMB36E1_PRIM") {
-            ranb36Num += it.value().toInt();
+            ranb36NumSynth += it.value().toInt();
         } else if (it.key() == "DSP48E1_VPR") {
-            dspNum += it.value().toInt();
+            dspNumSynth += it.value().toInt();
         }
     }
-    lut6Num = lutNum - muxf6Num; // LUT6
-    bramNum = fifo18Num + (ranb18Num+1)/2 + ranb36Num; // BRAM
+    lut6NumSynth = lutNumSynth - muxf6NumSynth; // LUT6
+    bramNumSynth = fifo18NumSynth + (ranb18NumSynth+1)/2 + ranb36NumSynth; // BRAM
 
     runsModel->setItem(0, 1, new QStandardItem(status)); // Status
-    runsModel->setItem(0, 2, new QStandardItem(QString::number(lut6Num))); // LUT6
-    runsModel->setItem(0, 3, new QStandardItem(QString::number(ffNum))); // ff
-    runsModel->setItem(0, 4, new QStandardItem(QString::number(bramNum))); // BRAM
-    runsModel->setItem(0, 5, new QStandardItem(QString::number(dspNum))); // dsp
+    runsModel->setItem(0, 2, new QStandardItem(QString::number(lut6NumSynth))); // LUT6
+    runsModel->setItem(0, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
+    runsModel->setItem(0, 4, new QStandardItem(QString::number(bramNumSynth))); // BRAM
+    runsModel->setItem(0, 5, new QStandardItem(QString::number(dspNumSynth))); // dsp
     runsModel->setItem(0, 6, new QStandardItem(startTime)); // 开始时间
     runsModel->setItem(0, 7, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(0, 8, new QStandardItem(partName)); // 封装名称
 }
 
-void InfoWidget::updateImplItem(const QString implPath)
-{
+void InfoWidget::updateImplItem(const QString implPath, const QString status, const QString startTime, const QString Elapsed , const QString partName){
+
     QFile file(implPath + "/pb_type_count.json");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;// 文件打开失败
@@ -75,6 +73,25 @@ void InfoWidget::updateImplItem(const QString implPath)
     file.close();
     QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
     QJsonObject object = doc.object();
+    // 配置表格数据
+    runsModel->setItem(1, 0, new QStandardItem(QString("impl")));
+
+    for (auto it = object.begin(); it != object.end(); ++it) {
+        if (it.key() == "BLK-TL-DSP48E1") {
+            dspNumImpl += it.value().toInt();
+        } else if (it.key() == "BLK-TL-BRAM_L") {
+            bramNumImpl += it.value().toInt();
+        }
+    }
+
+    runsModel->setItem(1, 1, new QStandardItem(status)); // Status
+    runsModel->setItem(1, 2, new QStandardItem(QString::number(lut6NumSynth))); // LUT6
+    runsModel->setItem(1, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
+    runsModel->setItem(1, 4, new QStandardItem(QString::number(bramNumImpl))); // BRAM
+    runsModel->setItem(1, 5, new QStandardItem(QString::number(dspNumImpl))); // dsp
+    runsModel->setItem(1, 6, new QStandardItem(startTime)); // 开始时间
+    runsModel->setItem(1, 7, new QStandardItem(Elapsed)); // 持续时间
+    runsModel->setItem(1, 8, new QStandardItem(partName)); // 封装名称
 }
 
 InfoWidget::InfoWidget(QWidget *parent)

@@ -20,14 +20,18 @@ QProcess *ProcessManager::getProcess()
     return process;
 }
 
-void ProcessManager::checkCall(const QString &phase, const QString &path, const QString &script) {
+void ProcessManager::checkCall(const QString &phase, const QString &path, const QString &script, const QString &pName) {
     this->curPhase = phase;
     this->curProjectPath = path;
+    this->partName = pName;
     QStringList arguments;
     arguments << "/c" << script;
     process->terminate(); // 开始前先终止
     configWorkPath(path);
     qDebug() << arguments;
+    // 记录开始执行的时间
+    this->startTime = TimeUtilities::getCurTimeAndFormat(); // 展示
+    this->startTimeForCal = TimeUtilities::getCurTime(); // 计算
     process->start("cmd.exe", arguments);
 }
 
@@ -186,9 +190,24 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
                     this->partName);
             // 跳转到资源展示窗口
             InfoWidget::instance()->setCurrentPage(4);
-        } else if (this->curPhase == "Pack"){
-            // Pack结束后，读取资源统计信息
-            InfoWidget::instance()->updateImplItem(this->curProjectPath);
+        } else if (this->curPhase == "Place"){
+            // Place结束后，读取资源统计信息
+            InfoWidget::instance()->updateImplItem(
+                    this->curProjectPath,
+                    this->curPhase + " Complete!",
+                    this->startTime,
+                    this->elapsedTime,
+                    this->partName);
+            // 跳转到资源展示窗口
+            InfoWidget::instance()->setCurrentPage(4);
+        } else if (this->curPhase == "Implementation"){
+            // Implementation结束后，读取资源统计信息
+            InfoWidget::instance()->updateImplItem(
+                    this->curProjectPath,
+                    this->curPhase + " Complete!",
+                    this->startTime,
+                    this->elapsedTime,
+                    this->partName);
             // 跳转到资源展示窗口
             InfoWidget::instance()->setCurrentPage(4);
         }

@@ -96,9 +96,6 @@ TaskManager::TaskManager(QWidget *parent)
             runSynth();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
-//            InfoWidget::instance()->updateSynthItem(projectSynthPath);
-            // 激活 Design Runs 窗口
-//            InfoWidget::instance()->setCurrentPage(4);
         } else if (item == synthReportItem) {
             // synthReport();
         } else if (item == impAllItem) {
@@ -106,7 +103,6 @@ TaskManager::TaskManager(QWidget *parent)
             buildImp();
             // 激活 log 窗口
             InfoWidget::instance()->setCurrentPage(2);
-            InfoWidget::instance()->updateImplItem(projectImplPath);
         } else if (item == impPackItem) {
             buildPack();
             // 激活 log 窗口
@@ -193,7 +189,7 @@ void TaskManager::buildPack() {
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
-    ProcessManager::instance().checkCall("Pack", projectImplPath, QString::fromStdString(script));
+    ProcessManager::instance().checkCall("Pack", projectImplPath, QString::fromStdString(script),partName);
 }
 
 
@@ -209,14 +205,14 @@ void TaskManager::buildPlace(int mode) {
     // 生成top.ioplace
     if (mode == 1) {
         script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        ProcessManager::instance().checkCall("IOPlace Generation", projectPath, QString::fromStdString(script));
+        ProcessManager::instance().checkCall("IOPlace Generation", projectPath, QString::fromStdString(script),partName);
     }
 
     // 生成top.ioplace 与 constrains.place
     if (mode == 2) {
         script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
         script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        ProcessManager::instance().checkCall("Constraints Generation", projectImplPath, QString::fromStdString(script));
+        ProcessManager::instance().checkCall("Constraints Generation", projectImplPath, QString::fromStdString(script),partName);
     }
 
     // 完成 vpr_place
@@ -224,7 +220,7 @@ void TaskManager::buildPlace(int mode) {
         script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
         script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
         script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
-        ProcessManager::instance().checkCall("Place", projectImplPath, QString::fromStdString(script));
+        ProcessManager::instance().checkCall("Place", projectImplPath, QString::fromStdString(script),partName);
     }
 }
 
@@ -236,7 +232,7 @@ void TaskManager::buildRoute() {
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
 
     std::string script = CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
-    ProcessManager::instance().checkCall("Route", projectImplPath, QString::fromStdString(script));
+    ProcessManager::instance().checkCall("Route", projectImplPath, QString::fromStdString(script),partName);
 }
 
 // pack place route
@@ -252,7 +248,7 @@ void TaskManager::buildImp() {
     script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
     // route
     script += " && " + CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
-    ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script));
+    ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script),partName);
 }
 
 // 生成bit流 阶段
@@ -264,12 +260,12 @@ void TaskManager::buildBit(int mode) {
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     if (mode == 1) {
         std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
-        ProcessManager::instance().checkCall("Fasm Generation", projectImplPath, QString::fromStdString(script));
+        ProcessManager::instance().checkCall("Fasm Generation", projectImplPath, QString::fromStdString(script),partName);
     }
     if (mode == 2) {
         std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
         script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%");
-        ProcessManager::instance().checkCall("Bitstream Generation", projectImplPath, QString::fromStdString(script));
+        ProcessManager::instance().checkCall("Bitstream Generation", projectImplPath, QString::fromStdString(script),partName);
     }
 }
 
@@ -278,5 +274,5 @@ void TaskManager::downloadBit() {
     QString topName = "top";
     ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath,"digilent_hs3","top.bit");
-    ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script));
+    ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),partName);
 }
