@@ -12,14 +12,14 @@ SitesSliceL::SitesSliceL(const QColor &color, int cur_width, int cur_height, int
     setAcceptHoverEvents(true);
 //    setVisible(false); // 默认隐藏
     // 创建多个子项
-    QGraphicsItem* childItem1 = new QGraphicsEllipseItem(0, 0, 50, 50, this);
-    QGraphicsItem* childItem2 = new QGraphicsRectItem(60, 0, 50, 50, this);
+//    QGraphicsItem* childItem1 = new QGraphicsEllipseItem(0, 0, 50, 50, this);
+//    QGraphicsItem* childItem2 = new QGraphicsRectItem(60, 0, 50, 50, this);
 
     // 为子项设置可交互性
-    childItem1->setFlag(QGraphicsItem::ItemIsSelectable);
-    childItem1->setFlag(QGraphicsItem::ItemIsMovable);
-    childItem2->setFlag(QGraphicsItem::ItemIsSelectable);
-    childItem2->setFlag(QGraphicsItem::ItemIsMovable);
+//    childItem1->setFlag(QGraphicsItem::ItemIsSelectable);
+//    childItem1->setFlag(QGraphicsItem::ItemIsMovable);
+//    childItem2->setFlag(QGraphicsItem::ItemIsSelectable);
+//    childItem2->setFlag(QGraphicsItem::ItemIsMovable);
 }
 
 QRectF SitesSliceL::boundingRect() const
