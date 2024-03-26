@@ -162,11 +162,11 @@ View::View(const QString &name, QWidget *parent)
 //    dragModeButton->setCheckable(true);
 //    dragModeButton->setChecked(false);
     antialiasButton = new QToolButton;
-    antialiasButton->setText(tr("抗锯齿"));
+    antialiasButton->setText(tr("antialias"));
     antialiasButton->setCheckable(true);
     antialiasButton->setChecked(false);
     openGlButton = new QToolButton;
-    openGlButton->setText(tr("启用OpenGL"));
+    openGlButton->setText(tr("Enable OpenGL"));
     openGlButton->setCheckable(true);
 #ifndef QT_NO_OPENGL
     openGlButton->setEnabled(QGLFormat::hasOpenGL());

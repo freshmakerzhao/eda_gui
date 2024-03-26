@@ -21,7 +21,7 @@
 FrameView::FrameView(const std::string& tileGridPath, const std::string& tileColorPathLocal,QString projectImplPath,QWidget *parent)
         :  QWidget(parent), scene(new QGraphicsScene(this))
 {
-    view = new View("视图");
+    view = new View("view");
     //主分割窗口
     QSplitter *splitterMain = new QSplitter(Qt::Horizontal, parent);
 
@@ -44,9 +44,9 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 
     // 上部分的按钮
     // QPushButton* right_top_load_arch = new QPushButton("加载架构信息");
-    QPushButton* rightTopBlockName = new QPushButton("隐藏模块名称");
-    QPushButton* rightTopSites = new QPushButton("显示内部模块");
-    QPushButton* rightTopUsage = new QPushButton("资源可视化(未选架构)");
+    QPushButton* rightTopBlockName = new QPushButton("Tile Name Off");
+    QPushButton* rightTopSites = new QPushButton("Show Module Details");
+    QPushButton* rightTopUsage = new QPushButton("Resource Usage(no arch)");
 //    QPushButton* right_top_four = new QPushButton("清空视图");
 //    right_top_four->setEnabled(false); // 默认禁止
 //    QPushButton* right_top_five = new QPushButton("保存视图");
@@ -79,15 +79,15 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
         // 如果此时显示了site，则隐藏
         if(showSites) {
             viewer.updateSitesVisibleStatus(false);
-            rightTopSites->setText("显示内部模块");
+            rightTopSites->setText("Show Module Details");
         }
 
         if(showTilesName){
             // 触发信号后，设置tile_name隐藏
-            rightTopBlockName->setText("显示模块名称");
+            rightTopBlockName->setText("Tile Name On");
         }else{
             // 触发信号后，设置tile_name显示
-            rightTopBlockName->setText("隐藏模块名称");
+            rightTopBlockName->setText("Tile Name Off");
         }
         showSites = false;
         showTilesName = !showTilesName;
@@ -99,13 +99,13 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
         // 如果此时显示了tile_name，则隐藏
         if(showTilesName) {
             viewer.updateTilesNameVisibleStatus(false);
-            rightTopBlockName->setText("显示模块名称");
+            rightTopBlockName->setText("Tile Name On");
         }
 
         if(showSites){
-            rightTopSites->setText("显示内部模块");
+            rightTopSites->setText("Show Module Details");
         }else{
-            rightTopSites->setText("隐藏内部模块");
+            rightTopSites->setText("Hide Module Details");
         }
         showTilesName = false;
         showSites = !showSites;
@@ -121,8 +121,8 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
             viewer.updateTilesNameVisibleStatus(false);
             showTilesName = false;
             showSites = true;
-            rightTopSites->setText("隐藏内部模块");
-            rightTopBlockName->setText("显示模块名称");
+            rightTopSites->setText("Hide Module Details");
+            rightTopBlockName->setText("Tile Name On");
             viewer.buildPlaceUsageGrid(usageJsonPath.toStdString());
             if (viewer.showPlaceUsageGrid(scene)){
             } else {
@@ -136,8 +136,8 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 //            viewer.updateTilesNameVisibleStatus(false);
 //            showTilesName = false;
 //            showSites = true;
-//            rightTopSites->setText("隐藏内部模块");
-//            rightTopBlockName->setText("显示模块名称");
+//            rightTopSites->setText("Hide Module Details");
+//            rightTopBlockName->setText("Tile Name On");
 //            viewer.buildPlaceUsageGrid(usageJsonPath.toStdString());
 //            if (viewer.showPlaceUsageGrid(scene)){
 //            } else {
@@ -197,7 +197,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addWidget(splitterMain);
     setLayout(mainLayout);
-    setWindowTitle(tr("基于QT的FPGA架构可视化工具"));
+    setWindowTitle(tr("GridView"));
 
     // 显示用户当前选择架构
     if (!tileGridPath.empty()){
@@ -206,7 +206,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
             rightTopBlockName->setEnabled(true);
             rightTopUsage->setEnabled(true);
             rightTopSites->setEnabled(true);
-            rightTopUsage->setText("资源可视化");
+            rightTopUsage->setText("Resource Usage");
         }
     }
 
