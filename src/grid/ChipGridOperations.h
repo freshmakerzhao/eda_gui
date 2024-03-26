@@ -7,7 +7,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QGraphicsScene>
-#include "json.hpp"
+#include "utils/json.hpp"
 #include "entity/Cluster.h"
 #include "blocks/Blocks.h"
 #include <QCoreApplication>

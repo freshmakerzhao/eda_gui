@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 
 #include "editor.h"
-#include "wizard.h"
+#include "wizard/Wizard.h"
 #include "navigator.h"
 #include "taskmanager.h"
 #include "infowidget.h"
-#include "processmanager.h"
+#include "utils/ProcessManager.h"
 
 MainWindow *MainWindow::instance()
 {

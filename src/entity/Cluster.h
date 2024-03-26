@@ -9,7 +9,7 @@
 
 #ifndef CLUSTER_H
 #define CLUSTER_H
-#include "json.hpp"
+#include "utils/json.hpp"
 #include <string>
 #include <utility>
 #include <vector>
