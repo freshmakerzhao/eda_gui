@@ -8,4 +8,11 @@
         <file>resource/search.ico</file>
         <file>resource/clean.ico</file>
     </qresource>
+    <qresource prefix="/gridview">
+        <file>resource/gridview/zoomin.png</file>
+        <file>resource/gridview/zoomout.png</file>
+        <file>resource/gridview/rotateleft.png</file>
+        <file>resource/gridview/rotateright.png</file>
+        <file>resource/gridview/fileprint.png</file>
+    </qresource>
 </RCC>

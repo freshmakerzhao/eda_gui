@@ -79,8 +79,6 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 }
 #endif
 
-
-
 View::View(const QString &name, QWidget *parent)
     : QFrame(parent) // 继承自QFrame类的构造函数，设置parent为其父部件
 {
@@ -100,7 +98,7 @@ View::View(const QString &name, QWidget *parent)
     zoomInIcon->setAutoRepeat(true); // 允许长按触发（自动重复）
     zoomInIcon->setAutoRepeatInterval(33); // 设置放大按钮的触发间隔为33毫秒
     zoomInIcon->setAutoRepeatDelay(0); // 设置放大按钮的延迟为0毫秒
-    zoomInIcon->setIcon(QPixmap(":/resource_win/chip_view/zoomin.png"));
+    zoomInIcon->setIcon(QPixmap(":/gridview/resource/gridview/zoomin.png"));
     zoomInIcon->setIconSize(iconSize); // 设置放大按钮的图标尺寸为iconSize
 
     // 缩小按钮
@@ -108,7 +106,7 @@ View::View(const QString &name, QWidget *parent)
     zoomOutIcon->setAutoRepeat(true);
     zoomOutIcon->setAutoRepeatInterval(33);
     zoomOutIcon->setAutoRepeatDelay(0);
-    zoomOutIcon->setIcon(QPixmap(":/resource_win/chip_view/zoomout.png"));
+    zoomOutIcon->setIcon(QPixmap(":/gridview/resource/gridview/zoomout.png"));
     zoomOutIcon->setIconSize(iconSize);
 
     zoomSlider = new QSlider;
@@ -125,10 +123,10 @@ View::View(const QString &name, QWidget *parent)
 
     // 左旋右旋按钮
     QToolButton *rotateLeftIcon = new QToolButton;
-    rotateLeftIcon->setIcon(QPixmap(":/resource_win/chip_view/rotateleft.png"));
+    rotateLeftIcon->setIcon(QPixmap(":/gridview/resource/gridview/rotateleft.png"));
     rotateLeftIcon->setIconSize(iconSize);
     QToolButton *rotateRightIcon = new QToolButton;
-    rotateRightIcon->setIcon(QPixmap(":/resource_win/chip_view/rotateright.png"));
+    rotateRightIcon->setIcon(QPixmap(":/gridview/resource/gridview/rotateright.png"));
     rotateRightIcon->setIconSize(iconSize);
 
     // 设置刻度等，与缩放类似
@@ -174,7 +172,7 @@ View::View(const QString &name, QWidget *parent)
     openGlButton->setEnabled(false);
 #endif
     printButton = new QToolButton;
-    printButton->setIcon(QIcon(QPixmap(":/resource_win/chip_view/fileprint.png")));
+    printButton->setIcon(QIcon(QPixmap(":/gridview/resource/gridview/fileprint.png")));
 
     QButtonGroup *pointerModeGroup = new QButtonGroup(this);
     pointerModeGroup->setExclusive(true);
@@ -212,8 +210,8 @@ View::View(const QString &name, QWidget *parent)
     connect(openGlButton, &QAbstractButton::toggled, this, &View::toggleOpenGL);
     connect(rotateLeftIcon, &QAbstractButton::clicked, this, &View::rotateLeft);
     connect(rotateRightIcon, &QAbstractButton::clicked, this, &View::rotateRight);
-    connect(zoomInIcon, &QAbstractButton::clicked, this, &View::zoomIn);
-    connect(zoomOutIcon, &QAbstractButton::clicked, this, &View::zoomOut);
+    connect(zoomInIcon, &QAbstractButton::clicked, this, [this]() { this->zoomIn(1); });
+    connect(zoomOutIcon, &QAbstractButton::clicked, this, [this]() { this->zoomOut(1); });
     connect(printButton, &QAbstractButton::clicked, this, &View::print);
 
     setupMatrix();
@@ -285,6 +283,7 @@ void View::print()
 
 void View::zoomIn(int level)
 {
+//    qDebug() << level;
     zoomSlider->setValue(zoomSlider->value() + level);
 }
 

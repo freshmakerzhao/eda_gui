@@ -21,6 +21,7 @@
 FrameView::FrameView(const std::string& tileGridPath, const std::string& tileColorPathLocal,QString projectImplPath,QWidget *parent)
         :  QWidget(parent), scene(new QGraphicsScene(this))
 {
+    this->setWindowIcon(QIcon(":/resource/icon.png"));
     view = new View("view");
     //主分割窗口
     QSplitter *splitterMain = new QSplitter(Qt::Horizontal, parent);

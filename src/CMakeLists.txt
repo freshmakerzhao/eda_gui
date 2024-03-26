@@ -85,7 +85,7 @@ set(PROJECT_HEADERS
     Qsci/qscilexer.h
     Qsci/qsciabstractapis.h
     yaml-cpp/yaml.h
-    utils/ProcessManager.cpp
+    utils/ProcessManager.h
     utils/StringUtilities.h
     utils/CommandBuilder.h
     utils/FileHelper.h
