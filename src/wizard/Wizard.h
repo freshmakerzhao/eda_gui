@@ -1,0 +1,50 @@
+#ifndef WIZARD_H
+#define WIZARD_H
+
+#include <QWizard>
+#include <QWizardPage>
+#include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QVBoxLayout>
+#include <QFileDialog>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QHeaderView>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QDialogButtonBox>
+#include <QSortFilterProxyModel>
+#include <QComboBox>
+#include <QFormLayout>
+#include <QToolBar>
+#include <QDebug>
+
+#include "project.h"
+
+class Wizard : public QWizard
+{
+    Q_OBJECT
+public:
+    Wizard(QWidget *parent = nullptr);
+    ~Wizard();
+
+private slots:
+    void onFinish();
+
+public:
+    QStringList sourcesFilesList;
+    QStringList constraintFilesList;
+    QString part;
+    QString archName;
+    QString arch;
+
+private:
+    Project *project;
+};
+
+#endif // WIZARD_H

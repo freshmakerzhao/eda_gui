@@ -42,10 +42,14 @@ set(PROJECT_SOURCES
     mainwindow.cpp
     navigator.cpp
     project.cpp
-    wizard.cpp
     taskmanager.cpp
-    processmanager.cpp
-    json.hpp
+    wizard/Wizard.cpp
+    wizard/SourcePage.cpp
+    wizard/ConstraintPage.cpp
+    wizard/DefaultPartPage.cpp
+    wizard/ProjectNamePage.cpp
+    utils/json.hpp
+    utils/ProcessManager.cpp
     utils/StringUtilities.cpp
     utils/CommandBuilder.cpp
     widgets/FrameView.cpp
@@ -68,16 +72,20 @@ set(PROJECT_HEADERS
     mainwindow.h
     navigator.h
     project.h
-    wizard.h
     taskmanager.h
-    processmanager.h
-    ./Qsci/qsciscintilla.h
-    ./Qsci/qsciscintillabase.h
-    ./Qsci/qscilexercpp.h
-    ./Qsci/qscilexercustom.h
-    ./Qsci/qscilexer.h
-    ./Qsci/qsciabstractapis.h
-    ./yaml-cpp/yaml.h
+    wizard/Wizard.h
+    wizard/SourcePage.h
+    wizard/ConstraintPage.h
+    wizard/DefaultPartPage.h
+    wizard/ProjectNamePage.h
+    Qsci/qsciscintilla.h
+    Qsci/qsciscintillabase.h
+    Qsci/qscilexercpp.h
+    Qsci/qscilexercustom.h
+    Qsci/qscilexer.h
+    Qsci/qsciabstractapis.h
+    yaml-cpp/yaml.h
+    utils/ProcessManager.cpp
     utils/StringUtilities.h
     utils/CommandBuilder.h
     utils/FileHelper.h

@@ -45,7 +45,7 @@ void Navigator::loadFile(Project *proj)
     // 测试用
     TaskManager::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
     // 打包用
-//    TaskManager::instance()->GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
+    // TaskManager::instance()->GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
 
 
     qDebug() << "[Navigator] loadFile...";

@@ -1,6 +1,6 @@
 #include <QMessageBox>
 #include "taskmanager.h"
-#include "processmanager.h"
+#include "utils/ProcessManager.h"
 #include "utils/StringUtilities.h"
 #include "utils/CommandBuilder.h"
 #include "infowidget.h"
