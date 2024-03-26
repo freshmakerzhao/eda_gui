@@ -131,7 +131,7 @@ TaskManager::TaskManager(QWidget *parent)
                 delete gridView;  // 删除现存的对象
                 gridView = nullptr;  // 确保指针不再指向已删除的对象
             }
-            gridView = new FrameView(tileGridPath,tileColorPath);
+            gridView = new FrameView(tileGridPath,tileColorPath,projectImplPath);
             gridView->resize(1000, 800);
             gridView->show();
         } else if (item == proNetlistViewItem) {

@@ -16,8 +16,9 @@
 #include <QScrollBar>
 #include <QGraphicsView>
 #include <QFormLayout>
+#include <utility>
 
-FrameView::FrameView(const std::string& tileGridPath, const std::string& tileColorPathLocal,QWidget *parent)
+FrameView::FrameView(const std::string& tileGridPath, const std::string& tileColorPathLocal,QString projectImplPath,QWidget *parent)
         :  QWidget(parent), scene(new QGraphicsScene(this))
 {
     view = new View("视图");
@@ -111,9 +112,10 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     });
 
     // 资源占用
-    connect(rightTopUsage, &QPushButton::clicked, [this,rightTopSites,rightTopBlockName]() {
-        usageJsonPath = FileHelper::addJsonFile();
-        if (!usageJsonPath.isEmpty()) {
+    connect(rightTopUsage, &QPushButton::clicked, [this,rightTopSites,rightTopBlockName,projectImplPath]() {
+        // ==================== 默认使用runs/impl目录下的end_placement.json文件可视化资源使用情况 =========================
+        usageJsonPath = projectImplPath + "/end_placement.json";
+        if (projectImplPath != "") {
             viewer.setAllTileWhite(scene);
             viewer.updateSitesVisibleStatus(true);
             viewer.updateTilesNameVisibleStatus(false);
@@ -126,6 +128,21 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
             } else {
             }
         }
+        // ==================== 手动选择资源占用文件，方便测试 =========================
+//        usageJsonPath = FileHelper::addJsonFile();
+//        if (!usageJsonPath.isEmpty()) {
+//            viewer.setAllTileWhite(scene);
+//            viewer.updateSitesVisibleStatus(true);
+//            viewer.updateTilesNameVisibleStatus(false);
+//            showTilesName = false;
+//            showSites = true;
+//            rightTopSites->setText("隐藏内部模块");
+//            rightTopBlockName->setText("显示模块名称");
+//            viewer.buildPlaceUsageGrid(usageJsonPath.toStdString());
+//            if (viewer.showPlaceUsageGrid(scene)){
+//            } else {
+//            }
+//        }
     });
 
     // ========================= 下部分的标签 ===========================

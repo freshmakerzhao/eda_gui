@@ -25,7 +25,7 @@ class FrameView  : public QWidget {
 Q_OBJECT
 
 public:
-    FrameView(const std::string& tileGridPath = "", const std::string& tileColorPathLocal = "",QWidget *parent = nullptr);
+    FrameView(const std::string& tileGridPath = "", const std::string& tileColorPathLocal = "",QString projectImplPath = "",QWidget *parent = nullptr);
     View *view;
 private:
     void setupMatrix();
