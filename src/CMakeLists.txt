@@ -110,7 +110,7 @@ set(PROJECT_RESOURCES
 add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
-    ${PROJECT_RESOURCES} 
+    ${PROJECT_RESOURCES}
 )
 
 # Link the Qt5 Widgets library and the QScintilla library to the executable

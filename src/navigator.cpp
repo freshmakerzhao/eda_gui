@@ -43,10 +43,26 @@ void Navigator::loadFile(Project *proj)
     TaskManager::instance()->archName = proj->archName;
     TaskManager::instance()->arch = proj->arch;
     // 测试用
-    TaskManager::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
+    // TaskManager::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
+    // TaskManager::instance()->GLOBAL_RESOURCE_PATH = "C:/Users/X13_Flow/Desktop/workspace/HybrdLink/resource_win";
+    QString TEST_PATH1 = "E:/workspace/qt_demo/resource_win";
+    QString TEST_PATH2 = "C:/Users/X13_Flow/Desktop/workspace/HybrdLink/resource_win";
     // 打包用
     // TaskManager::instance()->GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
+    QString PACK_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
 
+    QFileInfo fileInfo1(TEST_PATH1);
+    QFileInfo fileInfo2(TEST_PATH2);
+    QFileInfo fileInfo3(PACK_PATH);
+
+    if(fileInfo1.exists()) {
+        TaskManager::instance()->GLOBAL_RESOURCE_PATH = TEST_PATH1;
+    } else if (fileInfo2.exists()) {
+        TaskManager::instance()->GLOBAL_RESOURCE_PATH = TEST_PATH2;
+    } else if (fileInfo3.exists()) {
+        TaskManager::instance()->GLOBAL_RESOURCE_PATH = PACK_PATH;
+    }
+    qDebug() << TaskManager::instance()->GLOBAL_RESOURCE_PATH;
 
     qDebug() << "[Navigator] loadFile...";
     qDebug() << "[Navigator] proj->sourceList：" << proj->sourceList;
@@ -116,6 +132,16 @@ void Navigator::closeProjectAction()
     delete navTree->topLevelItem(0);
     delete p;
     p = nullptr;
+    TaskManager::instance()->sourcePathList.clear();
+    TaskManager::instance()->constraintPathList.clear();
+    // 存储路径
+    TaskManager::instance()->projectSynthPath = "";
+    TaskManager::instance()->projectImplPath = "";
+    TaskManager::instance()->projectPath = "";
+    // 存储partname
+    TaskManager::instance()->partName = "";
+    TaskManager::instance()->archName = "";
+    TaskManager::instance()->arch = "";
 }
 
 void Navigator::addSourcesAction()
