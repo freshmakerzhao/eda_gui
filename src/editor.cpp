@@ -173,18 +173,17 @@ void Editor::contextMenuEvent(QContextMenuEvent *event)
 
 void Editor::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_BracketLeft) {
-        QsciScintilla::keyPressEvent(event);
-        int pos = SendScintilla(QsciScintilla::SCI_GETCURRENTPOS);
-        insert("]");
-        SendScintilla(QsciScintilla::SCI_SETCURRENTPOS, pos);
-        return;
-    }
+    static const std::map<int, QString> autoCompletionMap = {
+        {Qt::Key_BracketLeft, "]"},
+        {Qt::Key_ParenLeft, ")"},
+        {Qt::Key_BraceLeft, "}"}
+    };
 
-    if (event->key() == Qt::Key_ParenLeft) {
+    auto it = autoCompletionMap.find(event->key());
+    if (it != autoCompletionMap.end()) {
         QsciScintilla::keyPressEvent(event);
         int pos = SendScintilla(QsciScintilla::SCI_GETCURRENTPOS);
-        insert(")");
+        insert(it->second);
         SendScintilla(QsciScintilla::SCI_SETCURRENTPOS, pos);
         return;
     }
