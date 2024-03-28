@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QAction>
+#include <QKeyEvent>
 
 #include "Qsci/qsciscintilla.h" // QsciScintilla本体
 #include "Qsci/qsciapis.h"      // 自动补全的apis
@@ -30,6 +31,8 @@ public:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
+
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     QsciLexerVerilog *textLexer;

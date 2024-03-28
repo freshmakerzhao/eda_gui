@@ -60,6 +60,10 @@ Editor::Editor(QWidget *parent)
     this->setLexer(textLexer);
     // EnCoding UTF-8
     SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
+    // 缩进宽度
+    setTabWidth(4);
+    // 缩进级别可见
+    setIndentationGuides(true);
 
 }
 
@@ -165,5 +169,26 @@ void Editor::contextMenuEvent(QContextMenuEvent *event)
     menu->addAction(readOnlyAction);
     menu->exec(event->globalPos());
     delete menu;
+}
+
+void Editor::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_BracketLeft) {
+        QsciScintilla::keyPressEvent(event);
+        int pos = SendScintilla(QsciScintilla::SCI_GETCURRENTPOS);
+        insert("]");
+        SendScintilla(QsciScintilla::SCI_SETCURRENTPOS, pos);
+        return;
+    }
+
+    if (event->key() == Qt::Key_ParenLeft) {
+        QsciScintilla::keyPressEvent(event);
+        int pos = SendScintilla(QsciScintilla::SCI_GETCURRENTPOS);
+        insert(")");
+        SendScintilla(QsciScintilla::SCI_SETCURRENTPOS, pos);
+        return;
+    }
+
+    QsciScintilla::keyPressEvent(event);
 }
 

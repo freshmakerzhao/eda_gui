@@ -85,11 +85,11 @@ void Navigator::loadFile(Project *proj)
         constraintsfile->setData(0, Qt::UserRole, QFileInfo(file).filePath());
     }
     // TODO:Load doc, ip
-    QTreeWidgetItem *docItem = new QTreeWidgetItem(nameItem);
-    docItem->setText(0, "doc");
+    // QTreeWidgetItem *docItem = new QTreeWidgetItem(nameItem);
+    // docItem->setText(0, "doc");
 
-    QTreeWidgetItem *ipItem = new QTreeWidgetItem(nameItem);
-    ipItem->setText(0, "ip");
+    // QTreeWidgetItem *ipItem = new QTreeWidgetItem(nameItem);
+    // ipItem->setText(0, "ip");
 }
 
 void Navigator::clickedFile(QTreeWidgetItem *item)
