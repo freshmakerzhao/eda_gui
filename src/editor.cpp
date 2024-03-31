@@ -64,7 +64,8 @@ Editor::Editor(QWidget *parent)
     setTabWidth(4);
     // 缩进级别可见
     setIndentationGuides(true);
-
+    // 自动缩进
+    setAutoIndent(true);
 }
 
 Editor::~Editor()

@@ -6,6 +6,8 @@
 #include "taskmanager.h"
 #include "infowidget.h"
 #include "utils/ProcessManager.h"
+#include "ads/DockManager.h"
+#include "ads/DockWidget.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -277,6 +279,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    int leftwidth = int(this->width() * 0.18);//左边的停靠窗宽是主界面的0.18倍
+    int rightwidth = int(this->width() * 0.82);//右边的停靠窗宽是主界面的0.82倍
+    resizeDocks({ManagerDock, BottomDock}, {42, 18}, Qt::Vertical);//右侧上下布局42 : 18
+    resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -284,7 +295,7 @@ MainWindow::MainWindow(QWidget *parent)
     setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowIcon(QIcon(":/resource/icon.png"));
     // 设置窗口初始大小
-    this->resize(1600, 900);
+    this->resize(1700, 1000);
     // =================== MENUBAR ====================
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
     fileMenu = menuBar->addMenu("File");
@@ -345,22 +356,45 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabWidgetCurrentChanged);
     tabWidget->setMovable(true), tabWidget->setTabsClosable(true);
     connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested); // 关闭编辑器
-    this->setCentralWidget(tabWidget);
+    // this->setCentralWidget(tabWidget);
     updateActionState();
     // ===================== DOCK =====================
-    QDockWidget *leftDock1 = new QDockWidget(this);
-    leftDock1->setWindowTitle("Project Navigator"), leftDock1->setWidget(Navigator::instance());
-    addDockWidget(Qt::LeftDockWidgetArea, leftDock1);
+    NavigationBar = new QDockWidget(this);
+    NavigationBar->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    NavigationBar->setFeatures(QDockWidget::DockWidgetClosable);
+    NavigationBar->setWindowTitle("Flow Navigator");
+    NavigationBar->setWidget(TaskManager::instance());
+    addDockWidget(Qt::LeftDockWidgetArea, NavigationBar, Qt::Vertical);
 
-    QDockWidget *leftDock2 = new QDockWidget(this);
-    leftDock2->setWindowTitle("Tasks"), leftDock2->setWidget(TaskManager::instance());
-    addDockWidget(Qt::LeftDockWidgetArea, leftDock2);
+    BottomDock = new QDockWidget(this);
+    BottomDock->setWindowTitle("INFOMATION");
+    BottomDock->setWidget(InfoWidget::instance());
+    addDockWidget(Qt::BottomDockWidgetArea, BottomDock);
 
-    QDockWidget *bottomDock = new QDockWidget(this);
-    bottomDock->setWindowTitle("Information"), bottomDock->setWidget(InfoWidget::instance());
-    addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
+    ManagerDock = new QDockWidget(this);
+    ManagerDock->setWindowTitle("PROJECT MANAGER");
+    // ManagerDock->setWidget(tabWidget);
+    addDockWidget(Qt::TopDockWidgetArea, ManagerDock);
 
+    splitDockWidget(NavigationBar, BottomDock, Qt::Horizontal);
+    splitDockWidget(NavigationBar, ManagerDock, Qt::Horizontal);
+    splitDockWidget(ManagerDock, BottomDock, Qt::Vertical);
 
+    ads::CDockManager *DockManager = new ads::CDockManager;
+    ManagerDock->setWidget(DockManager);
+
+    ads::CDockWidget *SourcesWidget = new ads::CDockWidget("Sources");
+    DockManager->addDockWidget(ads::LeftDockWidgetArea, SourcesWidget);
+    SourcesWidget->setWidget(Navigator::instance());
+
+    // ads::CDockWidget *PropertiesWidget = new ads::CDockWidget("Properties");
+    // DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget);
+
+    ads::CDockWidget *EditWidget = new ads::CDockWidget("Editor");
+    DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
+    EditWidget->setWidget(tabWidget);
+    // EditWidget->setMinimumSize(1300, 10);
+    EditWidget->setMinimumSize(600, 10);
 }
 
 MainWindow::~MainWindow()

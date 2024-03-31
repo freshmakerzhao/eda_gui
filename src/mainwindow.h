@@ -46,6 +46,8 @@ private slots:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -81,6 +83,10 @@ private:
     void streamProcessOutput();
     // 配置输出和完成信号槽
     void configOutputSignals(const QString &phase);
+
+    QDockWidget *NavigationBar;
+    QDockWidget *BottomDock;
+    QDockWidget *ManagerDock;
 };
 
 #endif // MAINWINDOW_H

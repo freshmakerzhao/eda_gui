@@ -33,6 +33,13 @@ set(YAML_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 include_directories(${YAML_INCLUDE_DIR})
 link_directories(${YAML_LIBRARY_DIR})
 
+# Include the QADVANCEDDOCK library
+set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ads")
+set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
+
+include_directories(${QADVANCEDDOCK_INCLUDE_DIR})
+link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
+
 # Add source files
 set(PROJECT_SOURCES
     chipplanner.cpp
@@ -118,6 +125,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     qscintilla2_qt5
     libyaml-cpp.a
+    qtadvanceddocking
 )
 
 # Specify installation paths (if required)
