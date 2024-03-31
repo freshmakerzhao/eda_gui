@@ -97,10 +97,11 @@ void Navigator::loadFile(Project *proj)
 }
 
 void Navigator::clickedFile(QTreeWidgetItem *item)
-{
+{ 
     QString path = item->data(0, Qt::UserRole).toString();
     // qDebug() << "Navigator:: open " << path;
     MainWindow::instance()->createEditorTab(path);
+    navTree->clearSelection(); // 清除navTree选中状态
 }
 
 void Navigator::showContextMenu(const QPoint &pos) {
@@ -126,6 +127,7 @@ void Navigator::showContextMenu(const QPoint &pos) {
 
     }
     contextMenu.exec(navTree->mapToGlobal(pos));
+    navTree->clearSelection(); // 清除navTree选中状态
 }
 
 void Navigator::closeProjectAction()

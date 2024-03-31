@@ -83,6 +83,7 @@ TaskManager::TaskManager(QWidget *parent)
     proDownloadBitItem->setIcon(0, QIcon(""));
 
     QObject::connect(taskTree, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
+        taskTree->clearSelection(); // 清除taskTree选中状态
         if (this->arch == ""){
             // 用户未选择架构时
             QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");

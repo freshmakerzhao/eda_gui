@@ -374,27 +374,29 @@ MainWindow::MainWindow(QWidget *parent)
     ManagerDock = new QDockWidget(this);
     ManagerDock->setWindowTitle("PROJECT MANAGER");
     // ManagerDock->setWidget(tabWidget);
+    ManagerDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    ManagerDock->setFeatures(QDockWidget::DockWidgetClosable);
     addDockWidget(Qt::TopDockWidgetArea, ManagerDock);
 
     splitDockWidget(NavigationBar, BottomDock, Qt::Horizontal);
     splitDockWidget(NavigationBar, ManagerDock, Qt::Horizontal);
     splitDockWidget(ManagerDock, BottomDock, Qt::Vertical);
 
-    ads::CDockManager *DockManager = new ads::CDockManager;
+    ads::CDockManager *DockManager = new ads::CDockManager(ManagerDock);
     ManagerDock->setWidget(DockManager);
 
-    ads::CDockWidget *SourcesWidget = new ads::CDockWidget("Sources");
+    ads::CDockWidget *SourcesWidget = new ads::CDockWidget("Sources", DockManager);
     DockManager->addDockWidget(ads::LeftDockWidgetArea, SourcesWidget);
     SourcesWidget->setWidget(Navigator::instance());
 
-    // ads::CDockWidget *PropertiesWidget = new ads::CDockWidget("Properties");
+    // ads::CDockWidget *PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
     // DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget);
 
-    ads::CDockWidget *EditWidget = new ads::CDockWidget("Editor");
+    ads::CDockWidget *EditWidget = new ads::CDockWidget("Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
     EditWidget->setWidget(tabWidget);
-    // EditWidget->setMinimumSize(1300, 10);
     EditWidget->setMinimumSize(600, 10);
+    // EditWidget->setMinimumSize(1300, 10);
 }
 
 MainWindow::~MainWindow()

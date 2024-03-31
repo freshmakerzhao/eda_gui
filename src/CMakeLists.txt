@@ -41,71 +41,28 @@ include_directories(${QADVANCEDDOCK_INCLUDE_DIR})
 link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
 
 # Add source files
-set(PROJECT_SOURCES
-    chipplanner.cpp
-    editor.cpp
-    infowidget.cpp
-    main.cpp
-    mainwindow.cpp
-    navigator.cpp
-    project.cpp
-    taskmanager.cpp
-    wizard/Wizard.cpp
-    wizard/SourcePage.cpp
-    wizard/ConstraintPage.cpp
-    wizard/DefaultPartPage.cpp
-    wizard/ProjectNamePage.cpp
-    utils/json.hpp
-    utils/ProcessManager.cpp
-    utils/StringUtilities.cpp
-    utils/CommandBuilder.cpp
-    widgets/FrameView.cpp
-    grid/ChipGridOperations.cpp
-    grid/view.cpp
-    blocks/Blocks.cpp
-    blocks/Sites.cpp
-    blocks/SitesBlock.cpp
-    blocks/SitesSliceL.cpp
-    blocks/Tiles.cpp
-    base/Globals.cpp
-    utils/TimeUtilities.cpp
+file(GLOB PROJECT_SOURCES
+    wizard/*.cpp
+    utils/*.cpp
+    widgets/*.cpp
+    grid/*.cpp
+    blocks/*.cpp
+    base/*.cpp
+    *.cpp
 )
 
 # Add header files
-set(PROJECT_HEADERS
-    chipplanner.h
-    editor.h
-    infowidget.h
-    mainwindow.h
-    navigator.h
-    project.h
-    taskmanager.h
-    wizard/Wizard.h
-    wizard/SourcePage.h
-    wizard/ConstraintPage.h
-    wizard/DefaultPartPage.h
-    wizard/ProjectNamePage.h
-    Qsci/qsciscintilla.h
-    Qsci/qsciscintillabase.h
-    Qsci/qscilexercpp.h
-    Qsci/qscilexercustom.h
-    Qsci/qscilexer.h
-    Qsci/qsciabstractapis.h
-    yaml-cpp/yaml.h
-    utils/ProcessManager.h
-    utils/StringUtilities.h
-    utils/CommandBuilder.h
-    utils/FileHelper.h
-    grid/ChipGridOperations.h
-    grid/view.h
-    blocks/Blocks.h
-    blocks/Sites.h
-    blocks/SitesBlock.h
-    blocks/SitesSliceL.h
-    blocks/Tiles.h
-    entity/Cluster.h
-    base/Globals.h
-    utils/TimeUtilities.h
+file(GLOB PROJECT_HEADERS
+    wizard/*.h
+    utils/*.h
+    widgets/*.h
+    grid/*.h
+    blocks/*h
+    base/*.h
+    entity/*.h
+    QSci/*.h
+    yaml-cpp/*.h
+    *.h
 )
 
 # Add resource files
