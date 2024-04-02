@@ -1,5 +1,5 @@
 #include <QMessageBox>
-#include "taskmanager.h"
+#include "TaskManager.h"
 #include "utils/ProcessManager.h"
 #include "utils/StringUtilities.h"
 #include "utils/CommandBuilder.h"
@@ -7,149 +7,82 @@
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 
-TaskManager *TaskManager::instance(QWidget *parent)
+TaskManager& TaskManager::instance()
 {
-    static TaskManager *m_instance = nullptr;
-    if (!m_instance) {
-        m_instance = new TaskManager(parent);
-    }
-    return m_instance;
+    static TaskManager instance;
+    return instance;
 }
 
-bool TaskManager::eventFilter(QObject *obj, QEvent *event)
+void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
 {
-    if (obj == taskTree->viewport()) {
-        //点击树的空白,取消选中
-        if (event->type() == QEvent::MouseButtonPress) {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-            if (mouseEvent->buttons() & Qt::LeftButton) {
-                QModelIndex index = taskTree->indexAt(mouseEvent->pos());
-                if (!index.isValid()) {
-                    taskTree->setCurrentIndex(QModelIndex());
-                }
-            }
+    if (this->arch == ""){
+        // 用户未选择架构时
+        QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
+        return;
+    }
+    if (!MainWindow::instance()->saveAllFile()) {
+        return;
+    }
+    // qDebug() << item->text(0);
+    // 双击触发
+    if (item->text(0) == "Run") {
+        runSynth();
+        // 激活 log 窗口
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (item->text(0) == "Report") {
+        // synthReport();
+    } else if (item->text(0) == "Run Implementation") {
+        // pack place route全流程
+        buildImp();
+        // 激活 log 窗口
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (item->text(0) == "Only pack") {
+        buildPack();
+        // 激活 log 窗口
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (item->text(0) == "Report") {
+        // impReport();
+    } else if (item->text(0) == "Only place") {
+        buildPlace(3);
+        // 激活 log 窗口
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (item->text(0) == "Only route") {
+        buildRoute();
+        // 激活 log 窗口
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (item->text(0) == "Generate Bitstream") {
+        buildBit(2);
+        // 激活 log 窗口
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (item->text(0) == "Generate GridView") {
+        qDebug() << "[TaskManager] arch " << this->arch;
+        std::string tileGridPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
+        std::string tileColorPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+        qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
+        qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
+        if (gridView) {
+            delete gridView;  // 删除现存的对象
+            gridView = nullptr;  // 确保指针不再指向已删除的对象
         }
+        gridView = new FrameView(tileGridPath,tileColorPath,projectImplPath);
+        gridView->resize(1000, 800);
+        gridView->show();
+    } else if (item->text(0) == "Generate NetlistView") {
+        // if (!frameView) {
+        //     frameView = new NetlistView();
+        // }
+        // frameView->resize(1000, 800);
+        // frameView->show();
+    } else if (item->text(0) == "Download Bit") {
+        downloadBit();
+        // 激活 log 窗口
+        InfoWidget::instance()->setCurrentPage(2);
     }
-    return QObject::eventFilter(obj, event);
 }
 
-TaskManager::TaskManager(QWidget *parent)
-    : QWidget(parent)
+TaskManager::TaskManager()
 {
     qDebug() << "[TaskManager] Constructing...";
-    taskTree = new QTreeWidget(this);
-    taskTree->viewport()->installEventFilter(this); //事件过滤
-    QGridLayout *layout = new QGridLayout(this);
-    layout->addWidget(taskTree);
-    layout->setMargin(0);
-    taskTree->setColumnCount(1);
-    taskTree->setHeaderHidden(true);
-    // ================== 综合 ==================
-    QTreeWidgetItem *synthItem = new QTreeWidgetItem(taskTree, QStringList() << "Synthesis");
-    synthItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
-    QTreeWidgetItem *synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run");
-    synthRunItem->setIcon(0, QIcon(""));
-    // run synth
-    QTreeWidgetItem *synthReportItem = new QTreeWidgetItem(synthItem, QStringList() << "Report");
-    synthReportItem->setIcon(0, QIcon(""));
-    // ================== imp ==================
-    QTreeWidgetItem *impItem = new QTreeWidgetItem(taskTree, QStringList() << "Implementation");
-    impItem->setIcon(0, QIcon(""));
-    // pack_place_route
-    QTreeWidgetItem *impAllItem = new QTreeWidgetItem(impItem, QStringList() << "Run Implementation");
-    impAllItem->setIcon(0, QIcon(""));
-    // 仅pack
-    QTreeWidgetItem *impPackItem = new QTreeWidgetItem(impItem, QStringList() << "Only pack");
-    impPackItem->setIcon(0, QIcon(""));
-    // 仅place
-    QTreeWidgetItem *impPlaceItem = new QTreeWidgetItem(impItem, QStringList() << "Only place");
-    impPlaceItem->setIcon(0, QIcon(""));
-    // 仅route
-    QTreeWidgetItem *impRouteItem = new QTreeWidgetItem(impItem, QStringList() << "Only route");
-    impRouteItem->setIcon(0, QIcon(""));
-    QTreeWidgetItem *impPackReportItem = new QTreeWidgetItem(impItem, QStringList() << "Report");
-    // 查看 Pack 日志
-    impPackReportItem->setIcon(0, QIcon(""));
-    // ================== 码流及可视化 ==================
-    QTreeWidgetItem *proItem = new QTreeWidgetItem(taskTree, QStringList() << "Program and Debug");
-    proItem->setIcon(0, QIcon(""));
-    QTreeWidgetItem *proNetlistViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate NetlistView");
-    proNetlistViewItem->setIcon(0, QIcon(""));
-    QTreeWidgetItem *proBitItem = new QTreeWidgetItem(proItem, QStringList() << "Generate Bitstream");
-    proBitItem->setIcon(0, QIcon(""));
-    QTreeWidgetItem *proBitViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate GridView");
-    proBitViewItem->setIcon(0, QIcon(""));
-    QTreeWidgetItem *proDownloadBitItem = new QTreeWidgetItem(proItem, QStringList() << "Download Bit");
-    proDownloadBitItem->setIcon(0, QIcon(""));
-
-    QObject::connect(taskTree, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
-        taskTree->clearSelection(); // 清除taskTree选中状态
-        if (this->arch == ""){
-            // 用户未选择架构时
-            QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
-            return;
-        }
-        if (!MainWindow::instance()->saveAllFile()) {
-            return;
-        }
-        // 双击触发
-        if (item == synthRunItem) {
-            runSynth();
-            // 激活 log 窗口
-            InfoWidget::instance()->setCurrentPage(2);
-        } else if (item == synthReportItem) {
-            // synthReport();
-        } else if (item == impAllItem) {
-            // pack place route全流程
-            buildImp();
-            // 激活 log 窗口
-            InfoWidget::instance()->setCurrentPage(2);
-        } else if (item == impPackItem) {
-            buildPack();
-            // 激活 log 窗口
-            InfoWidget::instance()->setCurrentPage(2);
-        } else if (item == impPackReportItem) {
-            // impReport();
-        } else if (item == impPlaceItem) {
-            buildPlace(3);
-            // 激活 log 窗口
-            InfoWidget::instance()->setCurrentPage(2);
-        } else if (item == impRouteItem) {
-            buildRoute();
-            // 激活 log 窗口
-            InfoWidget::instance()->setCurrentPage(2);
-        } else if (item == proBitItem) {
-            buildBit(2);
-            // 激活 log 窗口
-            InfoWidget::instance()->setCurrentPage(2);
-        } else if (item == proBitViewItem) {
-            qDebug() << "[TaskManager] arch " << this->arch;
-            std::string tileGridPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
-            std::string tileColorPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
-            qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
-            qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
-            if (gridView) {
-                delete gridView;  // 删除现存的对象
-                gridView = nullptr;  // 确保指针不再指向已删除的对象
-            }
-            gridView = new FrameView(tileGridPath,tileColorPath,projectImplPath);
-            gridView->resize(1000, 800);
-            gridView->show();
-        } else if (item == proNetlistViewItem) {
-            // if (!frameView) {
-            //     frameView = new NetlistView();
-            // }
-            // frameView->resize(1000, 800);
-            // frameView->show();
-        } else if (item == proDownloadBitItem) {
-            downloadBit();
-            // 激活 log 窗口
-            InfoWidget::instance()->setCurrentPage(2);
-        }
-    });
-
-    taskTree->expandAll();
-
 }
 
 TaskManager::~TaskManager()

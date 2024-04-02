@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : mainwindow.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/2/9
+  ******************************************************************************
+  */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -12,7 +21,9 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 
-#include "chipplanner.h"
+// #include "grid/ChipPlanner.h"
+#include "ads/DockManager.h"
+#include "ads/DockWidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -55,6 +66,7 @@ private:
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QMenu *editMenu;
+    QMenu *viewMenu;
     QMenu *helpMenu;
 
     QAction *newAction;
@@ -78,15 +90,16 @@ private:
     QToolBar *toolbar;
     QTabWidget *tabWidget;
 
-    ChipPlanner chipPlanner;
-
-    void streamProcessOutput();
-    // 配置输出和完成信号槽
-    void configOutputSignals(const QString &phase);
+    // ChipPlanner chipPlanner;
 
     QDockWidget *NavigationBar;
     QDockWidget *BottomDock;
     QDockWidget *ManagerDock;
+
+    ads::CDockManager *DockManager;
+
+    ads::CDockWidget *SourcesWidget;
+    ads::CDockWidget *EditWidget;
 };
 
 #endif // MAINWINDOW_H

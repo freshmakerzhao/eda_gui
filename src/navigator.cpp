@@ -1,6 +1,6 @@
 #include "navigator.h"
 #include "mainwindow.h"
-#include "taskmanager.h"
+#include "utils/TaskManager.h"
 #include "utils/StringUtilities.h"
 
 Navigator *Navigator::instance(QWidget *parent)
@@ -32,16 +32,16 @@ void Navigator::loadFile(Project *proj)
         p = proj;
     }
     // 存储设计文件与约束文件
-    TaskManager::instance()->sourcePathList = proj->sourceList;
-    TaskManager::instance()->constraintPathList = proj->constraintList;
+    TaskManager::instance().sourcePathList = proj->sourceList;
+    TaskManager::instance().constraintPathList = proj->constraintList;
     // 存储路径
-    TaskManager::instance()->projectSynthPath = proj->path + "/runs/synth";
-    TaskManager::instance()->projectImplPath = proj->path + "/runs/impl";
-    TaskManager::instance()->projectPath = proj->path;
+    TaskManager::instance().projectSynthPath = proj->path + "/runs/synth";
+    TaskManager::instance().projectImplPath = proj->path + "/runs/impl";
+    TaskManager::instance().projectPath = proj->path;
     // 存储partname
-    TaskManager::instance()->partName = proj->part;
-    TaskManager::instance()->archName = proj->archName;
-    TaskManager::instance()->arch = proj->arch;
+    TaskManager::instance().partName = proj->part;
+    TaskManager::instance().archName = proj->archName;
+    TaskManager::instance().arch = proj->arch;
     // 测试用
     // TaskManager::instance()->GLOBAL_RESOURCE_PATH = "E:/workspace/qt_demo/resource_win";
     // TaskManager::instance()->GLOBAL_RESOURCE_PATH = "C:/Users/X13_Flow/Desktop/workspace/HybrdLink/resource_win";
@@ -58,15 +58,15 @@ void Navigator::loadFile(Project *proj)
     QFileInfo fileInfo4(PACK_PATH);
 
     if(fileInfo1.exists()) {
-        TaskManager::instance()->GLOBAL_RESOURCE_PATH = TEST_PATH1;
+        TaskManager::instance().GLOBAL_RESOURCE_PATH = TEST_PATH1;
     } else if (fileInfo2.exists()) {
-        TaskManager::instance()->GLOBAL_RESOURCE_PATH = TEST_PATH2;
+        TaskManager::instance().GLOBAL_RESOURCE_PATH = TEST_PATH2;
     } else if (fileInfo3.exists()) {
-        TaskManager::instance()->GLOBAL_RESOURCE_PATH = TEST_PATH3;
+        TaskManager::instance().GLOBAL_RESOURCE_PATH = TEST_PATH3;
     } else if (fileInfo4.exists()) {
-        TaskManager::instance()->GLOBAL_RESOURCE_PATH = PACK_PATH;
+        TaskManager::instance().GLOBAL_RESOURCE_PATH = PACK_PATH;
     }
-    qDebug() << TaskManager::instance()->GLOBAL_RESOURCE_PATH;
+    qDebug() << TaskManager::instance().GLOBAL_RESOURCE_PATH;
 
     qDebug() << "[Navigator] loadFile...";
     qDebug() << "[Navigator] proj->sourceList：" << proj->sourceList;
@@ -110,23 +110,26 @@ void Navigator::showContextMenu(const QPoint &pos) {
     QAction addSources("Add Sources");
     QAction addConstraints("Add Constraints");
     QAction deleteFileAction("Remove File from Project");
-    if (navTree->currentItem() == nullptr) {
+    QTreeWidgetItem *rightClickedItem = navTree->itemAt(pos); // 右键点击位置
+    if (rightClickedItem == nullptr) {
         // qDebug() << "Empty Item";
+        navTree->clearSelection(); // 清除navTree选中状态
         return;
     }
-    if (navTree->currentItem()->parent() == nullptr) {
+    if (rightClickedItem->parent() == nullptr) {
         contextMenu.addAction(&closeProject);
         connect(&closeProject, &QAction::triggered, this, &Navigator::closeProjectAction);
         contextMenu.addAction(&addSources);
         connect(&addSources, &QAction::triggered, this, &Navigator::addSourcesAction);
         contextMenu.addAction(&addConstraints);
         connect(&addConstraints, &QAction::triggered, this, &Navigator::addConstraintsAction);
-    } else if (QFileInfo(navTree->currentItem()->data(0, Qt::UserRole).toString()).isFile()) {
+    } else if (QFileInfo(rightClickedItem->data(0, Qt::UserRole).toString()).isFile()) {
         contextMenu.addAction(&deleteFileAction);
         connect(&deleteFileAction, &QAction::triggered, this, &Navigator::removeFileAction);
 
     }
     contextMenu.exec(navTree->mapToGlobal(pos));
+    // contextMenu.exec(QCursor::pos());
     navTree->clearSelection(); // 清除navTree选中状态
 }
 
@@ -138,16 +141,16 @@ void Navigator::closeProjectAction()
     delete navTree->topLevelItem(0);
     delete p;
     p = nullptr;
-    TaskManager::instance()->sourcePathList.clear();
-    TaskManager::instance()->constraintPathList.clear();
+    TaskManager::instance().sourcePathList.clear();
+    TaskManager::instance().constraintPathList.clear();
     // 存储路径
-    TaskManager::instance()->projectSynthPath = "";
-    TaskManager::instance()->projectImplPath = "";
-    TaskManager::instance()->projectPath = "";
+    TaskManager::instance().projectSynthPath = "";
+    TaskManager::instance().projectImplPath = "";
+    TaskManager::instance().projectPath = "";
     // 存储partname
-    TaskManager::instance()->partName = "";
-    TaskManager::instance()->archName = "";
-    TaskManager::instance()->arch = "";
+    TaskManager::instance().partName = "";
+    TaskManager::instance().archName = "";
+    TaskManager::instance().arch = "";
 }
 
 void Navigator::addSourcesAction()
@@ -225,6 +228,7 @@ Navigator::Navigator(QWidget *parent)
 {
     qDebug() << "[Navigator] Constructing...";
     navTree = new QTreeWidget(this);
+    navTree->setStyleSheet("QTreeWidget::item { height: 32px; }");
     navTree->viewport()->installEventFilter(this);
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(navTree);

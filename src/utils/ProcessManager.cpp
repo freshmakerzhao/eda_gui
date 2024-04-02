@@ -1,4 +1,4 @@
-#include "processmanager.h"
+#include "ProcessManager.h"
 #include "utils/StringUtilities.h"
 #include "infowidget.h"
 #include "mainwindow.h"

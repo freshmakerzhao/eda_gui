@@ -1,13 +1,19 @@
+/**
+  ******************************************************************************
+  * @file           : mainwindow.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/2/9
+  ******************************************************************************
+  */
 #include "mainwindow.h"
 
-#include "editor.h"
+#include "widgets/Editor.h"
 #include "wizard/Wizard.h"
 #include "navigator.h"
-#include "taskmanager.h"
 #include "infowidget.h"
-#include "utils/ProcessManager.h"
-#include "ads/DockManager.h"
-#include "ads/DockWidget.h"
+#include "widgets/FlowNavigator.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -187,7 +193,7 @@ void MainWindow::onEditTriggered()
 
 void MainWindow::onChipPlannerTriggered()
 {
-    chipPlanner.show();
+    // chipPlanner.show();
 }
 
 void MainWindow::onDocumentationTriggered()
@@ -300,6 +306,7 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
     fileMenu = menuBar->addMenu("File");
     editMenu = menuBar->addMenu("Edit");
+    viewMenu = menuBar->addMenu("View");
     helpMenu = menuBar->addMenu("Help");
     // ===================== FILE ======================
     newAction = new QAction("New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
@@ -362,8 +369,9 @@ MainWindow::MainWindow(QWidget *parent)
     NavigationBar = new QDockWidget(this);
     NavigationBar->setFeatures(QDockWidget::NoDockWidgetFeatures);
     NavigationBar->setFeatures(QDockWidget::DockWidgetClosable);
-    NavigationBar->setWindowTitle("Flow Navigator");
-    NavigationBar->setWidget(TaskManager::instance());
+    NavigationBar->setWindowTitle("FLOW NAVIGATOR");
+    FlowNavigator *flowNavigator = new FlowNavigator(this);
+    NavigationBar->setWidget(flowNavigator);
     addDockWidget(Qt::LeftDockWidgetArea, NavigationBar, Qt::Vertical);
 
     BottomDock = new QDockWidget(this);
@@ -382,21 +390,30 @@ MainWindow::MainWindow(QWidget *parent)
     splitDockWidget(NavigationBar, ManagerDock, Qt::Horizontal);
     splitDockWidget(ManagerDock, BottomDock, Qt::Vertical);
 
-    ads::CDockManager *DockManager = new ads::CDockManager(ManagerDock);
+    DockManager = new ads::CDockManager(ManagerDock);
     ManagerDock->setWidget(DockManager);
 
-    ads::CDockWidget *SourcesWidget = new ads::CDockWidget("Sources", DockManager);
+    SourcesWidget = new ads::CDockWidget("Sources", DockManager);
+    // SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
     DockManager->addDockWidget(ads::LeftDockWidgetArea, SourcesWidget);
     SourcesWidget->setWidget(Navigator::instance());
 
     // ads::CDockWidget *PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
     // DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget);
 
-    ads::CDockWidget *EditWidget = new ads::CDockWidget("Editor", DockManager);
+    EditWidget = new ads::CDockWidget("Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
     EditWidget->setWidget(tabWidget);
     EditWidget->setMinimumSize(600, 10);
     // EditWidget->setMinimumSize(1300, 10);
+
+    // ===================== VIEW ======================
+    viewMenu->addAction(NavigationBar->toggleViewAction());
+    viewMenu->addAction(BottomDock->toggleViewAction());
+    viewMenu->addAction(ManagerDock->toggleViewAction());
+    viewMenu->addSeparator();
+    viewMenu->addAction(SourcesWidget->toggleViewAction());
+    viewMenu->addAction(EditWidget->toggleViewAction());
 }
 
 MainWindow::~MainWindow()
@@ -404,46 +421,3 @@ MainWindow::~MainWindow()
     qDebug() << "[Main Window] Distructing...";
 }
 
-void MainWindow::streamProcessOutput()
-{
-    QProcess* process = ProcessManager::instance().getProcess();
-    QByteArray output = process->readAllStandardOutput();
-    QByteArray errorOutput = process->readAllStandardError();
-
-    QTextCodec *tc = QTextCodec::codecForName("GBK");
-    QString outputStr = tc->toUnicode(output);
-    QString errorOutputStr = tc->toUnicode(errorOutput);
-    if (process->error() == QProcess::UnknownError) {
-        // 没有错误发生，输出 output
-        // logTextEdit->appendPlainText(outputStr);
-        InfoWidget::instance()->appendMsg(outputStr); // 发送到InfoWidget
-    } else {
-        // 发生错误，输出 errorOutput
-        // logTextEdit->appendPlainText(errorOutputStr);
-        InfoWidget::instance()->appendMsg(errorOutputStr);
-    }
-    QCoreApplication::processEvents(); // 刷新终端
-}
-
-void MainWindow::configOutputSignals(const QString &phase)
-{
-    // 清空已绑定的信号
-    ProcessManager::instance().getProcess()->disconnect();
-    // 合并channel
-    ProcessManager::instance().getProcess()->setProcessChannelMode(QProcess::MergedChannels);
-    // 绑定 readyReadStandardOutput 信号，有输出则显示在窗口中
-    connect(ProcessManager::instance().getProcess(), &QProcess::readyReadStandardOutput, this, &MainWindow::streamProcessOutput);
-    // 绑定 finished 信号，执行结束后触发
-    connect(ProcessManager::instance().getProcess(), QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),[=](int exitCode, QProcess::ExitStatus exitStatus) {
-        qDebug() << exitCode;
-        qDebug() << exitStatus;
-        qDebug() << phase + " over";
-        // 显示信息弹窗
-        // exitCode 为0表示正常执行并成功退出
-        if (exitCode == 0) {
-            QMessageBox::information(nullptr, "提示", phase + " 完成！");
-        } else {
-            QMessageBox::critical(nullptr, "错误", phase + " 执行失败！");
-        }
-    });
-}

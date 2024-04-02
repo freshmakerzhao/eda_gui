@@ -7,8 +7,6 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QGridLayout>
-#include <QSet>
-#include <QVector>
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QDir>

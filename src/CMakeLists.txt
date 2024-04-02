@@ -60,7 +60,7 @@ file(GLOB PROJECT_HEADERS
     blocks/*h
     base/*.h
     entity/*.h
-    QSci/*.h
+    Qsci/*.h
     yaml-cpp/*.h
     *.h
 )

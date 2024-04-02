@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 
 #include "navigator.h"
-// #include "taskmanager.h"
-// #include "infowidget.h"
 #include "project.h"
 #include <QApplication>
 #include <QDebug>

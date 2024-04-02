@@ -1,4 +1,4 @@
-#include "chipplanner.h"
+#include "ChipPlanner.h"
 
 ChipPlanner::ChipPlanner(QWidget *parent)
     : QMainWindow(parent)

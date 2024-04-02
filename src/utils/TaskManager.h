@@ -2,17 +2,15 @@
 #define TASKMANAGER_H
 
 #include <QTreeWidget>
-#include <QWidget>
-#include <QGridLayout>
-#include <QMouseEvent>
 #include <QDebug>
 
-
-class TaskManager : public QWidget
+class TaskManager : public QObject
 {
     Q_OBJECT
 public:
-    static TaskManager *instance(QWidget *parent = nullptr);
+    static TaskManager& instance();
+
+    void handleTreeItemActivation(QTreeWidgetItem *item);
 
 //    QStringList sourceList;
     // 存储设计与约束文件
@@ -32,11 +30,9 @@ public:
     QString arch;
     // arch name
     QString GLOBAL_RESOURCE_PATH;
-protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
-    TaskManager(QWidget *parent = nullptr);
+    TaskManager();
     ~TaskManager();
 
     QTreeWidget *taskTree;

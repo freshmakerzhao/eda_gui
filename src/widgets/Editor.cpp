@@ -1,4 +1,14 @@
-#include "editor.h"
+/**
+  ******************************************************************************
+  * @file           : Editor.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/2/7
+  ******************************************************************************
+  */
+
+#include "Editor.h"
 #include "mainwindow.h"
 
 
@@ -9,22 +19,21 @@ Editor::Editor(QWidget *parent)
 
     // updateActionState
     connect(this, &QsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
-
-    this->setCaretWidth(10); // 光标宽度
-
+    // 光标宽度
+    setCaretWidth(10);
     // 加载字体文件
     QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
     // 创建字体
     QFont font("JetBrains Mono NL", 10);
     // 设置行号字体
-    this->setMarginsFont(font);
+    setMarginsFont(font);
     // 设置显示行号
-    this->setMarginLineNumbers(0, true);
+    setMarginLineNumbers(0, true);
     // 设置行号的宽度
-    this->setMarginWidth(0, 50);
+    setMarginWidth(0, 50);
     // 设置折叠选项
-    this->setFolding(QsciScintilla::BoxedTreeFoldStyle);
-    this->setMarginWidth(2, 20);
+    setFolding(QsciScintilla::BoxedTreeFoldStyle);
+    setMarginWidth(2, 20);
     // 创建词法分析器
     textLexer = new QsciLexerVerilog(this);
     textLexer->setFont(font);
@@ -49,15 +58,15 @@ Editor::Editor(QWidget *parent)
 
     apis->prepare();
     //设置自动完成所有项
-    this->setAutoCompletionSource(QsciScintilla::AcsAll);
+    setAutoCompletionSource(QsciScintilla::AcsAll);
     //设置大小写敏感
-    this->setAutoCompletionCaseSensitivity(true);
+    setAutoCompletionCaseSensitivity(true);
     //每输入2个字符就出现自动完成的提示
-    this->setAutoCompletionThreshold(2);
+    setAutoCompletionThreshold(2);
     // 括号匹配
-    this->setBraceMatching(QsciScintilla::SloppyBraceMatch);
+    setBraceMatching(QsciScintilla::SloppyBraceMatch);
     // 设置词法分析器
-    this->setLexer(textLexer);
+    setLexer(textLexer);
     // EnCoding UTF-8
     SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
     // 缩进宽度
