@@ -1,6 +1,6 @@
 #include "ProcessManager.h"
 #include "utils/StringUtilities.h"
-#include "infowidget.h"
+#include "widgets/Infowidget.h"
 #include "mainwindow.h"
 #include <QTextCodec>
 #include <QMessageBox>

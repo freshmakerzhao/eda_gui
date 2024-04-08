@@ -12,10 +12,22 @@ public:
 
     void handleTreeItemActivation(QTreeWidgetItem *item);
 
+    /**
+     * 设置工程参数
+    */
+    void setParams(QMap<QString, QString> params);
+
+    /**
+     * 关闭工程清除参数
+    */
+    void cleanParams();
+
 //    QStringList sourceList;
     // 存储设计与约束文件
     QList<QString> sourcePathList;
     QList<QString> constraintPathList;
+
+private:
     // 项目路径
     QString projectPath;
     // 综合路径

@@ -47,7 +47,7 @@ protected:
 private:
     QsciLexerVerilog *textLexer;
     QsciAPIs *apis;
-    QString m_path;
+    QString _path;
 };
 
 #endif // EDITOR_H

@@ -7,6 +7,8 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QGridLayout>
+#include <QSet>
+#include <QVector>
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QDir>
@@ -14,7 +16,7 @@
 #include <QPair>
 #include <QProcess>
 
-#include "project.h"
+#include "utils/Project.h"
 
 class Navigator : public QWidget
 {

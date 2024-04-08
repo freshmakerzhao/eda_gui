@@ -1,12 +1,12 @@
-#include "infowidget.h"
+#include "Infowidget.h"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
-    static InfoWidget *m_instance = nullptr;
-    if (!m_instance) {
-        m_instance = new InfoWidget(parent);
+    static InfoWidget *_instance = nullptr;
+    if (!_instance) {
+        _instance = new InfoWidget(parent);
     }
-    return m_instance;
+    return _instance;
 }
 
 void InfoWidget::appendMsg(const QString &str) {

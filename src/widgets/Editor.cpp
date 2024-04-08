@@ -85,7 +85,7 @@ Editor::~Editor()
 
 bool Editor::openFile(const QString path)
 {
-    m_path = path;
+    _path = path;
     QFile file(path);
     if (!QFileInfo(file).isFile()) {
         return false;
@@ -104,7 +104,7 @@ bool Editor::openFile(const QString path)
 
 bool Editor::saveFile()
 {
-    QString path = m_path;
+    QString path = _path;
     if (!path.isEmpty()) {
         QFile file(path);
         QFileInfo fileInfo(file);
@@ -132,7 +132,7 @@ bool Editor::saveAsFile()
     QFileDialog dialog(this);
     dialog.setWindowTitle("Save As");
 
-    QFileInfo fileInfo(m_path);
+    QFileInfo fileInfo(_path);
     // 获取文件的扩展名
     QString extension = fileInfo.suffix();
 
@@ -156,7 +156,7 @@ bool Editor::saveAsFile()
         QMessageBox::warning(this, "Warning", "Cannot write file:\n" + file.errorString());
         return false;
     }
-    m_path = path;
+    _path = path;
     QTextStream out(&file);
     out.setCodec("UTF-8");
     out << this->text();

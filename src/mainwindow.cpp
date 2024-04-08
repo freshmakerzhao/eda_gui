@@ -11,17 +11,17 @@
 
 #include "widgets/Editor.h"
 #include "wizard/Wizard.h"
-#include "navigator.h"
-#include "infowidget.h"
+#include "widgets/Navigator.h"
+#include "widgets/Infowidget.h"
 #include "widgets/FlowNavigator.h"
 
 MainWindow *MainWindow::instance()
 {
-    static MainWindow *m_instance = nullptr;
-    if (!m_instance) {
-        m_instance = new MainWindow;
+    static MainWindow *_instance = nullptr;
+    if (!_instance) {
+        _instance = new MainWindow;
     }
-    return m_instance;
+    return _instance;
 }
 
 void MainWindow::updateActionState()
@@ -127,7 +127,7 @@ void MainWindow::onOpenTriggered()
 {
     QFileDialog dialog(this);
     dialog.setWindowTitle("Open Project");
-    dialog.setNameFilter("HPR Files (*.hpr)");
+    dialog.setNameFilter("HybrdLink Project File (*.hpr)");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     if (dialog.exec() != QDialog::Accepted) {
         return; // 用户取消了操作
@@ -136,7 +136,7 @@ void MainWindow::onOpenTriggered()
     if (!path.isEmpty()) {
         // 执行打开.hpr文件的逻辑
         Project *proj = new Project;
-        proj->openProject(path);
+        proj->parseProject(path);
         Navigator::instance()->loadFile(proj);
     }
 }
@@ -299,6 +299,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     qDebug() << "[Main Window] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
+    setWindowTitle("HybrdLink");
     this->setWindowIcon(QIcon(":/resource/icon.png"));
     // 设置窗口初始大小
     this->resize(1700, 1000);

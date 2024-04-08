@@ -34,7 +34,7 @@
 #include <QToolBar>
 #include <QDebug>
 
-#include "project.h"
+#include "utils/Project.h"
 
 class Wizard : public QWizard
 {

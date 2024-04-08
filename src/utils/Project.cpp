@@ -1,26 +1,30 @@
 /**
   ******************************************************************************
-  * @file           : project.cpp
+  * @file           : Project.cpp
   * @author         : ksy
   * @description    : None
   * @attention      : None
   * @date           : 2024/3/8
   ******************************************************************************
   */
-#include "project.h"
+#include "Project.h"
 
-
-Project::Project(QString name, QString path, QString part, QString arch, QString archName){
-    this->name = name;
-    this->path = path;
-    this->part = part;
-    this->arch = arch;
-    this->archName = archName;
+Project::Project(QString name,
+                 QString path,
+                 QString part,
+                 QString arch,
+                 QString archName){
+    param["name"] = name;          // 工程名称
+    param["path"] = path;          // 工程路径(绝对)
+    param["part"] = part;
+    param["arch"] = arch;
+    param["archName"] = archName;
 }
+
 
 bool Project::makeProject()
 {
-    QString hprfile = this->path +  "/" + name + ".hpr";
+    QString hprfile = param["path"] +  "/" + param["name"] + ".hpr";
     QFile file(hprfile);
     if(!file.remove()) { // 删除已有hpr文件
         qDebug() << "remove error:" << file.errorString();
@@ -48,8 +52,8 @@ bool Project::makeProject()
     xmlWriter.writeStartElement("root");
     // ================== 写入工程名称 ==================
     xmlWriter.writeAttribute("Name", "Project");
-    xmlWriter.writeAttribute("Val", this->name);
-    // ================== 写入资源列表路径 ==================
+    xmlWriter.writeAttribute("Val", param["name"]);
+    // ========= 写入资源列表路径(以相对路径保存) ==========
     for (const QString& source : sourceList) {
         QString relative = "/sources/" + QFileInfo(source).fileName();
         xmlWriter.writeTextElement("sourcePath", relative);
@@ -58,20 +62,20 @@ bool Project::makeProject()
         QString relative = "/constraints/" + QFileInfo(constraint).fileName();
         xmlWriter.writeTextElement("constraintPath", relative);
     }
-    // ================== 写入Part ==================
+    // =================== 写入Part ====================
     xmlWriter.writeStartElement("Option");
     xmlWriter.writeAttribute("Name", "Part");
-    xmlWriter.writeAttribute("Val", this->part);
+    xmlWriter.writeAttribute("Val", param["part"]);
 
-    // ================== 写入Arch ==================
+    // =================== 写入Arch =====================
     xmlWriter.writeStartElement("Option");
     xmlWriter.writeAttribute("Name", "Arch");
-    xmlWriter.writeAttribute("Val", this->arch);
+    xmlWriter.writeAttribute("Val", param["arch"]);
 
     // ================== 写入ArchName ==================
     xmlWriter.writeStartElement("Option");
     xmlWriter.writeAttribute("Name", "ArchName");
-    xmlWriter.writeAttribute("Val", this->archName);
+    xmlWriter.writeAttribute("Val", param["archName"]);
 
     xmlWriter.writeEndElement();
     xmlWriter.writeEndElement();
@@ -81,17 +85,20 @@ bool Project::makeProject()
     return true;
 }
 
-bool Project::openProject(const QString &path)
+/**
+     * 解析工程文件，将工程参数保存在Map
+     * @param path 工程文件(*.hpr)路径
+     * @return
+     */
+bool Project::parseProject(const QString &path)
 {
-    // this->sourceList.clear();
-    // this->constraintList.clear();
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "无法打开XML文件";
         return false;
     }
-    this->path = QFileInfo(path).path();
-    QString basePath = this->path;
+    param["path"] = QFileInfo(path).path();  // 获取项目文件夹绝对路径
+    QString basePath = param["path"];
     // 创建XML读取器
     QXmlStreamReader xmlReader(&file);
 
@@ -104,13 +111,10 @@ bool Project::openProject(const QString &path)
             QStringRef elementName = xmlReader.name();
             if (elementName == "sourcePath") {
                 xmlReader.readNext();
-                // QString absolute = QDir(basePath).absoluteFilePath(xmlReader.text().toString());
-                // QString relative = xmlReader.text().toString();
                 QString absolute = basePath + xmlReader.text().toString();
                 this->sourceList.append(absolute);
             } else if (elementName == "constraintPath") {
                 xmlReader.readNext();
-                // QString absolute = QDir(basePath).absoluteFilePath(xmlReader.text().toString());
                 QString absolute = basePath + xmlReader.text().toString();
                 this->constraintList.append(absolute);
             } else if (elementName == "Option") {
@@ -120,19 +124,19 @@ bool Project::openProject(const QString &path)
 
                 if (!name.isEmpty()) {
                     if (name == "Part") {
-                        this->part = val; 
+                        param["part"] = val;
                     } else if (name == "ArchName") {
-                        this->archName = val;
+                        param["archName"] = val;
                     } else if (name == "Arch") {
-                        this->arch = val;
+                        param["arch"] = val;
                     }
                     // 可以根据需要添加更多的条件分支
                 }
+
             } else if (elementName == "root") {
                 QXmlStreamAttributes attributes = xmlReader.attributes();
-                // QString xname = attributes.value("Name").toString();
                 QString val = attributes.value("Val").toString();
-                this->name = val;
+                param["name"] = val;
             }
         }
     }
@@ -144,11 +148,11 @@ bool Project::openProject(const QString &path)
     }
 
     // 输出解析结果
-    qDebug() << "Project Name" << this->name;
-    qDebug() << "Part Val:" << this->part;
-    qDebug() << "ArchName Val:" << this->archName;
-    qDebug() << "Arch Val:" << this->arch;
     qDebug() << "=======================================";
+    qDebug() << "Project Name " << param["name"];
+    qDebug() << "Part Val:    " << param["part"];
+    qDebug() << "ArchName Val:" << param["archName"];
+    qDebug() << "Arch Val:    " << param["arch"];
     qDebug() << "Source Path List:======================";
     for (const QString& source : this->sourceList) {
         qDebug() << " " << source;
@@ -161,5 +165,20 @@ bool Project::openProject(const QString &path)
     // 关闭文件
     file.close();
     return true;
+}
+
+/**
+     * 获取工程参数
+     * @param key
+     * @return
+     */
+QString Project::getParam(const QString &key)
+{
+    return param[key];
+}
+
+QMap<QString, QString> Project::getAllParams()
+{
+    return param;
 }
 

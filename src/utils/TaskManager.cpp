@@ -3,7 +3,7 @@
 #include "utils/ProcessManager.h"
 #include "utils/StringUtilities.h"
 #include "utils/CommandBuilder.h"
-#include "infowidget.h"
+#include "widgets/Infowidget.h"
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 
@@ -78,6 +78,60 @@ void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     }
+}
+
+/**
+  * 设置工程参数
+  */
+void TaskManager::setParams(QMap<QString, QString> params)
+{
+    // 存储路径
+    QString path = params["path"];
+    projectSynthPath = path + "/runs/synth";
+    projectImplPath = path + "/runs/impl";
+    projectPath = path;
+    // 存储partname
+    partName = params["part"];
+    archName = params["archName"];
+    arch = params["arch"];
+
+    // 测试用
+    QString TEST_PATH1 = "E:/workspace/qt_demo/resource_win";
+    QString TEST_PATH2 = "C:/Users/X13_Flow/Desktop/workspace/HybrdLink/resource_win";
+    QString TEST_PATH3 = "C:/Users/INTEL/Desktop/Work/VMwareFileWorkspace/HybrdLink/resource_win";
+    // 打包用
+    QString PACK_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
+
+    QFileInfo fileInfo1(TEST_PATH1);
+    QFileInfo fileInfo2(TEST_PATH2);
+    QFileInfo fileInfo3(TEST_PATH3);
+    QFileInfo fileInfo4(PACK_PATH);
+
+    if(fileInfo1.exists()) {
+        GLOBAL_RESOURCE_PATH = TEST_PATH1;
+    } else if (fileInfo2.exists()) {
+        GLOBAL_RESOURCE_PATH = TEST_PATH2;
+    } else if (fileInfo3.exists()) {
+        GLOBAL_RESOURCE_PATH = TEST_PATH3;
+    } else if (fileInfo4.exists()) {
+        GLOBAL_RESOURCE_PATH = PACK_PATH;
+    }
+    qDebug() << GLOBAL_RESOURCE_PATH;
+}
+
+/**
+  * 关闭工程清除参数
+  */
+void TaskManager::cleanParams()
+{
+    sourcePathList.clear();
+    constraintPathList.clear();
+    projectSynthPath = "";
+    projectImplPath = "";
+    projectPath = "";
+    partName = "";
+    archName = "";
+    arch = "";
 }
 
 TaskManager::TaskManager()

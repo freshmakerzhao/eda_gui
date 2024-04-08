@@ -12,7 +12,7 @@
 #include "SourcePage.h"
 #include "ConstraintPage.h"
 #include "DefaultPartPage.h"
-#include "navigator.h"
+#include "widgets/Navigator.h"
 
 Wizard::Wizard(QWidget *parent) : QWizard(parent)
 {
