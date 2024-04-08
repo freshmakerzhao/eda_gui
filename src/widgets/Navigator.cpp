@@ -34,7 +34,7 @@ void Navigator::loadFile(Project *proj)
 
     QTreeWidgetItem *nameItem = new QTreeWidgetItem(navTree);
     nameItem->setText(0, proj->getParam("name"));
-    QTreeWidgetItem *sourceItem = new QTreeWidgetItem(nameItem);
+    sourceItem = new QTreeWidgetItem(nameItem);
     sourceItem->setText(0, "sources");
     foreach (const QString &file, proj->sourceList) {
         QTreeWidgetItem *sourcefile = new QTreeWidgetItem(sourceItem);
@@ -69,22 +69,28 @@ void Navigator::showContextMenu(const QPoint &pos) {
     QAction closeProject("Close Project");
     QAction addSources("Add Sources");
     QAction addConstraints("Add Constraints");
-    QAction deleteFileAction("Remove File from Project");
-    if (navTree->currentItem() == nullptr) {
+    QAction removeFileAction("Remove File from Project");
+    QAction setAsTopAction("Set As Top");
+    QTreeWidgetItem *rightClickedItem = navTree->itemAt(pos); // 右键点击位置
+    if (rightClickedItem == nullptr) {
         // qDebug() << "Empty Item";
+        navTree->clearSelection(); // 清除navTree选中状态
         return;
     }
-    if (navTree->currentItem()->parent() == nullptr) {
+    if (rightClickedItem->parent() == nullptr) {
         contextMenu.addAction(&closeProject);
         connect(&closeProject, &QAction::triggered, this, &Navigator::closeProjectAction);
         contextMenu.addAction(&addSources);
         connect(&addSources, &QAction::triggered, this, &Navigator::addSourcesAction);
         contextMenu.addAction(&addConstraints);
         connect(&addConstraints, &QAction::triggered, this, &Navigator::addConstraintsAction);
-    } else if (QFileInfo(navTree->currentItem()->data(0, Qt::UserRole).toString()).isFile()) {
-        contextMenu.addAction(&deleteFileAction);
-        connect(&deleteFileAction, &QAction::triggered, this, &Navigator::removeFileAction);
-
+    } else if (QFileInfo(rightClickedItem->data(0, Qt::UserRole).toString()).isFile()) {
+        contextMenu.addAction(&removeFileAction);
+        connect(&removeFileAction, &QAction::triggered, this, &Navigator::removeFileAction);
+    }
+    if (rightClickedItem->parent() == sourceItem) {
+        contextMenu.addAction(&setAsTopAction);
+        // TODO 设置顶层模块操作
     }
     contextMenu.exec(navTree->mapToGlobal(pos));
     navTree->clearSelection(); // 清除navTree选中状态
@@ -176,6 +182,7 @@ Navigator::Navigator(QWidget *parent)
 {
     qDebug() << "[Navigator] Constructing...";
     navTree = new QTreeWidget(this);
+    navTree->setStyleSheet("QTreeWidget::item { height: 32px; }");
     navTree->viewport()->installEventFilter(this);
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(navTree);

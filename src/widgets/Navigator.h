@@ -50,6 +50,9 @@ private:
 
     QTreeWidget *navTree;
 
+    QTreeWidgetItem *sourceItem;
+    QTreeWidgetItem *constraintsItem;
+
     Project *p = nullptr;
 };
 
