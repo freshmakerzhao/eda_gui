@@ -25,6 +25,8 @@ void Navigator::loadFile(Project *proj)
     p = proj;
 
     TaskManager::instance().setParams(proj->getAllParams());
+    TaskManager::instance().sourcePathList = proj->sourceList;
+    TaskManager::instance().constraintPathList = proj->constraintList;
 
     qDebug() << "[Navigator] loadFile...";
     qDebug() << "[Navigator] proj->sourceList：" << proj->sourceList;
