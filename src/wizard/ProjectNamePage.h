@@ -2,12 +2,21 @@
 #define PROJECTNAMEPAGE_H
 
 #include "Wizard.h"
+#include <QMessageBox>
 
 class ProjectNamePage : public QWizardPage
 {
     Q_OBJECT
 public:
     ProjectNamePage(QWidget *parent = nullptr);
+
+protected:
+    bool isComplete() const override;
+
+private:
+    QLineEdit *nameLineEdit;
+    QLineEdit *pathLineEdit;
+    QLabel *warningLabel;
 };
 
 #endif // PROJECTNAMEPAGE_H
