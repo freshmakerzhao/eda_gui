@@ -48,6 +48,7 @@ file(GLOB PROJECT_SOURCES
     grid/*.cpp
     blocks/*.cpp
     base/*.cpp
+    dialog/*.cpp
     *.cpp
 )
 
@@ -60,6 +61,7 @@ file(GLOB PROJECT_HEADERS
     blocks/*h
     base/*.h
     entity/*.h
+    dialog/*.h
     Qsci/*.h
     yaml-cpp/*.h
     *.h

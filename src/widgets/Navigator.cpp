@@ -70,7 +70,7 @@ void Navigator::showContextMenu(const QPoint &pos) {
     QAction addSources("Add Sources");
     QAction addConstraints("Add Constraints");
     QAction removeFileAction("Remove File from Project");
-    QAction setAsTopAction("Set As Top");
+    // QAction setAsTopAction("Set As Top");
     QTreeWidgetItem *rightClickedItem = navTree->itemAt(pos); // 右键点击位置
     if (rightClickedItem == nullptr) {
         // qDebug() << "Empty Item";
@@ -88,10 +88,10 @@ void Navigator::showContextMenu(const QPoint &pos) {
         contextMenu.addAction(&removeFileAction);
         connect(&removeFileAction, &QAction::triggered, this, &Navigator::removeFileAction);
     }
-    if (rightClickedItem->parent() == sourceItem) {
-        contextMenu.addAction(&setAsTopAction);
-        // TODO 设置顶层模块操作
-    }
+    // if (rightClickedItem->parent() == sourceItem) {
+    //     contextMenu.addAction(&setAsTopAction);
+    //     // TODO 设置顶层模块操作
+    // }
     contextMenu.exec(navTree->mapToGlobal(pos));
     navTree->clearSelection(); // 清除navTree选中状态
 }
