@@ -6,6 +6,7 @@
 #include "widgets/Infowidget.h"
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
+#include "dialog/CustomMessageBox.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -17,7 +18,11 @@ void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
 {
     if (this->arch == ""){
         // 用户未选择架构时
-        QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
+        // QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
+        CustomMessageBox customMessageBox(MainWindow::instance());
+        customMessageBox.setStandardButtons(QMessageBox::Ok);
+        customMessageBox.setInfo("Failed", "Please select or create a project.");
+        customMessageBox.exec();
         return;
     }
     if (!MainWindow::instance()->saveAllFile()) {
