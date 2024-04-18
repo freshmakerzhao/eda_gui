@@ -16,6 +16,8 @@ set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS PrintSupport)
+find_package(Qt5 COMPONENTS OpenGL)
 
 # Include the QScintilla library
 set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Qsci")
@@ -31,54 +33,50 @@ set(YAML_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 include_directories(${YAML_INCLUDE_DIR})
 link_directories(${YAML_LIBRARY_DIR})
 
+# Include the QADVANCEDDOCK library
+set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ads")
+set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
+
+include_directories(${QADVANCEDDOCK_INCLUDE_DIR})
+link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
+
 # Add source files
-set(PROJECT_SOURCES
-    chipplanner.cpp
-    editor.cpp
-    infowidget.cpp
-    main.cpp
-    mainwindow.cpp
-    navigator.cpp
-    project.cpp
-    wizard.cpp
-    taskmanager.cpp
-    processmanager.cpp
+file(GLOB PROJECT_SOURCES
+    wizard/*.cpp
+    utils/*.cpp
+    widgets/*.cpp
+    grid/*.cpp
+    blocks/*.cpp
+    base/*.cpp
+    dialog/*.cpp
+    *.cpp
 )
 
 # Add header files
-set(PROJECT_HEADERS
-    chipplanner.h
-    editor.h
-    infowidget.h
-    mainwindow.h
-    navigator.h
-    project.h
-    wizard.h
-    taskmanager.h
-    processmanager.h
-    ./Qsci/qsciscintilla.h
-    ./Qsci/qsciscintillabase.h
-    ./Qsci/qscilexercpp.h
-    ./Qsci/qscilexercustom.h
-    ./Qsci/qscilexer.h
-    ./Qsci/qsciabstractapis.h
-    ./yaml-cpp/yaml.h
+file(GLOB PROJECT_HEADERS
+    wizard/*.h
+    utils/*.h
+    widgets/*.h
+    grid/*.h
+    blocks/*h
+    base/*.h
+    entity/*.h
+    dialog/*.h
+    Qsci/*.h
+    yaml-cpp/*.h
+    *.h
 )
 
 # Add resource files
 set(PROJECT_RESOURCES
     res.qrc
-        utils/StringUtilities.cpp
-        utils/StringUtilities.h
-        utils/CommandBuilder.cpp
-        utils/CommandBuilder.h
 )
 
 # Tell CMake to create the executable
 add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
-    ${PROJECT_RESOURCES} 
+    ${PROJECT_RESOURCES}
 )
 
 # Link the Qt5 Widgets library and the QScintilla library to the executable
@@ -86,6 +84,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     qscintilla2_qt5
     libyaml-cpp.a
+    qtadvanceddocking
 )
 
 # Specify installation paths (if required)
@@ -95,4 +94,19 @@ set(app_WINRC appicon.rc)
 set_property(SOURCE app_win32.rc APPEND PROPERTY
         OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/AppIcon.ico
 )
+
+
+if (Qt5PrintSupport_FOUND)
+    target_link_libraries(${PROJECT_NAME} Qt5::PrintSupport)
+endif()
+
+if (Qt5OpenGL_FOUND)
+    target_link_libraries(${PROJECT_NAME} Qt5::OpenGL)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    # 如果是Release模式，添加-mwindows标志
+    set(CMAKE_CXX_FLAGS "-mwindows")
+endif()
+
 

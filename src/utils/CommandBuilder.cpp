@@ -10,7 +10,7 @@
 #include "CommandBuilder.h"
 #include <sstream>
 #include "utils/StringUtilities.h"
-#include "processmanager.h"
+#include "ProcessManager.h"
 //获取实例
 CommandBuilder& CommandBuilder::instance()
 {

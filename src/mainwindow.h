@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : mainwindow.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/2/9
+  ******************************************************************************
+  */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -12,7 +21,9 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 
-#include "chipplanner.h"
+// #include "grid/ChipPlanner.h"
+#include "ads/DockManager.h"
+#include "ads/DockWidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -23,6 +34,8 @@ public:
 
     void updateActionState();                 // 更新编辑器按钮状态
     void createEditorTab(const QString& path); // 创建编辑器Tab
+    bool cleanEditorTab();
+    bool saveAllFile();
 
 private slots:
     void onNewTriggered();
@@ -30,12 +43,7 @@ private slots:
     void onOpenTriggered();
     void onSaveTriggered();
     void onSaveAsTriggered();
-
-    void onCutTriggered();
-    void onCopyTriggered();
-    void onPasteTriggered();
-    void onUndoTriggered();
-    void onRedoTriggered();
+    void onEditTriggered();
 
 
     void onChipPlannerTriggered();
@@ -49,6 +57,8 @@ private slots:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -56,13 +66,16 @@ private:
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QMenu *editMenu;
+    QMenu *viewMenu;
     QMenu *helpMenu;
 
     QAction *newAction;
     QAction *openAction;
-    QAction *openFileAction;    
+    QAction *closeAction;
+    QAction *openFileAction;
     QAction *saveAction;
     QAction *saveasAction;
+    QAction *exitAction;
     QAction *cutAction;
     QAction *copyAction;
     QAction *pasteAction;
@@ -77,14 +90,16 @@ private:
     QToolBar *toolbar;
     QTabWidget *tabWidget;
 
-    ChipPlanner chipPlanner;
+    // ChipPlanner chipPlanner;
 
-    QMessageBox documentationBox;
-    QDialog aboutDialog;
+    QDockWidget *NavigationBar;
+    QDockWidget *BottomDock;
+    QDockWidget *ManagerDock;
 
-    void streamProcessOutput();
-    // 配置输出和完成信号槽
-    void configOutputSignals(const QString &phase);
+    ads::CDockManager *DockManager;
+
+    ads::CDockWidget *SourcesWidget;
+    ads::CDockWidget *EditWidget;
 };
 
 #endif // MAINWINDOW_H
