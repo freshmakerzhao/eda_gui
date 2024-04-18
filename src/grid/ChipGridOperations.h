@@ -1,0 +1,49 @@
+
+
+#ifndef ChipGridOperations_H
+#define ChipGridOperations_H
+
+
+#include <QMainWindow>
+#include <QPushButton>
+#include <QGraphicsScene>
+#include "utils/json.hpp"
+#include "entity/Cluster.h"
+#include "blocks/Blocks.h"
+#include <QCoreApplication>
+#include <fstream>
+
+static std::map<std::string, std::map<std::string,int>> TYPE_TO_SIZE_FACTORS;
+
+class ChipGridOperations : public QMainWindow{
+    Q_OBJECT
+public:
+    std::string tileFilePath;
+    std::string tileColorPath;
+    TotalSize totalSize;
+
+    // 架构信息
+    std::vector<std::vector<NormalTile>> gridTypeMatrix; // 存储tile_grid
+    std::vector<std::vector<Blocks*>> gridMatrix; // 存储绘图对象 graphicItem
+    std::vector<SubItem> usageGrid;
+
+    ChipGridOperations();
+    void buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal);
+    void setSkipTile(int curX, int curY, int height);
+    void setColorsToTiles(NormalTile& tile,std::map<std::string, std::map<std::string, std::map<std::string, int>>> colorMap);
+
+    bool showGridView(QGraphicsScene *scene);
+    void setAllTileWhite(QGraphicsScene *scene);
+    void buildPlaceUsageGrid(const std::string& usageJsonPath);
+    bool showPlaceUsageGrid(QGraphicsScene *scene);
+    void updateSitesVisibleStatus(bool sitesVisibleStatus);
+    void updateTilesNameVisibleStatus(bool status);
+    NormalTile getTileInfo(int col,int row);
+private:
+    std::map<std::string, std::map<std::string, std::map<std::string, int>>> buildTileInfoMap(const nlohmann::basic_json<>& colorJson);
+    // 根据传入type返回对应的tile
+    void clearVector();
+};
+
+
+#endif //ChipGridOperations_H
