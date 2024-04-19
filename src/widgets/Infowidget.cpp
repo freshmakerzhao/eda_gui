@@ -40,6 +40,8 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
             muxf6NumSynth += it.value().toInt();
         } else if (it.key() == "FDRE_ZINI" || it.key() == "FDSE_ZINI" || it.key() == "FDCE_ZINI" || it.key() == "FDPE_ZINI") {
             ffNumSynth += it.value().toInt();
+        } else if (it.key() == "FDRE_ZINI_1" || it.key() == "FDSE_ZINI_1" || it.key() == "FDCE_ZINI_1" || it.key() == "FDPE_ZINI_1") {
+            ffNumSynth += it.value().toInt();
         } else if (it.key() == "FIFO18E1_VPR") {
             fifo18NumSynth += it.value().toInt();
         } else if (it.key() == "RAMB18E1_VPR") {

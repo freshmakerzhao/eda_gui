@@ -72,7 +72,7 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     proDownloadBitItem->setIcon(0, QIcon(""));
     expandAll();
 
-    QObject::connect(this, &QTreeWidget::itemClicked, [=](QTreeWidgetItem *item, int column) {
+    QObject::connect(this, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
         TaskManager::instance().handleTreeItemActivation(item);
         clearSelection(); // 清除选中状态
     });

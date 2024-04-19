@@ -7,6 +7,7 @@
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
+#include "FileHelper.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -28,7 +29,6 @@ void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
     if (!MainWindow::instance()->saveAllFile()) {
         return;
     }
-    // qDebug() << item->text(0);
     // 双击触发
     if (item->text(0) == "Run") {
         runSynth();
@@ -153,7 +153,19 @@ TaskManager::~TaskManager()
 void TaskManager::runSynth() {
 
     // TODO 执行前判断source与constraint文件是否存在
+    bool a = FileHelper::fileExists(R"(C:\Users\DELL\Desktop\044_IN_FIFO_484_2.edn)");
+    if (a){
+        qDebug() << "文件存在";
+    } else {
+        qDebug() << "文件不存在";
+    }
+
     // TODO source不存在不能执行
+//    QMessageBox::StandardButton showCritical(
+//            QWidget *parent, const QString &title,
+//         const QString &text, QMessageBox::StandardButtons buttons,
+//    QMessageBox::StandardButton defaultButton)
+
     // TODO constraint文件不存在弹出提示框
     // TODO runs及synth路径是否存在
     QString family = "xc7";
