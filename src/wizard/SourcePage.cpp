@@ -1,14 +1,37 @@
+/**
+  ******************************************************************************
+  * @file           : SourcesPage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/3/26
+  ******************************************************************************
+  */
+
 #include "SourcePage.h"
 
-SourcesPage::SourcesPage(QWidget *parent) : QWizardPage(parent)
+SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
 {
-    connect(this, &SourcesPage::filesListUpdatedSignal, this, &SourcesPage::updateFilesList);
+    _mode = mode;
 
     setTitle("Add Sources");
     setSubTitle("Specify HDL, netlist, Block Design, and iP files to add to your project.");
 
-    filesListWidget = new QListWidget;
-    filesListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+    model = new QStandardItemModel(this);
+    model->setColumnCount(3); // 增加列数，用于显示索引
+    model->setHeaderData(0, Qt::Horizontal, QObject::tr("Index")); // 设置标题
+    model->setHeaderData(1, Qt::Horizontal, QObject::tr("File Name"));
+    model->setHeaderData(2, Qt::Horizontal, QObject::tr("File Type"));
+
+    tableView = new QTableView(this);
+    tableView->setModel(model);
+    tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
+    tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+    tableView->verticalHeader()->hide(); //隐藏行号方法
+    // tableView->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
+    tableView->setColumnWidth(0, 85);
+    tableView->setColumnWidth(1, 270);
 
     QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &SourcesPage::onAddFiles);
@@ -21,7 +44,7 @@ SourcesPage::SourcesPage(QWidget *parent) : QWizardPage(parent)
 
     QVBoxLayout *layout = new QVBoxLayout;
     QHBoxLayout *btnLayout = new QHBoxLayout;
-    layout->addWidget(filesListWidget);
+    layout->addWidget(tableView);
     btnLayout->addWidget(addFilesButton);
     btnLayout->addWidget(createFileButton);
     btnLayout->addWidget(removeButton);
@@ -31,15 +54,27 @@ SourcesPage::SourcesPage(QWidget *parent) : QWizardPage(parent)
 
 void SourcesPage::onAddFiles()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.v)");
-    if (!files.isEmpty())
-    {
-        Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->sourcesFilesList.append(files);  // 将选择的文件追加到列表中
-        for (int i = 0; i < wizard->sourcesFilesList.size(); ++i) {
-            qDebug() << wizard->sourcesFilesList.at(i);
+    int currentIndex = model->rowCount() + 1; // 用于记录当前索引
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.v)");
+    for (const QString &fileName : fileNames) {
+        QFileInfo fileInfo(fileName);
+        QList<QStandardItem *> items;
+        items << new QStandardItem(QString::number(currentIndex++)); // 设置索引
+        items << new QStandardItem(fileInfo.fileName());
+        auto it = Map.find(fileInfo.suffix());
+        if (it != Map.end()){
+            items << new QStandardItem(Map[fileInfo.suffix()]);
+        }else{
+            items << new QStandardItem(fileInfo.suffix());
         }
-        emit filesListUpdatedSignal(files); // 发送信号
+        model->appendRow(items);
+        Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
+        wizard->sourcesFilesList.append(fileName); // 添加文件路径到列表中
+
+        qDebug() << "-----------------------------------------------------";
+        for(auto it : wizard->sourcesFilesList){
+            qDebug() << it;
+        }
     }
 }
 
@@ -76,7 +111,7 @@ void SourcesPage::onCreateFile()
         if (!directory.exists()) {
             directory.mkpath(".");
         }
-
+        // TODO:文件名不能为空
         QString newFilePath = "Cache/" + fileName + extension;
         QFile file(newFilePath);
         if (file.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -87,11 +122,27 @@ void SourcesPage::onCreateFile()
         else {
             // Failed to create file, handle error appropriately
         }
-        QStringList tmp;
-        tmp.append(newFilePath);
-        emit filesListUpdatedSignal(tmp);
+
+        int currentIndex = model->rowCount() + 1;
+        QFileInfo fileInfo(newFilePath);
+        QList<QStandardItem *> items;
+        items << new QStandardItem(QString::number(currentIndex++)); // 设置索引
+        items << new QStandardItem(fileInfo.fileName());
+        auto it = Map.find(fileInfo.suffix());
+        if (it != Map.end()){
+            items << new QStandardItem(Map[fileInfo.suffix()]);
+        }else{
+            items << new QStandardItem(fileInfo.suffix());
+        }
+        model->appendRow(items);
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->sourcesFilesList.append(newFilePath);  // 将新建的文件追加到列表中
+        wizard->sourcesFilesList.append(newFilePath); // 添加文件路径到列表中
+
+        qDebug() << "-----------------------------------------------------";
+        for(auto it : wizard->sourcesFilesList){
+            qDebug() << it;
+        }
+
         dialog.accept();
     });
 
@@ -101,18 +152,30 @@ void SourcesPage::onCreateFile()
 
 void SourcesPage::onRemoveFiles()
 {
-    QList<QListWidgetItem*> selectedItems = filesListWidget->selectedItems();
-    for (QListWidgetItem* item : selectedItems)
-    {
-        int row = filesListWidget->row(item);
-        filesListWidget->takeItem(row);
-        // 从sourcesFilesList中移除对应项
-        Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->sourcesFilesList.removeAt(row);
+    int currentIndex = 1;
+    Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
+    QModelIndexList selectedIndexes = tableView->selectionModel()->selectedRows();
+    for (const QModelIndex &index : selectedIndexes) {
+        model->removeRow(index.row());
+        wizard->sourcesFilesList.removeAt(index.row()); // 从文件路径列表中移除对应的文件路径
+    }
+    // 重新设置索引
+    for (int row = 0; row < model->rowCount(); ++row) {
+        model->setData(model->index(row, 0), row + 1);
+    }
+    currentIndex = model->rowCount() + 1; // 更新当前索引
+
+    qDebug() << "-----------------------------------------------------";
+    for(auto it : wizard->sourcesFilesList){
+        qDebug() << it;
     }
 }
 
-void SourcesPage::updateFilesList(const QStringList &files)
+int SourcesPage::nextId() const
 {
-    filesListWidget->addItems(files);
+    // 跳过其他页面
+    if (_mode == 1) {
+        return -1;
+    }
+    return QWizardPage::nextId();
 }

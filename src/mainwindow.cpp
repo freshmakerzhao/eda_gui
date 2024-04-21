@@ -14,6 +14,7 @@
 #include "widgets/Navigator.h"
 #include "widgets/Infowidget.h"
 #include "widgets/FlowNavigator.h"
+#include "dialog/AboutDialog.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -198,41 +199,12 @@ void MainWindow::onChipPlannerTriggered()
 
 void MainWindow::onDocumentationTriggered()
 {
-    QDialog documentationDialog(this);
-    documentationDialog.setFixedSize(640, 480);
-    documentationDialog.setWindowFlags(documentationDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    documentationDialog.setWindowTitle("Documentation");
-    QLabel *textLabel = new QLabel(&documentationDialog);
-    textLabel->setText("Features to be developed");
-
     // TODO:load documentation
-
-    documentationDialog.exec();
 }
 
 void MainWindow::onAboutTriggered()
 {
-    QDialog aboutDialog(this);
-    aboutDialog.setFixedSize(640, 480);
-    aboutDialog.setWindowFlags(aboutDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
-    aboutDialog.setWindowTitle("About Software");
-    QLabel *textLabel = new QLabel(&aboutDialog);
-    textLabel->setText("<html><h2>About Software</h2"
-                   "<p>© 2024 Power by HybrdChip</p>"
-                   "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a>"
-                   "</p></html>");
-    textLabel->setTextFormat(Qt::RichText);
-    textLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    textLabel->setOpenExternalLinks(true);
-
-    QLabel *imageLabel = new QLabel(&aboutDialog);
-    QPixmap image(":/resource/logo.png");
-    imageLabel->setPixmap(image.scaled(500, 300));
-    imageLabel->setAlignment(Qt::AlignCenter);
-    QVBoxLayout layout(&aboutDialog);
-
-    layout.addWidget(textLabel);
-    layout.addWidget(imageLabel);
+    AboutDialog aboutDialog(this);
     aboutDialog.exec();
 }
 
@@ -345,6 +317,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(redoAction, &QAction::triggered, this, &MainWindow::onEditTriggered);
     // ===================== HELP ======================
     documentation = new QAction("Documentation", this);
+    documentation->setDisabled(true);
     aboutAction = new QAction("About", this);
     helpMenu->addActions({documentation, aboutAction});
     connect(documentation, &QAction::triggered, this, &MainWindow::onDocumentationTriggered);
@@ -405,7 +378,7 @@ MainWindow::MainWindow(QWidget *parent)
     EditWidget = new ads::CDockWidget("Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
     EditWidget->setWidget(tabWidget);
-    EditWidget->setMinimumSize(600, 10);
+    EditWidget->setMinimumSize(450, 10);
     // EditWidget->setMinimumSize(1300, 10);
 
     // ===================== VIEW ======================

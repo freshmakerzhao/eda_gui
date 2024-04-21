@@ -1,29 +1,58 @@
 #include "CustomMessageBox.h"
 
-CustomMessageBox::CustomMessageBox(QWidget *parent)
-    :QMessageBox(parent)
+CustomMessageBox::CustomMessageBox(QWidget *parent) : QMessageBox(parent)
 {
-    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
+
 }
 
-void CustomMessageBox::setInfo(const QString& title, const QString& message)
+
+QMessageBox::StandardButton CustomMessageBox::showInformation(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
 {
-    setWindowTitle(title);
-    setText(message);
-    setIcon(QMessageBox::Information);
+    CustomMessageBox messageBox(parent);
+    messageBox.setIcon(Information);
+    messageBox.setWindowTitle(title);
+    messageBox.setText(text);
+    messageBox.setStandardButtons(buttons);
+    messageBox.setDefaultButton(defaultButton);
+    return static_cast<StandardButton>(messageBox.exec());
 }
 
-void CustomMessageBox::setWarning(const QString& title, const QString& message)
+QMessageBox::StandardButton CustomMessageBox::showQuestion(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
 {
-    setWindowTitle(title);
-    setText(message);
-    setIcon(QMessageBox::Warning);
+    CustomMessageBox messageBox(parent);
+    messageBox.setIcon(Question);
+    messageBox.setWindowTitle(title);
+    messageBox.setText(text);
+    messageBox.setStandardButtons(buttons);
+    messageBox.setDefaultButton(defaultButton);
+    return static_cast<StandardButton>(messageBox.exec());
 }
 
-void CustomMessageBox::setError(const QString& title, const QString& message)
+QMessageBox::StandardButton CustomMessageBox::showSuccess(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
 {
-    setWindowTitle(title);
-    setText(message);
-    setIcon(QMessageBox::Critical);
+    CustomMessageBox messageBox(parent);
+    messageBox.setIcon(QMessageBox::NoIcon);
+    messageBox.setWindowTitle(title);
+    messageBox.setText(text);
+    messageBox.setStandardButtons(buttons);
+    messageBox.setDefaultButton(defaultButton);
+    return static_cast<StandardButton>(messageBox.exec());
+}
+
+QMessageBox::StandardButton CustomMessageBox::showError(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
+{
+    CustomMessageBox messageBox(parent);
+    messageBox.setIcon(Critical);
+    messageBox.setWindowTitle(title);
+    messageBox.setText(text);
+    messageBox.setStandardButtons(buttons);
+    messageBox.setDefaultButton(defaultButton);
+    return static_cast<StandardButton>(messageBox.exec());
+}
+
+void CustomMessageBox::resizeEvent(QResizeEvent *event){
+    QMessageBox::resizeEvent(event);
+    this->setFixedWidth(600);
+    this->setFixedHeight(300);
 }
 

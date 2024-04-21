@@ -40,11 +40,13 @@ class Wizard : public QWizard
 {
     Q_OBJECT
 public:
-    Wizard(QWidget *parent = nullptr);
+    Wizard(QWidget *parent = nullptr, const int mode = 0, Project *pro = nullptr);
     ~Wizard();
 
 private slots:
-    void onFinish();
+    void onNewFinish();
+
+    void onAddFinish();
 
 public:
     QStringList sourcesFilesList;
@@ -53,8 +55,19 @@ public:
     QString archName;
     QString arch;
 
+    enum {
+        Page_AddGuide,
+        Page_NewGuide,
+        Page_ProjectName,
+        Page_Source,
+        Page_Constraint,
+        Page_DefaultPart
+    };
+
 private:
-    Project *project;
+    Project *new_project;
+
+    Project *current_project;
 };
 
 #endif // WIZARD_H
