@@ -37,8 +37,6 @@ public slots:
 
     void addSourcesAction();
 
-    void addConstraintsAction();
-
     void removeFileAction();
 
 protected:

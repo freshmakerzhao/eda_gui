@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file           : DefaultPartPage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/3/26
+  ******************************************************************************
+  */
+
 #include "DefaultPartPage.h"
 #include <yaml-cpp/yaml.h>
 
@@ -67,7 +77,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     proxyModel->setSourceModel(model);
     tableView->setModel(proxyModel);
     QLineEdit *lineEdit = new QLineEdit(this);
-    lineEdit->setFixedSize(180, 30);
+    lineEdit->setFixedSize(220, 30);
     connect(lineEdit, &QLineEdit::textChanged, [proxyModel](const QString &text){
         proxyModel->setFilterFixedString(text);
     });

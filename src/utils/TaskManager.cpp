@@ -7,6 +7,8 @@
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
+#include "wizard/Wizard.h"
+#include "widgets/Navigator.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -19,10 +21,7 @@ void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
     if (this->arch == ""){
         // 用户未选择架构时
         // QMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
-        CustomMessageBox customMessageBox(MainWindow::instance());
-        customMessageBox.setStandardButtons(QMessageBox::Ok);
-        customMessageBox.setInfo("Failed", "Please select or create a project.");
-        customMessageBox.exec();
+        CustomMessageBox::showQuestion(MainWindow::instance(), "Failed", "Please select or create a project.");
         return;
     }
     if (!MainWindow::instance()->saveAllFile()) {
@@ -82,6 +81,8 @@ void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
         downloadBit();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
+    } else if (item->text(0) == "Add Sources") {
+        Navigator::instance()->addSourcesAction();
     }
 }
 
