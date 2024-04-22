@@ -138,8 +138,10 @@ void MainWindow::onOpenTriggered()
         // 执行打开.hpr文件的逻辑
         Project *proj = new Project;
         proj->parseProject(path);
+        if (Navigator::instance()->canSetTile(proj)){
+            setWindowTitle(path);
+        }
         Navigator::instance()->loadFile(proj);
-        setWindowTitle(path);
     }
 }
 
