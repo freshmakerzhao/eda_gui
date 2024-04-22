@@ -70,7 +70,7 @@ bool ProjectNamePage::isComplete() const
     }
 
     // 检查工程名是否合法
-    bool isEnglishPath = QRegularExpression("^[a-zA-Z0-9]+$").match(projectName).hasMatch();
+    bool isEnglishPath = QRegularExpression("^[a-zA-Z0-9_]+$").match(projectName).hasMatch();
     if (!isEnglishPath) {
         warningLabel->setText("Non-English Project name");
         return false;
