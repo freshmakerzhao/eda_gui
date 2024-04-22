@@ -16,11 +16,11 @@
 #include "widgets/FlowNavigator.h"
 #include "dialog/AboutDialog.h"
 
-MainWindow *MainWindow::instance(const QString &path)
+MainWindow *MainWindow::instance()
 {
     static MainWindow *_instance = nullptr;
     if (!_instance) {
-        _instance = new MainWindow(nullptr,path);
+        _instance = new MainWindow(nullptr);
     }
     return _instance;
 }
@@ -279,12 +279,11 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
 }
 
-MainWindow::MainWindow(QWidget *parent,const QString &path)
+MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent)
 {
     qDebug() << "[Main Window] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(path == nullptr ? "HybrdLink" : path);
     this->setWindowIcon(QIcon(":/resource/icon.png"));
     // 设置窗口初始大小
     this->resize(1700, 1000);
