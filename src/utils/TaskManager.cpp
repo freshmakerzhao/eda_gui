@@ -155,13 +155,6 @@ TaskManager::~TaskManager()
 void TaskManager::runSynth() {
 
     // TODO 执行前判断source与constraint文件是否存在
-    bool a = FileHelper::fileExists(R"(C:\Users\DELL\Desktop\044_IN_FIFO_484_2.edn)");
-    if (a){
-        qDebug() << "文件存在";
-    } else {
-        qDebug() << "文件不存在";
-    }
-
     // TODO source不存在不能执行
     // TODO constraint文件不存在弹出提示框
     // TODO runs及synth路径是否存在

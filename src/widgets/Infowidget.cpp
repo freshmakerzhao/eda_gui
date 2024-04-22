@@ -50,6 +50,8 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
             ranb36NumSynth += it.value().toInt();
         } else if (it.key() == "DSP48E1_VPR") {
             dspNumSynth += it.value().toInt();
+        } else if (it.key() == "CARRY4_VPR") {
+            carry4NumSynth += it.value().toInt();
         }
     }
     lut6NumSynth = lutNumSynth - muxf6NumSynth; // LUT6
@@ -60,9 +62,10 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     runsModel->setItem(0, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
     runsModel->setItem(0, 4, new QStandardItem(QString::number(bramNumSynth))); // BRAM
     runsModel->setItem(0, 5, new QStandardItem(QString::number(dspNumSynth))); // dsp
-    runsModel->setItem(0, 6, new QStandardItem(startTime)); // 开始时间
-    runsModel->setItem(0, 7, new QStandardItem(Elapsed)); // 持续时间
-    runsModel->setItem(0, 8, new QStandardItem(partName)); // 封装名称
+    runsModel->setItem(0, 6, new QStandardItem(QString::number(carry4NumSynth))); // carry4
+    runsModel->setItem(0, 7, new QStandardItem(startTime)); // 开始时间
+    runsModel->setItem(0, 8, new QStandardItem(Elapsed)); // 持续时间
+    runsModel->setItem(0, 9, new QStandardItem(partName)); // 封装名称
 }
 
 void InfoWidget::updateImplItem(const QString implPath, const QString status, const QString startTime, const QString Elapsed , const QString partName){
@@ -91,9 +94,10 @@ void InfoWidget::updateImplItem(const QString implPath, const QString status, co
     runsModel->setItem(1, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
     runsModel->setItem(1, 4, new QStandardItem(QString::number(bramNumImpl))); // BRAM
     runsModel->setItem(1, 5, new QStandardItem(QString::number(dspNumImpl))); // dsp
-    runsModel->setItem(1, 6, new QStandardItem(startTime)); // 开始时间
-    runsModel->setItem(1, 7, new QStandardItem(Elapsed)); // 持续时间
-    runsModel->setItem(1, 8, new QStandardItem(partName)); // 封装名称
+    runsModel->setItem(1, 6, new QStandardItem(QString::number(carry4NumImpl))); // carry
+    runsModel->setItem(1, 7, new QStandardItem(startTime)); // 开始时间
+    runsModel->setItem(1, 8, new QStandardItem(Elapsed)); // 持续时间
+    runsModel->setItem(1, 9, new QStandardItem(partName)); // 封装名称
 }
 
 InfoWidget::InfoWidget(QWidget *parent)
@@ -163,6 +167,7 @@ InfoWidget::InfoWidget(QWidget *parent)
                            "FF",
                            "BRAM",
                            "DSP",
+                           "CARRY4",
                            "Start",
                            "Elapsed",
                            "Part"};
