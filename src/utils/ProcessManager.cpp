@@ -3,11 +3,11 @@
 #include "widgets/Infowidget.h"
 #include "mainwindow.h"
 #include <QTextCodec>
-#include <QMessageBox>
 #include <iomanip>
 #include <chrono>
 #include <ctime>
 #include "utils/TimeUtilities.h"
+#include "dialog/CustomMessageBox.h"
 
 ProcessManager& ProcessManager::instance()
 {
@@ -179,7 +179,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     // 显示信息弹窗
     // exitCode 为0表示正常执行并成功退出
     if (exitCode == 0) {
-        QMessageBox::information(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
+        CustomMessageBox::showSuccess(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
         if (this->curPhase == "Synthesis"){
             // 综合结束后，读取资源统计信息
             InfoWidget::instance()->updateSynthItem(
@@ -212,7 +212,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
             InfoWidget::instance()->setCurrentPage(4);
         }
     } else {
-        QMessageBox::critical(MainWindow::instance(), this->curPhase + " Failed", this->curPhase + " failed.");
+        CustomMessageBox::showError(MainWindow::instance(), this->curPhase + " Failed", this->curPhase + " failed.");
     }
 }
 
