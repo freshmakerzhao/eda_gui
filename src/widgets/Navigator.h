@@ -24,7 +24,7 @@ class Navigator : public QWidget
 
 public:
     static Navigator *instance(QWidget *parent = nullptr);
-    bool canSetTile(Project *proj);
+
     void loadFile(Project *proj);
 
 public slots:

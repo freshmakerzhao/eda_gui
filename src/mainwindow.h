@@ -37,6 +37,8 @@ public:
     bool cleanEditorTab();
     bool saveAllFile();
 
+    void showProjectTitle(int mode = 0, const QString &title = "");
+
 private slots:
     void onNewTriggered();
     void onOpenFileTriggered();

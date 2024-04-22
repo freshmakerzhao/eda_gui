@@ -112,6 +112,19 @@ bool MainWindow::saveAllFile()
     return true;
 }
 
+void MainWindow::showProjectTitle(int mode, const QString &title)
+{
+    /*
+     * mode 0 设置工程目录Title
+     * mode 1 还原Title
+    **/
+    if (mode == 0) {
+        setWindowTitle("HybrdLink -[" + title + "]");
+        return;
+    }
+    setWindowTitle("HybrdLink");
+}
+
 void MainWindow::onNewTriggered()
 {
     Wizard wizard(this);
@@ -138,9 +151,6 @@ void MainWindow::onOpenTriggered()
         // 执行打开.hpr文件的逻辑
         Project *proj = new Project;
         proj->parseProject(path);
-        if (Navigator::instance()->canSetTile(proj)){
-            setWindowTitle(path);
-        }
         Navigator::instance()->loadFile(proj);
     }
 }
