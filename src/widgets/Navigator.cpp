@@ -55,6 +55,8 @@ void Navigator::loadFile(Project *proj)
 
     // QTreeWidgetItem *ipItem = new QTreeWidgetItem(nameItem);
     // ipItem->setText(0, "ip");
+
+    MainWindow::instance()->showProjectTitle(0, proj->getParam("path") + "/" + proj->getParam("name") + ".hpr");
 }
 
 void Navigator::clickedFile(QTreeWidgetItem *item)
@@ -106,6 +108,7 @@ void Navigator::closeProjectAction()
     delete p;
     p = nullptr;
     TaskManager::instance().cleanParams();
+    MainWindow::instance()->showProjectTitle(1);
 }
 
 void Navigator::addSourcesAction()
@@ -178,18 +181,5 @@ Navigator::Navigator(QWidget *parent)
 Navigator::~Navigator()
 {
     qDebug() << "[Navigator] Distructing...";
-}
-
-bool Navigator::canSetTile(Project *proj) {
-
-    if (p == nullptr && proj == nullptr) {
-        // 第一次开启项目
-        return true;
-    }else if (p != nullptr && p != proj) {
-        // 加载的不是同一个工程
-        return false;
-    } else {
-        return true;
-    }
 }
 
