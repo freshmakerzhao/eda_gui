@@ -3,6 +3,7 @@
 #include "utils/TaskManager.h"
 #include "utils/StringUtilities.h"
 #include "utils/ProjectManager.h"
+#include "wizard/Wizard.h"
 
 Navigator *Navigator::instance(QWidget *parent)
 {
@@ -67,8 +68,8 @@ void Navigator::clickedFile(QTreeWidgetItem *item)
 void Navigator::showContextMenu(const QPoint &pos) {
     QMenu contextMenu;
     QAction closeProject("Close Project");
-    QAction addSources("Add Sources");
-    QAction addConstraints("Add Constraints");
+    QAction addSources("Add/Create...");
+    // QAction addConstraints("Add Constraints");
     QAction removeFileAction("Remove File from Project");
     // QAction setAsTopAction("Set As Top");
     QTreeWidgetItem *rightClickedItem = navTree->itemAt(pos); // 右键点击位置
@@ -82,8 +83,8 @@ void Navigator::showContextMenu(const QPoint &pos) {
         connect(&closeProject, &QAction::triggered, this, &Navigator::closeProjectAction);
         contextMenu.addAction(&addSources);
         connect(&addSources, &QAction::triggered, this, &Navigator::addSourcesAction);
-        contextMenu.addAction(&addConstraints);
-        connect(&addConstraints, &QAction::triggered, this, &Navigator::addConstraintsAction);
+        // contextMenu.addAction(&addConstraints);
+        // connect(&addConstraints, &QAction::triggered, this, &Navigator::addConstraintsAction);
     } else if (QFileInfo(rightClickedItem->data(0, Qt::UserRole).toString()).isFile()) {
         contextMenu.addAction(&removeFileAction);
         connect(&removeFileAction, &QAction::triggered, this, &Navigator::removeFileAction);
@@ -109,34 +110,8 @@ void Navigator::closeProjectAction()
 
 void Navigator::addSourcesAction()
 {
-    QString path = p->getParam("path");
-    qDebug() << path;
-    QString addSourcesPath = path + "/sources/";
-    qDebug() << "addSources path:" << addSourcesPath;
-    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, addSourcesPath + QFileInfo(file).fileName());
-            p->sourceList.append(addSourcesPath + QFileInfo(file).fileName());
-        }
-    }
-    p->makeProject();
-    delete navTree->topLevelItem(0);
-    loadFile(p);
-}
-
-void Navigator::addConstraintsAction()
-{
-    QString path = p->getParam("path");
-    QString constrainsPath = path + "/constraints/";
-    qDebug() << "constraints path:" << constrainsPath;
-    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files", "", "");
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, constrainsPath + QFileInfo(file).fileName());
-            p->constraintList.append(constrainsPath + QFileInfo(file).fileName());
-        }
-    }
+    Wizard wizard(MainWindow::instance(), 1, p);
+    wizard.exec();
     p->makeProject();
     delete navTree->topLevelItem(0);
     loadFile(p);
