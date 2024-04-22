@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    static MainWindow *instance(const QString &path = nullptr);
+    static MainWindow *instance();
 
     void updateActionState();                 // 更新编辑器按钮状态
     void createEditorTab(const QString& path); // 创建编辑器Tab
@@ -62,7 +62,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
-    MainWindow(QWidget *parent = nullptr,const QString &path = nullptr);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     QMenuBar *menuBar;
@@ -102,8 +102,6 @@ private:
 
     ads::CDockWidget *SourcesWidget;
     ads::CDockWidget *EditWidget;
-    // 工程文件路径
-    QString hprPath = nullptr;
 };
 
 #endif // MAINWINDOW_H
