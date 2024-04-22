@@ -267,7 +267,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+        : QMainWindow(parent)
 {
     qDebug() << "[Main Window] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
@@ -394,4 +394,3 @@ MainWindow::~MainWindow()
 {
     qDebug() << "[Main Window] Distructing...";
 }
-
