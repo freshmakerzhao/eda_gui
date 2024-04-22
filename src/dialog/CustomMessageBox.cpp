@@ -39,7 +39,6 @@ QMessageBox::StandardButton CustomMessageBox::showQuestion(QWidget *parent, cons
                              "   border-width: 2px; "           // 边框宽度
                              "   border-color: #4f7cce; "       // 边框颜色
                              "   border-style: solid; "         // 边框样式
-                             "   box-shadow: none;"             // 没有阴影
                              "   min-width: 60px; "             // 最小宽度
                              "   padding: 6px; "                // 内边距
                              "}"
@@ -50,7 +49,6 @@ QMessageBox::StandardButton CustomMessageBox::showQuestion(QWidget *parent, cons
                              "   border-width: 2px; "           // 边框宽度
                              "   border-color: #4f7cce; "       // 边框颜色
                              "   border-style: solid; "         // 边框样式
-                             "   box-shadow: none;"             // 没有阴影
                              "   min-width: 60px; "             // 最小宽度
                              "   padding: 4px;"                // 内边距
                              "   margin: 2px;"
@@ -84,7 +82,6 @@ QMessageBox::StandardButton CustomMessageBox::showSuccess(QWidget *parent, const
                              "   border-width: 2px; "           // 边框宽度
                              "   border-color: #4f7cce; "       // 边框颜色
                              "   border-style: solid; "         // 边框样式
-                             "   box-shadow: none;"             // 没有阴影
                              "   min-width: 60px; "             // 最小宽度
                              "   padding: 6px; "                // 内边距
                              "}"
@@ -95,7 +92,6 @@ QMessageBox::StandardButton CustomMessageBox::showSuccess(QWidget *parent, const
                              "   border-width: 2px; "           // 边框宽度
                              "   border-color: #4f7cce; "       // 边框颜色
                              "   border-style: solid; "         // 边框样式
-                             "   box-shadow: none;"             // 没有阴影
                              "   min-width: 60px; "             // 最小宽度
                              "   padding: 4px;"                // 内边距
                              "   margin: 2px;"
