@@ -6,6 +6,22 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
+# 检测操作系统
+if(WIN32)
+    message(STATUS "Configuring on/for Windows")
+    # 特定于Windows的编译选项
+    add_definitions(-DWINDOWS_PLATFORM)
+elseif(UNIX AND NOT APPLE)
+    message(STATUS "Configuring on/for Linux")
+    # 特定于Linux的编译选项
+    add_definitions(-DLINUX_PLATFORM)
+elseif(APPLE)
+    message(STATUS "Configuring on/for macOS")
+    # 特定于macOS的编译选项
+    add_definitions(-DMACOS_PLATFORM)
+endif()
+
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
