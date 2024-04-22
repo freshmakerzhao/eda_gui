@@ -180,3 +180,16 @@ Navigator::~Navigator()
     qDebug() << "[Navigator] Distructing...";
 }
 
+bool Navigator::canSetTile(Project *proj) {
+
+    if (p == nullptr && proj == nullptr) {
+        // 第一次开启项目
+        return true;
+    }else if (p != nullptr && p != proj) {
+        // 加载的不是同一个工程
+        return false;
+    } else {
+        return true;
+    }
+}
+
