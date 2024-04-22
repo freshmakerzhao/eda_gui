@@ -19,17 +19,19 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // setIndentation(20);
     setStyleSheet("QTreeWidget::item { height: 45px; }");
     // ============ PROJECT MANAGER ============
-    // QTreeWidgetItem *proMgrItem = new QTreeWidgetItem(this, QStringList() << "PROJECT MANAGER");
-    // proMgrItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
-    // // Settings
-    // QTreeWidgetItem *settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");
-    // settingsItem->setIcon(0, QIcon(""));
-    // // Add Sources
-    // QTreeWidgetItem *addSourcesItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Add Sources");
-    // addSourcesItem->setIcon(0, QIcon(""));
-    // // IP Catalog
-    // QTreeWidgetItem *ipCatalogItem = new QTreeWidgetItem(proMgrItem, QStringList() << "IP Catalog");
-    // ipCatalogItem->setIcon(0, QIcon(""));
+    QTreeWidgetItem *proMgrItem = new QTreeWidgetItem(this, QStringList() << "PROJECT MANAGER");
+    proMgrItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
+    // Settings
+    QTreeWidgetItem *settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");
+    settingsItem->setIcon(0, QIcon(""));
+    settingsItem->setDisabled(true);
+    // Add Sources
+    QTreeWidgetItem *addSourcesItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Add Sources");
+    addSourcesItem->setIcon(0, QIcon(""));
+    // IP Catalog
+    QTreeWidgetItem *ipCatalogItem = new QTreeWidgetItem(proMgrItem, QStringList() << "IP Catalog");
+    ipCatalogItem->setIcon(0, QIcon(""));
+    ipCatalogItem->setDisabled(true);
     // ================== 综合 ==================
     QTreeWidgetItem *synthItem = new QTreeWidgetItem(this, QStringList() << "SYNTHESIS");
     synthItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico

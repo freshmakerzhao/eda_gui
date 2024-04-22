@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file           : DefaultPartPage.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/3/26
+  ******************************************************************************
+  */
+
 #ifndef DEFAULTPARTPAGE_H
 #define DEFAULTPARTPAGE_H
 

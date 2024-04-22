@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file           : ProjectNamePage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/3/26
+  ******************************************************************************
+  */
+
 #include "ProjectNamePage.h"
 
 ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
