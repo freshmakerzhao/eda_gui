@@ -7,6 +7,8 @@
         <file>resource/parts.yaml</file>
         <file>resource/search.ico</file>
         <file>resource/clean.ico</file>
+        <file>resource/logo1.png</file>
+        <file>resource/white.png</file>
     </qresource>
     <qresource prefix="/gridview">
         <file>resource/gridview/zoomin.png</file>
