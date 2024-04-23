@@ -7,7 +7,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     setWindowTitle("About Software");
     QLabel *textLabel = new QLabel(this);
-    textLabel->setText("<html><h2>About Software</h2"
+    textLabel->setText("<html><h2>About HybrdLink</h2"
                        "<p>© 2024 Power by HybrdChip</p>"
                        "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a>"
                        "</p></html>");
@@ -17,7 +17,7 @@ AboutDialog::AboutDialog(QWidget *parent)
 
     QLabel *imageLabel = new QLabel(this);
     QPixmap image(":/resource/logo.png");
-    imageLabel->setPixmap(image.scaled(500, 300));
+    imageLabel->setPixmap(image.scaled(600, 360));
     imageLabel->setAlignment(Qt::AlignCenter);
     QVBoxLayout *layout = new QVBoxLayout(this);
 

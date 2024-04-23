@@ -284,6 +284,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     qDebug() << "[Main Window] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
+    setWindowTitle("HybrdLink");
     this->setWindowIcon(QIcon(":/resource/icon.png"));
     // 设置窗口初始大小
     this->resize(1700, 1000);

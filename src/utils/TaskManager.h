@@ -10,7 +10,7 @@ class TaskManager : public QObject
 public:
     static TaskManager& instance();
 
-    void handleTreeItemActivation(QTreeWidgetItem *item);
+    void handleTreeItemActivation(const int mode);
 
     /**
      * 设置工程参数

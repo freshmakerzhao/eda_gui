@@ -75,7 +75,31 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     expandAll();
 
     QObject::connect(this, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
-        TaskManager::instance().handleTreeItemActivation(item);
+        if (item == synthRunItem) {
+            TaskManager::instance().handleTreeItemActivation(0);
+        } else if (item == synthReportItem){
+            TaskManager::instance().handleTreeItemActivation(1);
+        } else if (item == impAllItem) {
+            TaskManager::instance().handleTreeItemActivation(2);
+        } else if (item == impPackItem) {
+            TaskManager::instance().handleTreeItemActivation(3);
+        } else if (item == impPlaceItem) {
+            TaskManager::instance().handleTreeItemActivation(4);
+        } else if (item == impRouteItem) {
+            TaskManager::instance().handleTreeItemActivation(5);
+        } else if (item == impPackReportItem) {
+            TaskManager::instance().handleTreeItemActivation(6);
+        } else if (item == proNetlistViewItem) {
+            TaskManager::instance().handleTreeItemActivation(7);
+        } else if (item == proBitItem) {
+            TaskManager::instance().handleTreeItemActivation(8);
+        } else if (item == proBitViewItem) {
+            TaskManager::instance().handleTreeItemActivation(9);
+        } else if (item == proDownloadBitItem) {
+            TaskManager::instance().handleTreeItemActivation(10);
+        } else if (item == addSourcesItem) {
+            TaskManager::instance().handleTreeItemActivation(11);
+        }
         clearSelection(); // 清除选中状态
     });
 
