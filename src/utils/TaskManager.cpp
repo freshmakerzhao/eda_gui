@@ -7,7 +7,6 @@
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
-#include "wizard/Wizard.h"
 #include "widgets/Navigator.h"
 #include "FileHelper.h"
 
@@ -17,7 +16,7 @@ TaskManager& TaskManager::instance()
     return instance;
 }
 
-void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
+void TaskManager::handleTreeItemActivation(const int mode)
 {
     if (this->arch == ""){
         // 用户未选择架构时
@@ -28,38 +27,37 @@ void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
     if (!MainWindow::instance()->saveAllFile()) {
         return;
     }
-    // qDebug() << item->text(0);
     // 双击触发
-    if (item->text(0) == "Run") {
+    if (mode == 0) {
         runSynth();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-    } else if (item->text(0) == "Report") {
+    } else if (mode == 1) {
         // synthReport();
-    } else if (item->text(0) == "Run Implementation") {
+    } else if (mode == 2) {
         // pack place route全流程
         buildImp();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-    } else if (item->text(0) == "Only pack") {
+    } else if (mode == 3) {
         buildPack();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-    } else if (item->text(0) == "Report") {
+    } else if (mode == 6) {
         // impReport();
-    } else if (item->text(0) == "Only place") {
+    } else if (mode == 4) {
         buildPlace(3);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-    } else if (item->text(0) == "Only route") {
+    } else if (mode == 5) {
         buildRoute();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-    } else if (item->text(0) == "Generate Bitstream") {
+    } else if (mode == 8) {
         buildBit(2);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-    } else if (item->text(0) == "Generate GridView") {
+    } else if (mode == 9) {
         qDebug() << "[TaskManager] arch " << this->arch;
         std::string tileGridPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
         std::string tileColorPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
@@ -72,17 +70,17 @@ void TaskManager::handleTreeItemActivation(QTreeWidgetItem *item)
         gridView = new FrameView(tileGridPath,tileColorPath,projectImplPath);
         gridView->resize(1000, 800);
         gridView->show();
-    } else if (item->text(0) == "Generate NetlistView") {
+    } else if (mode == 7) {
         // if (!frameView) {
         //     frameView = new NetlistView();
         // }
         // frameView->resize(1000, 800);
         // frameView->show();
-    } else if (item->text(0) == "Download Bit") {
+    } else if (mode == 10) {
         downloadBit();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-    } else if (item->text(0) == "Add Sources") {
+    } else if (mode == 11) {
         Navigator::instance()->addSourcesAction();
     }
 }
@@ -104,7 +102,7 @@ void TaskManager::setParams(QMap<QString, QString> params)
 
     // 测试用
     QString TEST_PATH1 = "E:/workspace/qt_demo/resource_win";
-    QString TEST_PATH2 = "C:/Users/X13_Flow/Desktop/workspace/HybrdLink/resource_win";
+    QString TEST_PATH2 = "C:/HybrdLink/resource_win";
     QString TEST_PATH3 = "C:/Users/INTEL/Desktop/Work/VMwareFileWorkspace/HybrdLink/resource_win";
     // 打包用
     QString PACK_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
