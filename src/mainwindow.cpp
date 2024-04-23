@@ -14,6 +14,7 @@
 #include "widgets/Navigator.h"
 #include "widgets/Infowidget.h"
 #include "widgets/FlowNavigator.h"
+#include "widgets/Form.h"
 #include "dialog/AboutDialog.h"
 
 MainWindow *MainWindow::instance()
@@ -112,7 +113,7 @@ bool MainWindow::saveAllFile()
     return true;
 }
 
-void MainWindow::showProjectTitle(int mode, const QString &title)
+void MainWindow::showProjectTitle(const int mode, const QString &title)
 {
     /*
      * mode 0 设置工程目录Title
@@ -123,6 +124,33 @@ void MainWindow::showProjectTitle(int mode, const QString &title)
         return;
     }
     setWindowTitle("HybrdLink");
+}
+
+void MainWindow::setForm(const int mode)
+{
+    if (mode == 0) {
+        Form::instance()->hide();
+        toolbar->show();
+        ManagerDock->show();
+        BottomDock->show();
+        NavigationBar->show();
+        ManagerDock->toggleViewAction()->setEnabled(true);
+        BottomDock->toggleViewAction()->setEnabled(true);
+        NavigationBar->toggleViewAction()->setEnabled(true);
+        resize(this->size() - QSize(1, 0));
+        resize(this->size() + QSize(1, 0));
+        return;
+    }
+    Form::instance()->show();
+    toolbar->hide();
+    ManagerDock->hide();
+    BottomDock->hide();
+    NavigationBar->hide();
+    ManagerDock->toggleViewAction()->setEnabled(false);
+    BottomDock->toggleViewAction()->setEnabled(false);
+    NavigationBar->toggleViewAction()->setEnabled(false);
+    resize(this->size() - QSize(1, 0));
+    resize(this->size() + QSize(1, 0));
 }
 
 void MainWindow::onNewTriggered()

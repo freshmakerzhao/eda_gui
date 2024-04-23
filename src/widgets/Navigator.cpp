@@ -57,6 +57,7 @@ void Navigator::loadFile(Project *proj)
     // ipItem->setText(0, "ip");
 
     MainWindow::instance()->showProjectTitle(0, proj->getParam("path") + "/" + proj->getParam("name") + ".hpr");
+    MainWindow::instance()->setForm(0);
 }
 
 void Navigator::clickedFile(QTreeWidgetItem *item)
@@ -109,6 +110,7 @@ void Navigator::closeProjectAction()
     p = nullptr;
     TaskManager::instance().cleanParams();
     MainWindow::instance()->showProjectTitle(1);
+    MainWindow::instance()->setForm(1);
 }
 
 void Navigator::addSourcesAction()
