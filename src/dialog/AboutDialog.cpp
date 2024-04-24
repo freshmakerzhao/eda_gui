@@ -30,7 +30,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     QLabel *imageLabel = new QLabel(this);
     QPixmap image(":/resource/logo.png");
     // 缩放图片到当前分辨率下的显示大小，SmoothTransformation平滑处理。
-    imageLabel->setPixmap(image.scaled(700, 496, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    imageLabel->setPixmap(image.scaled(700, 496, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     imageLabel->setAlignment(Qt::AlignCenter);
     QVBoxLayout *layout = new QVBoxLayout(this);
 

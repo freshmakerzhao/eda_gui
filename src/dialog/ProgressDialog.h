@@ -24,10 +24,10 @@ public:
     void setProgressValue(int value);
 
 private:
-    QString m_title;
-    QString m_progressText;
-    int m_progressValue;
-    QLabel *m_label;
+    QString _title;
+    QString _progressText;
+    int _progressValue;
+    QLabel *_label;
 };
 
 #endif // PROGRESSDIALOG_H

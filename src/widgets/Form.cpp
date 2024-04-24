@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file           : Form.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/4/23
+  ******************************************************************************
+  */
+
 #include "Form.h"
 #include "mainwindow.h"
 
@@ -12,6 +22,7 @@ Form *Form::instance()
 
 void Form::paintEvent(QPaintEvent *event)
 {
+    // 填充Widget空白处
     QPainter painer(this);
     painer.setPen(Qt::NoPen);
     painer.setBrush(Qt::white);
@@ -22,15 +33,16 @@ void Form::paintEvent(QPaintEvent *event)
 Form::Form(QWidget *parent)
     : QWidget(parent)
 {
+    qDebug() << "[Form] Constructing...";
     setStyleSheet("QWidget { background-image: url(:/resource/white.png); }"
                   "QGroupBox { font-family: Console; font-size: 30px; }"
                   "QPushButton { border: none; text-align: left; font-size: 22px; }"
                   "QPushButton:hover { color: #4f7cce; }"
                   );
-    QPixmap logoPixmap(":/resource/logo1.png");
+    QPixmap logoPixmap(":/resource/logo2.png");
     QLabel *logoLabel = new QLabel(this);
-    logoLabel->setPixmap(logoPixmap.scaled(280, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-    logoLabel->setFixedHeight(50);
+    logoLabel->setPixmap(logoPixmap.scaled(420, 298, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    logoLabel->setFixedHeight(75);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(logoLabel, 0, Qt::AlignLeft);
