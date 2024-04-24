@@ -29,7 +29,7 @@ Form::Form(QWidget *parent)
                   );
     QPixmap logoPixmap(":/resource/logo1.png");
     QLabel *logoLabel = new QLabel(this);
-    logoLabel->setPixmap(logoPixmap.scaled(280, 50));
+    logoLabel->setPixmap(logoPixmap.scaled(280, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     logoLabel->setFixedHeight(50);
 
     QVBoxLayout *layout = new QVBoxLayout(this);

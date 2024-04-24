@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     // 启动画面
     QPixmap pix(":/resource/logo.png");
-    QSplashScreen splash(pix.scaled(700, 496));
+    QSplashScreen splash(pix.scaled(700, 496, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     splash.show();
     a.processEvents();
     splash.finish(MainWindow::instance()); // 启动画面结束
