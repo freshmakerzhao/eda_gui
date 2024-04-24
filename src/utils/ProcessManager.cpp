@@ -72,6 +72,7 @@ void ProcessManager::initEnvironment(const QString& family,
                                              const QString& partName,
                                              QList<QString> constraintPathList,
                                              const QString& topName) {
+    initStatus();
     //synth env setting
     // 设置环境变量
     env = QProcessEnvironment::systemEnvironment();
@@ -179,7 +180,6 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     // 显示信息弹窗
     // exitCode 为0表示正常执行并成功退出
     if (exitCode == 0) {
-        CustomMessageBox::showSuccess(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
         if (this->curPhase == "Synthesis"){
             // 综合结束后，读取资源统计信息
             InfoWidget::instance()->updateSynthItem(
@@ -188,8 +188,16 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
                     this->startTime,
                     this->elapsedTime,
                     this->partName);
-            // 跳转到资源展示窗口
-            InfoWidget::instance()->setCurrentPage(4);
+            if(showSynthSuccessMsg){
+                // 跳转到资源展示窗口
+                InfoWidget::instance()->setCurrentPage(4);
+                // 需要弹窗则弹窗
+                CustomMessageBox::showSuccess(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
+            }
+            if(hasNextImplementProcess){
+                // 接下来需要执行 Implement
+                checkCall(this->nextPhase,this->nextpath,this->nextscript,this->nextpName);
+            }
         } else if (this->curPhase == "Place"){
             // Place结束后，读取资源统计信息
             InfoWidget::instance()->updateImplItem(
@@ -201,15 +209,18 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
             // 跳转到资源展示窗口
             InfoWidget::instance()->setCurrentPage(4);
         } else if (this->curPhase == "Implementation"){
-            // Implementation结束后，读取资源统计信息
             InfoWidget::instance()->updateImplItem(
                     this->curProjectPath,
                     this->curPhase + " Complete!",
                     this->startTime,
                     this->elapsedTime,
                     this->partName);
-            // 跳转到资源展示窗口
-            InfoWidget::instance()->setCurrentPage(4);
+            if (showImplementSuccessMsg){
+                CustomMessageBox::showSuccess(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
+                // Implementation结束后，读取资源统计信息
+                // 跳转到资源展示窗口
+                InfoWidget::instance()->setCurrentPage(4);
+            }
         }
     } else {
         CustomMessageBox::showError(MainWindow::instance(), this->curPhase + " Failed", this->curPhase + " failed.");
@@ -237,4 +248,36 @@ ProcessManager::ProcessManager()
 ProcessManager::~ProcessManager()
 {
     delete process;
+}
+
+void ProcessManager::setSynthSuccessMsgStatus(bool status) {
+    showSynthSuccessMsg = status;
+}
+
+void ProcessManager::setImplementSuccessMsgStatus(bool status) {
+    showImplementSuccessMsg = status;
+}
+void ProcessManager::initStatus() {
+    showSynthSuccessMsg = true;
+    showImplementSuccessMsg = true;
+    hasNextImplementProcess = false;
+    nextPhase = nullptr;
+    nextpath = nullptr;
+    nextscript = nullptr;
+    nextpName = nullptr;
+}
+
+void ProcessManager::setNextImplementProcessStatus(bool status) {
+    hasNextImplementProcess = status;
+}
+
+void ProcessManager::setNextImplementProcessScript(
+        const QString &phase,
+        const QString &path,
+        const QString &script,
+        const QString &pName) {
+    this->nextPhase = phase;
+    this->nextpath = path;
+    this->nextscript = script;
+    this->nextpName = pName;
 }
