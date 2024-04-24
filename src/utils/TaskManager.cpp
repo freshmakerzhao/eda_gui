@@ -29,14 +29,14 @@ void TaskManager::handleTreeItemActivation(const int mode)
     }
     // 双击触发
     if (mode == 0) {
-        runSynth();
+        taskController(0);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 1) {
         // synthReport();
     } else if (mode == 2) {
+        taskController(2);
         // pack place route全流程
-        buildImp();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 3) {
@@ -84,6 +84,200 @@ void TaskManager::handleTreeItemActivation(const int mode)
         Navigator::instance()->addSourcesAction();
     }
 }
+/**
+ * 任务分配器
+ * @param mode 待执行任务
+ */
+void TaskManager::taskController(const int mode) {
+    bool sourceModified = MainWindow::instance()->isModified();
+    std::string netlistPath = StringUtilities::concatPath({projectSynthPath.toStdString(), (topName + netlistType).toStdString()});
+    bool netlistExist = FileHelper::fileExists(netlistPath);
+    // 准备环境
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    if (mode == 0){
+        // 综合操作
+        if (netlistExist){
+            if (sourceModified){
+                // 有网表且文件有改动
+                if(twoOptionMsg(
+                        "Run Synthesis",
+                        "Re-running synthesis will result in resetting implementation and removing all results files. OK to proceed?",
+                        QMessageBox::Ok,
+                        QMessageBox::Cancel
+                )){
+                    // 用户点击OK
+                    // 执行综合
+                    QStringList arguments = buildSynthScript();
+                    qDebug() << arguments;
+                    ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
+                    return;
+                } else {
+                    // 取消操作
+                    return;
+                }
+            } else {
+                // 有网表且文件没有改动
+                if(twoOptionMsg(
+                        "Run Synthesis",
+                        "Synthesis has already completed and is up to date. Re-run anyway?",
+                        QMessageBox::Ok,
+                        QMessageBox::Cancel
+                )){
+                    // 用户点击OK
+                    // 执行综合
+                    QStringList arguments = buildSynthScript();
+                    ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
+                    return;
+                } else {
+                    // 取消操作
+                    return;
+                }
+            }
+        } else {
+            // 如果网表不存在
+            // 直接执行
+            QStringList arguments = buildSynthScript();
+            ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
+            return;
+        }
+    } else if (mode == 2){
+        // implement
+        std::string packResultPath = StringUtilities::concatPath({projectImplPath.toStdString(), (topName + packResultType).toStdString()});
+        std::string placeResultPath = StringUtilities::concatPath({projectImplPath.toStdString(), (topName + placeResultType).toStdString()});
+        std::string routeResultPath = StringUtilities::concatPath({projectImplPath.toStdString(), (topName + routeResultType).toStdString()});
+        bool implementExist = FileHelper::fileExists(packResultPath) ||
+                            FileHelper::fileExists(placeResultPath) ||
+                            FileHelper::fileExists(routeResultPath);
+        if (netlistExist){
+            if (implementExist){
+                // 存在net、place、route中的任意一个文件
+                if (sourceModified){
+                    // 设计文件有改动
+                    if(twoOptionMsg(
+                            "Synthesis is Out-of-data",
+                            "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
+                            QMessageBox::Ok,
+                            QMessageBox::Cancel
+                    )){
+                        // 重新综合
+                        // 综合命令
+                        QStringList arguments = buildSynthScript();
+                        // implement命令
+                        std::string script = buildImpScript();
+                        // 定义综合后执行的命令
+                        ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                        // 不显示综合成功弹窗
+                        ProcessManager::instance().setSynthSuccessMsgStatus(false);
+                        ProcessManager::instance().setNextImplementProcessStatus(true);
+                        ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
+                        return;
+                    } else {
+                        // 不操作
+                        return;
+                    }
+                } else {
+                    // 设计文件没有改动
+                    if(twoOptionMsg(
+                            "Run Implement",
+                            "A completed implementation run exists. Re-run anyway?",
+                            QMessageBox::Ok,
+                            QMessageBox::Cancel
+                    )){
+                        // 重新implement
+                        std::string script = buildImpScript();
+                        ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                        return;
+                    } else {
+                        // 不操作
+                        return;
+                    }
+                }
+            } else {
+                // 没有net、place、route文件
+                if (sourceModified){
+                    // 设计文件有改动
+                    if(twoOptionMsg(
+                            "Synthesis is Out-of-data",
+                            "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
+                            QMessageBox::Ok,
+                            QMessageBox::Cancel
+                    )){
+                        // 重新综合
+                        // 综合命令
+                        QStringList arguments = buildSynthScript();
+                        // implement命令
+                        std::string script = buildImpScript();
+                        // 定义综合后执行的命令
+                        ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                        // 不显示综合成功弹窗
+                        ProcessManager::instance().setSynthSuccessMsgStatus(false);
+                        ProcessManager::instance().setNextImplementProcessStatus(true);
+                        ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
+                        return;
+                    } else {
+                        // 不操作
+                        return;
+                    }
+                } else {
+                    // 设计文件没有改动
+                    // 直接执行implement
+                    std::string script = buildImpScript();
+                    qDebug() << QString::fromStdString(script);
+                    ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                    return;
+                }
+            }
+        } else {
+            // 网表不存在
+            if(twoOptionMsg(
+                    "Missing Syntheis Results",
+                    "There is no netlist available. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
+                    QMessageBox::Ok,
+                    QMessageBox::Cancel
+            )){
+                // 综合
+                // 综合命令
+                QStringList arguments = buildSynthScript();
+                // implement命令
+                std::string script = buildImpScript();
+                // 不显示综合成功弹窗
+                ProcessManager::instance().setSynthSuccessMsgStatus(false);
+                ProcessManager::instance().setNextImplementProcessStatus(true);
+                // 定义综合后执行的命令
+                ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
+                return;
+            } else {
+                // 取消操作
+                return;
+            }
+        }
+    }
+}
+
+/**
+ * 返回综合命令
+ * @return
+ */
+QStringList TaskManager::buildSynthScript() {
+    // 初始化环境
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    //start synthesis
+    QString tclPath = QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "f4pga", "scripts", "xc7.f4pga_xilinx.tcl"}));
+    QString yosysCmd = QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "bin", "yosys.exe"}));
+    QString script1 = yosysCmd + " -p " + R"(")" + "tcl " + tclPath + R"(")" + " -l top_synth.log ";
+    QString script2 = yosysCmd + " -p \"tcl " + tclPath + "\"" + " -l top_synth.log ";
+    QStringList arguments;
+    arguments << "/c" << yosysCmd
+              << "-p" << "tcl "+ tclPath
+              << "-l" << "top_synth.log";
+    for(const QString& sourcePath :sourcePathList){
+        arguments << sourcePath;
+    }
+
+    return arguments;
+}
+
 
 /**
   * 设置工程参数
@@ -149,51 +343,20 @@ TaskManager::~TaskManager()
     qDebug() << "[TaskManager] Distructing...";
 }
 
-// 执行综合阶段
-void TaskManager::runSynth() {
-
-    // TODO 执行前判断source与constraint文件是否存在
-    // TODO source不存在不能执行
-    // TODO constraint文件不存在弹出提示框
-    // TODO runs及synth路径是否存在
-    QString family = "xc7";
-    QString topName = "top";
-    // 初始化环境
-    ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-
-    //start synthesis
-    QString tclPath = QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "f4pga", "scripts", "xc7.f4pga_xilinx.tcl"}));
-    QString yosysCmd = QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "bin", "yosys.exe"}));
-    QString script1 = yosysCmd + " -p " + R"(")" + "tcl " + tclPath + R"(")" + " -l top_synth.log ";
-    QString script2 = yosysCmd + " -p \"tcl " + tclPath + "\"" + " -l top_synth.log ";
-    QStringList arguments;
-    arguments << "/c" << yosysCmd
-              << "-p" << "tcl "+ tclPath
-              << "-l" << "top_synth.log";
-
-    for(const QString& sourcePath :sourcePathList){
-        arguments << sourcePath;
-    }
-    ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,partName);
-}
-
 void TaskManager::buildPack() {
-    QString family = "xc7";
-    QString topName = "top";
-    ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+
+    qDebug() << "buildPack";
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
     ProcessManager::instance().checkCall("Pack", projectImplPath, QString::fromStdString(script),partName);
 }
-
 
 // place 阶段
 // mode 1 ： 仅生成top.ioplace
 // mode 2 ： 生成top.ioplace 与 constrains.place
 // mode 3 ： 生成top.ioplace 与 constrains.place 并完成 vpr_place
 void TaskManager::buildPlace(int mode) {
-    QString family = "xc7";
-    QString topName = "top";
-    ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script;
     // 生成top.ioplace
     if (mode == 1) {
@@ -220,19 +383,15 @@ void TaskManager::buildPlace(int mode) {
 
 // Route 阶段
 void TaskManager::buildRoute() {
-    QString family = "xc7";
-    QString topName = "top";
-    ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
 
     std::string script = CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
     ProcessManager::instance().checkCall("Route", projectImplPath, QString::fromStdString(script),partName);
 }
 
-// pack place route
-void TaskManager::buildImp() {
-    QString family = "xc7";
-    QString topName = "top";
-    ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+
+std::string TaskManager::buildImpScript() {
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     // pack
     std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
     // place
@@ -241,16 +400,14 @@ void TaskManager::buildImp() {
     script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
     // route
     script += " && " + CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
-    ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script),partName);
+    return script;
 }
 
 // 生成bit流 阶段
 // mode 1 ： 仅生成top.fasm
 // mode 2 ： 生成top.fasm 与 top.bit
 void TaskManager::buildBit(int mode) {
-    QString family = "xc7";
-    QString topName = "top";
-    ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     if (mode == 1) {
         std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
         ProcessManager::instance().checkCall("Fasm Generation", projectImplPath, QString::fromStdString(script),partName);
@@ -263,9 +420,23 @@ void TaskManager::buildBit(int mode) {
 }
 
 void TaskManager::downloadBit() {
-    QString family = "xc7";
-    QString topName = "top";
-    ProcessManager::instance().initEnvironment(family,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath,"digilent_hs3","top.bit");
     ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),partName);
+}
+
+// 两个选项的弹窗，true 左侧，false 右侧
+bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft , QMessageBox::StandardButton buttonRight) {
+    // 等待用户响应
+    int msg = CustomMessageBox::showTwoOptionQuestion(
+            MainWindow::instance(),
+            title,
+            text
+    );
+    // 根据用户选择做出响应
+    if (msg == buttonLeft) {
+        return true;
+    } else if (msg == buttonRight) {
+        return false;
+    }
 }
