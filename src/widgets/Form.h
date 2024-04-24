@@ -8,6 +8,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPainter>
+#include <QDebug>
 
 class Form : public QWidget
 {
@@ -15,13 +16,13 @@ class Form : public QWidget
 
 public:
     static Form *instance();
-    explicit Form(QWidget *parent = nullptr);
-    ~Form();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
+    Form(QWidget *parent = nullptr);
+    ~Form();
 };
 
 #endif // FORM_H
