@@ -10,12 +10,22 @@ Form *Form::instance()
     return _instance;
 }
 
+void Form::paintEvent(QPaintEvent *event)
+{
+    QPainter painer(this);
+    painer.setPen(Qt::NoPen);
+    painer.setBrush(Qt::white);
+    painer.drawRect(rect());
+}
+
+
 Form::Form(QWidget *parent)
     : QWidget(parent)
 {
     setStyleSheet("QWidget { background-image: url(:/resource/white.png); }"
                   "QGroupBox { font-family: Console; font-size: 30px; }"
                   "QPushButton { border: none; text-align: left; font-size: 22px; }"
+                  "QPushButton:hover { color: #4f7cce; }"
                   );
     QPixmap logoPixmap(":/resource/logo1.png");
     QLabel *logoLabel = new QLabel(this);
@@ -28,18 +38,15 @@ Form::Form(QWidget *parent)
 
     QGroupBox *groupBox = new QGroupBox("Quick Start");
     QVBoxLayout *groupLayout = new QVBoxLayout(groupBox);
-    QPushButton *button1 = new QPushButton("Create Project >");
-    connect(button1, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onNewTriggered);
-    // button1->QPushButton::setFlat(true);
-    // button1->setStyleSheet( "QPushButton:hover {color: red;");
-    // button1->setStyleSheet("QPushButton { font-family: Times New Roman; font-size: 14px; }");
-    QPushButton *button2 = new QPushButton("Open Project >");
-    connect(button2, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onOpenTriggered);
-    QPushButton *button3 = new QPushButton("Open Example Project >");
-    button3->setEnabled(false);
-    groupLayout->addWidget(button1);
-    groupLayout->addWidget(button2);
-    groupLayout->addWidget(button3);
+    QPushButton *createProjectBtn = new QPushButton("Create Project >");
+    connect(createProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onNewTriggered);
+    QPushButton *openProjectBtn = new QPushButton("Open Project >");
+    connect(openProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onOpenTriggered);
+    QPushButton *openExampleBtn = new QPushButton("Open Example Project >");
+    openExampleBtn->setEnabled(false);
+    groupLayout->addWidget(createProjectBtn);
+    groupLayout->addWidget(openProjectBtn);
+    groupLayout->addWidget(openExampleBtn);
     layout->addWidget(groupBox);
 
     QGroupBox *groupBox1 = new QGroupBox("Tasks");
@@ -72,13 +79,5 @@ Form::Form(QWidget *parent)
 
 Form::~Form()
 {
-
-}
-
-void Form::paintEvent(QPaintEvent *event)
-{
-    QPainter painer(this);
-    painer.setPen(Qt::NoPen);
-    painer.setBrush(Qt::white);
-    painer.drawRect(rect());
+    qDebug() << "[Form] Distructing...";
 }
