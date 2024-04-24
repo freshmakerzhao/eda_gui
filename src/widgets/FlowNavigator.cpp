@@ -35,7 +35,7 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // ================== 综合 ==================
     QTreeWidgetItem *synthItem = new QTreeWidgetItem(this, QStringList() << "SYNTHESIS");
     synthItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
-    QTreeWidgetItem *synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run");
+    QTreeWidgetItem *synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run Synthesis");
     synthRunItem->setIcon(0, QIcon(""));
     // run synth
     QTreeWidgetItem *synthReportItem = new QTreeWidgetItem(synthItem, QStringList() << "Report");
@@ -48,14 +48,14 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     QTreeWidgetItem *impAllItem = new QTreeWidgetItem(impItem, QStringList() << "Run Implementation");
     impAllItem->setIcon(0, QIcon(""));
     // 仅pack
-    QTreeWidgetItem *impPackItem = new QTreeWidgetItem(impItem, QStringList() << "Only pack");
-    impPackItem->setIcon(0, QIcon(""));
+//    QTreeWidgetItem *impPackItem = new QTreeWidgetItem(impItem, QStringList() << "Only pack");
+//    impPackItem->setIcon(0, QIcon(""));
     // 仅place
-    QTreeWidgetItem *impPlaceItem = new QTreeWidgetItem(impItem, QStringList() << "Only place");
-    impPlaceItem->setIcon(0, QIcon(""));
+//    QTreeWidgetItem *impPlaceItem = new QTreeWidgetItem(impItem, QStringList() << "Only place");
+//    impPlaceItem->setIcon(0, QIcon(""));
     // 仅route
-    QTreeWidgetItem *impRouteItem = new QTreeWidgetItem(impItem, QStringList() << "Only route");
-    impRouteItem->setIcon(0, QIcon(""));
+//    QTreeWidgetItem *impRouteItem = new QTreeWidgetItem(impItem, QStringList() << "Only route");
+//    impRouteItem->setIcon(0, QIcon(""));
     QTreeWidgetItem *impPackReportItem = new QTreeWidgetItem(impItem, QStringList() << "Report");
     // 查看 Pack 日志
     impPackReportItem->setIcon(0, QIcon(""));
@@ -81,12 +81,12 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(1);
         } else if (item == impAllItem) {
             TaskManager::instance().handleTreeItemActivation(2);
-        } else if (item == impPackItem) {
-            TaskManager::instance().handleTreeItemActivation(3);
-        } else if (item == impPlaceItem) {
-            TaskManager::instance().handleTreeItemActivation(4);
-        } else if (item == impRouteItem) {
-            TaskManager::instance().handleTreeItemActivation(5);
+//        } else if (item == impPackItem) {
+//            TaskManager::instance().handleTreeItemActivation(3);
+//        } else if (item == impPlaceItem) {
+//            TaskManager::instance().handleTreeItemActivation(4);
+//        } else if (item == impRouteItem) {
+//            TaskManager::instance().handleTreeItemActivation(5);
         } else if (item == impPackReportItem) {
             TaskManager::instance().handleTreeItemActivation(6);
         } else if (item == proNetlistViewItem) {

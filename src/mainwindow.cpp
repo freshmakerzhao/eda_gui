@@ -390,7 +390,7 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::LeftDockWidgetArea, NavigationBar, Qt::Vertical);
 
     BottomDock = new QDockWidget(this);
-    BottomDock->setWindowTitle("INFOMATION");
+    BottomDock->setWindowTitle("INFORMATION");
     BottomDock->setWidget(InfoWidget::instance());
     addDockWidget(Qt::BottomDockWidgetArea, BottomDock);
 
@@ -409,12 +409,13 @@ MainWindow::MainWindow(QWidget *parent)
     ManagerDock->setWidget(DockManager);
 
     SourcesWidget = new ads::CDockWidget("Sources", DockManager);
-    // SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
+//    SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
     DockManager->addDockWidget(ads::LeftDockWidgetArea, SourcesWidget);
     SourcesWidget->setWidget(Navigator::instance());
 
-    // ads::CDockWidget *PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
-    // DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget);
+//    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
+//    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget,SourcesWidget->dockAreaWidget());
+//    PropertiesWidget->setWidget(new QLabel("This is a test"));
 
     EditWidget = new ads::CDockWidget("Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
@@ -428,7 +429,19 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(ManagerDock->toggleViewAction());
     viewMenu->addSeparator();
     viewMenu->addAction(SourcesWidget->toggleViewAction());
+//    viewMenu->addAction(PropertiesWidget->toggleViewAction());
     viewMenu->addAction(EditWidget->toggleViewAction());
+}
+
+// 占位，以后做成判断文件是否修改过的函数
+bool MainWindow::isModified() {
+    for (int i = 0; i < tabWidget->count(); ++i) {
+        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
+        if (editor->isModified()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 MainWindow::~MainWindow()
