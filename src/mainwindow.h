@@ -39,6 +39,8 @@ public:
 
     void showProjectTitle(const int mode = 0, const QString &title = "");
     void setForm(const int mode = 0);
+    // 判断文件是否修改
+    bool isModified();
 
 public slots:
     void onNewTriggered();
@@ -103,6 +105,7 @@ private:
 
     ads::CDockWidget *SourcesWidget;
     ads::CDockWidget *EditWidget;
+    ads::CDockWidget *PropertiesWidget;
 };
 
 #endif // MAINWINDOW_H
