@@ -68,7 +68,7 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     runsModel->setItem(0, 9, new QStandardItem(partName)); // 封装名称
 }
 
-void InfoWidget::updateImplItem(const QString implPath, const QString status, const QString startTime, const QString Elapsed , const QString partName){
+void InfoWidget::updateImplItem(const QString& implPath, const QString& status, const QString& startTime, const QString& Elapsed , const QString& partName){
 
     QFile file(implPath + "/pb_type_count.json");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -94,7 +94,7 @@ void InfoWidget::updateImplItem(const QString implPath, const QString status, co
     runsModel->setItem(1, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
     runsModel->setItem(1, 4, new QStandardItem(QString::number(bramNumImpl))); // BRAM
     runsModel->setItem(1, 5, new QStandardItem(QString::number(dspNumImpl))); // dsp
-    runsModel->setItem(1, 6, new QStandardItem(QString::number(carry4NumImpl))); // carry
+    runsModel->setItem(1, 6, new QStandardItem(QString::number(carry4NumSynth))); // carry
     runsModel->setItem(1, 7, new QStandardItem(startTime)); // 开始时间
     runsModel->setItem(1, 8, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(1, 9, new QStandardItem(partName)); // 封装名称
