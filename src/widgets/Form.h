@@ -1,6 +1,16 @@
 #ifndef FORM_H
 #define FORM_H
 
+/**
+  ******************************************************************************
+  * @file           : Form.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/4/23
+  ******************************************************************************
+  */
+
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QButtonGroup>
