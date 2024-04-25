@@ -221,6 +221,11 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
             }
+        } else {
+            // 生成码流结束提示，后续在此扩展
+            if (showGenBitSuccessMsg){
+                CustomMessageBox::showSuccess(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
+            }
         }
     } else {
         CustomMessageBox::showError(MainWindow::instance(), this->curPhase + " Failed", this->curPhase + " failed.");
