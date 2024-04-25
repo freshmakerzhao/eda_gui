@@ -95,6 +95,8 @@ private:
     bool showSynthSuccessMsg = true;
     // 是否显示布局布线成功弹窗
     bool showImplementSuccessMsg = true;
+    // 是否显示生成码流成功弹窗
+    bool showGenBitSuccessMsg = true;
     // 综合之后是否要执行implement
     bool hasNextImplementProcess = false;
 
