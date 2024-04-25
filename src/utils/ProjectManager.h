@@ -16,10 +16,10 @@
 #include <QDebug>
 #include "Project.h"
 #include "TaskManager.h"
-#include "widgets/Navigator.h"
 
-class ProjectManager
+class ProjectManager :  public QObject
 {
+    Q_OBJECT
 public:
     static ProjectManager& instance();
 
@@ -37,12 +37,19 @@ public:
      * @param 工程实例
      * @return
      */
-    // void loadFiles(Project *project);
+    void loadFiles(Project *project);
+
+    void addSourcesAction();
+
+    bool removeFileAction(const QString &path);
+
+public slots:
+    void closeProject();
 
 private:
     ProjectManager();
 
-    Project *pro = nullptr;
+    Project *_project = nullptr;
 };
 
 #endif // PROJECTMANAGER_H

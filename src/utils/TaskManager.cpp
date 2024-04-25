@@ -3,11 +3,11 @@
 #include "utils/ProcessManager.h"
 #include "utils/StringUtilities.h"
 #include "utils/CommandBuilder.h"
+#include "utils/ProjectManager.h"
 #include "widgets/Infowidget.h"
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
-#include "widgets/Navigator.h"
 #include "FileHelper.h"
 
 TaskManager& TaskManager::instance()
@@ -81,7 +81,7 @@ void TaskManager::handleTreeItemActivation(const int mode)
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 11) {
-        Navigator::instance()->addSourcesAction();
+        ProjectManager::instance().addSourcesAction();
     }
 }
 /**

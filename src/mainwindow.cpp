@@ -11,11 +11,12 @@
 
 #include "widgets/Editor.h"
 #include "wizard/Wizard.h"
-#include "widgets/Navigator.h"
 #include "widgets/Infowidget.h"
 #include "widgets/FlowNavigator.h"
 #include "widgets/Form.h"
 #include "dialog/AboutDialog.h"
+#include "widgets/FileManager.h"
+#include "utils/ProjectManager.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -179,7 +180,8 @@ void MainWindow::onOpenTriggered()
         // 执行打开.hpr文件的逻辑
         Project *proj = new Project;
         proj->parseProject(path);
-        Navigator::instance()->loadFile(proj);
+        // Navigator::instance()->loadFile(proj);
+        ProjectManager::instance().loadFiles(proj);
     }
 }
 
@@ -337,7 +339,7 @@ MainWindow::MainWindow(QWidget *parent)
     // ================= 文件按钮绑定 ====================
     connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
     connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
-    connect(closeAction, &QAction::triggered, Navigator::instance(), &Navigator::closeProjectAction);
+    connect(closeAction, &QAction::triggered, &ProjectManager::instance(), &ProjectManager::closeProject);
     connect(openFileAction, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
     connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
     connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
@@ -411,7 +413,8 @@ MainWindow::MainWindow(QWidget *parent)
     SourcesWidget = new ads::CDockWidget("Sources", DockManager);
 //    SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
     DockManager->addDockWidget(ads::LeftDockWidgetArea, SourcesWidget);
-    SourcesWidget->setWidget(Navigator::instance());
+    // SourcesWidget->setWidget(Navigator::instance());
+    SourcesWidget->setWidget(FileManager::instance());
 
 //    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
 //    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget,SourcesWidget->dockAreaWidget());
