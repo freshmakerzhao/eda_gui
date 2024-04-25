@@ -9,6 +9,9 @@
   */
 
 #include "ProjectManager.h"
+#include "widgets/FileManager.h"
+#include "wizard/Wizard.h"
+#include "mainwindow.h"
 
 ProjectManager &ProjectManager::instance()
 {
@@ -45,8 +48,7 @@ bool ProjectManager::loadProject(QStringList args)
         qDebug() << "Loading Project:" << hprfile;
         Project *new_project = new Project;
         new_project->parseProject(hprfile);
-        Navigator::instance()->loadFile(new_project);
-        // ProjectManager::instance().loadFiles(new_project);
+        ProjectManager::instance().loadFiles(new_project);
         return true;
     }
     return false;
@@ -57,26 +59,72 @@ bool ProjectManager::loadProject(QStringList args)
   * @param 工程实例
   * @return
   */
-// void ProjectManager::loadFiles(Project *project)
-// {
-//     // 加载的不是同一个工程
-//     if (pro != nullptr && pro != project) {
-//         // 运行新进程，在新进程加载工程
-//         ProjectManager::instance().startProcess(project);
-//         return;
-//     }
+void ProjectManager::loadFiles(Project *project)
+{
+    // 加载的不是同一个工程
+    if (_project != nullptr && _project != project) {
+        // 运行新进程，在新进程加载工程
+        ProjectManager::instance().startProcess(project);
+        return;
+    }
 
-//     pro = project;
+    _project = project;
 
-//     qDebug() << "[PROJECTMANAGER] loadFiles...";
+    qDebug() << "[PROJECTMANAGER] loadFiles...";
 
-//     // 存储设计文件与约束文件
-//     TaskManager::instance().sourcePathList = pro->sourceList;
-//     TaskManager::instance().constraintPathList = pro->constraintList;
-//     // 设置工程参数
-//     TaskManager::instance().setParams(pro->getAllParams());
+    // 存储设计文件与约束文件
+    TaskManager::instance().sourcePathList = _project->sourceList;
+    TaskManager::instance().constraintPathList = _project->constraintList;
+    // 设置工程参数
+    TaskManager::instance().setParams(_project->getAllParams());
+    // 加载文件树
+    FileManager::instance()->updateDesignSources(_project->sourceList);
+    FileManager::instance()->updateConstraints(_project->constraintList);
+    // UI反馈
+    MainWindow::instance()->showProjectTitle(0, _project->getParam("path") + "/" + _project->getParam("name") + ".hpr");
+    MainWindow::instance()->setForm(0);
+}
 
-//     SourcesView::instance()->loadFileTree(pro);
-// }
+void ProjectManager::addSourcesAction()
+{
+    if (_project == nullptr) {
+        return;
+    }
+    Wizard wizard(MainWindow::instance(), 1, _project);
+    wizard.exec();
+    _project->makeProject();
+    loadFiles(_project);
+}
+
+bool ProjectManager::removeFileAction(const QString &path)
+{
+    QFileInfo fileInfo(path);
+    QString folderName = fileInfo.dir().dirName();
+    qDebug() << folderName;
+    if (folderName == "sources") {
+        _project->sourceList.removeOne(path);
+    } else if (folderName == "constraints") {
+        _project->constraintList.removeOne(path);
+    }
+    _project->makeProject();
+    loadFiles(_project);
+    return true;
+}
+
+void ProjectManager::closeProject()
+{
+    if (!MainWindow::instance()->cleanEditorTab()) {
+        return;
+    }
+
+    delete _project;
+    _project = nullptr;
+
+    FileManager::instance()->closeProject();
+    TaskManager::instance().cleanParams();
+
+    MainWindow::instance()->showProjectTitle(1);
+    MainWindow::instance()->setForm(1);
+}
 
 ProjectManager::ProjectManager() {}
