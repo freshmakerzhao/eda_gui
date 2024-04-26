@@ -39,8 +39,17 @@ public:
      */
     void loadFiles(Project *project);
 
+    /**
+     * 启动Wizard，添加Sources
+     * @return
+     */
     void addSourcesAction();
 
+    /**
+     * 移除工程中的文件
+     * @param 目标文件路径
+     * @return
+     */
     bool removeFileAction(const QString &path);
 
 public slots:

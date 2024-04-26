@@ -10,7 +10,7 @@
 
 #include "Editor.h"
 #include "mainwindow.h"
-
+#include "dialog/CustomMessageBox.h"
 
 Editor::Editor(QWidget *parent)
     : QsciScintilla(parent)
@@ -110,7 +110,7 @@ bool Editor::saveFile()
         QFileInfo fileInfo(file);
         if (!fileInfo.isWritable()) {
             // 提示用户文件只读
-            QMessageBox::warning(MainWindow::instance(), "Warning",
+            CustomMessageBox::showWarning(MainWindow::instance(), "Warning",
                                  "The file is read-only. Writing operation failed.");
             return false;
         }

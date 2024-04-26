@@ -10,6 +10,10 @@ class CustomMessageBox : public QMessageBox
 public:
     CustomMessageBox(QWidget *parent = nullptr);
 
+    static StandardButton showWarning(QWidget *parent, const QString &title,
+                                          const QString &text, StandardButtons buttons = Ok,
+                                          StandardButton defaultButton = NoButton);
+
     static StandardButton showInformation(QWidget *parent, const QString &title,
                                           const QString &text, StandardButtons buttons = Ok,
                                           StandardButton defaultButton = NoButton);

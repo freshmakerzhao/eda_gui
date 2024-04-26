@@ -14,7 +14,6 @@
 #include <QMenuBar>
 
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QFileDialog>
 #include <QDockWidget>
 #include <QTextCodec>
@@ -39,8 +38,6 @@ public:
 
     void showProjectTitle(const int mode = 0, const QString &title = "");
     void setForm(const int mode = 0);
-    // 判断文件是否修改
-    bool isModified();
 
 public slots:
     void onNewTriggered();
@@ -50,14 +47,10 @@ public slots:
     void onSaveAsTriggered();
     void onEditTriggered();
 
-
     void onChipPlannerTriggered();
 
     void onDocumentationTriggered();
     void onAboutTriggered();
-
-    void onTabWidgetCurrentChanged(int index);
-    void onTabWidgetTabCloseRequested(int index);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -93,7 +86,6 @@ private:
     QAction *chipPlannerAction;
 
     QToolBar *toolbar;
-    QTabWidget *tabWidget;
 
     // ChipPlanner chipPlanner;
 
