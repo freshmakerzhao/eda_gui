@@ -12,6 +12,7 @@
 #include "widgets/FileManager.h"
 #include "wizard/Wizard.h"
 #include "mainwindow.h"
+#include "dialog/CustomMessageBox.h"
 
 ProjectManager &ProjectManager::instance()
 {
@@ -35,10 +36,10 @@ bool ProjectManager::startProcess(Project *project)
 }
 
 /**
-  * 传递文件作为命令行参数，加载工程
-  * @param 命令行参数列表
-  * @return
-  */
+ * 传递文件作为命令行参数，加载工程
+ * @param 命令行参数列表
+ * @return
+ */
 bool ProjectManager::loadProject(QStringList args)
 {
     // TODO 工程加载失败处理
@@ -55,10 +56,10 @@ bool ProjectManager::loadProject(QStringList args)
 }
 
 /**
-  * 加载工程
-  * @param 工程实例
-  * @return
-  */
+ * 加载工程
+ * @param 工程实例
+ * @return
+ */
 void ProjectManager::loadFiles(Project *project)
 {
     // 加载的不是同一个工程
@@ -85,9 +86,15 @@ void ProjectManager::loadFiles(Project *project)
     MainWindow::instance()->setForm(0);
 }
 
+/**
+ * 启动Wizard，添加Sources
+ * @return
+ */
 void ProjectManager::addSourcesAction()
 {
     if (_project == nullptr) {
+        CustomMessageBox::showQuestion(MainWindow::instance(), "Warning",
+                                      "Please select or create a project.");
         return;
     }
     Wizard wizard(MainWindow::instance(), 1, _project);
@@ -96,6 +103,11 @@ void ProjectManager::addSourcesAction()
     loadFiles(_project);
 }
 
+/**
+ * 移除工程中的文件
+ * @param 目标文件路径
+ * @return
+ */
 bool ProjectManager::removeFileAction(const QString &path)
 {
     QFileInfo fileInfo(path);
@@ -120,10 +132,13 @@ void ProjectManager::closeProject()
     delete _project;
     _project = nullptr;
 
+    // 清除文件树
     FileManager::instance()->closeProject();
+    // 清除任务管理器参数
     TaskManager::instance().cleanParams();
-
+    // 还原主窗口Title
     MainWindow::instance()->showProjectTitle(1);
+    // 显示起始页
     MainWindow::instance()->setForm(1);
 }
 

@@ -6,6 +6,7 @@
 #include "utils/ProjectManager.h"
 #include "widgets/Infowidget.h"
 #include "widgets/FrameView.h"
+#include "widgets/EditorManager.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
 #include "FileHelper.h"
@@ -89,7 +90,7 @@ void TaskManager::handleTreeItemActivation(const int mode)
  * @param mode 待执行任务
  */
 void TaskManager::taskController(const int mode) {
-    bool sourceModified = MainWindow::instance()->isModified();
+    bool sourceModified = EditorManager::instance()->isModified();
     std::string netlistPath = StringUtilities::concatPath({projectSynthPath.toStdString(), (topName + netlistType).toStdString()});
     bool netlistExist = FileHelper::fileExists(netlistPath);
     // 准备环境

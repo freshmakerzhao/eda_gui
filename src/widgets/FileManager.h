@@ -1,10 +1,19 @@
+/**
+  ******************************************************************************
+  * @file           : FileManager.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/4/25
+  ******************************************************************************
+  */
+
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
 #include <QTreeView>
 #include <QMenu>
 #include <QAction>
-#include <QLineEdit>
 #include <QModelIndex>
 #include <QKeyEvent>
 #include <QStandardItemModel>

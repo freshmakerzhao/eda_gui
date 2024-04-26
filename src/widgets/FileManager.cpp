@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file           : FileManager.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/4/25
+  ******************************************************************************
+  */
+
 #include "FileManager.h"
 #include "mainwindow.h"
 #include "utils/ProjectManager.h"
