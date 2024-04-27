@@ -34,9 +34,9 @@ protected:
 public slots:
     void showContextMenu(const QPoint& pos);
 
-    void updateDesignSources(QStringList &list);
+    void updateDesignSources(const QStringList &list);
 
-    void updateConstraints(QStringList &list);
+    void updateConstraints(const QStringList &list);
 
     void clickedFile(const QModelIndex& index);
 
