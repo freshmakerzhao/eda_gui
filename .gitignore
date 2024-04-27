@@ -1,2 +1,3 @@
+.gitignore
 /build-src-Desktop_Qt_5_15_2_MinGW_64_bit-Release
 /src/CMakeLists.txt.user

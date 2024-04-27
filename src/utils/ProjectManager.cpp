@@ -125,6 +125,7 @@ bool ProjectManager::removeFileAction(const QString &path)
 
 void ProjectManager::closeProject()
 {
+    // TODO: 关闭项目提示
     if (!MainWindow::instance()->cleanEditorTab()) {
         return;
     }
