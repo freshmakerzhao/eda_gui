@@ -27,7 +27,7 @@ public:
     Editor *currentEditor();
 
 public slots:
-    void editorEdit(int op);
+    void editorEdit(const int op);
 
     void editorSave();
 

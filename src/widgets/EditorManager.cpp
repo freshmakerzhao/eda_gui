@@ -85,7 +85,7 @@ Editor *EditorManager::currentEditor()
     return (Editor*) this->currentWidget();
 }
 
-void EditorManager::editorEdit(int op)
+void EditorManager::editorEdit(const int op)
 {
     Editor *editor = qobject_cast<Editor*>(this->currentWidget());
     if (!editor) {
