@@ -53,7 +53,7 @@ void FileManager::showContextMenu(const QPoint &pos)
     contextMenu.exec(mapToGlobal(pos));
 }
 
-void FileManager::updateDesignSources(QStringList &list)
+void FileManager::updateDesignSources(const QStringList &list)
 {
     designsources->removeRows(0, designsources->rowCount());
     foreach (const QString &file, list) {
@@ -63,7 +63,7 @@ void FileManager::updateDesignSources(QStringList &list)
     }
 }
 
-void FileManager::updateConstraints(QStringList &list)
+void FileManager::updateConstraints(const QStringList &list)
 {
     constraints->removeRows(0, constraints->rowCount());
     foreach (const QString &file, list) {
@@ -113,20 +113,8 @@ void FileManager::removeFileAction()
 
 void FileManager::closeProject()
 {
-    QModelIndexList selectedIndexes = selectionModel()->selectedIndexes();
-
-    foreach (const QModelIndex& index, selectedIndexes) {
-        if (index.isValid()) {
-            QStandardItemModel* model = dynamic_cast<QStandardItemModel*>(this->model());
-            if (model) {
-                QStandardItem* item = model->itemFromIndex(index);
-                if (item) {
-                    // 删除所有子节点
-                    item->removeRows(0, item->rowCount());
-                }
-            }
-        }
-    }
+    designsources->removeRows(0, designsources->rowCount());
+    constraints->removeRows(0, constraints->rowCount());
 }
 
 // void FileManager::keyPressEvent(QKeyEvent *event)
