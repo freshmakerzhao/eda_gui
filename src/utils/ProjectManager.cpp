@@ -42,17 +42,21 @@ bool ProjectManager::startProcess(Project *project)
  */
 bool ProjectManager::loadProject(QStringList args)
 {
-    // TODO 工程加载失败处理
-    if(args.size() > 1) {
-        // 获取第一个文件路径
-        QString hprfile = args.at(1);
-        qDebug() << "Loading Project:" << hprfile;
-        Project *new_project = new Project;
-        new_project->parseProject(hprfile);
-        ProjectManager::instance().loadFiles(new_project);
-        return true;
+    if(args.size() <= 1) {
+        return false;
     }
-    return false;
+    // 获取第一个文件路径
+    QString hprfile = args.at(1);
+    qDebug() << "Loading Project:" << hprfile;
+    Project *new_project = new Project;
+    if (!new_project->parseProject(hprfile)) {
+        CustomMessageBox::showError(MainWindow::instance(), "Error",
+                                       "Failed to open project, File parsing error.");
+
+        return false;
+    }
+    ProjectManager::instance().loadFiles(new_project);
+    return true;
 }
 
 /**

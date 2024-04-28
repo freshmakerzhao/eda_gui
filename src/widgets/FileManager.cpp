@@ -105,7 +105,7 @@ void FileManager::removeFileAction()
                 // 获取父节点的模型索引
                 QModelIndex parentIndex = index.parent();
                 // 从模型中移除选中的子节点
-                model()->removeRow(index.row(), parentIndex);
+                model->removeRow(index.row(), parentIndex);
             }
         }
     }
@@ -152,6 +152,7 @@ void FileManager::closeProject()
 
 FileManager::FileManager(QWidget *parent) : QTreeView(parent)
 {
+    qDebug() << "[FileManager] Constructing...";
     setStyleSheet("QTreeView::item { height: 32px; }");
     setHeaderHidden(true);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -160,7 +161,7 @@ FileManager::FileManager(QWidget *parent) : QTreeView(parent)
     connect(this, &QTreeView::doubleClicked, this, &FileManager::clickedFile);
 
 
-    QStandardItemModel* model = new QStandardItemModel(this);
+    model = new QStandardItemModel(this);
     setModel(model);
     designsources = new QStandardItem("Design Sources");
     constraints = new QStandardItem("Constraints");
@@ -168,4 +169,12 @@ FileManager::FileManager(QWidget *parent) : QTreeView(parent)
     model->setItem(1, 0, constraints);
 
     expandAll();
+}
+
+FileManager::~FileManager()
+{
+    qDebug() << "[FileManager] Distructing...";
+    model->removeRows(0, model->rowCount());
+    // delete designsources;
+    // delete constraints;
 }

@@ -53,6 +53,10 @@ public slots:
 private:
     FileManager(QWidget* parent = nullptr);
 
+    ~FileManager();
+
+    QStandardItemModel *model;
+
     QStandardItem *designsources;
 
     QStandardItem *constraints;
