@@ -118,16 +118,7 @@ void MainWindow::onOpenTriggered()
         return; // 用户取消了操作
     }
     QString path = dialog.selectedFiles().value(0, "");
-    if (!path.isEmpty()) {
-        // 执行打开.hpr文件的逻辑
-        Project *proj = new Project;
-        if (!proj->parseProject(path)) {
-            CustomMessageBox::showError(MainWindow::instance(), "Error",
-                                        "Failed to open project, File parsing error.");
-            return;
-        }
-        ProjectManager::instance().loadFiles(proj);
-    }
+    ProjectManager::instance().openProject(path);
 }
 
 void MainWindow::onSaveTriggered()

@@ -36,11 +36,29 @@ bool ProjectManager::startProcess(Project *project)
 }
 
 /**
- * 传递文件作为命令行参数，加载工程
+ * 传递工程文件路径，加载工程
  * @param 命令行参数列表
  * @return
  */
-bool ProjectManager::loadProject(QStringList args)
+bool ProjectManager::openProject(const QString &path)
+{
+    Project *new_open_project = new Project;
+    if (!new_open_project->parseProject(path)) {
+        CustomMessageBox::showError(MainWindow::instance(), "Error",
+                                    "Failed to open project, File parsing error.");
+        delete new_open_project;
+        return false;
+    }
+    ProjectManager::instance().loadFiles(new_open_project);
+    return true;
+}
+
+/**
+ * 传递工程文件作为命令行参数，加载工程
+ * @param 命令行参数列表
+ * @return
+ */
+bool ProjectManager::openFromArgs(const QStringList &args)
 {
     if(args.size() <= 1) {
         return false;
@@ -48,14 +66,9 @@ bool ProjectManager::loadProject(QStringList args)
     // 获取第一个文件路径
     QString hprfile = args.at(1);
     qDebug() << "Loading Project:" << hprfile;
-    Project *new_project = new Project;
-    if (!new_project->parseProject(hprfile)) {
-        CustomMessageBox::showError(MainWindow::instance(), "Error",
-                                       "Failed to open project, File parsing error.");
-
+    if (!openProject(hprfile)) {
         return false;
     }
-    ProjectManager::instance().loadFiles(new_project);
     return true;
 }
 
