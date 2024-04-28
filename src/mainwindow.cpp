@@ -121,7 +121,11 @@ void MainWindow::onOpenTriggered()
     if (!path.isEmpty()) {
         // 执行打开.hpr文件的逻辑
         Project *proj = new Project;
-        proj->parseProject(path);
+        if (!proj->parseProject(path)) {
+            CustomMessageBox::showError(MainWindow::instance(), "Error",
+                                        "Failed to open project, File parsing error.");
+            return;
+        }
         ProjectManager::instance().loadFiles(proj);
     }
 }
@@ -202,7 +206,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent)
 {
-    qDebug() << "[Main Window] Constructing...";
+    qDebug() << "[MainWindow] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("HybrdLink");
     this->setWindowIcon(QIcon(":/resource/icon.png"));
@@ -323,5 +327,5 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "[Main Window] Distructing...";
+    qDebug() << "[MainWindow] Distructing...";
 }
