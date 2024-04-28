@@ -26,11 +26,18 @@ public:
     bool startProcess(Project *project);
 
     /**
-     * 传递文件作为命令行参数，加载工程
+     * 传递工程文件路径，打开工程
      * @param 命令行参数列表
      * @return
      */
-    bool loadProject(QStringList args);
+    bool openProject(const QString &path);
+
+    /**
+     * 传递工程文件作为命令行参数，加载工程
+     * @param 命令行参数列表
+     * @return
+     */
+    bool openFromArgs(const QStringList &args);
 
     /**
      * 加载工程

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     // 获取命令行参数列表
     QStringList args = a.arguments();
     // 如果有传递文件作为命令行参数
-    ProjectManager::instance().loadProject(args);
+    ProjectManager::instance().openFromArgs(args);
 
     return a.exec();
 }
