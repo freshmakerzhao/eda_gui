@@ -10,12 +10,12 @@ class TaskManager : public QObject
 public:
     static TaskManager& instance();
 
-    void handleTreeItemActivation(const int mode);
+    void handleTreeItemActivation(const int &mode);
 
     /**
      * 设置工程参数
-    */
-    void setParams(QMap<QString, QString> params);
+     */
+    void setParams(const QMap<QString, QString> &params);
 
     /**
      * 任务分配器

@@ -34,8 +34,16 @@ protected:
 public slots:
     void showContextMenu(const QPoint& pos);
 
+    /**
+     * 更新DesignSources
+     * @param list DesignSources文件路径列表
+     */
     void updateDesignSources(const QStringList &list);
 
+    /**
+     * 更新Constraints
+     * @param list Constraints文件路径列表
+     */
     void updateConstraints(const QStringList &list);
 
     void clickedFile(const QModelIndex& index);
@@ -44,9 +52,15 @@ public slots:
 
     void addSourcesAction();
 
+    /**
+     * 移除选中节点，并从工程文件列表移除该文件
+     */
     void removeFileAction();
 
-    void closeProject();
+    /**
+     * 清除文件树节点
+     */
+    void cleanFileItems();
 
     // void renameSelectedItem();
 

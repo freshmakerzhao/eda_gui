@@ -37,7 +37,7 @@ public:
      * @param 命令行参数列表
      * @return
      */
-    bool openFromArgs(const QStringList &args);
+    bool openProjectFromArgs(const QStringList &args);
 
     /**
      * 加载工程

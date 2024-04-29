@@ -17,7 +17,7 @@ TaskManager& TaskManager::instance()
     return instance;
 }
 
-void TaskManager::handleTreeItemActivation(const int mode)
+void TaskManager::handleTreeItemActivation(const int &mode)
 {
     if (this->arch == ""){
         // 用户未选择架构时
@@ -283,7 +283,7 @@ QStringList TaskManager::buildSynthScript() {
 /**
   * 设置工程参数
   */
-void TaskManager::setParams(QMap<QString, QString> params)
+void TaskManager::setParams(const QMap<QString, QString> &params)
 {
     // 存储路径
     QString path = params["path"];

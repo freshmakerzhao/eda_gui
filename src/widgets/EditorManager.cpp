@@ -40,9 +40,9 @@ void EditorManager::createEditorTab(const QString &path)
 bool EditorManager::saveAllFiles()
 {
     if (isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "There are unsaved files,"
-                                                                             " are you sure you want to run?",
-                                                            QMessageBox::Yes | QMessageBox::No);
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(MainWindow::instance(), "Warning", "There are unsaved files,"
+                                                                             "  save and execute?",
+                                                            QMessageBox::Yes, QMessageBox::No);
         if (btn == QMessageBox::No) {
             return false;
         }
@@ -85,6 +85,9 @@ Editor *EditorManager::currentEditor()
     return (Editor*) this->currentWidget();
 }
 
+/**
+ * 编辑操作
+ */
 void EditorManager::editorEdit(const int op)
 {
     Editor *editor = qobject_cast<Editor*>(this->currentWidget());

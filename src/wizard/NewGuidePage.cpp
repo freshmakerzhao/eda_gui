@@ -15,6 +15,6 @@ NewGuidePage::NewGuidePage(QWidget *parent) : QWizardPage(parent)
     setTitle("Create a New HybrdLink Project");
     setSubTitle("This wizard will guide you through the creation of a new project.\n"
                 "To create a HybrdLink project you will need to provide a name and a "
-                "location for your project files.Finally, you will specify your project "
+                "location for your project files. Finally, you will specify your project "
                 "sources and choose a default part.");
 }

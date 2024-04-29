@@ -58,7 +58,7 @@ bool ProjectManager::openProject(const QString &path)
  * @param 命令行参数列表
  * @return
  */
-bool ProjectManager::openFromArgs(const QStringList &args)
+bool ProjectManager::openProjectFromArgs(const QStringList &args)
 {
     if(args.size() <= 1) {
         return false;
@@ -142,16 +142,24 @@ bool ProjectManager::removeFileAction(const QString &path)
 
 void ProjectManager::closeProject()
 {
-    // TODO: 关闭项目提示
+    // 关闭项目提示
+    // CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(MainWindow::instance(), "Question", "Do you want to close the project?",
+    //                                                                                QMessageBox::Yes, QMessageBox::No);
+    // if (btn == QMessageBox::No) {
+    //     return;
+    // }
+
+    // 检查是否能关闭所有Editor
     if (!MainWindow::instance()->cleanEditorTab()) {
         return;
     }
 
+    // 删除工程对象
     delete _project;
     _project = nullptr;
 
     // 清除文件树
-    FileManager::instance()->closeProject();
+    FileManager::instance()->cleanFileItems();
     // 清除任务管理器参数
     TaskManager::instance().cleanParams();
     // 还原主窗口Title
