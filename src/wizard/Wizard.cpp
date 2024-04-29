@@ -125,7 +125,7 @@ void Wizard::onNewFinish()
 void Wizard::onAddFinish()
 {
     qDebug() << "Add Finish";
-    if(current_project == nullptr) {
+    if (current_project == nullptr) {
         return;
     }
     QString path = current_project->getParam("path");

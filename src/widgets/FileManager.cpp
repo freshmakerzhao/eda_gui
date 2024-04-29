@@ -53,6 +53,10 @@ void FileManager::showContextMenu(const QPoint &pos)
     contextMenu.exec(mapToGlobal(pos));
 }
 
+/**
+ * 更新DesignSources
+ * @param list DesignSources文件路径列表
+ */
 void FileManager::updateDesignSources(const QStringList &list)
 {
     designsources->removeRows(0, designsources->rowCount());
@@ -63,6 +67,10 @@ void FileManager::updateDesignSources(const QStringList &list)
     }
 }
 
+/**
+ * 更新Constraints
+ * @param list Constraints文件路径列表
+ */
 void FileManager::updateConstraints(const QStringList &list)
 {
     constraints->removeRows(0, constraints->rowCount());
@@ -94,6 +102,9 @@ void FileManager::addSourcesAction()
     ProjectManager::instance().addSourcesAction();
 }
 
+/**
+ * 移除选中节点，并从工程文件列表移除该文件
+ */
 void FileManager::removeFileAction()
 {
     QModelIndexList selectedIndexes = selectionModel()->selectedIndexes();
@@ -111,7 +122,10 @@ void FileManager::removeFileAction()
     }
 }
 
-void FileManager::closeProject()
+/**
+ * 清除文件树节点
+ */
+void FileManager::cleanFileItems()
 {
     designsources->removeRows(0, designsources->rowCount());
     constraints->removeRows(0, constraints->rowCount());

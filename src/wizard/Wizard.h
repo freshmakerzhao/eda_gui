@@ -25,13 +25,11 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QHeaderView>
-#include <QListWidget>
 #include <QMessageBox>
 #include <QDialogButtonBox>
 #include <QSortFilterProxyModel>
 #include <QComboBox>
 #include <QFormLayout>
-#include <QToolBar>
 #include <QDebug>
 
 #include "utils/Project.h"

@@ -27,6 +27,9 @@ public:
     Editor *currentEditor();
 
 public slots:
+    /**
+     * 编辑操作
+     */
     void editorEdit(const int op);
 
     void editorSave();

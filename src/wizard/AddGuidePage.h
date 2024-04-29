@@ -29,8 +29,6 @@ protected:
 private:
     QRadioButton *radioBtn1;
     QRadioButton *radioBtn2;
-    // void handleRadioButton1Toggled(bool checked);
-    // void handleRadioButton2Toggled(bool checked);
 };
 
 #endif // ADDGUIDEPAGE_H
