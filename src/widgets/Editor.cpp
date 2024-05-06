@@ -24,7 +24,7 @@ Editor::Editor(QWidget *parent)
     // 加载字体文件
     QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
     // 创建字体
-    QFont font("JetBrains Mono NL", 10);
+    QFont font("JetBrains Mono NL", 9);
     // 设置行号字体
     setMarginsFont(font);
     // 设置显示行号

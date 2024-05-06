@@ -37,6 +37,10 @@ void EditorManager::createEditorTab(const QString &path)
     MainWindow::instance()->updateActionState();
 }
 
+/**
+ * 执行操作前询问用户是否保存所有已打开的文件
+ * @return 保存成功/失败
+ */
 bool EditorManager::saveAllFiles()
 {
     if (isModified()) {

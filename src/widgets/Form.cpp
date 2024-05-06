@@ -37,11 +37,11 @@ Form::Form(QWidget *parent)
     setStyleSheet("QWidget { background-image: url(:/resource/white.png); }"
                   "QGroupBox { font-family: Console; font-size: 30px; }"
                   "QPushButton { border: none; text-align: left; font-size: 22px; }"
-                  "QPushButton:hover { color: #4f7cce; }"
+                  "QPushButton:hover { color: #4f7cce; text-decoration:underline;}"
                   );
-    QPixmap logoPixmap(":/resource/logo2.png");
+    QPixmap logoPixmap(":/resource/logo.png");
     QLabel *logoLabel = new QLabel(this);
-    logoLabel->setPixmap(logoPixmap.scaled(420, 298, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    logoLabel->setPixmap(logoPixmap.scaled(350, 260, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     logoLabel->setFixedHeight(75);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -51,8 +51,10 @@ Form::Form(QWidget *parent)
     QGroupBox *groupBox = new QGroupBox("Quick Start");
     QVBoxLayout *groupLayout = new QVBoxLayout(groupBox);
     QPushButton *createProjectBtn = new QPushButton("Create Project >");
+    createProjectBtn->setFixedWidth(300);
     connect(createProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onNewTriggered);
     QPushButton *openProjectBtn = new QPushButton("Open Project >");
+    openProjectBtn->setFixedWidth(300);
     connect(openProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onOpenTriggered);
     QPushButton *openExampleBtn = new QPushButton("Open Example Project >");
     openExampleBtn->setEnabled(false);

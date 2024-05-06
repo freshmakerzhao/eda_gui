@@ -93,6 +93,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
     ${PROJECT_RESOURCES}
+    win32.rc
 )
 
 # Link the Qt5 Widgets library and the QScintilla library to the executable
@@ -105,12 +106,6 @@ target_link_libraries(${PROJECT_NAME}
 
 # Specify installation paths (if required)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /opt/${PROJECT_NAME}/bin)
-
-set(app_WINRC appicon.rc)
-set_property(SOURCE app_win32.rc APPEND PROPERTY
-        OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/AppIcon.ico
-)
-
 
 if (Qt5PrintSupport_FOUND)
     target_link_libraries(${PROJECT_NAME} Qt5::PrintSupport)

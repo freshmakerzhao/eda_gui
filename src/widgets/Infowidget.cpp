@@ -1,4 +1,5 @@
-#include "Infowidget.h"
+#include "InfoWidget.h"
+#include "LogWidget.h"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
@@ -7,14 +8,6 @@ InfoWidget *InfoWidget::instance(QWidget *parent)
         _instance = new InfoWidget(parent);
     }
     return _instance;
-}
-
-void InfoWidget::appendMsg(const QString &str) {
-    msg->appendPlainText(str);
-}
-
-void InfoWidget::appendLog(const QString &str) {
-    log->appendPlainText(str);
 }
 
 void InfoWidget::setCurrentPage(int index) {
@@ -112,51 +105,18 @@ InfoWidget::InfoWidget(QWidget *parent)
     // =========================== Csg =============================
     csl = new QPlainTextEdit(this);
     tabWidget->addTab(csl, "Tcl Console");
+    tabWidget->setTabEnabled(0, false);
     // =========================== Msg =============================
     msg = new QPlainTextEdit(this), msg->setReadOnly(true);
     tabWidget->addTab(msg, "Messages");
-
+    tabWidget->setTabEnabled(1, false);
     // =========================== Log =============================
-    QWidget *logWidget = new QWidget(tabWidget);
-    QHBoxLayout *hLayout = new QHBoxLayout(logWidget);
-    hLayout->setMargin(0);
-    hLayout->setSpacing(0);
-
-    log = new QPlainTextEdit(logWidget);
-    log->setReadOnly(true);
-
-    QToolBar *toolbar = new QToolBar("Tools", logWidget);
-    toolbar->setFixedWidth(35); // 调整toolbar宽度
-    toolbar->setOrientation(Qt::Vertical);
-    hLayout->addWidget(toolbar);
-    hLayout->addWidget(log);
-
-    QAction *searchAction = new QAction("Search", toolbar);
-    searchAction->setIcon(QIcon(":/resource/search.ico"));
-    toolbar->addAction(searchAction);
-    connect(searchAction, &QAction::triggered, [=](){
-        QString searchText = QInputDialog::getText(this, "Search", "Enter text to search");
-        if (!searchText.isEmpty()) {
-            if(log->find(searchText, QTextDocument::FindBackward)) {
-                QPalette palette = log->palette();
-                palette.setColor(QPalette::Highlight, palette.color(QPalette::Active, QPalette::Highlight));
-                log->setPalette(palette);
-            } else {
-                QMessageBox::information(this, tr("Warning"), tr("Not Found"), QMessageBox::Ok);
-            }
-        }
-    });
-
-    QAction *cleanAction = new QAction("Clean", toolbar);
-    cleanAction->setIcon(QIcon(":/resource/clean.ico"));
-    connect(cleanAction, &QAction::triggered, log, &QPlainTextEdit::clear);
-    toolbar->addAction(cleanAction);
-    tabWidget->addTab(logWidget, "Log");
-
+    tabWidget->addTab(LogWidget::instance(), "Log");
+    tabWidget->setCurrentIndex(2);
     // ============================ Rpt ============================
     rpt = new QPlainTextEdit(this), rpt->setReadOnly(true);
     tabWidget->addTab(rpt, "Reports");
-
+    tabWidget->setTabEnabled(3, false);
     // ======================== Design Runs ========================
     runsView = new QTreeView(this);
     tabWidget->addTab(runsView, "Design Runs");

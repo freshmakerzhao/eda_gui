@@ -1,6 +1,7 @@
 #include "ProcessManager.h"
 #include "utils/StringUtilities.h"
-#include "widgets/Infowidget.h"
+#include "widgets/LogWidget.h"
+#include "widgets/InfoWidget.h"
 #include "mainwindow.h"
 #include <QTextCodec>
 #include <iomanip>
@@ -145,10 +146,10 @@ void ProcessManager::handleReadyReadStandardOutput()
     // 判断是否报错
     if (process->error() == QProcess::UnknownError) {
         // 没有错误发生，输出 output
-        InfoWidget::instance()->appendLog(outputStr);
+        LogWidget::instance()->appendLog(outputStr);
     } else {
         // 发生错误，输出 errorOutput
-        InfoWidget::instance()->appendLog(errorOutputStr);
+        LogWidget::instance()->appendLog(errorOutputStr);
     }
 }
 
@@ -162,7 +163,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     // 转码
     QString outputStr = tc->toUnicode(remainingOutput);
     if (!remainingOutput.isEmpty()) {
-        InfoWidget::instance()->appendLog(outputStr);
+        LogWidget::instance()->appendLog(outputStr);
     }
 
     // 读取可能剩余的标准错误
@@ -170,7 +171,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     // 转码
     outputStr = tc->toUnicode(remainingError);
     if (!remainingError.isEmpty()) {
-        InfoWidget::instance()->appendLog(outputStr);
+        LogWidget::instance()->appendLog(outputStr);
     }
     // 结束时间
     this->endTimeForCal = TimeUtilities::getCurTime();
