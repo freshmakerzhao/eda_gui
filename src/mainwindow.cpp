@@ -10,7 +10,7 @@
 #include "mainwindow.h"
 #include "wizard/Wizard.h"
 #include "widgets/Editor.h"
-#include "widgets/Infowidget.h"
+#include "widgets/InfoWidget.h"
 #include "widgets/FlowNavigator.h"
 #include "widgets/Form.h"
 #include "widgets/FileManager.h"
@@ -202,7 +202,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("HybrdLink");
     this->setWindowIcon(QIcon(":/resource/icon.png"));
     // 设置窗口初始大小
-    this->resize(1700, 1000);
+    this->resize(1700, 960);
     // =================== MENUBAR ====================
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
     fileMenu = menuBar->addMenu("File");
@@ -273,7 +273,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     BottomDock = new QDockWidget(this);
     BottomDock->setWindowTitle("INFORMATION");
+    BottomDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    BottomDock->setFeatures(QDockWidget::DockWidgetClosable);
+    BottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
     BottomDock->setWidget(InfoWidget::instance());
+    // 隐藏TitleBar
+    // QWidget* lTitleBar = BottomDock->titleBarWidget();
+    // QWidget* lEmptyWidget = new QWidget();
+    // BottomDock->setTitleBarWidget(lEmptyWidget);
+    // delete lTitleBar;
+    // 垂直TitleBar
+    // BottomDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
     addDockWidget(Qt::BottomDockWidgetArea, BottomDock);
 
     ManagerDock = new QDockWidget(this);

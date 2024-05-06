@@ -6,11 +6,14 @@
 
 int main(int argc, char *argv[])
 {
-    // QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+    QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+
     QApplication a(argc, argv);
     // 启动画面
     QPixmap pix(":/resource/logo.png");
-    QSplashScreen splash(pix.scaled(700, 496, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    QSplashScreen splash(pix.scaled(440, 440, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     splash.show();
     a.processEvents();
     splash.finish(MainWindow::instance()); // 启动画面结束

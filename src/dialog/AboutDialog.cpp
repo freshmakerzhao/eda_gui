@@ -28,9 +28,10 @@ AboutDialog::AboutDialog(QWidget *parent)
     textLabel->setOpenExternalLinks(true);
 
     QLabel *imageLabel = new QLabel(this);
+    imageLabel->setFixedHeight(400);
     QPixmap image(":/resource/logo.png");
     // 缩放图片到当前分辨率下的显示大小，SmoothTransformation平滑处理。
-    imageLabel->setPixmap(image.scaled(700, 496, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    imageLabel->setPixmap(image.scaled(400, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     imageLabel->setAlignment(Qt::AlignCenter);
     QVBoxLayout *layout = new QVBoxLayout(this);
 

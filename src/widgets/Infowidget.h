@@ -6,7 +6,6 @@
 #include <QGridLayout>
 #include <QPlainTextEdit>
 #include <QToolBar>
-#include <QInputDialog>
 #include <QMessageBox>
 #include <QTreeView>
 #include <QStandardItemModel>
@@ -22,8 +21,6 @@ class InfoWidget : public QWidget
 public:
     static InfoWidget *instance(QWidget *parent = nullptr);
 
-    void appendMsg(const QString& str);
-    void appendLog(const QString& str);
     // 指定激活index标签
     void setCurrentPage(int index);
     QTabWidget *tabWidget;
