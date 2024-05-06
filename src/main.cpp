@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QSplashScreen>
 #include "widgets/Form.h"
+#include "base/InitialConfig.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
     QApplication a(argc, argv);
+
+    InitialConfig::instance().initializeApplicationConfig();
+    InitialConfig::instance().initializeRoamingPath();
+
     // 启动画面
     QPixmap pix(":/resource/logo.png");
     QSplashScreen splash(pix.scaled(440, 440, Qt::KeepAspectRatio, Qt::SmoothTransformation));
