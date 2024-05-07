@@ -51,6 +51,16 @@ public:
             const char *fatherElementName,
             const std::vector<XmlRecent>& recentList
     );
+
+    /**
+     * 获取recent列表，从新到旧，已反转
+     * @param xmlPath xml地址
+     * @param fatherElementName recent父元素地址
+     * @return recent列表，从新到旧
+     */
+    std::vector<XmlRecent> getRecentListFromFatherElementName(
+            const char *xmlPath,
+            const char *fatherElementName);
 };
 
 

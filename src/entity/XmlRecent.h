@@ -15,14 +15,13 @@
 class XmlRecent {
 private:
     int index;
-    const char *path;
+    std::string path;
 
 public:
-    XmlRecent(int idx, const char *pth);  // 构造函数
+    XmlRecent(int idx, std::string pth);  // 构造函数
     int getIndex() const;
     void setIndex(int idx);
-    const char* getPath() const;
-    void setPath(const char *pth);
+    std::string getPath() const;
+    void setPath(std::string pth);
 };
-
 #endif //WORKSPACE_CPP_XMLRECENT_H

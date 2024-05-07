@@ -38,6 +38,7 @@ public:
 
     void showProjectTitle(const int mode = 0, const QString &title = "");
     void setForm(const int mode = 0);
+    void setRecentMenu();
 
 public slots:
     void onNewTriggered();
@@ -66,6 +67,9 @@ private:
     QMenu *editMenu;
     QMenu *viewMenu;
     QMenu *helpMenu;
+
+    // Open Recent 子菜单
+    QMenu *recentFilesMenu;
 
     QAction *newAction;
     QAction *openAction;
