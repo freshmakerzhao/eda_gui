@@ -198,6 +198,21 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
         // 查询下一个recent
         recentFile = recentFile->NextSiblingElement("recent");
     }
+
+    // 合并前去重
+    // 使用迭代器进行循环，安全删除元素
+    for (auto it1 = recentList.begin(); it1 != recentList.end(); ++it1) {
+        for (auto it2 = recentAllList.begin(); it2 != recentAllList.end();) {
+            if (it1->getPath() == it2->getPath()) {
+                // 使用 erase 删除元素，并更新迭代器 it2
+                it2 = recentAllList.erase(it2);
+            } else {
+                // 不删除元素时,移动迭代器
+                ++it2;
+            }
+        }
+    }
+
     // 合并待插入数据
     recentAllList.insert(recentAllList.end(),recentList.begin(),recentList.end());
 
@@ -222,7 +237,7 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
         // 创建一个新的 recent 元素并设置属性
         tinyxml2::XMLElement* newRecent = xml.NewElement("recent");
         newRecent->SetAttribute("index", index);
-        newRecent->SetAttribute("path", recent.getPath());
+        newRecent->SetAttribute("path", recent.getPath().c_str());
         // 添加新的 recent 元素到 newFatherNode 元素
         newFatherNode->InsertEndChild(newRecent);
         ++index;
@@ -235,4 +250,67 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
         return false;
     }
     return true;
+}
+
+std::vector<XmlRecent> XmlUtilities::getRecentListFromFatherElementName(
+        const char *xmlPath,
+        const char *fatherElementName) {
+    tinyxml2::XMLDocument xml;
+    tinyxml2::XMLError eResult = xml.LoadFile(xmlPath);
+    // 存储所有recent
+    std::vector<XmlRecent> recentAllList;
+    if(eResult != tinyxml2::XML_SUCCESS) {
+        qDebug() << "[XmlUtilities] load xml file failed";
+        return recentAllList;
+    }
+
+    //------------
+    //找到导入的xml的根节点
+    //------------
+    tinyxml2::XMLElement* rootNode = xml.RootElement();
+    if (rootNode == nullptr) {
+        return recentAllList;
+    }
+
+    //------------
+    //读取根节点下的 general 节点信息
+    //------------
+    tinyxml2::XMLElement* generalNode = rootNode->FirstChildElement("general");
+    if (generalNode == nullptr) {
+        qDebug() << "[XmlUtilities] Failed to find 'general' element.";
+        return recentAllList;
+    }
+
+    //------------
+    //读取general节点下的 fatherElementName 节点信息
+    //------------
+    tinyxml2::XMLElement* fatherElementNode = generalNode->FirstChildElement(fatherElementName);
+    if (fatherElementNode == nullptr) {
+        qDebug() << "[XmlUtilities] Failed to find '" << fatherElementName << "' element.";
+        return recentAllList;
+    }
+
+    // 读取 fatherElementNode 下所有的recent，存入list
+    tinyxml2::XMLElement* recentFile = fatherElementNode->FirstChildElement("recent");
+    while (recentFile != nullptr) {
+        int index;
+        const char* path;
+        eResult = recentFile->QueryIntAttribute("index", &index);
+        if (eResult != tinyxml2::XML_SUCCESS) {
+            // 读取失败
+            std::reverse(recentAllList.begin(),recentAllList.end());
+            return recentAllList;
+        }
+        // 读取path属性，如果为空则读取失败
+        path = recentFile->Attribute("path");
+        if (path == nullptr) {
+            std::reverse(recentAllList.begin(),recentAllList.end());
+            return recentAllList;
+        }
+        recentAllList.emplace_back(index,path);
+        // 查询下一个recent
+        recentFile = recentFile->NextSiblingElement("recent");
+    }
+    std::reverse(recentAllList.begin(),recentAllList.end());
+    return recentAllList;
 }

@@ -45,9 +45,8 @@ bool ProjectManager::startProcess(Project *project)
 bool ProjectManager::openProject(const QString &path)
 {
     std::vector<XmlRecent> recentLists = {
-            {0, path.toStdString().c_str()}
+            {0, path.toStdString()}
     };
-
     try {
         XmlUtilities::instance().insertHybrdLinkXmlRecent(
                 InitialConfig::instance().xmlPath.toStdString().c_str(),
@@ -57,7 +56,7 @@ bool ProjectManager::openProject(const QString &path)
     } catch (const std::exception& e) {
         // 异常
         // 不让IO操作影响主进程
-        qDebug() << "[PROJECTMANAGER] An error occurred from openProject: " << e.what();
+        qDebug() << "[ProjectManager] An error occurred from openProject: " << e.what();
     }
 
     Project *new_open_project = new Project;
@@ -106,7 +105,7 @@ void ProjectManager::loadFiles(Project *project)
 
     _project = project;
 
-    qDebug() << "[PROJECTMANAGER] loadFiles...";
+    qDebug() << "[ProjectManager] loadFiles...";
 
     // 存储设计文件与约束文件
     TaskManager::instance().sourcePathList = _project->sourceList;

@@ -18,6 +18,9 @@
 #include "dialog/AboutDialog.h"
 #include "dialog/CustomMessageBox.h"
 #include "utils/ProjectManager.h"
+#include "entity/XmlRecent.h"
+#include "utils/XmlUtilities.h"
+#include "base/InitialConfig.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -94,6 +97,36 @@ void MainWindow::setForm(const int mode)
     resize(this->size() - QSize(1, 0));
     resize(this->size() + QSize(1, 0));
 }
+
+
+void MainWindow::setRecentMenu() {
+    // 不让 Open Recent 操作影响主进程
+    try {
+        // 获取 RECENT_PROJECTS 的 recentList
+        std::vector<XmlRecent> recentList = XmlUtilities::instance().getRecentListFromFatherElementName(
+                InitialConfig::instance().xmlPath.toStdString().c_str(),
+                "RECENT_PROJECTS"
+        );
+        if (recentList.empty()){
+            // 当 recentList 空时
+            // Open Recent 不允许点击
+            recentFilesMenu->setDisabled(true);
+        } else {
+            recentFilesMenu->setDisabled(false);
+            for (XmlRecent recent : recentList) {
+                recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
+                //  QAction *recentFileAction = recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
+            }
+            // 分割线
+            recentFilesMenu->addSeparator();
+            recentFilesMenu->addAction(QString::fromStdString("Clear List"));
+        }
+    } catch (const std::exception& e) {
+        // 异常
+        qDebug() << "[MainWindow] An error occurred from MainWindow recentList: " << e.what();
+    }
+}
+
 
 void MainWindow::onNewTriggered()
 {
@@ -218,9 +251,13 @@ MainWindow::MainWindow(QWidget *parent)
     saveasAction = new QAction("Save As", this);
     exitAction = new QAction("Exit", this), exitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F4));
     fileMenu->addActions({newAction, openAction, closeAction}), fileMenu->addSeparator();
-    fileMenu->addActions({openFileAction}), fileMenu->addSeparator();
+    fileMenu->addActions({openFileAction});
+    recentFilesMenu = fileMenu->addMenu("Open Recent");
+    fileMenu->addSeparator();
     fileMenu->addActions({saveAction, saveasAction}), fileMenu->addSeparator();
     fileMenu->addActions({exitAction});
+    // ===================== Open Recent ======================
+    setRecentMenu();
     // ================= 文件按钮绑定 ====================
     connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
     connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
