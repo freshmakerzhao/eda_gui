@@ -133,7 +133,7 @@ int XmlUtilities::getLastIndexFromNode(tinyxml2::XMLElement* node){
 }
 
 /**
- * 插入recent
+ * 插入recent，index越往下越新，最多不超过 expectRecentLength
  * @param xmlPath xml地址
  * @param fatherElementName recent父元素地址
  * @param recentList recent列表，待插入数据
@@ -143,6 +143,7 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
         const char *xmlPath,
         const char *fatherElementName,
         const std::vector<XmlRecent>& recentList) {
+    int expectRecentLength = 10;
     tinyxml2::XMLDocument xml;
     tinyxml2::XMLError eResult = xml.LoadFile(xmlPath);
     if(eResult != tinyxml2::XML_SUCCESS) {
@@ -176,30 +177,61 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
         return false;
     }
 
-    // 根据最后一个节点的index值，更新待插入recent
-    int lastIndex = getLastIndexFromNode(fatherElementNode);
-    if (lastIndex + recentList.size() > 9){
-        // Todo:如果加上插入内容大于10
-        // 计算多余部分
-        // 其他位置的index相应变化
-        // 修改lastIndex
-        lastIndex = 0;
+    // 存储所有recent
+    std::vector<XmlRecent> recentAllList;
+    // 读取 fatherElementNode 下所有的recent，存入list
+    tinyxml2::XMLElement* recentFile = fatherElementNode->FirstChildElement("recent");
+    while (recentFile != nullptr) {
+        int index;
+        const char* path;
+        eResult = recentFile->QueryIntAttribute("index", &index);
+        if (eResult != tinyxml2::XML_SUCCESS) {
+            // 读取失败
+            return false;
+        }
+        // 读取path属性，如果为空则读取失败
+        path = recentFile->Attribute("path");
+        if (path == nullptr) {
+            return false;
+        }
+        recentAllList.emplace_back(index,path);
+        // 查询下一个recent
+        recentFile = recentFile->NextSiblingElement("recent");
     }
+    // 合并待插入数据
+    recentAllList.insert(recentAllList.end(),recentList.begin(),recentList.end());
 
-    for (XmlRecent recent : recentList) {
-        ++lastIndex;
+    // 删除原有数据
+    generalNode->DeleteChild(fatherElementNode);
+
+    // 创建一个新的空的 newFatherNode
+    tinyxml2::XMLElement* newFatherNode = xml.NewElement(fatherElementName);
+    generalNode->InsertEndChild(newFatherNode);
+
+    unsigned recentAllListSize = recentAllList.size();
+
+    if (recentAllListSize > expectRecentLength-1){
+        // 超过9，则取后10个
+        // 从前往后移除
+        recentAllList.erase(recentAllList.begin(), recentAllList.begin() + recentAllListSize - expectRecentLength);
+    }
+    // 根据最后一个节点的index值，更新待插入recent
+    int index = 0;
+
+    for (XmlRecent recent : recentAllList) {
         // 创建一个新的 recent 元素并设置属性
         tinyxml2::XMLElement* newRecent = xml.NewElement("recent");
-        newRecent->SetAttribute("index", lastIndex);
+        newRecent->SetAttribute("index", index);
         newRecent->SetAttribute("path", recent.getPath());
-        // 添加新的 recent 元素到 RECENT_FILES 元素
-        fatherElementNode->InsertEndChild(newRecent);
+        // 添加新的 recent 元素到 newFatherNode 元素
+        newFatherNode->InsertEndChild(newRecent);
+        ++index;
     }
 
     // 保存修改后的 XML 文件
     eResult = xml.SaveFile(xmlPath);
     if (eResult != tinyxml2::XML_SUCCESS) {
-        qDebug() << "[XmlUtilities] Failed to save\n";
+        qDebug() << "[XmlUtilities] Failed to save";
         return false;
     }
     return true;

@@ -32,30 +32,30 @@ void InitialConfig::initializeRoamingPath() {
     // =================== 创建数据文件夹 ===================
     // 获取 AppData 路径
     // "C:/Users/xxx/AppData/Roaming/HybrdChip/HybrdLink"
-    QString roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    int pos = roamingPath.lastIndexOf("HybrdLink");
+    this->roamingPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    int pos = this->roamingPath.lastIndexOf("HybrdLink");
     if (pos != -1) {
-        roamingPath.remove(pos, QString("HybrdLink").length());
+        this->roamingPath.remove(pos, QString("HybrdLink").length());
     }
     // 常规配置路径
-    QString commonPath = QDir(roamingPath).filePath("Common");
+    this->commonPath = QDir(this->roamingPath).filePath("Common");
     // 应用路径
-    QString hybrdPath = QDir(roamingPath).filePath(QCoreApplication::applicationName());
+    this->hybrdPath = QDir(this->roamingPath).filePath(QCoreApplication::applicationName());
     // 版本路径
-    QString versionPath = QDir(hybrdPath).filePath(QCoreApplication::applicationVersion());
+    this->versionPath = QDir(this->hybrdPath).filePath(QCoreApplication::applicationVersion());
     // 确保目录存在,如果不存在，创建路径
-    FileHelper::ensureDirectoryExists(roamingPath);
-    FileHelper::ensureDirectoryExists(commonPath);
-    FileHelper::ensureDirectoryExists(hybrdPath);
-    FileHelper::ensureDirectoryExists(versionPath);
+    FileHelper::ensureDirectoryExists(this->roamingPath);
+    FileHelper::ensureDirectoryExists(this->commonPath);
+    FileHelper::ensureDirectoryExists(this->hybrdPath);
+    FileHelper::ensureDirectoryExists(this->versionPath);
 
     // =================== 创建xml文件 ===================
 
     // xml路径
-    QString xmlPath = QDir(versionPath).filePath("hybrdlink.xml");
+    this->xmlPath = QDir(versionPath).filePath("hybrdlink.xml");
     if (!FileHelper::fileExists(xmlPath.toStdString())){
         // 文件不存在则创建
-        XmlUtilities::instance().createXml(xmlPath.toStdString());
+        XmlUtilities::instance().createXml(this->xmlPath.toStdString());
     }
-    qDebug() << "[InitialConfig] Initial xml" << xmlPath;
+    qDebug() << "[InitialConfig] Initial xml" << this->xmlPath;
 }
