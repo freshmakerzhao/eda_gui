@@ -11,6 +11,7 @@
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 
+#include <QApplication>
 #include <QDialog>
 #include <QLabel>
 #include <QVBoxLayout>
