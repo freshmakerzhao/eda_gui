@@ -23,6 +23,7 @@
 // #include "grid/ChipPlanner.h"
 #include "ads/DockManager.h"
 #include "ads/DockWidget.h"
+#include "entity/XmlRecent.h"
 
 class MainWindow : public QMainWindow
 {
@@ -44,6 +45,8 @@ public slots:
     void onNewTriggered();
     void onOpenFileTriggered();
     void onOpenTriggered();
+    void onOpenRecentTriggered(std::string path);
+    void onClearTriggered();
     void onSaveTriggered();
     void onSaveAsTriggered();
     void onEditTriggered();
@@ -70,6 +73,7 @@ private:
 
     // Open Recent 子菜单
     QMenu *recentFilesMenu;
+    QAction *clearAction;
 
     QAction *newAction;
     QAction *openAction;

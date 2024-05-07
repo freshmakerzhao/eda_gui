@@ -114,12 +114,16 @@ void MainWindow::setRecentMenu() {
         } else {
             recentFilesMenu->setDisabled(false);
             for (XmlRecent recent : recentList) {
-                recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
-                //  QAction *recentFileAction = recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
+                QAction *recentFileAction = recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
+                connect(recentFileAction, &QAction::triggered, [this, recent]() {
+                    this->onOpenRecentTriggered(recent.getPath());
+                });
             }
             // 分割线
             recentFilesMenu->addSeparator();
-            recentFilesMenu->addAction(QString::fromStdString("Clear List"));
+            clearAction = new QAction("Clear List", recentFilesMenu);
+            recentFilesMenu->addAction(clearAction);
+            connect(clearAction, &QAction::triggered, this, &MainWindow::onClearTriggered);
         }
     } catch (const std::exception& e) {
         // 异常
@@ -366,4 +370,18 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     qDebug() << "[MainWindow] Distructing...";
+}
+
+void MainWindow::onClearTriggered() {
+    // 清空 RECENT_PROJECTS 下的 recent
+    XmlUtilities::instance().clearNodesFromFatherElementName(
+            InitialConfig::instance().xmlPath.toStdString().c_str(),
+            "RECENT_PROJECTS");
+    // Open Recent 置灰
+    recentFilesMenu->clear();
+    recentFilesMenu->setDisabled(true);
+}
+
+void MainWindow::onOpenRecentTriggered(std::string path) {
+    ProjectManager::instance().openProject(QString::fromStdString(path));
 }
