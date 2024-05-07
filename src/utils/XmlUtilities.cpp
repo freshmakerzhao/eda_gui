@@ -203,7 +203,7 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
     // 使用迭代器进行循环，安全删除元素
     for (auto it1 = recentList.begin(); it1 != recentList.end(); ++it1) {
         for (auto it2 = recentAllList.begin(); it2 != recentAllList.end();) {
-            if (it1->getPath() == it2->getPath()) {
+            if (isSamePath(it1->getPath(),it2->getPath())) {
                 // 使用 erase 删除元素，并更新迭代器 it2
                 it2 = recentAllList.erase(it2);
             } else {
@@ -313,4 +313,25 @@ std::vector<XmlRecent> XmlUtilities::getRecentListFromFatherElementName(
     }
     std::reverse(recentAllList.begin(),recentAllList.end());
     return recentAllList;
+}
+
+/**
+ * 比较两个路径是否指向同一个位置
+ * @param path1
+ * @param path2
+ * @return
+ */
+bool XmlUtilities::isSamePath(std::string path1, std::string path2){
+    // 将路径中的 '\\' 转为 '/'，统一分隔符后进行比较
+    std::transform(path1.begin(), path1.end(), path1.begin(),
+                   [](char c) { return (c == '\\') ? '/' : c; });
+    std::transform(path2.begin(), path2.end(), path2.begin(),
+                   [](char c) { return (c == '\\') ? '/' : c; });
+
+    // 转小写，忽略大小写
+    std::transform(path1.begin(), path1.end(), path1.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    std::transform(path2.begin(), path2.end(), path2.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    return path1 == path2;
 }
