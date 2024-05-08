@@ -38,8 +38,8 @@ bool ProjectManager::startProcess(Project *project)
 }
 
 /**
- * 传递工程文件路径，加载工程
- * @param 命令行参数列表
+ * 接收工程文件(*.hpr)路径，打开工程
+ * @param 工程文件绝对路径
  * @return
  */
 bool ProjectManager::openProject(const QString &path)
@@ -71,7 +71,7 @@ bool ProjectManager::openProject(const QString &path)
 }
 
 /**
- * 传递工程文件作为命令行参数，加载工程
+ * 接收命令行参数，判断是否有工程文件(*.hpr)路径，执行打开工程函数
  * @param 命令行参数列表
  * @return
  */
