@@ -48,8 +48,6 @@ Editor::Editor(QWidget *parent)
     setAutoCompletionThreshold(2);
     // 括号匹配
     setBraceMatching(QsciScintilla::SloppyBraceMatch);
-    // 设置词法分析器
-    setLexer(verilogLexer);
     // EnCoding UTF-8
     SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
     // 缩进宽度
