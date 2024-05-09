@@ -33,6 +33,7 @@ protected:
 private:
     Form(QWidget *parent = nullptr);
     ~Form();
+    std::string extractProjectName(const std::string& path);
 };
 
 #endif // FORM_H

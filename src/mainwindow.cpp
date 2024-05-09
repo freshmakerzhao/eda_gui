@@ -113,7 +113,7 @@ void MainWindow::setRecentMenu() {
             recentFilesMenu->setDisabled(true);
         } else {
             recentFilesMenu->setDisabled(false);
-            for (XmlRecent recent : recentList) {
+            for (const XmlRecent& recent : recentList) {
                 QAction *recentFileAction = recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
                 connect(recentFileAction, &QAction::triggered, [this, recent]() {
                     this->onOpenRecentTriggered(recent.getPath());

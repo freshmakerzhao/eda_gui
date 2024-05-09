@@ -1,0 +1,73 @@
+/**
+  ******************************************************************************
+  * @file           : CustomListItem.cpp
+  * @author         : zs
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/5/8
+  ******************************************************************************
+  */
+#include <iostream>
+#include "CustomListWidget.h"
+CustomListWidget::CustomListWidget(const QString &projectName, const QString &projectPath, QWidget *parent) : QWidget(parent) {
+    layout = new QVBoxLayout(this);
+    this->projectName = projectName;
+    this->projectPath = projectPath;
+    titleLabel = new QLabel(projectName);
+    pathLabel = new QLabel(projectPath);
+
+    QFont titleFont = titleLabel->font();
+    titleFont.setPointSize(14);
+    titleLabel->setFont(titleFont);
+
+    QFont pathFont = pathLabel->font();
+    pathFont.setPointSize(10);
+    pathLabel->setFont(pathFont);
+
+    layout->addWidget(titleLabel);
+    layout->addWidget(pathLabel);
+    layout->setSpacing(0);
+    layout->setContentsMargins(5, 5, 5, 5);
+    setAutoFillBackground(true);  // 确保背景颜色被填充
+    this->setStyleSheet(
+            "background-color: transparent;"
+    );
+    this->setLayout(layout);
+    this->installEventFilter(this);
+}
+
+bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {
+    if (event->type() == QEvent::MouseButtonPress) {
+        emit getProjectPath(this->projectPath);
+        return true;
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
+//bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {
+//    std::cout << 123;
+//    if (obj == this) {
+//        if (event->type() == QEvent::HoverEnter) {
+//            this->setStyleSheet("background-color: lightgray;");
+//        } else if (event->type() == QEvent::HoverLeave) {
+//            this->setStyleSheet("background-color: white;");
+//        }
+//    }
+//    return QWidget::eventFilter(obj, event);
+//}
+
+//void CustomListWidget::enterEvent(QEvent *event) {
+//    std::cout << 123;
+//    Q_UNUSED(event);
+//    QPalette pal = palette();
+//    pal.setColor(QPalette::Window, QColor(255, 0, 0));  // 设置 hover 背景色
+//    setPalette(pal);
+//}
+//
+//void CustomListWidget::leaveEvent(QEvent *event) {
+//    std::cout << 456;
+//    Q_UNUSED(event);
+//    QPalette pal = palette();
+//    pal.setColor(QPalette::Window, palette().window().color());  // 还原背景色
+//    setPalette(pal);
+//}
