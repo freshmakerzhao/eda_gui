@@ -49,7 +49,7 @@ public:
     bool insertHybrdLinkXmlRecent(
             const char *xmlPath,
             const char *fatherElementName,
-            const std::vector<XmlRecent>& recentList
+            std::vector<XmlRecent> recentList
     );
 
     /**
@@ -70,6 +70,12 @@ private:
      * @return
      */
     bool isSamePath(std::string path1, std::string path2);
+    /**
+     * 将路径中的右斜替换成左斜，统一分隔符。
+     * @param path
+     * @return
+     */
+    std::string normalizePathSeparators(std::string path);
 };
 
 

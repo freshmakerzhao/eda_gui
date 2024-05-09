@@ -16,6 +16,7 @@ class XmlRecent {
 private:
     int index;
     std::string path;
+    std::string projectName;
 
 public:
     XmlRecent(int idx, std::string pth);  // 构造函数

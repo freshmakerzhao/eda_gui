@@ -11,8 +11,7 @@
 
 #include <utility>
 
-
-XmlRecent::XmlRecent(int idx, std::string pth) : index(idx), path(pth) {
+XmlRecent::XmlRecent(int idx, std::string pth) : index(idx), path(std::move(pth)) {
 }
 
 int XmlRecent::getIndex() const {
@@ -28,5 +27,5 @@ std::string XmlRecent::getPath() const {
 }
 
 void XmlRecent::setPath(std::string pth) {
-    this->path = pth;
+    this->path = std::move(pth);
 }

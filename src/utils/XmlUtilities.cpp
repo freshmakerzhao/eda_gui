@@ -142,7 +142,7 @@ int XmlUtilities::getLastIndexFromNode(tinyxml2::XMLElement* node){
 bool XmlUtilities::insertHybrdLinkXmlRecent(
         const char *xmlPath,
         const char *fatherElementName,
-        const std::vector<XmlRecent>& recentList) {
+        std::vector<XmlRecent> recentList) {
     int expectRecentLength = 10;
     tinyxml2::XMLDocument xml;
     tinyxml2::XMLError eResult = xml.LoadFile(xmlPath);
@@ -199,11 +199,16 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
         recentFile = recentFile->NextSiblingElement("recent");
     }
 
+    // 路径标准化
+    for (auto & recent : recentList) {
+        recent.setPath(normalizePathSeparators(recent.getPath()));
+    }
+
     // 合并前去重
     // 使用迭代器进行循环，安全删除元素
-    for (auto it1 = recentList.begin(); it1 != recentList.end(); ++it1) {
+    for (auto & it1 : recentList) {
         for (auto it2 = recentAllList.begin(); it2 != recentAllList.end();) {
-            if (isSamePath(it1->getPath(),it2->getPath())) {
+            if (it1.getPath() == it2->getPath()) {
                 // 使用 erase 删除元素，并更新迭代器 it2
                 it2 = recentAllList.erase(it2);
             } else {
@@ -233,7 +238,7 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
     // 根据最后一个节点的index值，更新待插入recent
     int index = 0;
 
-    for (XmlRecent recent : recentAllList) {
+    for (const XmlRecent& recent : recentAllList) {
         // 创建一个新的 recent 元素并设置属性
         tinyxml2::XMLElement* newRecent = xml.NewElement("recent");
         newRecent->SetAttribute("index", index);
@@ -334,4 +339,16 @@ bool XmlUtilities::isSamePath(std::string path1, std::string path2){
     std::transform(path2.begin(), path2.end(), path2.begin(),
                    [](unsigned char c) { return std::tolower(c); });
     return path1 == path2;
+}
+
+/**
+ * 将路径中的右斜替换成左斜，统一分隔符。
+ * @param path
+ * @return
+ */
+std::string XmlUtilities::normalizePathSeparators(std::string path){
+    // 将路径中的 '\\' 转为 '/'，统一分隔符后进行比较
+    std::transform(path.begin(), path.end(), path.begin(),
+                   [](char c) { return (c == '\\') ? '/' : c; });
+    return path;
 }
