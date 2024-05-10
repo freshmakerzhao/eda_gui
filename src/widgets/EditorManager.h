@@ -42,6 +42,16 @@ public slots:
 
     bool cleanEditorTab();
 
+    /**
+     * 当文本与已保存的不一致，设置Tab标记
+     */
+    void setSavePointFlag();
+
+    /**
+     * 当文本与已保存的一致，取消Tab标记
+     */
+    void resetSavePointFlag();
+
 private slots:
     void onTabWidgetCurrentChanged(int index);
 

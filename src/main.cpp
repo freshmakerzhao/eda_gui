@@ -1,17 +1,17 @@
 #include "mainwindow.h"
 #include "utils/ProjectManager.h"
-#include <QApplication>
-#include <QSplashScreen>
 #include "widgets/Form.h"
 #include "base/InitialConfig.h"
+#include <QApplication>
+#include <QFontDatabase>
+#include <QSplashScreen>
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-    QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-
     QApplication a(argc, argv);
+
+    // 加载字体文件
+    QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
 
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();

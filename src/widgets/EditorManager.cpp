@@ -167,6 +167,24 @@ bool EditorManager::cleanEditorTab()
     return true;
 }
 
+/**
+ * 当文本与已保存的不一致，设置Tab标记
+ */
+void EditorManager::setSavePointFlag()
+{
+    Editor *editor = (Editor*) this->currentWidget();
+    setTabText(currentIndex(), QFileInfo(editor->property("filePath").toString()).fileName() + "[*]");
+}
+
+/**
+ * 当文本与已保存的一致，取消Tab标记
+ */
+void EditorManager::resetSavePointFlag()
+{
+    Editor *editor = (Editor*) this->currentWidget();
+    setTabText(currentIndex(), QFileInfo(editor->property("filePath").toString()).fileName());
+}
+
 void EditorManager::onTabWidgetCurrentChanged(int index)
 {
     Q_UNUSED(index);
