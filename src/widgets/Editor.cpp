@@ -9,6 +9,7 @@
   */
 
 #include "Editor.h"
+#include "EditorManager.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
 
@@ -17,12 +18,18 @@ Editor::Editor(QWidget *parent)
 {
     qDebug() << "[Editor] Constructing...";
 
+    // setStyleSheet("QScrollBar:vertical {"
+    //                 "width: 16px;"
+    //               "}"
+    //               "QScrollBar:horizontal {"
+    //                 "height: 16px;"
+    //               "}"
+    // );
+
     // updateActionState
     connect(this, &QsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
     // 光标宽度
     setCaretWidth(10);
-    // 加载字体文件
-    QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
     // 创建字体
     QFont font("JetBrains Mono NL", 9);
     // 设置行号字体
@@ -106,6 +113,9 @@ bool Editor::openFile(const QString path)
     this->setText(in.readAll());
     file.close();
     this->setModified(false);
+    // 绑定Tab标签
+    connect(this, &QsciScintillaBase::SCN_SAVEPOINTLEFT, EditorManager::instance(), &EditorManager::setSavePointFlag);
+    connect(this, &QsciScintillaBase::SCN_SAVEPOINTREACHED, EditorManager::instance(), &EditorManager::resetSavePointFlag);
     return true;
 }
 

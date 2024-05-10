@@ -15,7 +15,6 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QTextStream>
-#include <QFontDatabase>
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QAction>
