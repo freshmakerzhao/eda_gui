@@ -1,23 +1,43 @@
+/**
+  ******************************************************************************
+  * @file           : AboutDialog.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/4/21
+  ******************************************************************************
+  */
+
 #include "AboutDialog.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setFixedSize(640, 480);
+    setStyleSheet("QWidget { background-image: url(:/resource/white.png); }");
+    setFixedSize(720, 540);
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     setWindowTitle("About Software");
+    QString buildDateTime = QString("%1 %2").arg(__DATE__, __TIME__);
+    QString version = QApplication::applicationVersion().isEmpty() ? "unknown" : QApplication::applicationVersion();
+    QString information = "<html>"
+                          "<h2>About HybrdLink</h2"
+                          "<p>Build Date Time: %1</p>"
+                          "<p>Version: %2</p>"
+                          "<p>© 2024 Power by HybrdChip</p>"
+                          "<p>Zhongke Xin Magnetic Technology Co., Ltd.</p>"
+                          "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a></p>"
+                          "</html>";
     QLabel *textLabel = new QLabel(this);
-    textLabel->setText("<html><h2>About Software</h2"
-                       "<p>© 2024 Power by HybrdChip</p>"
-                       "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a>"
-                       "</p></html>");
+    textLabel->setText(information.arg(buildDateTime, version));
     textLabel->setTextFormat(Qt::RichText);
     textLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     textLabel->setOpenExternalLinks(true);
 
     QLabel *imageLabel = new QLabel(this);
+    imageLabel->setFixedHeight(300);
     QPixmap image(":/resource/logo.png");
-    imageLabel->setPixmap(image.scaled(500, 300));
+    // 缩放图片到当前分辨率下的显示大小，SmoothTransformation平滑处理。
+    imageLabel->setPixmap(image.scaled(400, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     imageLabel->setAlignment(Qt::AlignCenter);
     QVBoxLayout *layout = new QVBoxLayout(this);
 

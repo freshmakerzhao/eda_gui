@@ -2,11 +2,10 @@
     <qresource prefix="/">
         <file>resource/keywords.txt</file>
         <file>resource/JetBrainsMonoNL-Bold.ttf</file>
-        <file>resource/logo.png</file>
         <file>resource/icon.png</file>
         <file>resource/parts.yaml</file>
-        <file>resource/search.ico</file>
-        <file>resource/clean.ico</file>
+        <file>resource/white.png</file>
+        <file>resource/logo.png</file>
     </qresource>
     <qresource prefix="/gridview">
         <file>resource/gridview/zoomin.png</file>

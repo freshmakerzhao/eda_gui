@@ -8,26 +8,32 @@
   ******************************************************************************
   */
 #include "mainwindow.h"
-
-#include "widgets/Editor.h"
 #include "wizard/Wizard.h"
-#include "widgets/Navigator.h"
-#include "widgets/Infowidget.h"
+#include "widgets/Editor.h"
+#include "widgets/InfoWidget.h"
 #include "widgets/FlowNavigator.h"
+#include "widgets/Form.h"
+#include "widgets/FileManager.h"
+#include "widgets/EditorManager.h"
 #include "dialog/AboutDialog.h"
+#include "dialog/CustomMessageBox.h"
+#include "utils/ProjectManager.h"
+#include "entity/XmlRecent.h"
+#include "utils/XmlUtilities.h"
+#include "base/InitialConfig.h"
 
 MainWindow *MainWindow::instance()
 {
     static MainWindow *_instance = nullptr;
     if (!_instance) {
-        _instance = new MainWindow;
+        _instance = new MainWindow(nullptr);
     }
     return _instance;
 }
 
 void MainWindow::updateActionState()
 {
-    Editor *editor = (Editor*) tabWidget->currentWidget();
+    Editor *editor = EditorManager::instance()->currentEditor();
     saveAction->setEnabled(editor != nullptr);
     saveasAction->setEnabled(editor != nullptr);
     cutAction->setEnabled(editor != nullptr && !editor->isReadOnly());
@@ -39,78 +45,92 @@ void MainWindow::updateActionState()
 
 void MainWindow::createEditorTab(const QString& path)
 {
-    if(path.isEmpty()) {// 取消打开文件
-        return;
-    }
-
-    for (int i = 0; i < tabWidget->count(); ++i) { // 不重复打开文件
-        if(tabWidget->widget(i)->property("filePath").toString() == path) {
-            tabWidget->setCurrentIndex(i);
-            return;
-        }
-    }
-
-    Editor *editor = new Editor(this); // 创建对象
-    editor->setProperty("filePath", path);
-    if (!editor->openFile(path)) {
-        delete editor;
-        return;
-    }
-    tabWidget->addTab(editor, QFileInfo(path).fileName()); // 添加tab
-    tabWidget->setCurrentIndex(tabWidget->count() - 1); // 设置当前文件的索引
-
-    updateActionState();
+    EditorManager::instance()->createEditorTab(path);
 }
 
 bool MainWindow::cleanEditorTab()
 {
-    for (int i = 0; i < tabWidget->count(); ++i) {
-        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
-        if (editor->isModified()) {
-            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
-                                                                                     " are you sure you want to close?",
-                                                                    QMessageBox::Yes | QMessageBox::No);
-            if (btn == QMessageBox::No) {
-                return false;
-            } else {
-                break;
-            }
-        }
-    }
-
-    while (tabWidget->count() > 0) {
-        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(0));
-        delete editor;
-    }
-    return true;
+    return EditorManager::instance()->cleanEditorTab();
 }
 
 bool MainWindow::saveAllFile()
 {
-    for (int i = 0; i < tabWidget->count(); ++i) {
-        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
-        if (editor->isModified()) {
-            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
-                                                                                     " are you sure you want to run?",
-                                                                    QMessageBox::Yes | QMessageBox::No);
-            if (btn == QMessageBox::No) {
-                return false;
-            } else {
-                break;
-            }
-        }
-    }
-
-    for (int i = 0; i < tabWidget->count(); ++i) {
-        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
-        if (editor->isModified()) {
-            if(!editor->saveFile()) {
-                return false;
-            }
-        }
-    }
-    return true;
+    return EditorManager::instance()->saveAllFiles();
 }
+
+void MainWindow::showProjectTitle(const int mode, const QString &title)
+{
+    /*
+     * mode 0 设置工程目录Title
+     * mode 1 还原Title
+    **/
+    if (mode == 0) {
+        setWindowTitle("HybrdLink -[" + title + "]");
+        return;
+    }
+    setWindowTitle("HybrdLink");
+}
+
+void MainWindow::setForm(const int mode)
+{
+    if (mode == 0) {
+        Form::instance()->hide();
+        toolbar->show();
+        ManagerDock->show();
+        BottomDock->show();
+        NavigationBar->show();
+        ManagerDock->toggleViewAction()->setEnabled(true);
+        BottomDock->toggleViewAction()->setEnabled(true);
+        NavigationBar->toggleViewAction()->setEnabled(true);
+        resize(this->size() - QSize(1, 0));
+        resize(this->size() + QSize(1, 0));
+        return;
+    }
+    Form::instance()->show();
+    toolbar->hide();
+    ManagerDock->hide();
+    BottomDock->hide();
+    NavigationBar->hide();
+    ManagerDock->toggleViewAction()->setEnabled(false);
+    BottomDock->toggleViewAction()->setEnabled(false);
+    NavigationBar->toggleViewAction()->setEnabled(false);
+    resize(this->size() - QSize(1, 0));
+    resize(this->size() + QSize(1, 0));
+}
+
+
+void MainWindow::setRecentMenu() {
+    // 不让 Open Recent 操作影响主进程
+    try {
+        // 获取 RECENT_PROJECTS 的 recentList
+        std::vector<XmlRecent> recentList = XmlUtilities::instance().getRecentListFromFatherElementName(
+                InitialConfig::instance().xmlPath.toStdString().c_str(),
+                "RECENT_PROJECTS"
+        );
+        if (recentList.empty()){
+            // 当 recentList 空时
+            // Open Recent 不允许点击
+            recentFilesMenu->setDisabled(true);
+        } else {
+            recentFilesMenu->setDisabled(false);
+            for (const XmlRecent& recent : recentList) {
+                QAction *recentFileAction = recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
+                connect(recentFileAction, &QAction::triggered, [this, recent]() {
+                    this->onOpenRecentTriggered(recent.getPath());
+                });
+            }
+            // 分割线
+            recentFilesMenu->addSeparator();
+            clearAction = new QAction("Clear List", recentFilesMenu);
+            recentFilesMenu->addAction(clearAction);
+            connect(clearAction, &QAction::triggered, this, &MainWindow::onClearTriggered);
+        }
+    } catch (const std::exception& e) {
+        // 异常
+        qDebug() << "[MainWindow] An error occurred from MainWindow recentList: " << e.what();
+    }
+}
+
 
 void MainWindow::onNewTriggered()
 {
@@ -122,6 +142,7 @@ void MainWindow::onOpenFileTriggered()
 {
     QString path = QFileDialog::getOpenFileName(this, "Open File");
     createEditorTab(path);
+    setForm(0);
 }
 
 void MainWindow::onOpenTriggered()
@@ -134,37 +155,17 @@ void MainWindow::onOpenTriggered()
         return; // 用户取消了操作
     }
     QString path = dialog.selectedFiles().value(0, "");
-    if (!path.isEmpty()) {
-        // 执行打开.hpr文件的逻辑
-        Project *proj = new Project;
-        proj->parseProject(path);
-        Navigator::instance()->loadFile(proj);
-    }
+    ProjectManager::instance().openProject(path);
 }
 
 void MainWindow::onSaveTriggered()
 {
-    Editor *editor = (Editor*) tabWidget->currentWidget();
-
-    if(editor) {
-        if(editor->saveFile()) {
-            qDebug() << "Save Success";
-            // TODO
-        }
-    }
-
-    updateActionState();
+    EditorManager::instance()->editorSave();
 }
 
 void MainWindow::onSaveAsTriggered()
 {
-    Editor *editor = (Editor*) tabWidget->currentWidget();
-    if(editor) {
-        if(editor->saveAsFile()) {
-            qDebug() << "Save_As Success";
-            // TODO
-        }
-    }
+    EditorManager::instance()->editorSaveAs();
 }
 
 void MainWindow::onEditTriggered()
@@ -174,22 +175,20 @@ void MainWindow::onEditTriggered()
         return;
     }
 
-    Editor *editor = qobject_cast<Editor*>(tabWidget->currentWidget());
-    if (!editor) {
-        return;
+    int op = -1;
+    if (action == cutAction) {
+        op = 0;
+    } else if (action == copyAction) {
+        op = 1;
+    } else if (action == pasteAction) {
+        op = 2;
+    } else if (action == undoAction) {
+        op = 3;
+    } else if (action == redoAction) {
+        op = 4;
     }
 
-    if (action == cutAction) {
-        editor->cut();
-    } else if (action == copyAction) {
-        editor->copy();
-    } else if (action == pasteAction) {
-        editor->paste();
-    } else if (action == undoAction) {
-        editor->undo();
-    } else if (action == redoAction) {
-        editor->redo();
-    }
+    EditorManager::instance()->editorEdit(op);
 }
 
 void MainWindow::onChipPlannerTriggered()
@@ -208,51 +207,17 @@ void MainWindow::onAboutTriggered()
     aboutDialog.exec();
 }
 
-void MainWindow::onTabWidgetCurrentChanged(int index)
-{
-    Q_UNUSED(index);
-    updateActionState();
-}
-
-void MainWindow::onTabWidgetTabCloseRequested(int index)
-{
-    // qDebug() << "Tab index " << index;
-    Editor *editor = qobject_cast<Editor*>(tabWidget->widget(index));
-    if (editor->isModified()) {
-        // qDebug() << "File" << index << "has been Modified";
-        QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "The document has been modified.\n"
-                                                                                 "Do you want to save your changes?",
-                                                                QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-        if (btn == QMessageBox::Yes) {
-            if(editor->saveFile()) {
-                qDebug() << "Save Success";
-                // TODO
-            }
-        } else if (btn == QMessageBox::Cancel) {
-            // 对话框的关闭按钮是与QMessageBox::question里面最后一个值绑定的
-            return;
-        }
-    }
-    tabWidget->removeTab(index);
-    delete editor;
-
-    updateActionState();
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    for (int i = 0; i < tabWidget->count(); ++i) {
-        Editor *editor = qobject_cast<Editor*>(tabWidget->widget(i));
-        if (editor->isModified()) {
-            QMessageBox::StandardButton btn = QMessageBox::question(this, "Warning", "There are unsaved files,"
-                                                                                     " are you sure you want to close?",
-                                                                    QMessageBox::Yes | QMessageBox::No);
-            if (btn == QMessageBox::Yes) {
-                event->accept();
-            } else {
-                event->ignore();
-            }
-            break;
+    if (EditorManager::instance()->isModified()) {
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(this, "Warning", "There are unsaved files,"
+                                                                                               " are you sure you want to close?",
+                                                                              QMessageBox::Yes, QMessageBox::No);
+        if (btn == QMessageBox::Yes) {
+            ProjectManager::instance().closeProject();
+            event->accept();
+        } else {
+            event->ignore();
         }
     }
 }
@@ -267,14 +232,14 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+        : QMainWindow(parent)
 {
-    qDebug() << "[Main Window] Constructing...";
+    qDebug() << "[MainWindow] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("HybrdLink");
     this->setWindowIcon(QIcon(":/resource/icon.png"));
     // 设置窗口初始大小
-    this->resize(1700, 1000);
+    this->resize(1700, 960);
     // =================== MENUBAR ====================
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
     fileMenu = menuBar->addMenu("File");
@@ -284,19 +249,23 @@ MainWindow::MainWindow(QWidget *parent)
     // ===================== FILE ======================
     newAction = new QAction("New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     openAction = new QAction("Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
-    closeAction = new QAction("Close", this);
+    closeAction = new QAction("Close Project", this);
     openFileAction = new QAction("Open File", this);
     saveAction = new QAction("Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     saveasAction = new QAction("Save As", this);
     exitAction = new QAction("Exit", this), exitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F4));
     fileMenu->addActions({newAction, openAction, closeAction}), fileMenu->addSeparator();
-    fileMenu->addActions({openFileAction}), fileMenu->addSeparator();
+    fileMenu->addActions({openFileAction});
+    recentFilesMenu = fileMenu->addMenu("Open Recent");
+    fileMenu->addSeparator();
     fileMenu->addActions({saveAction, saveasAction}), fileMenu->addSeparator();
     fileMenu->addActions({exitAction});
+    // ===================== Open Recent ======================
+    setRecentMenu();
     // ================= 文件按钮绑定 ====================
     connect(newAction, &QAction::triggered, this, &MainWindow::onNewTriggered);
     connect(openAction, &QAction::triggered, this, &MainWindow::onOpenTriggered);
-    connect(closeAction, &QAction::triggered, Navigator::instance(), &Navigator::closeProjectAction);
+    connect(closeAction, &QAction::triggered, &ProjectManager::instance(), &ProjectManager::closeProject);
     connect(openFileAction, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
     connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveTriggered);
     connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
@@ -333,11 +302,6 @@ MainWindow::MainWindow(QWidget *parent)
     // toolbar->addActions({chipPlannerAction});
     addToolBar(toolbar);
     // ================= EDITOR TAB ====================
-    tabWidget = new QTabWidget(this);
-    connect(tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabWidgetCurrentChanged);
-    tabWidget->setMovable(true), tabWidget->setTabsClosable(true);
-    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabWidgetTabCloseRequested); // 关闭编辑器
-    // this->setCentralWidget(tabWidget);
     updateActionState();
     // ===================== DOCK =====================
     NavigationBar = new QDockWidget(this);
@@ -349,8 +313,18 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::LeftDockWidgetArea, NavigationBar, Qt::Vertical);
 
     BottomDock = new QDockWidget(this);
-    BottomDock->setWindowTitle("INFOMATION");
+    BottomDock->setWindowTitle("INFORMATION");
+    BottomDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    BottomDock->setFeatures(QDockWidget::DockWidgetClosable);
+    BottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
     BottomDock->setWidget(InfoWidget::instance());
+    // 隐藏TitleBar
+    // QWidget* lTitleBar = BottomDock->titleBarWidget();
+    // QWidget* lEmptyWidget = new QWidget();
+    // BottomDock->setTitleBarWidget(lEmptyWidget);
+    // delete lTitleBar;
+    // 垂直TitleBar
+    // BottomDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
     addDockWidget(Qt::BottomDockWidgetArea, BottomDock);
 
     ManagerDock = new QDockWidget(this);
@@ -368,16 +342,18 @@ MainWindow::MainWindow(QWidget *parent)
     ManagerDock->setWidget(DockManager);
 
     SourcesWidget = new ads::CDockWidget("Sources", DockManager);
-    // SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
+//    SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
     DockManager->addDockWidget(ads::LeftDockWidgetArea, SourcesWidget);
-    SourcesWidget->setWidget(Navigator::instance());
+    // SourcesWidget->setWidget(Navigator::instance());
+    SourcesWidget->setWidget(FileManager::instance());
 
-    // ads::CDockWidget *PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
-    // DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget);
+//    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
+//    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget,SourcesWidget->dockAreaWidget());
+//    PropertiesWidget->setWidget(new QLabel("This is a test"));
 
     EditWidget = new ads::CDockWidget("Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
-    EditWidget->setWidget(tabWidget);
+    EditWidget->setWidget(EditorManager::instance());
     EditWidget->setMinimumSize(450, 10);
     // EditWidget->setMinimumSize(1300, 10);
 
@@ -387,11 +363,25 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(ManagerDock->toggleViewAction());
     viewMenu->addSeparator();
     viewMenu->addAction(SourcesWidget->toggleViewAction());
+//    viewMenu->addAction(PropertiesWidget->toggleViewAction());
     viewMenu->addAction(EditWidget->toggleViewAction());
 }
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "[Main Window] Distructing...";
+    qDebug() << "[MainWindow] Distructing...";
 }
 
+void MainWindow::onClearTriggered() {
+    // 清空 RECENT_PROJECTS 下的 recent
+    XmlUtilities::instance().clearNodesFromFatherElementName(
+            InitialConfig::instance().xmlPath.toStdString().c_str(),
+            "RECENT_PROJECTS");
+    // Open Recent 置灰
+    recentFilesMenu->clear();
+    recentFilesMenu->setDisabled(true);
+}
+
+void MainWindow::onOpenRecentTriggered(std::string path) {
+    ProjectManager::instance().openProject(QString::fromStdString(path));
+}

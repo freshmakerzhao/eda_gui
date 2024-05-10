@@ -1,4 +1,5 @@
-#include "Infowidget.h"
+#include "InfoWidget.h"
+#include "LogWidget.h"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
@@ -7,14 +8,6 @@ InfoWidget *InfoWidget::instance(QWidget *parent)
         _instance = new InfoWidget(parent);
     }
     return _instance;
-}
-
-void InfoWidget::appendMsg(const QString &str) {
-    msg->appendPlainText(str);
-}
-
-void InfoWidget::appendLog(const QString &str) {
-    log->appendPlainText(str);
 }
 
 void InfoWidget::setCurrentPage(int index) {
@@ -40,6 +33,8 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
             muxf6NumSynth += it.value().toInt();
         } else if (it.key() == "FDRE_ZINI" || it.key() == "FDSE_ZINI" || it.key() == "FDCE_ZINI" || it.key() == "FDPE_ZINI") {
             ffNumSynth += it.value().toInt();
+        } else if (it.key() == "FDRE_ZINI_1" || it.key() == "FDSE_ZINI_1" || it.key() == "FDCE_ZINI_1" || it.key() == "FDPE_ZINI_1") {
+            ffNumSynth += it.value().toInt();
         } else if (it.key() == "FIFO18E1_VPR") {
             fifo18NumSynth += it.value().toInt();
         } else if (it.key() == "RAMB18E1_VPR") {
@@ -48,6 +43,8 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
             ranb36NumSynth += it.value().toInt();
         } else if (it.key() == "DSP48E1_VPR") {
             dspNumSynth += it.value().toInt();
+        } else if (it.key() == "CARRY4_VPR") {
+            carry4NumSynth += it.value().toInt();
         }
     }
     lut6NumSynth = lutNumSynth - muxf6NumSynth; // LUT6
@@ -58,12 +55,13 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     runsModel->setItem(0, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
     runsModel->setItem(0, 4, new QStandardItem(QString::number(bramNumSynth))); // BRAM
     runsModel->setItem(0, 5, new QStandardItem(QString::number(dspNumSynth))); // dsp
-    runsModel->setItem(0, 6, new QStandardItem(startTime)); // 开始时间
-    runsModel->setItem(0, 7, new QStandardItem(Elapsed)); // 持续时间
-    runsModel->setItem(0, 8, new QStandardItem(partName)); // 封装名称
+    runsModel->setItem(0, 6, new QStandardItem(QString::number(carry4NumSynth))); // carry4
+    runsModel->setItem(0, 7, new QStandardItem(startTime)); // 开始时间
+    runsModel->setItem(0, 8, new QStandardItem(Elapsed)); // 持续时间
+    runsModel->setItem(0, 9, new QStandardItem(partName)); // 封装名称
 }
 
-void InfoWidget::updateImplItem(const QString implPath, const QString status, const QString startTime, const QString Elapsed , const QString partName){
+void InfoWidget::updateImplItem(const QString& implPath, const QString& status, const QString& startTime, const QString& Elapsed , const QString& partName){
 
     QFile file(implPath + "/pb_type_count.json");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -89,9 +87,10 @@ void InfoWidget::updateImplItem(const QString implPath, const QString status, co
     runsModel->setItem(1, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
     runsModel->setItem(1, 4, new QStandardItem(QString::number(bramNumImpl))); // BRAM
     runsModel->setItem(1, 5, new QStandardItem(QString::number(dspNumImpl))); // dsp
-    runsModel->setItem(1, 6, new QStandardItem(startTime)); // 开始时间
-    runsModel->setItem(1, 7, new QStandardItem(Elapsed)); // 持续时间
-    runsModel->setItem(1, 8, new QStandardItem(partName)); // 封装名称
+    runsModel->setItem(1, 6, new QStandardItem(QString::number(carry4NumSynth))); // carry
+    runsModel->setItem(1, 7, new QStandardItem(startTime)); // 开始时间
+    runsModel->setItem(1, 8, new QStandardItem(Elapsed)); // 持续时间
+    runsModel->setItem(1, 9, new QStandardItem(partName)); // 封装名称
 }
 
 InfoWidget::InfoWidget(QWidget *parent)
@@ -106,51 +105,18 @@ InfoWidget::InfoWidget(QWidget *parent)
     // =========================== Csg =============================
     csl = new QPlainTextEdit(this);
     tabWidget->addTab(csl, "Tcl Console");
+    tabWidget->setTabEnabled(0, false);
     // =========================== Msg =============================
     msg = new QPlainTextEdit(this), msg->setReadOnly(true);
     tabWidget->addTab(msg, "Messages");
-
+    tabWidget->setTabEnabled(1, false);
     // =========================== Log =============================
-    QWidget *logWidget = new QWidget(tabWidget);
-    QHBoxLayout *hLayout = new QHBoxLayout(logWidget);
-    hLayout->setMargin(0);
-    hLayout->setSpacing(0);
-
-    log = new QPlainTextEdit(logWidget);
-    log->setReadOnly(true);
-
-    QToolBar *toolbar = new QToolBar("Tools", logWidget);
-    toolbar->setFixedWidth(35); // 调整toolbar宽度
-    toolbar->setOrientation(Qt::Vertical);
-    hLayout->addWidget(toolbar);
-    hLayout->addWidget(log);
-
-    QAction *searchAction = new QAction("Search", toolbar);
-    searchAction->setIcon(QIcon(":/resource/search.ico"));
-    toolbar->addAction(searchAction);
-    connect(searchAction, &QAction::triggered, [=](){
-        QString searchText = QInputDialog::getText(this, "Search", "Enter text to search");
-        if (!searchText.isEmpty()) {
-            if(log->find(searchText, QTextDocument::FindBackward)) {
-                QPalette palette = log->palette();
-                palette.setColor(QPalette::Highlight, palette.color(QPalette::Active, QPalette::Highlight));
-                log->setPalette(palette);
-            } else {
-                QMessageBox::information(this, tr("Warning"), tr("Not Found"), QMessageBox::Ok);
-            }
-        }
-    });
-
-    QAction *cleanAction = new QAction("Clean", toolbar);
-    cleanAction->setIcon(QIcon(":/resource/clean.ico"));
-    connect(cleanAction, &QAction::triggered, log, &QPlainTextEdit::clear);
-    toolbar->addAction(cleanAction);
-    tabWidget->addTab(logWidget, "Log");
-
+    tabWidget->addTab(LogWidget::instance(), "Log");
+    tabWidget->setCurrentIndex(2);
     // ============================ Rpt ============================
     rpt = new QPlainTextEdit(this), rpt->setReadOnly(true);
     tabWidget->addTab(rpt, "Reports");
-
+    tabWidget->setTabEnabled(3, false);
     // ======================== Design Runs ========================
     runsView = new QTreeView(this);
     tabWidget->addTab(runsView, "Design Runs");
@@ -161,6 +127,7 @@ InfoWidget::InfoWidget(QWidget *parent)
                            "FF",
                            "BRAM",
                            "DSP",
+                           "CARRY4",
                            "Start",
                            "Elapsed",
                            "Part"};

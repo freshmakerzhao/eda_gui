@@ -12,7 +12,6 @@
 #define PROJECTNAMEPAGE_H
 
 #include "Wizard.h"
-#include <QMessageBox>
 
 class ProjectNamePage : public QWizardPage
 {

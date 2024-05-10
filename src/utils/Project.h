@@ -56,7 +56,7 @@ public:
 private:
     QMap<QString, QString> param;    // 工程参数
 
-    QMap<QString, QStringList> files; // 工程文件
+    // QMap<QString, QStringList> files; // 工程文件
 };
 
 #endif // PROJECT_H

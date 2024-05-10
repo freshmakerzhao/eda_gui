@@ -13,6 +13,13 @@
 #include <QString>
 #include <QWidget>
 #include <QFileDialog>
+#include <QDebug>
+#ifdef WINDOWS_PLATFORM
+// windows下校验文件是否存在时使用
+#include <windows.h>
+#elif defined(LINUX_PLATFORM)
+#include <sys/stat.h>
+#endif
 
 class FileHelper {
 public:
@@ -31,5 +38,50 @@ public:
         }
         return fileName;
     }
+    #ifdef WINDOWS_PLATFORM
+    // windows下校验文件是否存在时使用
+    /**
+     * 判断文件是否存在
+     * @param path 文件预期路径
+     * @return
+     */
+    static bool fileExists(const std::string& path) {
+        DWORD fileAttr = GetFileAttributesA(path.c_str());
+        if (fileAttr == INVALID_FILE_ATTRIBUTES)
+            return false;
+        return true;
+    }
+    #elif defined(LINUX_PLATFORM)
+    #include <sys/stat.h>
+    /**
+     * 判断文件是否存在 (POSIX)
+     * @param path 文件预期路径
+     * @return true 如果文件存在，否则 false
+     */
+    static bool fileExists(const std::string& path) {
+        struct stat buffer;
+        return (stat(path.c_str(), &buffer) == 0);
+    }
+    #else
+    std::cout << "Running on an unknown platform" << std::endl;
+    #endif
+
+    /**
+     * 判断路径是否存在，不存在则创建
+     * @param path 路径信息
+     */
+    static void ensureDirectoryExists(const QString& path) {
+        QDir dir(path);
+        if (!dir.exists()) {
+            if (!dir.mkpath(path)) {
+                qDebug() << "[FileHelper] Failed to create directory at:" << path;
+            } else {
+                qDebug() << "[FileHelper] Directory created or exists at:" << path;
+            }
+        }
+    }
 };
 #endif //GRID_VIEW_FILEHELPER_H
+
+
+
