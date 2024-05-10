@@ -18,10 +18,11 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
     setSubTitle("Specify HDL, netlist, Block Design, and iP files to add to your project.");
 
     model = new QStandardItemModel(this);
-    model->setColumnCount(3); // 增加列数，用于显示索引
+    model->setColumnCount(4); // 增加列数，用于显示索引
     model->setHeaderData(0, Qt::Horizontal, QObject::tr("Index")); // 设置标题
     model->setHeaderData(1, Qt::Horizontal, QObject::tr("File Name"));
     model->setHeaderData(2, Qt::Horizontal, QObject::tr("File Type"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("Location"));
 
     tableView = new QTableView(this);
     tableView->setModel(model);
@@ -31,7 +32,8 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
     tableView->verticalHeader()->hide(); //隐藏行号方法
     // tableView->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
     tableView->setColumnWidth(0, 85);
-    tableView->setColumnWidth(1, 270);
+    tableView->setColumnWidth(1, 250);
+    tableView->setColumnWidth(3, 340);
 
     QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &SourcesPage::onAddFiles);
@@ -67,6 +69,7 @@ void SourcesPage::onAddFiles()
         }else{
             items << new QStandardItem(fileInfo.suffix());
         }
+        items << new QStandardItem(QString(fileInfo.path()));
         model->appendRow(items);
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
         wizard->sourcesFilesList.append(fileName); // 添加文件路径到列表中
@@ -95,6 +98,7 @@ void SourcesPage::onCreateFile()
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     formLayout->addRow(buttonBox);
+    formLayout->setVerticalSpacing(25); // 设置垂直间距
 
     connect(buttonBox, &QDialogButtonBox::accepted, [comboBox, lineEdit, &dialog, this](){
         QString fileType = comboBox->currentText();
@@ -134,6 +138,7 @@ void SourcesPage::onCreateFile()
         }else{
             items << new QStandardItem(fileInfo.suffix());
         }
+        items << new QStandardItem("<Local to Project>");
         model->appendRow(items);
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
         wizard->sourcesFilesList.append(newFilePath); // 添加文件路径到列表中

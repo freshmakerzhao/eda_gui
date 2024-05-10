@@ -9,22 +9,29 @@
   */
 
 #include "Editor.h"
+#include "EditorManager.h"
 #include "mainwindow.h"
-
+#include "dialog/CustomMessageBox.h"
 
 Editor::Editor(QWidget *parent)
     : QsciScintilla(parent)
 {
     qDebug() << "[Editor] Constructing...";
 
+    // setStyleSheet("QScrollBar:vertical {"
+    //                 "width: 16px;"
+    //               "}"
+    //               "QScrollBar:horizontal {"
+    //                 "height: 16px;"
+    //               "}"
+    // );
+
     // updateActionState
     connect(this, &QsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
     // 光标宽度
     setCaretWidth(10);
-    // 加载字体文件
-    QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
     // 创建字体
-    QFont font("JetBrains Mono NL", 10);
+    QFont font("JetBrains Mono NL", 9);
     // 设置行号字体
     setMarginsFont(font);
     // 设置显示行号
@@ -35,28 +42,11 @@ Editor::Editor(QWidget *parent)
     setFolding(QsciScintilla::BoxedTreeFoldStyle);
     setMarginWidth(2, 20);
     // 创建词法分析器
-    textLexer = new QsciLexerVerilog(this);
-    textLexer->setFont(font);
-    apis = new QsciAPIs(textLexer);
-
-    QStringList keywords;
-    QFile file(":/resource/keywords.txt");
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        while (!in.atEnd()) {
-            QString keyword = in.readLine();
-            keywords.append(keyword);
-        }
-        file.close();
-        qDebug() << "keywords loaded successfully";
-    }
-
-    // 将关键词添加到自动完成列表
-    foreach(const QString &keyword, keywords) {
-        apis->add(keyword);
-    }
-
-    apis->prepare();
+    verilogLexer = new QsciLexerVerilog(this);
+    verilogLexer->setFont(font);
+    tclLexer = new QsciLexerTCL(this);
+    tclLexer->setFont(font);
+    // tclLexer->setColor(QColor(128, 0, 0), QsciLexerTCL::Identifier);
     //设置自动完成所有项
     setAutoCompletionSource(QsciScintilla::AcsAll);
     //设置大小写敏感
@@ -65,8 +55,6 @@ Editor::Editor(QWidget *parent)
     setAutoCompletionThreshold(2);
     // 括号匹配
     setBraceMatching(QsciScintilla::SloppyBraceMatch);
-    // 设置词法分析器
-    setLexer(textLexer);
     // EnCoding UTF-8
     SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
     // 缩进宽度
@@ -87,18 +75,47 @@ bool Editor::openFile(const QString path)
 {
     _path = path;
     QFile file(path);
-    if (!QFileInfo(file).isFile()) {
+    QFileInfo fileInfo(file);
+    if (!fileInfo.isFile()) {
         return false;
     }
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::warning(this, "Warning", "Cannot open file:\n" + file.errorString());
         return false;
     }
+    if (fileInfo.suffix() == "v") {
+        apis = new QsciAPIs(verilogLexer);
+        QStringList keywords;
+        QFile file(":/resource/keywords.txt");
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream in(&file);
+            while (!in.atEnd()) {
+                QString keyword = in.readLine();
+                keywords.append(keyword);
+            }
+            file.close();
+            qDebug() << "keywords loaded successfully";
+        }
+
+        // 将关键词添加到自动完成列表
+        foreach(const QString &keyword, keywords) {
+            apis->add(keyword);
+        }
+        apis->prepare();
+        setLexer(verilogLexer); // 设置词法分析器
+    } else if (fileInfo.suffix() == "xdc") {
+        apis = new QsciAPIs(tclLexer);
+        apis->prepare();
+        setLexer(tclLexer);
+    }
     QTextStream in(&file);
     in.setCodec("UTF-8");   // Decoding files using UTF-8
     this->setText(in.readAll());
     file.close();
     this->setModified(false);
+    // 绑定Tab标签
+    connect(this, &QsciScintillaBase::SCN_SAVEPOINTLEFT, EditorManager::instance(), &EditorManager::setSavePointFlag);
+    connect(this, &QsciScintillaBase::SCN_SAVEPOINTREACHED, EditorManager::instance(), &EditorManager::resetSavePointFlag);
     return true;
 }
 
@@ -110,7 +127,7 @@ bool Editor::saveFile()
         QFileInfo fileInfo(file);
         if (!fileInfo.isWritable()) {
             // 提示用户文件只读
-            QMessageBox::warning(MainWindow::instance(), "Warning",
+            CustomMessageBox::showWarning(MainWindow::instance(), "Warning",
                                  "The file is read-only. Writing operation failed.");
             return false;
         }

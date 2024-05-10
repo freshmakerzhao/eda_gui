@@ -15,7 +15,6 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QTextStream>
-#include <QFontDatabase>
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QAction>
@@ -25,7 +24,7 @@
 #include "Qsci/qsciapis.h"      // 自动补全的apis
 #include <qscilexerverilog.h>   // Verilog词法分析器
 // #include <qscilexervhdl.h>      // VHDL词法分析器(未启用)
-
+#include <qscilexertcl.h>
 
 class Editor : public QsciScintilla
 {
@@ -45,7 +44,8 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 private:
-    QsciLexerVerilog *textLexer;
+    QsciLexerVerilog *verilogLexer;
+    QsciLexerTCL *tclLexer;
     QsciAPIs *apis;
     QString _path;
 };

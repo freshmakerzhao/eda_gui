@@ -55,6 +55,13 @@ public:
     QString elapsedTime;
     // partName
     QString partName;
+
+    // 下一阶段使用的命令
+    QString nextPhase = nullptr;
+    QString nextpath = nullptr;
+    QString nextscript = nullptr;
+    QString nextpName = nullptr;
+
     /**
      * 初始化环境变量
      */
@@ -64,6 +71,15 @@ public:
                          const QString& partname,
                          QList<QString> constraintPathList,
                          const QString& topName = "top");
+    /**
+     * 设置弹窗显示状态，true则显示，false不显示
+     * @param status
+     */
+    void setSynthSuccessMsgStatus(bool status);
+    void setImplementSuccessMsgStatus(bool status);
+    void setNextImplementProcessStatus(bool status);
+    void setNextImplementProcessScript(const QString &phase, const QString &path, const QString &script, const QString &pName);
+    void initStatus();
     /**
      * 获取指定变量值
      * @param key
@@ -75,6 +91,14 @@ private:
     ProcessManager();
     ~ProcessManager();
     QProcess* process;
+    // 是否显示综合成功弹窗
+    bool showSynthSuccessMsg = true;
+    // 是否显示布局布线成功弹窗
+    bool showImplementSuccessMsg = true;
+    // 是否显示生成码流成功弹窗
+    bool showGenBitSuccessMsg = true;
+    // 综合之后是否要执行implement
+    bool hasNextImplementProcess = false;
 
 private slots:
     void handleFinished(int exitCode,QProcess::ExitStatus exitStatus);

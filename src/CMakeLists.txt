@@ -6,6 +6,22 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
+# 检测操作系统
+if(WIN32)
+    message(STATUS "Configuring on/for Windows")
+    # 特定于Windows的编译选项
+    add_definitions(-DWINDOWS_PLATFORM)
+elseif(UNIX AND NOT APPLE)
+    message(STATUS "Configuring on/for Linux")
+    # 特定于Linux的编译选项
+    add_definitions(-DLINUX_PLATFORM)
+elseif(APPLE)
+    message(STATUS "Configuring on/for macOS")
+    # 特定于macOS的编译选项
+    add_definitions(-DMACOS_PLATFORM)
+endif()
+
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -49,6 +65,8 @@ file(GLOB PROJECT_SOURCES
     blocks/*.cpp
     base/*.cpp
     dialog/*.cpp
+    tinyxml2/*.cpp
+    entity/*.cpp
     *.cpp
 )
 
@@ -64,6 +82,7 @@ file(GLOB PROJECT_HEADERS
     dialog/*.h
     Qsci/*.h
     yaml-cpp/*.h
+    tinyxml2/*.h
     *.h
 )
 
@@ -77,6 +96,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
     ${PROJECT_RESOURCES}
+    win32.rc
 )
 
 # Link the Qt5 Widgets library and the QScintilla library to the executable
@@ -89,12 +109,6 @@ target_link_libraries(${PROJECT_NAME}
 
 # Specify installation paths (if required)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /opt/${PROJECT_NAME}/bin)
-
-set(app_WINRC appicon.rc)
-set_property(SOURCE app_win32.rc APPEND PROPERTY
-        OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/AppIcon.ico
-)
-
 
 if (Qt5PrintSupport_FOUND)
     target_link_libraries(${PROJECT_NAME} Qt5::PrintSupport)

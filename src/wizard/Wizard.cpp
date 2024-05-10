@@ -14,7 +14,7 @@
 #include "SourcePage.h"
 #include "ConstraintPage.h"
 #include "DefaultPartPage.h"
-#include "widgets/Navigator.h"
+#include "utils/ProjectManager.h"
 
 Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
 {
@@ -113,7 +113,7 @@ void Wizard::onNewFinish()
     new_project->sourceList = sourcetmp;
     new_project->constraintList = constrainttmp;
     new_project->makeProject();
-    Navigator::instance()->loadFile(new_project);
+    ProjectManager::instance().loadFiles(new_project);
 
     // ============================= 清除缓存 =================================
     QDir dircache("Cache");
@@ -125,7 +125,7 @@ void Wizard::onNewFinish()
 void Wizard::onAddFinish()
 {
     qDebug() << "Add Finish";
-    if(current_project == nullptr) {
+    if (current_project == nullptr) {
         return;
     }
     QString path = current_project->getParam("path");

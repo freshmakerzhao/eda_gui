@@ -14,7 +14,6 @@
 #include <QMenuBar>
 
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QFileDialog>
 #include <QDockWidget>
 #include <QTextCodec>
@@ -24,6 +23,7 @@
 // #include "grid/ChipPlanner.h"
 #include "ads/DockManager.h"
 #include "ads/DockWidget.h"
+#include "entity/XmlRecent.h"
 
 class MainWindow : public QMainWindow
 {
@@ -37,22 +37,24 @@ public:
     bool cleanEditorTab();
     bool saveAllFile();
 
-private slots:
+    void showProjectTitle(const int mode = 0, const QString &title = "");
+    void setForm(const int mode = 0);
+    void setRecentMenu();
+
+public slots:
     void onNewTriggered();
     void onOpenFileTriggered();
     void onOpenTriggered();
+    void onOpenRecentTriggered(std::string path);
+    void onClearTriggered();
     void onSaveTriggered();
     void onSaveAsTriggered();
     void onEditTriggered();
-
 
     void onChipPlannerTriggered();
 
     void onDocumentationTriggered();
     void onAboutTriggered();
-
-    void onTabWidgetCurrentChanged(int index);
-    void onTabWidgetTabCloseRequested(int index);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -68,6 +70,10 @@ private:
     QMenu *editMenu;
     QMenu *viewMenu;
     QMenu *helpMenu;
+
+    // Open Recent 子菜单
+    QMenu *recentFilesMenu;
+    QAction *clearAction;
 
     QAction *newAction;
     QAction *openAction;
@@ -88,7 +94,6 @@ private:
     QAction *chipPlannerAction;
 
     QToolBar *toolbar;
-    QTabWidget *tabWidget;
 
     // ChipPlanner chipPlanner;
 
@@ -100,6 +105,7 @@ private:
 
     ads::CDockWidget *SourcesWidget;
     ads::CDockWidget *EditWidget;
+    ads::CDockWidget *PropertiesWidget;
 };
 
 #endif // MAINWINDOW_H
