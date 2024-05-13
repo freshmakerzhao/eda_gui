@@ -28,16 +28,18 @@ Editor::Editor(QWidget *parent)
 
     // updateActionState
     connect(this, &QsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
+    // updateLineWidth
+    connect(this, &QsciScintilla::linesChanged, this, &Editor::resizeLineWidth);
     // 光标宽度
     setCaretWidth(10);
     // 创建字体
     QFont font("JetBrains Mono NL", 9);
+    QFontMetrics _fontMetrics(font);
+    _width = _fontMetrics.horizontalAdvance(QChar('0'));
     // 设置行号字体
     setMarginsFont(font);
     // 设置显示行号
     setMarginLineNumbers(0, true);
-    // 设置行号的宽度
-    setMarginWidth(0, 50);
     // 设置折叠选项
     setFolding(QsciScintilla::BoxedTreeFoldStyle);
     setMarginWidth(2, 20);
@@ -218,3 +220,8 @@ void Editor::keyPressEvent(QKeyEvent *event)
     QsciScintilla::keyPressEvent(event);
 }
 
+void Editor::resizeLineWidth()
+{
+    // 设置行号的宽度
+    setMarginWidth(0, QString::number(lines()).size() * _width + 16);
+}
