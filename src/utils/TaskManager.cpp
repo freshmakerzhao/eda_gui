@@ -83,6 +83,8 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 11) {
         ProjectManager::instance().addSourcesAction();
+    } else if (mode == 12) {
+        MainWindow::instance()->showIPCatalog();
     }
 }
 /**
