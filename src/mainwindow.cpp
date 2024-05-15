@@ -21,6 +21,7 @@
 #include "entity/XmlRecent.h"
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
+#include "ipmanager/IPManager.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -129,6 +130,12 @@ void MainWindow::setRecentMenu() {
         // 异常
         qDebug() << "[MainWindow] An error occurred from MainWindow recentList: " << e.what();
     }
+}
+
+void MainWindow::showIPCatalog()
+{
+    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
+    IPManagerWidget->show();
 }
 
 
@@ -365,6 +372,11 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(SourcesWidget->toggleViewAction());
 //    viewMenu->addAction(PropertiesWidget->toggleViewAction());
     viewMenu->addAction(EditWidget->toggleViewAction());
+
+    IPManagerWidget = new ads::CDockWidget("IP Catalog", DockManager);
+    IPManagerWidget->hide();
+    // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
+    IPManagerWidget->setWidget(IPManager::instance());
 }
 
 MainWindow::~MainWindow()
