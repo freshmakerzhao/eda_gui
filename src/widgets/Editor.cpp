@@ -46,6 +46,8 @@ Editor::Editor(QWidget *parent)
     // 创建词法分析器
     verilogLexer = new QsciLexerVerilog(this);
     verilogLexer->setFont(font);
+    verilogLexer->setFoldComments(true); // 开启注释可折叠
+    verilogLexer->setFoldAtModule(true); // 开启模块(Module)可折叠
     tclLexer = new QsciLexerTCL(this);
     tclLexer->setFont(font);
     // tclLexer->setColor(QColor(128, 0, 0), QsciLexerTCL::Identifier);
