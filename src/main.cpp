@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // 加载字体文件
-    QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
+    QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Regular.ttf");
 
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();

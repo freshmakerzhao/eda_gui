@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : EditorManager.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/4/25
+  ******************************************************************************
+  */
 #include "EditorManager.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
@@ -91,6 +100,7 @@ Editor *EditorManager::currentEditor()
 
 /**
  * 编辑操作
+ * @param op 操作选项
  */
 void EditorManager::editorEdit(const int op)
 {

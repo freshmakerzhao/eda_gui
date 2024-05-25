@@ -33,7 +33,7 @@ AboutDialog::AboutDialog(QWidget *parent)
                           "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a></p>"
                           "</html>";
     QLabel *textLabel = new QLabel(this);
-    textLabel->setText(information.arg(buildDateTime, compilerString,version));
+    textLabel->setText(information.arg(buildDateTime, compilerString, version));
     textLabel->setTextFormat(Qt::RichText);
     textLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     textLabel->setOpenExternalLinks(true);
