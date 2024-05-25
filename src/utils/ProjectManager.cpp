@@ -22,6 +22,12 @@ ProjectManager &ProjectManager::instance()
     return instance;
 }
 
+/**
+ * ! Reopen project on startup
+ * ! Open project in New window
+ * @param 工程实例
+ * @return
+ */
 bool ProjectManager::startProcess(Project *project)
 {
     // 获取程序路径
@@ -92,7 +98,6 @@ bool ProjectManager::openProjectFromArgs(const QStringList &args)
 /**
  * 加载工程
  * @param 工程实例
- * @return
  */
 void ProjectManager::loadFiles(Project *project)
 {
@@ -122,7 +127,6 @@ void ProjectManager::loadFiles(Project *project)
 
 /**
  * 启动Wizard，添加Sources
- * @return
  */
 void ProjectManager::addSourcesAction()
 {
@@ -139,19 +143,25 @@ void ProjectManager::addSourcesAction()
 
 /**
  * 移除工程中的文件
- * @param 目标文件路径
+ * @param path 目标文件路径
+ * @param erase false:仅移除 true:彻底删除文件
  * @return
  */
-bool ProjectManager::removeFileAction(const QString &path)
+bool ProjectManager::removeFileAction(const QString &path, const bool &erase)
 {
     QFileInfo fileInfo(path);
     QString folderName = fileInfo.dir().dirName();
-    qDebug() << folderName;
+    // qDebug() << folderName;
     if (folderName == "sources") {
         _project->sourceList.removeOne(path);
     } else if (folderName == "constraints") {
         _project->constraintList.removeOne(path);
     }
+
+    if (erase) {
+        QFile::remove(path);
+    }
+
     _project->makeProject();
     loadFiles(_project);
     return true;

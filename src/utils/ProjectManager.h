@@ -23,6 +23,12 @@ class ProjectManager :  public QObject
 public:
     static ProjectManager& instance();
 
+    /**
+     * ! Reopen project on startup
+     * ! Open project in New window
+     * @param 工程实例
+     * @return
+     */
     bool startProcess(Project *project);
 
     /**
@@ -42,22 +48,21 @@ public:
     /**
      * 加载工程
      * @param 工程实例
-     * @return
      */
     void loadFiles(Project *project);
 
     /**
      * 启动Wizard，添加Sources
-     * @return
      */
     void addSourcesAction();
 
     /**
      * 移除工程中的文件
-     * @param 目标文件路径
+     * @param path 目标文件路径
+     * @param erase false:仅移除 true:彻底删除文件
      * @return
      */
-    bool removeFileAction(const QString &path);
+    bool removeFileAction(const QString &path, const bool &erase = false);
 
 public slots:
     void closeProject();
