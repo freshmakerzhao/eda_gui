@@ -12,15 +12,20 @@
 RemoveFileDialog::RemoveFileDialog(QWidget *parent, const QString &path)
 {
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
-    setFixedSize(800, 240);
+    setFixedWidth(800);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setWindowTitle("Remove File");
     QLabel *label = new QLabel("Do you want to remove this file from project?", this);
-    label->setFixedHeight(20);
+    label->setFixedHeight(25);
     filePathLabel = new QLabel(path, this); // 显示目标文件的路径
+    filePathLabel->setGeometry(QRect(1, 1, 1, 1));
     filePathLabel->setWordWrap(true);
+    filePathLabel->setAlignment(Qt::AlignTop);
+    // filePathLabel->adjustSize();
     checkBox = new QCheckBox("Completely delete this file", this);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(label);
+    layout->insertSpacing(1, 20); // 在两个Label之间插入间距
     // layout->setSpacing(0);
     layout->addWidget(filePathLabel);
     layout->addWidget(checkBox);
