@@ -10,6 +10,7 @@
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
 #include "FileHelper.h"
+#include "settings/SettingsDialog.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -85,6 +86,9 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         ProjectManager::instance().addSourcesAction();
     } else if (mode == 12) {
         MainWindow::instance()->showIPCatalog();
+    } else if (mode == 13) {
+        SettingsDialog dialog;
+        dialog.exec();
     }
 }
 /**
@@ -334,6 +338,16 @@ void TaskManager::cleanParams()
     partName = "";
     archName = "";
     arch = "";
+}
+
+QString TaskManager::getTopModule()
+{
+    return topName;
+}
+
+void TaskManager::setTopModule(const QString &topModule)
+{
+    topName = topModule;
 }
 
 TaskManager::TaskManager()

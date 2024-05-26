@@ -24,7 +24,6 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // Settings
     QTreeWidgetItem *settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");
     settingsItem->setIcon(0, QIcon(""));
-    settingsItem->setDisabled(true);
     // Add Sources
     QTreeWidgetItem *addSourcesItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Add Sources");
     addSourcesItem->setIcon(0, QIcon(""));
@@ -100,6 +99,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(11);
         } else if (item == ipCatalogItem) {
             TaskManager::instance().handleTreeItemActivation(12);
+        } else if (item == settingsItem) {
+            TaskManager::instance().handleTreeItemActivation(13);
         }
         clearSelection(); // 清除选中状态
     });

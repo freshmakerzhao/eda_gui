@@ -66,6 +66,7 @@ file(GLOB PROJECT_SOURCES
     base/*.cpp
     dialog/*.cpp
     ipmanager/*.cpp
+    settings/*.cpp
     tinyxml2/*.cpp
     entity/*.cpp
     *.cpp
@@ -82,6 +83,7 @@ file(GLOB PROJECT_HEADERS
     entity/*.h
     dialog/*.h
     ipmanager/*.h
+    settings/*.h
     Qsci/*.h
     yaml-cpp/*.h
     tinyxml2/*.h
