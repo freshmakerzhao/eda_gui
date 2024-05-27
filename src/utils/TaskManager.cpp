@@ -443,12 +443,13 @@ void TaskManager::downloadBit() {
 }
 
 // 两个选项的弹窗，true 左侧，false 右侧
-bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft , QMessageBox::StandardButton buttonRight) {
+bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft, QMessageBox::StandardButton buttonRight) {
     // 等待用户响应
-    int msg = CustomMessageBox::showTwoOptionQuestion(
+    int msg = CustomMessageBox::showQuestion(
             MainWindow::instance(),
             title,
-            text
+            text,
+            buttonLeft | buttonRight
     );
     // 根据用户选择做出响应
     if (msg == buttonLeft) {
@@ -456,4 +457,5 @@ bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessa
     } else if (msg == buttonRight) {
         return false;
     }
+    return false;
 }

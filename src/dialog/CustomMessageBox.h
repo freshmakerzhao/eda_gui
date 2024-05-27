@@ -26,17 +26,6 @@ public:
             StandardButton defaultButton = NoButton
     );
 
-    // 两个选项的询问对话框
-    static StandardButton showTwoOptionQuestion(
-            QWidget *parent,
-            const QString &title,
-            const QString &text,
-            StandardButton buttonLeft = Ok,
-            StandardButton buttonRight = Cancel,
-            Icon defaultIcon = Question,
-            StandardButton defaultButton = NoButton
-    );
-
     static StandardButton showSuccess(QWidget *parent, const QString &title,
                                       const QString &text, StandardButtons buttons = Ok,
                                       StandardButton defaultButton = NoButton);
@@ -46,7 +35,11 @@ public:
                                     StandardButton defaultButton = NoButton);
 
 
+protected:
     void resizeEvent(QResizeEvent *event) override;
+
+private:
+    static void setButtonStyleSheet(CustomMessageBox &messageBox);
 };
 
 #endif // CUSTOMMESSAGEBOX_H
