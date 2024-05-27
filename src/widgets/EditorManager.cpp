@@ -53,9 +53,9 @@ void EditorManager::createEditorTab(const QString &path)
 bool EditorManager::saveAllFiles()
 {
     if (isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(MainWindow::instance(), "Warning", "There are unsaved files,"
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "There are unsaved files,"
                                                                              "  save and execute?",
-                                                            QMessageBox::Yes, QMessageBox::No);
+                                                            QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::No) {
             return false;
         }
@@ -162,9 +162,9 @@ void EditorManager::editorSaveAs()
 bool EditorManager::cleanEditorTab()
 {
     if (isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(MainWindow::instance(), "Warning", "The document has been modified.\n"
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "The document has been modified.\n"
                                                                                                "Do you want to save your changes?",
-                                                                              QMessageBox::Yes, QMessageBox::No);
+                                                                              QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::No) {
             return false;
         }
