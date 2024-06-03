@@ -16,14 +16,14 @@ class CommandBuilder {
 public:
 
     static CommandBuilder& instance();
-    std::string generateImpPackCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName);
-    std::string generateImpIOPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath);
-    std::string generateImpConstrainsCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath);
-    std::string generateImpPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName);
-    std::string generateImpRouteCommands(const QString& projectSynthPath,const QString& archName);
-    std::string generateImpementationCommands(const QString& projectSynthPath,const QString& archName);
-    std::string generateFasmCommands(const QString& projectSynthPath,const QString& archName);
-    std::string generateBitCommands(const QString& projectImplPath,const std::string& pythonPath);
+    std::string generateImpPackCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName,const QString& topName = "top");
+    std::string generateImpIOPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath,const QString& topName = "top");
+    std::string generateImpConstrainsCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath,const QString& topName = "top");
+    std::string generateImpPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName,const QString& topName = "top");
+    std::string generateImpRouteCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
+    std::string generateImpementationCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
+    std::string generateFasmCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
+    std::string generateBitCommands(const QString& projectImplPath,const std::string& pythonPath,const QString& topName = "top");
     std::string generateDownloadBitCommands(const QString& projectImplPath, const std::string& digilentName,const std::string& bitName);
 
 private:

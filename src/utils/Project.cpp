@@ -19,7 +19,7 @@ Project::Project(QString name,
     param["part"] = part;
     param["arch"] = arch;
     param["archName"] = archName;
-    // param["topName"] = "top";
+    param["topName"] = "top";
 }
 
 bool Project::writeProject()

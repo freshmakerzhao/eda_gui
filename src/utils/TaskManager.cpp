@@ -365,7 +365,7 @@ void TaskManager::buildPack() {
 
     qDebug() << "buildPack";
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
+    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName,topName);
     ProcessManager::instance().checkCall("Pack", projectImplPath, QString::fromStdString(script),partName);
 }
 
@@ -378,22 +378,22 @@ void TaskManager::buildPlace(int mode) {
     std::string script;
     // 生成top.ioplace
     if (mode == 1) {
-        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
+        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
         ProcessManager::instance().checkCall("IOPlace Generation", projectPath, QString::fromStdString(script),partName);
     }
 
     // 生成top.ioplace 与 constrains.place
     if (mode == 2) {
-        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
+        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
         ProcessManager::instance().checkCall("Constraints Generation", projectImplPath, QString::fromStdString(script),partName);
     }
 
     // 完成 vpr_place
     if (mode == 3) {
-        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
+        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+        script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName,topName);
         ProcessManager::instance().checkCall("Place", projectImplPath, QString::fromStdString(script),partName);
     }
 }
@@ -403,7 +403,7 @@ void TaskManager::buildPlace(int mode) {
 void TaskManager::buildRoute() {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
 
-    std::string script = CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
+    std::string script = CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName,topName);
     ProcessManager::instance().checkCall("Route", projectImplPath, QString::fromStdString(script),partName);
 }
 
@@ -411,13 +411,13 @@ void TaskManager::buildRoute() {
 std::string TaskManager::buildImpScript() {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     // pack
-    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
+    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName,topName);
     // place
-    script += " && " + CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-    script += " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-    script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
+    script += " && " + CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+    script += " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+    script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName,topName);
     // route
-    script += " && " + CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
+    script += " && " + CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName,topName);
     return script;
 }
 
@@ -427,12 +427,12 @@ std::string TaskManager::buildImpScript() {
 void TaskManager::buildBit(int mode) {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     if (mode == 1) {
-        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
+        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName,topName);
         ProcessManager::instance().checkCall("Fasm Generation", projectImplPath, QString::fromStdString(script),partName);
     }
     if (mode == 2) {
-        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
-        script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%");
+        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName,topName);
+        script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%",topName);
         ProcessManager::instance().checkCall("Bitstream Generation", projectImplPath, QString::fromStdString(script),partName);
     }
 }
