@@ -5,7 +5,6 @@
         <file>resource/parts.yaml</file>
         <file>resource/white.png</file>
         <file>resource/logo.png</file>
-        <file>resource/JetBrainsMonoNL-Regular.ttf</file>
     </qresource>
     <qresource prefix="/gridview">
         <file>resource/gridview/zoomin.png</file>
