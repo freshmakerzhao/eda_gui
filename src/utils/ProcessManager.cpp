@@ -86,10 +86,10 @@ void ProcessManager::initEnvironment(const QString& family,
     QString envPath =  libPathVpr + ";" + libPathYosys + ";" + libPathOpenFPGALoader;
     env.insert("PATH", envPath);
 
-    env.insert("OUT_EBLIF", "top.eblif");
+    env.insert("OUT_EBLIF", topName + ".eblif");
     env.insert("OUT_FASM_EXTRA", "top_fasm_extra.fasm");
-    env.insert("OUT_JSON", "top.json");
-    env.insert("OUT_SDC", "top.sdc");
+    env.insert("OUT_JSON", topName + ".json");
+    env.insert("OUT_SDC", topName + ".sdc");
     env.insert("OUT_SYNTH_V", "top_synth.v");
     env.insert("PART_JSON", QString::fromStdString(StringUtilities::concatPath({resourcePath.toStdString(), "f4pga", "prjxray-db/artix7", partName.toStdString(), "part.json"})));
     // python路径
