@@ -161,8 +161,8 @@ void MainWindow::onOpenTriggered()
     if (dialog.exec() != QDialog::Accepted) {
         return; // 用户取消了操作
     }
-    QString path = dialog.selectedFiles().value(0, "");
-    ProjectManager::instance().openProject(path);
+    QString hprPath = dialog.selectedFiles().value(0, "");
+    ProjectManager::instance().openProject(hprPath);
 }
 
 void MainWindow::onSaveTriggered()

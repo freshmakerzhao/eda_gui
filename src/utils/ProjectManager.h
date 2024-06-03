@@ -26,28 +26,28 @@ public:
     /**
      * ! Reopen project on startup
      * ! Open project in New window
-     * @param 工程实例
+     * @param project 工程实例
      * @return
      */
     bool startProcess(Project *project);
 
     /**
      * 接收工程文件(*.hpr)路径，打开工程
-     * @param 工程文件绝对路径
+     * @param hprPath 工程文件路径
      * @return
      */
-    bool openProject(const QString &path);
+    bool openProject(const QString &hprPath);
 
     /**
      * 接收命令行参数，判断是否有工程文件(*.hpr)路径，执行打开工程函数
-     * @param 命令行参数列表
+     * @param args 命令行参数列表
      * @return
      */
     bool openProjectFromArgs(const QStringList &args);
 
     /**
-     * 加载工程
-     * @param 工程实例
+     * 加载工程到TaskManager
+     * @param project 工程实例
      */
     void loadFiles(Project *project);
 
@@ -63,6 +63,10 @@ public:
      * @return
      */
     bool removeFileAction(const QString &path, const bool &erase = false);
+
+    void setTopModule(const QString &topModule);
+
+    QString getTopModule();
 
 public slots:
     void closeProject();

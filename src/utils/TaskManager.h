@@ -36,9 +36,9 @@ public:
     */
     void cleanParams();
 
-    QString getTopModule();
+    // QString getTopModule();
 
-    void setTopModule(const QString &topModule);
+    // void setTopModule(const QString &topModule);
 
 //    QStringList sourceList;
     // 存储设计与约束文件

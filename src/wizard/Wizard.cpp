@@ -112,7 +112,7 @@ void Wizard::onNewFinish()
     new_project = new Project(projectName, targetPath, part, arch, archName);
     new_project->sourceList = sourcetmp;
     new_project->constraintList = constrainttmp;
-    new_project->makeProject();
+    new_project->writeProject();
     ProjectManager::instance().loadFiles(new_project);
 
     // ============================= 清除缓存 =================================

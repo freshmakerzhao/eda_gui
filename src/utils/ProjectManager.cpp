@@ -25,7 +25,7 @@ ProjectManager &ProjectManager::instance()
 /**
  * ! Reopen project on startup
  * ! Open project in New window
- * @param 工程实例
+ * @param project 工程实例
  * @return
  */
 bool ProjectManager::startProcess(Project *project)
@@ -45,20 +45,20 @@ bool ProjectManager::startProcess(Project *project)
 
 /**
  * 接收工程文件(*.hpr)路径，打开工程
- * @param 工程文件绝对路径
+ * @param hprPath 工程文件路径
  * @return
  */
-bool ProjectManager::openProject(const QString &path)
+bool ProjectManager::openProject(const QString &hprPath)
 {
     std::vector<XmlRecent> recentLists = {
-            {0, path.toStdString()}
+        {0, hprPath.toStdString()}
     };
     try {
         XmlUtilities::instance().insertHybrdLinkXmlRecent(
-                InitialConfig::instance().xmlPath.toStdString().c_str(),
-                "RECENT_PROJECTS",
-                recentLists
-        );
+            InitialConfig::instance().xmlPath.toStdString().c_str(),
+            "RECENT_PROJECTS",
+            recentLists
+            );
     } catch (const std::exception& e) {
         // 异常
         // 不让IO操作影响主进程
@@ -66,7 +66,7 @@ bool ProjectManager::openProject(const QString &path)
     }
 
     Project *new_open_project = new Project;
-    if (!new_open_project->parseProject(path)) {
+    if (!new_open_project->parseProject(hprPath)) {
         CustomMessageBox::showError(MainWindow::instance(), "Error",
                                     "Failed to open project, File parsing error.");
         delete new_open_project;
@@ -78,7 +78,7 @@ bool ProjectManager::openProject(const QString &path)
 
 /**
  * 接收命令行参数，判断是否有工程文件(*.hpr)路径，执行打开工程函数
- * @param 命令行参数列表
+ * @param args 命令行参数列表
  * @return
  */
 bool ProjectManager::openProjectFromArgs(const QStringList &args)
@@ -87,17 +87,17 @@ bool ProjectManager::openProjectFromArgs(const QStringList &args)
         return false;
     }
     // 获取第一个文件路径
-    QString hprfile = args.at(1);
-    qDebug() << "Loading Project:" << hprfile;
-    if (!openProject(hprfile)) {
+    QString hprPath = args.at(1);
+    qDebug() << "Loading Project:" << hprPath;
+    if (!openProject(hprPath)) {
         return false;
     }
     return true;
 }
 
 /**
- * 加载工程
- * @param 工程实例
+ * 加载工程到TaskManager
+ * @param project 工程实例
  */
 void ProjectManager::loadFiles(Project *project)
 {
@@ -137,7 +137,7 @@ void ProjectManager::addSourcesAction()
     }
     Wizard wizard(MainWindow::instance(), 1, _project);
     wizard.exec();
-    _project->makeProject();
+    _project->writeProject();
     loadFiles(_project);
 }
 
@@ -162,9 +162,25 @@ bool ProjectManager::removeFileAction(const QString &path, const bool &erase)
         QFile::remove(path);
     }
 
-    _project->makeProject();
+    _project->writeProject();
     loadFiles(_project);
     return true;
+}
+
+void ProjectManager::setTopModule(const QString &topModule)
+{
+    if (_project) {
+        _project->setTopModule(topModule);
+        loadFiles(_project);
+    }
+}
+
+QString ProjectManager::getTopModule()
+{
+    if (_project) {
+        return _project->getParam("top");
+    }
+    return QString();
 }
 
 void ProjectManager::closeProject()
