@@ -21,6 +21,7 @@
 #include "entity/XmlRecent.h"
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
+#include "ipmanager/IPManager.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -131,6 +132,12 @@ void MainWindow::setRecentMenu() {
     }
 }
 
+void MainWindow::showIPCatalog()
+{
+    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
+    IPManagerWidget->show();
+}
+
 
 void MainWindow::onNewTriggered()
 {
@@ -154,8 +161,8 @@ void MainWindow::onOpenTriggered()
     if (dialog.exec() != QDialog::Accepted) {
         return; // 用户取消了操作
     }
-    QString path = dialog.selectedFiles().value(0, "");
-    ProjectManager::instance().openProject(path);
+    QString hprPath = dialog.selectedFiles().value(0, "");
+    ProjectManager::instance().openProject(hprPath);
 }
 
 void MainWindow::onSaveTriggered()
@@ -210,9 +217,10 @@ void MainWindow::onAboutTriggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (EditorManager::instance()->isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(this, "Warning", "There are unsaved files,"
-                                                                                               " are you sure you want to close?",
-                                                                              QMessageBox::Yes, QMessageBox::No);
+        // CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(this, "Warning", "There are unsaved files,"
+        //                                                                                        " are you sure you want to close?",
+        //                                                                       QMessageBox::Yes, QMessageBox::No);
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(this, "Warning", "There are unsaved files, are you sure you want to close?", QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::Yes) {
             ProjectManager::instance().closeProject();
             event->accept();
@@ -365,6 +373,11 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(SourcesWidget->toggleViewAction());
 //    viewMenu->addAction(PropertiesWidget->toggleViewAction());
     viewMenu->addAction(EditWidget->toggleViewAction());
+
+    IPManagerWidget = new ads::CDockWidget("IP Catalog", DockManager);
+    IPManagerWidget->hide();
+    // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
+    IPManagerWidget->setWidget(IPManager::instance());
 }
 
 MainWindow::~MainWindow()

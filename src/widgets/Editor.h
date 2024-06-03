@@ -43,7 +43,11 @@ protected:
 
     void keyPressEvent(QKeyEvent *event) override;
 
+private slots:
+    void resizeLineWidth();
+
 private:
+    int _width = 16; // 字符宽度
     QsciLexerVerilog *verilogLexer;
     QsciLexerTCL *tclLexer;
     QsciAPIs *apis;

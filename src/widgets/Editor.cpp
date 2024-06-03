@@ -12,6 +12,7 @@
 #include "EditorManager.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
+#include <QFontDatabase>
 
 Editor::Editor(QWidget *parent)
     : QsciScintilla(parent)
@@ -28,22 +29,32 @@ Editor::Editor(QWidget *parent)
 
     // updateActionState
     connect(this, &QsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
+    // updateLineWidth
+    connect(this, &QsciScintilla::linesChanged, this, &Editor::resizeLineWidth);
     // 光标宽度
     setCaretWidth(10);
     // 创建字体
-    QFont font("JetBrains Mono NL", 9);
+    QString fontName = "LFT Etica Mono";
+    QFontDatabase database;
+    QStringList fontFamilies = database.families();
+    if (!fontFamilies.contains(fontName)) {
+        fontName = "Consolas";
+    }
+    QFont font(fontName, 9);
+    QFontMetrics _fontMetrics(font);
+    _width = _fontMetrics.horizontalAdvance(QChar('0'));
     // 设置行号字体
     setMarginsFont(font);
     // 设置显示行号
     setMarginLineNumbers(0, true);
-    // 设置行号的宽度
-    setMarginWidth(0, 50);
     // 设置折叠选项
     setFolding(QsciScintilla::BoxedTreeFoldStyle);
     setMarginWidth(2, 20);
     // 创建词法分析器
     verilogLexer = new QsciLexerVerilog(this);
     verilogLexer->setFont(font);
+    verilogLexer->setFoldComments(true); // 开启注释可折叠
+    verilogLexer->setFoldAtModule(true); // 开启模块(Module)可折叠
     tclLexer = new QsciLexerTCL(this);
     tclLexer->setFont(font);
     // tclLexer->setColor(QColor(128, 0, 0), QsciLexerTCL::Identifier);
@@ -218,3 +229,8 @@ void Editor::keyPressEvent(QKeyEvent *event)
     QsciScintilla::keyPressEvent(event);
 }
 
+void Editor::resizeLineWidth()
+{
+    // 设置行号的宽度
+    setMarginWidth(0, QString::number(lines()).size() * _width + 16);
+}

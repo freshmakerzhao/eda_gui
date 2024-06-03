@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>resource/keywords.txt</file>
-        <file>resource/JetBrainsMonoNL-Bold.ttf</file>
         <file>resource/icon.png</file>
         <file>resource/parts.yaml</file>
         <file>resource/white.png</file>

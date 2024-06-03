@@ -18,7 +18,7 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
 
     QLabel *nameLabel = new QLabel("Project name:");
     nameLineEdit = new QLineEdit;
-    nameLineEdit->setText("untitled");
+    nameLineEdit->setText("project_1");
     registerField("projectName*", nameLineEdit);
 
     QLabel *pathLabel = new QLabel("Project path:");

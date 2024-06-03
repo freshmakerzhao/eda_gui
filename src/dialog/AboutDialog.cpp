@@ -18,17 +18,22 @@ AboutDialog::AboutDialog(QWidget *parent)
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     setWindowTitle("About Software");
     QString buildDateTime = QString("%1 %2").arg(__DATE__, __TIME__);
+    QString compiler = "<unknown>";
+    #if defined(Q_CC_GNU)
+        compiler = QLatin1String("GCC ") + QLatin1String(__VERSION__);
+    #endif
+    QString compilerString = QString("%1-%2bit").arg(compiler, QString::number(QSysInfo::WordSize));
     QString version = QApplication::applicationVersion().isEmpty() ? "unknown" : QApplication::applicationVersion();
     QString information = "<html>"
                           "<h2>About HybrdLink</h2"
                           "<p>Build Date Time: %1</p>"
-                          "<p>Version: %2</p>"
-                          "<p>© 2024 Power by HybrdChip</p>"
-                          "<p>Zhongke Xin Magnetic Technology Co., Ltd.</p>"
+                          "<p>Compiler: %2</p>"
+                          "<p>Version: %3</p>"
+                          "<p>© 2024 Power by HybrdChip Zhongke Xin Magnetic Technology Co., Ltd.</p>"
                           "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a></p>"
                           "</html>";
     QLabel *textLabel = new QLabel(this);
-    textLabel->setText(information.arg(buildDateTime, version));
+    textLabel->setText(information.arg(buildDateTime, compilerString, version));
     textLabel->setTextFormat(Qt::RichText);
     textLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     textLabel->setOpenExternalLinks(true);

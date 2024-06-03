@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : EditorManager.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/4/25
+  ******************************************************************************
+  */
 #include "EditorManager.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
@@ -44,9 +53,9 @@ void EditorManager::createEditorTab(const QString &path)
 bool EditorManager::saveAllFiles()
 {
     if (isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(MainWindow::instance(), "Warning", "There are unsaved files,"
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "There are unsaved files,"
                                                                              "  save and execute?",
-                                                            QMessageBox::Yes, QMessageBox::No);
+                                                            QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::No) {
             return false;
         }
@@ -91,6 +100,7 @@ Editor *EditorManager::currentEditor()
 
 /**
  * 编辑操作
+ * @param op 操作选项
  */
 void EditorManager::editorEdit(const int op)
 {
@@ -152,9 +162,9 @@ void EditorManager::editorSaveAs()
 bool EditorManager::cleanEditorTab()
 {
     if (isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(MainWindow::instance(), "Warning", "The document has been modified.\n"
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "The document has been modified.\n"
                                                                                                "Do you want to save your changes?",
-                                                                              QMessageBox::Yes, QMessageBox::No);
+                                                                              QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::No) {
             return false;
         }

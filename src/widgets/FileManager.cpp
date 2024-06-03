@@ -11,6 +11,7 @@
 #include "FileManager.h"
 #include "mainwindow.h"
 #include "utils/ProjectManager.h"
+#include "dialog/RemoveFileDialog.h"
 
 FileManager *FileManager::instance(QWidget *parent)
 {
@@ -83,18 +84,16 @@ void FileManager::updateConstraints(const QStringList &list)
 
 void FileManager::clickedFile(const QModelIndex& index)
 {
-    QString path = index.data(Qt::UserRole).toString();
+    const QString path = index.data(Qt::UserRole).toString();
     MainWindow::instance()->createEditorTab(path);
 }
 
 void FileManager::openFileAction()
 {
-    QModelIndexList selectedIndexes = selectionModel()->selectedIndexes();
-    foreach (const QModelIndex& index, selectedIndexes) {
-        QString path = index.data(Qt::UserRole).toString(); // 获取项的Qt::UserRole数据
-        // 在此处使用数据进行打开文件操作
-        MainWindow::instance()->createEditorTab(path);
-    }
+    const QModelIndex &index = selectionModel()->currentIndex();
+    const QString path = index.data(Qt::UserRole).toString(); // 获取项的Qt::UserRole数据
+    // 在此处使用数据进行打开文件操作
+    MainWindow::instance()->createEditorTab(path);
 }
 
 void FileManager::addSourcesAction()
@@ -103,22 +102,37 @@ void FileManager::addSourcesAction()
 }
 
 /**
- * 移除选中节点，并从工程文件列表移除该文件
+ * 移除选中节点，并从工程文件列表移除该文件，(选择)删除该文件
  */
 void FileManager::removeFileAction()
 {
-    QModelIndexList selectedIndexes = selectionModel()->selectedIndexes();
+    // 获取当前右键指向的节点索引
+    const QModelIndex &index = selectionModel()->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    // 获取项的Qt::UserRole数据
+    const QString path = index.data(Qt::UserRole).toString();
 
-    foreach (const QModelIndex& index, selectedIndexes) {
-        if (index.isValid()) {
-            QString path = index.data(Qt::UserRole).toString(); // 获取项的Qt::UserRole数据
-            if (ProjectManager::instance().removeFileAction(path)) {
-                // 获取父节点的模型索引
-                QModelIndex parentIndex = index.parent();
-                // 从模型中移除选中的子节点
-                model->removeRow(index.row(), parentIndex);
-            }
-        }
+    RemoveFileDialog dialog(MainWindow::instance(), path);
+    const int op = dialog.exec();
+    bool isRemove = false;
+    switch (op) {
+    case 1: // 仅移除
+        isRemove = ProjectManager::instance().removeFileAction(path, false);
+        break;
+    case 2: // 移除+删除
+        isRemove = ProjectManager::instance().removeFileAction(path, true);
+        break;
+    default: // 忽略
+        return;
+    }
+
+    if (isRemove) {
+        // 获取父节点的模型索引
+        QModelIndex parentIndex = index.parent();
+        // 从模型中移除选中的子节点
+        model->removeRow(index.row(), parentIndex);
     }
 }
 
@@ -192,3 +206,4 @@ FileManager::~FileManager()
     // delete designsources;
     // delete constraints;
 }
+
