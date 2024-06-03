@@ -12,6 +12,7 @@
 #include "EditorManager.h"
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
+#include <QFontDatabase>
 
 Editor::Editor(QWidget *parent)
     : QsciScintilla(parent)
@@ -33,7 +34,13 @@ Editor::Editor(QWidget *parent)
     // 光标宽度
     setCaretWidth(10);
     // 创建字体
-    QFont font("JetBrains Mono NL", 9);
+    QString fontName = "LFT Etica Mono";
+    QFontDatabase database;
+    QStringList fontFamilies = database.families();
+    if (!fontFamilies.contains(fontName)) {
+        fontName = "Consolas";
+    }
+    QFont font(fontName, 9);
     QFontMetrics _fontMetrics(font);
     _width = _fontMetrics.horizontalAdvance(QChar('0'));
     // 设置行号字体
