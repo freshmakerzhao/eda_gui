@@ -40,6 +40,7 @@ public:
     void showProjectTitle(const int mode = 0, const QString &title = "");
     void setForm(const int mode = 0);
     void setRecentMenu();
+    void showIPCatalog();
 
 public slots:
     void onNewTriggered();
@@ -106,6 +107,7 @@ private:
     ads::CDockWidget *SourcesWidget;
     ads::CDockWidget *EditWidget;
     ads::CDockWidget *PropertiesWidget;
+    ads::CDockWidget *IPManagerWidget;
 };
 
 #endif // MAINWINDOW_H

@@ -10,6 +10,7 @@
 #include "mainwindow.h"
 #include "dialog/CustomMessageBox.h"
 #include "FileHelper.h"
+#include "settings/SettingsDialog.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -83,6 +84,11 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 11) {
         ProjectManager::instance().addSourcesAction();
+    } else if (mode == 12) {
+        MainWindow::instance()->showIPCatalog();
+    } else if (mode == 13) {
+        SettingsDialog dialog;
+        dialog.exec();
     }
 }
 /**
@@ -290,6 +296,7 @@ void TaskManager::setParams(const QMap<QString, QString> &params)
     projectSynthPath = path + "/runs/synth";
     projectImplPath = path + "/runs/impl";
     projectPath = path;
+    topName = params["top"];
     // 存储partname
     partName = params["part"];
     archName = params["archName"];
@@ -334,6 +341,16 @@ void TaskManager::cleanParams()
     arch = "";
 }
 
+// QString TaskManager::getTopModule()
+// {
+//     return topName;
+// }
+
+// void TaskManager::setTopModule(const QString &topModule)
+// {
+//     topName = topModule;
+// }
+
 TaskManager::TaskManager()
 {
     qDebug() << "[TaskManager] Constructing...";
@@ -348,7 +365,7 @@ void TaskManager::buildPack() {
 
     qDebug() << "buildPack";
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
+    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName,topName);
     ProcessManager::instance().checkCall("Pack", projectImplPath, QString::fromStdString(script),partName);
 }
 
@@ -361,22 +378,22 @@ void TaskManager::buildPlace(int mode) {
     std::string script;
     // 生成top.ioplace
     if (mode == 1) {
-        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
+        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
         ProcessManager::instance().checkCall("IOPlace Generation", projectPath, QString::fromStdString(script),partName);
     }
 
     // 生成top.ioplace 与 constrains.place
     if (mode == 2) {
-        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
+        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
         ProcessManager::instance().checkCall("Constraints Generation", projectImplPath, QString::fromStdString(script),partName);
     }
 
     // 完成 vpr_place
     if (mode == 3) {
-        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-        script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
+        script = CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+        script = script + " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+        script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName,topName);
         ProcessManager::instance().checkCall("Place", projectImplPath, QString::fromStdString(script),partName);
     }
 }
@@ -386,7 +403,7 @@ void TaskManager::buildPlace(int mode) {
 void TaskManager::buildRoute() {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
 
-    std::string script = CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
+    std::string script = CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName,topName);
     ProcessManager::instance().checkCall("Route", projectImplPath, QString::fromStdString(script),partName);
 }
 
@@ -394,13 +411,13 @@ void TaskManager::buildRoute() {
 std::string TaskManager::buildImpScript() {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     // pack
-    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName);
+    std::string script = CommandBuilder::instance().generateImpPackCommands(projectSynthPath,projectImplPath,archName,topName);
     // place
-    script += " && " + CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-    script += " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%");
-    script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName);
+    script += " && " + CommandBuilder::instance().generateImpIOPlaceCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+    script += " && " + CommandBuilder::instance().generateImpConstrainsCommands(projectSynthPath,projectImplPath,"%PYTHON3%",topName);
+    script += " && " + CommandBuilder::instance().generateImpPlaceCommands(projectSynthPath,projectImplPath,archName,topName);
     // route
-    script += " && " + CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName);
+    script += " && " + CommandBuilder::instance().generateImpRouteCommands(projectSynthPath,archName,topName);
     return script;
 }
 
@@ -410,12 +427,12 @@ std::string TaskManager::buildImpScript() {
 void TaskManager::buildBit(int mode) {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     if (mode == 1) {
-        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
+        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName,topName);
         ProcessManager::instance().checkCall("Fasm Generation", projectImplPath, QString::fromStdString(script),partName);
     }
     if (mode == 2) {
-        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName);
-        script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%");
+        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName,topName);
+        script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%",topName);
         ProcessManager::instance().checkCall("Bitstream Generation", projectImplPath, QString::fromStdString(script),partName);
     }
 }
@@ -427,12 +444,13 @@ void TaskManager::downloadBit() {
 }
 
 // 两个选项的弹窗，true 左侧，false 右侧
-bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft , QMessageBox::StandardButton buttonRight) {
+bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft, QMessageBox::StandardButton buttonRight) {
     // 等待用户响应
-    int msg = CustomMessageBox::showTwoOptionQuestion(
+    int msg = CustomMessageBox::showQuestion(
             MainWindow::instance(),
             title,
-            text
+            text,
+            buttonLeft | buttonRight
     );
     // 根据用户选择做出响应
     if (msg == buttonLeft) {
@@ -440,4 +458,5 @@ bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessa
     } else if (msg == buttonRight) {
         return false;
     }
+    return false;
 }

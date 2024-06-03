@@ -19,166 +19,214 @@ Project::Project(QString name,
     param["part"] = part;
     param["arch"] = arch;
     param["archName"] = archName;
+    param["topName"] = "top";
 }
 
-
-bool Project::makeProject()
+bool Project::writeProject()
 {
-    QString hprfile = param["path"] +  "/" + param["name"] + ".hpr";
-    QFile file(hprfile);
-    if(!file.remove()) { // 删除已有hpr文件
-        qDebug() << "remove error:" << file.errorString();
-    }
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "无法创建XML文件";
-        return false;
+    QString hprPath = QString("%1/%2.hpr").arg(param["path"], param["name"]);
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLDeclaration* decl = doc.NewDeclaration("xml version=\"1.0\" encoding=\"UTF-8\"");
+    doc.InsertFirstChild(decl);
+    // 版本注释
+    tinyxml2::XMLComment* versionComment = doc.NewComment("               Product Version: HybrdLink v2024.1                   ");
+    doc.InsertEndChild(versionComment);
+    // 版权注释
+    tinyxml2::XMLComment* copyrightComment = doc.NewComment(" © Copyright 2024 Zhongke Xin Magnetic Technology(Zhuhai) Co., Ltd. ");
+    doc.InsertEndChild(copyrightComment);
+    // Root
+    tinyxml2::XMLElement* project = doc.NewElement("Project");
+    doc.InsertEndChild(project);
+
+    tinyxml2::XMLElement* configuration = doc.NewElement("Configuration");
+    project->InsertEndChild(configuration);
+
+    tinyxml2::XMLElement* prjNameOption = doc.NewElement("Option");
+    prjNameOption->SetAttribute("Name", "PrjName");
+    prjNameOption->SetAttribute("Val", param["name"].toStdString().c_str());
+    configuration->InsertEndChild(prjNameOption);
+
+    // <Option Name="Part" Val="xc7a35tfgg484-2"/>
+    tinyxml2::XMLElement* partOption = doc.NewElement("Option");
+    partOption->SetAttribute("Name", "Part");
+    partOption->SetAttribute("Val", param["part"].toStdString().c_str());
+    configuration->InsertEndChild(partOption);
+
+    tinyxml2::XMLElement* archOption = doc.NewElement("Option");
+    archOption->SetAttribute("Name", "Arch");
+    archOption->SetAttribute("Val", param["arch"].toStdString().c_str());
+    configuration->InsertEndChild(archOption);
+
+    tinyxml2::XMLElement* archNameOption = doc.NewElement("Option");
+    archNameOption->SetAttribute("Name", "ArchName");
+    archNameOption->SetAttribute("Val", param["archName"].toStdString().c_str());
+    configuration->InsertEndChild(archNameOption);
+
+    // ------------------ Design Sources --------------------
+    tinyxml2::XMLElement* designSrcsfileSet = doc.NewElement("FileSet");
+    designSrcsfileSet->SetAttribute("Name", "sources");
+    project->InsertEndChild(designSrcsfileSet);
+
+    foreach (const QString designSrc, sourceList) {
+        tinyxml2::XMLElement* fileElement = doc.NewElement("File");
+        const QString item = "$PrjDir/sources/" + QFileInfo(designSrc).fileName();
+        fileElement->SetAttribute("Name", item.toStdString().c_str());
+        designSrcsfileSet->InsertEndChild(fileElement);
     }
 
-    // ================== Debug ==================
-    qDebug() << "sourceList";
-    for (const QString& source : sourceList) {
-        qDebug() << " " << source;
+    // TopModule
+    tinyxml2::XMLElement* config = doc.NewElement("Config");
+    designSrcsfileSet->InsertEndChild(config);
+    tinyxml2::XMLElement* TopModuleOption = doc.NewElement("Option");
+    TopModuleOption->SetAttribute("Name", "TopModule");
+    TopModuleOption->SetAttribute("Val", param["top"].toStdString().c_str());
+    config->InsertEndChild(TopModuleOption);
+
+    // ------------------- Constraints -----------------------
+    tinyxml2::XMLElement* constrsfileSet = doc.NewElement("FileSet");
+    constrsfileSet->SetAttribute("Name", "constraints");
+    project->InsertEndChild(constrsfileSet);
+
+    foreach (const QString constr, constraintList) {
+        tinyxml2::XMLElement* fileElement = doc.NewElement("File");
+        const QString item = "$PrjDir/constraints/" + QFileInfo(constr).fileName();
+        fileElement->SetAttribute("Name", item.toStdString().c_str());
+        constrsfileSet->InsertEndChild(fileElement);
     }
-    qDebug() << "constraintList";
-    for (const QString& constraint : constraintList) {
-        qDebug() << " " << constraint;
+
+    if (doc.SaveFile(hprPath.toStdString().c_str()) == tinyxml2::XML_SUCCESS) {
+        return true;
     }
-    // 创建XML写入器
-    QXmlStreamWriter xmlWriter(&file);
-    xmlWriter.setAutoFormatting(true);
-    xmlWriter.writeStartDocument();
-
-    // 写入XML内容
-    xmlWriter.writeStartElement("root");
-    // ================== 写入工程名称 ==================
-    xmlWriter.writeAttribute("Name", "Project");
-    xmlWriter.writeAttribute("Val", param["name"]);
-    // ========= 写入资源列表路径(以相对路径保存) ==========
-    for (const QString& source : sourceList) {
-        QString relative = "/sources/" + QFileInfo(source).fileName();
-        xmlWriter.writeTextElement("sourcePath", relative);
-    }
-    for (const QString& constraint : constraintList) {
-        QString relative = "/constraints/" + QFileInfo(constraint).fileName();
-        xmlWriter.writeTextElement("constraintPath", relative);
-    }
-    // =================== 写入Part ====================
-    xmlWriter.writeStartElement("Option");
-    xmlWriter.writeAttribute("Name", "Part");
-    xmlWriter.writeAttribute("Val", param["part"]);
-
-    // =================== 写入Arch =====================
-    xmlWriter.writeStartElement("Option");
-    xmlWriter.writeAttribute("Name", "Arch");
-    xmlWriter.writeAttribute("Val", param["arch"]);
-
-    // ================== 写入ArchName ==================
-    xmlWriter.writeStartElement("Option");
-    xmlWriter.writeAttribute("Name", "ArchName");
-    xmlWriter.writeAttribute("Val", param["archName"]);
-
-    xmlWriter.writeEndElement();
-    xmlWriter.writeEndElement();
-    xmlWriter.writeEndDocument();
-
-    file.close();
-    return true;
+    return false;
 }
 
 /**
-     * 解析工程文件，将工程参数保存在Map
-     * @param path 工程文件(*.hpr)路径
-     * @return
-     */
-bool Project::parseProject(const QString &path)
+ * 解析工程文件，将工程参数保存在Map
+ * @param hprPath 工程文件(*.hpr)路径
+ * @return
+ */
+bool Project::parseProject(const QString &hprPath)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "无法打开XML文件";
+    tinyxml2::XMLDocument doc;
+    if (doc.LoadFile(hprPath.toStdString().c_str()) != tinyxml2::XML_SUCCESS) {
+        qDebug() << "[Project] Error loading XML file";
         return false;
     }
-    param["path"] = QFileInfo(path).path();  // 获取项目文件夹绝对路径
-    QString basePath = param["path"];
-    // 创建XML读取器
-    QXmlStreamReader xmlReader(&file);
 
-    // 解析XML内容
-    while (!xmlReader.atEnd() && !xmlReader.hasError()) {
-        // 逐行解析
-        QXmlStreamReader::TokenType token = xmlReader.readNext();
+    tinyxml2::XMLElement* root = doc.FirstChildElement("Project");
+    if (!root) {
+        return false;
+    }
+    QString prjDir = QFileInfo(hprPath).path();
+    param["path"] = prjDir;  // 获取项目文件夹绝对路径
 
-        if (token == QXmlStreamReader::StartElement) {
-            QStringRef elementName = xmlReader.name();
-            if (elementName == "sourcePath") {
-                xmlReader.readNext();
-                QString absolute = basePath + xmlReader.text().toString();
-                this->sourceList.append(absolute);
-            } else if (elementName == "constraintPath") {
-                xmlReader.readNext();
-                QString absolute = basePath + xmlReader.text().toString();
-                this->constraintList.append(absolute);
-            } else if (elementName == "Option") {
-                QXmlStreamAttributes attributes = xmlReader.attributes();
-                QString name = attributes.value("Name").toString();
-                QString val = attributes.value("Val").toString();
+    // ------------------------------ Configuration --------------------------------
+    tinyxml2::XMLElement* configuration = root->FirstChildElement("Configuration");
+    if (!configuration) {
+        return false;
+    }
+    tinyxml2::XMLElement* option = configuration->FirstChildElement("Option");
+    while (option) {
+        if (std::string(option->Attribute("Name")) == "PrjName")
+            param["name"] = option->Attribute("Val");
+        if (std::string(option->Attribute("Name")) == "Part")
+            param["part"] = option->Attribute("Val");
+        if (std::string(option->Attribute("Name")) == "Arch")
+            param["arch"] = option->Attribute("Val");
+        if (std::string(option->Attribute("Name")) == "ArchName")
+            param["archName"] = option->Attribute("Val");
+        option = option->NextSiblingElement("Option");
+    }
 
-                if (!name.isEmpty()) {
-                    if (name == "Part") {
-                        param["part"] = val;
-                    } else if (name == "ArchName") {
-                        param["archName"] = val;
-                    } else if (name == "Arch") {
-                        param["arch"] = val;
-                    }
-                    // 可以根据需要添加更多的条件分支
-                }
 
-            } else if (elementName == "root") {
-                QXmlStreamAttributes attributes = xmlReader.attributes();
-                QString val = attributes.value("Val").toString();
-                param["name"] = val;
-            }
+    // ----------------------- DesignSources FileSet ---------------------------
+    QStringList designSrcs;
+    tinyxml2::XMLElement* fileSet = root->FirstChildElement("FileSet");
+    if (!fileSet->Attribute("Name", "sources")) {
+        return false;
+    }
+
+    tinyxml2::XMLElement* fileElement = fileSet->FirstChildElement("File");
+    while (fileElement) {
+        const char* name = fileElement->Attribute("Name");
+        const QString item = QString(name).replace("$PrjDir", prjDir);
+        designSrcs.append(item);
+        fileElement = fileElement->NextSiblingElement("File");
+    }
+    sourceList = designSrcs;
+    // ---------------------------- TopModule ----------------------------------
+    tinyxml2::XMLElement* config = fileSet->FirstChildElement("Config");
+    if (config) {
+        tinyxml2::XMLElement* option = config->FirstChildElement("Option");
+        if (option) {
+            const char* name = option->Attribute("Name");
+            const char* value = option->Attribute("Val");
+            if (std::string(option->Attribute("Name")) == "TopModule")
+                param["top"] = value;
+            option = option->NextSiblingElement("Option");
         }
     }
 
-    // 检查XML解析是否成功
-    if (xmlReader.hasError()) {
-        qDebug() << "解析XML文件时发生错误：" << xmlReader.errorString();
+    if (!fileSet) {
+        return false;
+    }
+    fileSet = fileSet->NextSiblingElement("FileSet");
+    if (!fileSet->Attribute("Name", "constraints")) {
         return false;
     }
 
+    // ------------------------ constraints FileSet ----------------------------
+    QStringList constrs;
+    tinyxml2::XMLElement* fileElement1 = fileSet->FirstChildElement("File");
+    while (fileElement1) {
+        const char* name = fileElement1->Attribute("Name");
+        const QString item = QString(name).replace("$PrjDir", prjDir);
+        constrs.append(item);
+        fileElement1 = fileElement1->NextSiblingElement("File");
+    }
+    constraintList = constrs;
+    
     // 输出解析结果
-    qDebug() << "=======================================";
-    qDebug() << "Project Name " << param["name"];
-    qDebug() << "Part Val:    " << param["part"];
-    qDebug() << "ArchName Val:" << param["archName"];
-    qDebug() << "Arch Val:    " << param["arch"];
-    qDebug() << "Source Path List:======================";
-    for (const QString& source : this->sourceList) {
+    qDebug() << "---------------------------------------------------------------";
+    qDebug() << "Project Name:" << param["name"];
+    qDebug() << "Part        :" << param["part"];
+    qDebug() << "ArchName    :" << param["archName"];
+    qDebug() << "Arch        :" << param["arch"];
+    qDebug() << "TopModule   :" << param["top"];
+    qDebug() << "Design Sources-------------------------------------------------";
+    foreach (const QString& source , this->sourceList) {
         qDebug() << " " << source;
     }
-    qDebug() << "Constrain Path List:===================";
-    for (const QString& constraint : this->constraintList) {
+    qDebug() << "Constraints----------------------------------------------------";
+    foreach (const QString& constraint , this->constraintList) {
         qDebug() << " " << constraint;
     }
-    qDebug() << "=======================================";
-    // 关闭文件
-    file.close();
+    qDebug() << "---------------------------------------------------------------";
     return true;
 }
 
 /**
-     * 获取工程参数
-     * @param key
-     * @return
-     */
+ * 获取工程参数
+ * @param key
+ * @return
+ */
 QString Project::getParam(const QString &key)
 {
     return param[key];
 }
 
+/**
+ * 获取所有工程参数
+ * @return
+ */
 QMap<QString, QString> Project::getAllParams()
 {
     return param;
+}
+
+void Project::setTopModule(const QString &topName)
+{
+    param["top"] = topName;
+    writeProject();
 }
 

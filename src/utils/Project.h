@@ -17,7 +17,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
-#include <QXmlStreamWriter>
+#include <tinyxml2/tinyxml2.h>
 
 class Project
 {
@@ -28,14 +28,14 @@ public:
             QString arch = "",
             QString archName = "");
 
-    bool makeProject();
+    bool writeProject();
 
     /**
      * 解析工程文件，将工程参数保存在Map
-     * @param path 工程文件(*.hpr)路径
+     * @param hprPath 工程文件(*.hpr)路径
      * @return
      */
-    bool parseProject(const QString &path);
+    bool parseProject(const QString &hprPath);
 
     /**
      * 获取工程参数
@@ -49,6 +49,8 @@ public:
      * @return
      */
     QMap<QString, QString> getAllParams();
+
+    void setTopModule(const QString &topName);
 
     QStringList sourceList;     // Sources(绝对路径)
     QStringList constraintList; // Constraints(绝对路径)

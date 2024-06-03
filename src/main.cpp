@@ -11,7 +11,17 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // 加载字体文件
-    QFontDatabase::addApplicationFont(":/resource/JetBrainsMonoNL-Bold.ttf");
+    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF");// LFT Etica Mono
+    QFontDatabase::addApplicationFont(":/resource/fonts/AlibabaPuHuiTi3.0-55Regular.ttf");
+
+    QString fontName = "Alibaba PuHuiTi 3.0";
+    QFontDatabase database;
+    QStringList fontFamilies = database.families();
+    if (!fontFamilies.contains(fontName)) {
+        fontName = "Microsoft YaHei UI";
+    }
+    QFont font(fontName, 9);
+    a.setFont(font);
 
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();

@@ -24,14 +24,12 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // Settings
     QTreeWidgetItem *settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");
     settingsItem->setIcon(0, QIcon(""));
-    settingsItem->setDisabled(true);
     // Add Sources
     QTreeWidgetItem *addSourcesItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Add Sources");
     addSourcesItem->setIcon(0, QIcon(""));
     // IP Catalog
     QTreeWidgetItem *ipCatalogItem = new QTreeWidgetItem(proMgrItem, QStringList() << "IP Catalog");
     ipCatalogItem->setIcon(0, QIcon(""));
-    ipCatalogItem->setDisabled(true);
     // ================== 综合 ==================
     QTreeWidgetItem *synthItem = new QTreeWidgetItem(this, QStringList() << "SYNTHESIS");
     synthItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
@@ -99,6 +97,10 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(10);
         } else if (item == addSourcesItem) {
             TaskManager::instance().handleTreeItemActivation(11);
+        } else if (item == ipCatalogItem) {
+            TaskManager::instance().handleTreeItemActivation(12);
+        } else if (item == settingsItem) {
+            TaskManager::instance().handleTreeItemActivation(13);
         }
         clearSelection(); // 清除选中状态
     });

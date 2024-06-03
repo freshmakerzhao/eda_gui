@@ -26,7 +26,7 @@ CommandBuilder::~CommandBuilder()
 }
 
 
-std::string CommandBuilder::generateImpPackCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName){
+std::string CommandBuilder::generateImpPackCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName,const QString& topName){
     std::map<std::string,std::string> parameters;
     QString device;
     QString rr_device;
@@ -64,10 +64,10 @@ std::string CommandBuilder::generateImpPackCommands(const QString& projectSynthP
 
     std::stringstream cmd;
 
-    // vprPath + arch.timing.xml + top.eblif + 后面的参数
+    // vprPath + arch.timing.xml + topName.eblif + 后面的参数
     std::string vprBinPath = ProcessManager::instance().getProperty("vpr_path");
     std::string archPath = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), "arch.timing.xml"});
-    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), "top.eblif"});
+    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), topName.toStdString() + ".eblif"});
     cmd << vprBinPath << " " << archPath << " " << eblifPath << " ";
 
     for(const auto& pair : parameters) {
@@ -78,13 +78,13 @@ std::string CommandBuilder::generateImpPackCommands(const QString& projectSynthP
 }
 
 
-std::string CommandBuilder::generateImpIOPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath){
+std::string CommandBuilder::generateImpIOPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath,const QString& topName){
     std::map<std::string,std::string> parameters;
 
-    parameters["blif"] = StringUtilities::concatPath({projectSynthPath.toStdString(), "top.eblif"});
+    parameters["blif"] = StringUtilities::concatPath({projectSynthPath.toStdString(), topName.toStdString() + ".eblif"});
     parameters["map"] = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), ProcessManager::instance().getProperty("part_name"), "pinmap.csv"});
-    parameters["net"] = StringUtilities::concatPath({projectImplPath.toStdString(), "top.net"});
-    parameters["output"] = StringUtilities::concatPath({projectImplPath.toStdString(), "top.ioplace"});
+    parameters["net"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".net"});
+    parameters["output"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".ioplace"});
 
     std::stringstream cmd;
     std::string executePath = ProcessManager::instance().getProperty("generate_ioplace_path");
@@ -98,16 +98,16 @@ std::string CommandBuilder::generateImpIOPlaceCommands(const QString& projectSyn
     return cmd.str();
 }
 
-std::string CommandBuilder::generateImpConstrainsCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath){
+std::string CommandBuilder::generateImpConstrainsCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath,const QString& topName){
     std::map<std::string,std::string> parameters;
 
-    parameters["blif"] = StringUtilities::concatPath({projectSynthPath.toStdString(), "top.eblif"});
-    parameters["net"] = StringUtilities::concatPath({projectImplPath.toStdString(), "top.net"});
+    parameters["blif"] = StringUtilities::concatPath({projectSynthPath.toStdString(), topName.toStdString() + ".eblif"});
+    parameters["net"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".net"});
     parameters["arch"] = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), "arch.timing.xml"});
     parameters["part"] = ProcessManager::instance().getProperty("part_name");
     parameters["vpr_grid_map"] = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), "vpr_grid_map.csv"});
     parameters["db_root"] = ProcessManager::instance().getProperty("prjxray_db_path");
-    parameters["input"] = StringUtilities::concatPath({projectImplPath.toStdString(), "top.ioplace"});
+    parameters["input"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".ioplace"});
     parameters["output"] = StringUtilities::concatPath({projectImplPath.toStdString(), "constraints.place"});
 
     std::stringstream cmd;
@@ -124,7 +124,7 @@ std::string CommandBuilder::generateImpConstrainsCommands(const QString& project
 }
 
 
-std::string CommandBuilder::generateImpPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName){
+std::string CommandBuilder::generateImpPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName,const QString& topName){
     std::map<std::string,std::string> parameters;
 
     QString device;
@@ -165,10 +165,10 @@ std::string CommandBuilder::generateImpPlaceCommands(const QString& projectSynth
 
     std::stringstream cmd;
 
-    // vprPath + arch.timing.xml + top.eblif + 后面的参数
+    // vprPath + arch.timing.xml + topName.eblif + 后面的参数
     std::string vprBinPath = ProcessManager::instance().getProperty("vpr_path");
     std::string archPath = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), "arch.timing.xml"});
-    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), "top.eblif"});
+    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), topName.toStdString() + ".eblif"});
     cmd << vprBinPath << " " << archPath << " " << eblifPath << " ";
 
     for(const auto& pair : parameters) {
@@ -179,7 +179,7 @@ std::string CommandBuilder::generateImpPlaceCommands(const QString& projectSynth
 }
 
 
-std::string CommandBuilder::generateImpRouteCommands(const QString& projectSynthPath,const QString& archName){
+std::string CommandBuilder::generateImpRouteCommands(const QString& projectSynthPath,const QString& archName,const QString& topName){
     std::map<std::string,std::string> parameters;
 
     QString device;
@@ -219,10 +219,10 @@ std::string CommandBuilder::generateImpRouteCommands(const QString& projectSynth
 
     std::stringstream cmd;
 
-    // vprPath + arch.timing.xml + top.eblif + 后面的参数
+    // vprPath + arch.timing.xml + topName.eblif + 后面的参数
     std::string vprBinPath = ProcessManager::instance().getProperty("vpr_path");
     std::string archPath = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), "arch.timing.xml"});
-    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), "top.eblif"});
+    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), topName.toStdString() + ".eblif"});
     cmd << vprBinPath << " " << archPath << " " << eblifPath << " ";
 
     for(const auto& pair : parameters) {
@@ -233,7 +233,7 @@ std::string CommandBuilder::generateImpRouteCommands(const QString& projectSynth
 }
 
 
-std::string CommandBuilder::generateFasmCommands(const QString& projectSynthPath,const QString& archName){
+std::string CommandBuilder::generateFasmCommands(const QString& projectSynthPath,const QString& archName,const QString& topName){
     std::map<std::string,std::string> parameters;
 
 
@@ -271,10 +271,10 @@ std::string CommandBuilder::generateFasmCommands(const QString& projectSynthPath
 
     std::stringstream cmd;
 
-    // vprPath + arch.timing.xml + top.eblif + 后面的参数
+    // vprPath + arch.timing.xml + topName.eblif + 后面的参数
     std::string vprBinPath = ProcessManager::instance().getProperty("generate_fasm_path");
     std::string archPath = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), "arch.timing.xml"});
-    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), "top.eblif"});
+    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), topName.toStdString() + ".eblif"});
     cmd <<  vprBinPath << " " << archPath << " " << eblifPath << " ";
 
     for(const auto& pair : parameters) {
@@ -284,7 +284,7 @@ std::string CommandBuilder::generateFasmCommands(const QString& projectSynthPath
     return cmd.str();
 }
 
-std::string CommandBuilder::generateBitCommands(const QString& projectImplPath,const std::string& pythonPath) {
+std::string CommandBuilder::generateBitCommands(const QString& projectImplPath,const std::string& pythonPath,const QString& topName){
     std::map<std::string,std::string> parameters;
 
     parameters["db-root"] = StringUtilities::concatPath({ProcessManager::instance().getProperty("prjxray_db_path"), "artix7"});
@@ -293,8 +293,8 @@ std::string CommandBuilder::generateBitCommands(const QString& projectImplPath,c
     parameters["sparse"] = "";
     parameters["frm2bit"] = ProcessManager::instance().getProperty("fasm2bit_path");
     parameters["emit_pudc_b_pullup"] = "";
-    parameters["fn_in"] = StringUtilities::concatPath({projectImplPath.toStdString(), "top.fasm"});
-    parameters["bit_out"] = StringUtilities::concatPath({projectImplPath.toStdString(), "top.bit"});
+    parameters["fn_in"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".fasm"});
+    parameters["bit_out"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".bit"});
 
     std::stringstream cmd;
     std::string xcfasmPath = ProcessManager::instance().getProperty("generate_bit_path");
@@ -320,7 +320,7 @@ std::string CommandBuilder::generateDownloadBitCommands(
 }
 
 
-std::string CommandBuilder::generateImpementationCommands(const QString& projectSynthPath,const QString& archName) {
+std::string CommandBuilder::generateImpementationCommands(const QString& projectSynthPath,const QString& archName,const QString& topName){
     std::map<std::string,std::string> parameters;
 
     QString device;
@@ -359,10 +359,10 @@ std::string CommandBuilder::generateImpementationCommands(const QString& project
 
     std::stringstream cmd;
 
-    // vprPath + arch.timing.xml + top.eblif + 后面的参数
+    // vprPath + arch.timing.xml + topName.eblif + 后面的参数
     std::string vprBinPath = ProcessManager::instance().getProperty("vpr_path");
     std::string archPath = StringUtilities::concatPath({ProcessManager::instance().getProperty("arch_path"), "arch.timing.xml"});
-    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), "top.eblif"});
+    std::string eblifPath = StringUtilities::concatPath({projectSynthPath.toStdString(), topName.toStdString() + ".eblif"});
     cmd << vprBinPath << " " << archPath << " " << eblifPath << " ";
 
     for(const auto& pair : parameters) {
