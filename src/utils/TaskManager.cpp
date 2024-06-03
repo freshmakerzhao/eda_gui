@@ -296,6 +296,7 @@ void TaskManager::setParams(const QMap<QString, QString> &params)
     projectSynthPath = path + "/runs/synth";
     projectImplPath = path + "/runs/impl";
     projectPath = path;
+    topName = params["top"];
     // 存储partname
     partName = params["part"];
     archName = params["archName"];
@@ -340,15 +341,15 @@ void TaskManager::cleanParams()
     arch = "";
 }
 
-QString TaskManager::getTopModule()
-{
-    return topName;
-}
+// QString TaskManager::getTopModule()
+// {
+//     return topName;
+// }
 
-void TaskManager::setTopModule(const QString &topModule)
-{
-    topName = topModule;
-}
+// void TaskManager::setTopModule(const QString &topModule)
+// {
+//     topName = topModule;
+// }
 
 TaskManager::TaskManager()
 {

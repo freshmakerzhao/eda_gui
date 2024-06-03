@@ -2,8 +2,7 @@
 #define CUSTOMMESSAGEBOX_H
 
 #include <QMessageBox>
-#include <QSpacerItem>
-#include <QGridLayout>
+#include <QPushButton>
 
 class CustomMessageBox : public QMessageBox
 {

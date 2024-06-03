@@ -87,6 +87,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         "   width: 60px; "                 // 宽度
         "   height: 20px; "                 // 高度
         "   padding: 4px;"                // 内边距
+        "   margin: 2px;"
         "   margin-right: 10px;"
         "}");
 

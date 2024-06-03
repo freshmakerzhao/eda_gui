@@ -1,5 +1,5 @@
 #include "GeneralPage.h"
-#include "utils/TaskManager.h"
+#include "utils/ProjectManager.h"
 
 GeneralPage::GeneralPage(QWidget *parent)
 {
@@ -12,7 +12,7 @@ GeneralPage::GeneralPage(QWidget *parent)
     // fLayout->addRow("Project device:", project_device);
     fLayout->addRow("Top module name:", top_module_name);
 
-    QString topName = TaskManager::instance().getTopModule();
+    QString topName = ProjectManager::instance().getTopModule();
     top_module_name->setText(topName);
 
 
@@ -20,5 +20,6 @@ GeneralPage::GeneralPage(QWidget *parent)
 
 void GeneralPage::setTopModule()
 {
-    TaskManager::instance().setTopModule(top_module_name->text());
+    // TaskManager::instance().setTopModule(top_module_name->text());
+    ProjectManager::instance().setTopModule(top_module_name->text());
 }

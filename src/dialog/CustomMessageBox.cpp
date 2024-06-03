@@ -1,5 +1,4 @@
 #include "CustomMessageBox.h"
-#include <QPushButton>
 
 CustomMessageBox::CustomMessageBox(QWidget *parent) : QMessageBox(parent)
 {
