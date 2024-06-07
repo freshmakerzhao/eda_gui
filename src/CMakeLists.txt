@@ -66,6 +66,7 @@ file(GLOB PROJECT_SOURCES
     base/*.cpp
     dialog/*.cpp
     ipmanager/*.cpp
+    ipmanager/BlockMemoryGenerator/*.cpp
     settings/*.cpp
     tinyxml2/*.cpp
     entity/*.cpp
@@ -83,6 +84,7 @@ file(GLOB PROJECT_HEADERS
     entity/*.h
     dialog/*.h
     ipmanager/*.h
+    ipmanager/BlockMemoryGenerator/*.h
     settings/*.h
     Qsci/*.h
     yaml-cpp/*.h

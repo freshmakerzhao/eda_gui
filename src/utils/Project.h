@@ -22,11 +22,21 @@
 class Project
 {
 public:
-    Project(QString name = "",
-            QString path = "",
-            QString part = "",
-            QString arch = "",
-            QString archName = "");
+    Project();
+
+    /**
+     * 初始化工程参数，仅在新建工程时使用
+     * @param name
+     * @param path
+     * @param part
+     * @param arch
+     * @param archName
+     */
+    void initProject(QString &name,
+                     QString &path,
+                     QString &part,
+                     QString &arch,
+                     QString &archName);
 
     bool writeProject();
 

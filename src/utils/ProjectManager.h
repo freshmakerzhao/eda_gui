@@ -24,6 +24,23 @@ public:
     static ProjectManager& instance();
 
     /**
+     * 创建一个新的HybrdLink工程
+     * @param name
+     * @param path
+     * @param part
+     * @param arch
+     * @param archName
+     * @return
+     */
+    bool createProject(QString &name,
+                       QString &path,
+                       QString &part,
+                       QString &arch,
+                       QString &archName,
+                       QStringList &designSrcs,
+                       QStringList &constraints);
+
+    /**
      * ! Reopen project on startup
      * ! Open project in New window
      * @param project 工程实例
@@ -74,6 +91,7 @@ public slots:
 private:
     ProjectManager();
 
+    // ! 指向当前打开的工程
     Project *_project = nullptr;
 };
 

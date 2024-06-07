@@ -15,9 +15,6 @@
 #include "ConstraintPage.h"
 #include "DefaultPartPage.h"
 #include "utils/ProjectManager.h"
-#include "entity/XmlRecent.h"
-#include "utils/XmlUtilities.h"
-#include "base/InitialConfig.h"
 
 Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
 {
@@ -91,7 +88,7 @@ void Wizard::onNewFinish()
         return;
     }
 
-    QString targetPath =  projectPath + "/" + projectName;
+    QString targetPath = QString("%1/%2").arg(projectPath, projectName);
     // 复制文件列表中的文件到项目文件夹sources
     foreach (const QString &file, sourcesFilesList) {
         QFile::copy(file, targetPath + "/sources/" + QFileInfo(file).fileName());
@@ -112,31 +109,13 @@ void Wizard::onNewFinish()
         constrainttmp.append(newPath);
     }
     // ============================= 生成工程 =================================
-    new_project = new Project(projectName, targetPath, part, arch, archName);
-    new_project->sourceList = sourcetmp;
-    new_project->constraintList = constrainttmp;
-    new_project->writeProject();
-    ProjectManager::instance().loadFiles(new_project);
-
-    qDebug() << " = = = = = = = = = = = = ";
-    qDebug() << new_project->getParam("path") +  "/" + new_project->getParam("name") + ".hpr";
-    qDebug() << " = = = = = = = = = = = = ";
-
-    std::vector<XmlRecent> recentLists = {
-        {0, (new_project->getParam("path") +  "/" + new_project->getParam("name") + ".hpr").toStdString()}
-    };
-    try {
-        XmlUtilities::instance().insertHybrdLinkXmlRecent(
-            InitialConfig::instance().xmlPath.toStdString().c_str(),
-            "RECENT_PROJECTS",
-            recentLists
-        );
-    } catch (const std::exception& e) {
-        // 异常
-        // 不让IO操作影响主进程
-        qDebug() << "[Wizard] An error occurred from createProject: " << e.what();
-    }
-
+    ProjectManager::instance().createProject(projectName,
+                                             targetPath,
+                                             part,
+                                             arch,
+                                             archName,
+                                             sourcetmp,
+                                             constrainttmp);
     // ============================= 清除缓存 =================================
     QDir dircache("Cache");
     if (!dircache.isEmpty()) {

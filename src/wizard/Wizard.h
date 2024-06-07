@@ -63,8 +63,6 @@ public:
     };
 
 private:
-    Project *new_project;
-
     Project *current_project;
 };
 

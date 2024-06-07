@@ -9,17 +9,31 @@
   */
 #include "Project.h"
 
-Project::Project(QString name,
-                 QString path,
-                 QString part,
-                 QString arch,
-                 QString archName){
+Project::Project()
+{
+    qDebug() << "[Project] Constructing...";
+}
+
+/**
+ * 初始化工程参数，仅在新建工程时使用
+ * @param name
+ * @param path
+ * @param part
+ * @param arch
+ * @param archName
+ */
+void Project::initProject(QString &name,
+                          QString &path,
+                          QString &part,
+                          QString &arch,
+                          QString &archName)
+{
     param["name"] = name;          // 工程名称
     param["path"] = path;          // 工程路径(绝对)
     param["part"] = part;
     param["arch"] = arch;
     param["archName"] = archName;
-    param["topName"] = "top";
+    param["top"] = "top";
 }
 
 bool Project::writeProject()
