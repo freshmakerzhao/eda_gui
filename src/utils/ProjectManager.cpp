@@ -23,6 +23,41 @@ ProjectManager &ProjectManager::instance()
 }
 
 /**
+ * 创建一个新的HybrdLink工程
+ * @param name
+ * @param path
+ * @param part
+ * @param arch
+ * @param archName
+ * @return
+ */
+bool ProjectManager::createProject(QString &name,
+                                   QString &path,
+                                   QString &part,
+                                   QString &arch,
+                                   QString &archName,
+                                   QStringList &designSrcs,
+                                   QStringList &constraints)
+{
+    // 此处的project是一个临时对象，生成工程文件后销毁
+    Project *project = new Project;
+    project->initProject(name,
+                         path,
+                         part,
+                         arch,
+                         archName);
+    project->sourceList = designSrcs;
+    project->constraintList = constraints;
+    project->writeProject();
+    delete project;
+    QString hprPath = QString("%1/%2.hpr").arg(path, name);
+    if (!openProject(hprPath)) {
+        return false;
+    }
+    return true;
+}
+
+/**
  * ! Reopen project on startup
  * ! Open project in New window
  * @param project 工程实例

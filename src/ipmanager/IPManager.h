@@ -26,9 +26,14 @@ private:
 
     void init();
 
+public slots:
+    void clickedIP(const QModelIndex& index);
+ private:
     QTreeView *treeView;
 
     QStandardItemModel *model;
+
+    QStandardItem *blockmemorygeneratoritem;
 };
 
 #endif // IPMANAGER_H

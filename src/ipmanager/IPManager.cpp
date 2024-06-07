@@ -1,4 +1,5 @@
 #include "IPManager.h"
+#include "BlockMemoryGenerator/BlockMemoryGenerator.h"
 
 IPManager *IPManager::instance()
 {
@@ -70,26 +71,41 @@ void IPManager::init()
     vlayout2->setMargin(0);
     vlayout2->addWidget(splitter);
 
-    QStandardItem *item1 = new QStandardItem(QString("Vivado Repository"));
-    model->setItem(0, 0, item1);
-    QStandardItem *item2 = new QStandardItem(QString("Alliance Partners"));
-    item1->appendRow(item2);
-    QStandardItem *item3 = new QStandardItem(QString("Arm"));
-    item2->appendRow(item3);
-    QStandardItem *item4 = new QStandardItem(QString("Arm Cortex-M1 Processor"));
-    item3->appendRow(item4);
-    QStandardItem *item5 = new QStandardItem(QString("Arm Cortex-M3 Processor"));
-    item3->appendRow(item5);
+    QStandardItem *rootItem = new QStandardItem(QString("Vivado Repository"));
+    model->setItem(0, 0, rootItem);
+    QStandardItem *basicelsmentsitem = new QStandardItem(QString("Basic Elements"));
+    rootItem->appendRow(basicelsmentsitem);
+    QStandardItem *memoryelementsitem = new QStandardItem(QString("Memory Elements"));
+    basicelsmentsitem->appendRow(memoryelementsitem);
+    blockmemorygeneratoritem = new QStandardItem(QString("Block Memory Generator"));
+    QList<QStandardItem *> rowItems;
+    rowItems.append(blockmemorygeneratoritem);
+    rowItems.append(new QStandardItem(QString("AXI4")));
+    rowItems.append(new QStandardItem(QString("Production")));
+    rowItems.append(new QStandardItem(QString("Included")));
+    rowItems.append(new QStandardItem(QString("xilinx.com:ip:blk_mem_gen:8.4")));
+    // memoryelementsitem->appendRow(blockmemorygeneratoritem);
+    memoryelementsitem->appendRow(rowItems);
+    blockmemorygeneratoritem->setData("blockmemorygenerator", Qt::UserRole);
 
-    for (int i = 0; i < 5; ++i) {
-        QList<QStandardItem *> rowItems;
-        for (int j = 0; j < headers.size(); ++j) {
-            QString data = "Data " + QString::number(i + 1) + "-" + QString::number(j + 1);
-            QStandardItem *item = new QStandardItem(data);
-            rowItems.append(item);
-        }
-        model->appendRow(rowItems);
-    }
+
+    connect(treeView, &QTreeView::doubleClicked, this, &IPManager::clickedIP);
 
     treeView->expandAll();
+}
+
+void IPManager::clickedIP(const QModelIndex &index)
+{
+    //取选中的这行的第一个元素的index
+    const QModelIndex &idx = index.sibling(index.row(),0);
+    if (!idx.isValid()) {
+        return;
+    }
+    const QString ipName = idx.data(Qt::UserRole).toString();
+    // qDebug() << idx;
+    if (ipName == "blockmemorygenerator") {
+        BlockMemoryGenerator blockMemoryGenerator(this);
+        blockMemoryGenerator.exec();
+    }
+
 }
