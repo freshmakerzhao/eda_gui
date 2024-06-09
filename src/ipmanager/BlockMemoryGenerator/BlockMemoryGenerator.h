@@ -38,24 +38,24 @@ public:
 
     int exec() override;
 
-    // ! 响应MemoryType选择
-    // ! 更新Summary
-    // ！更新Tab
+    //! 响应MemoryType选择
+    //! 更新Summary页面
+    //! 更新Tab
     void updateMemoryType(const QString &option);
 private:
     QTabWidget *tabWidget;
 
     QLineEdit *cmptNameLineEdit;
 
-    BasicWidget *basic;
+    BasicWidget *basicWidget;
 
-    PortAOptionsWidget *portAOptions;
+    PortAOptionsWidget *portAOptionsWidget;
 
-    PortBOptionsWidget *portBOptions;
+    PortBOptionsWidget *portBOptionsWidget;
 
-    OtherOptionsWidget *otherOptions;
+    OtherOptionsWidget *otherOptionsWidget;
 
-    SummaryWidget *summary;
+    SummaryWidget *summaryWidget;
 
     QGraphicsView *viewModule;
 

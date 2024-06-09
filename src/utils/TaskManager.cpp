@@ -3,7 +3,7 @@
 #include "utils/ProcessManager.h"
 #include "utils/StringUtilities.h"
 #include "utils/CommandBuilder.h"
-#include "utils/ProjectManager.h"
+#include "ProjectManager.h"
 #include "widgets/Infowidget.h"
 #include "widgets/FrameView.h"
 #include "widgets/EditorManager.h"
@@ -289,18 +289,18 @@ QStringList TaskManager::buildSynthScript() {
 /**
   * 设置工程参数
   */
-void TaskManager::setParams(const QMap<QString, QString> &params)
+void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
 {
     // 存储路径
-    QString path = params["path"];
+    QString path = params[Project::Path];
     projectSynthPath = path + "/runs/synth";
     projectImplPath = path + "/runs/impl";
     projectPath = path;
-    topName = params["top"];
+    topName = params[Project::TopModule];
     // 存储partname
-    partName = params["part"];
-    archName = params["archName"];
-    arch = params["arch"];
+    partName = params[Project::Part];
+    archName = params[Project::ArchName];
+    arch = params[Project::Arch];
 
     // 测试用
     QString TEST_PATH1 = "E:/workspace/qt_demo/resource_win";
@@ -340,16 +340,6 @@ void TaskManager::cleanParams()
     archName = "";
     arch = "";
 }
-
-// QString TaskManager::getTopModule()
-// {
-//     return topName;
-// }
-
-// void TaskManager::setTopModule(const QString &topModule)
-// {
-//     topName = topModule;
-// }
 
 TaskManager::TaskManager()
 {

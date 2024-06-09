@@ -69,17 +69,17 @@ BlockMemoryGenerator::BlockMemoryGenerator(QWidget *parent) :
     vLayout->setStretchFactor(AvLayout, 1);
     vLayout->setStretchFactor(splitter, 13);
 
-    basic = new BasicWidget(this);
-    connect(basic, &BasicWidget::memoryTypeComboBoxChangeSignal, this, &BlockMemoryGenerator::updateMemoryType);
-    portAOptions = new PortAOptionsWidget(this);
-    portBOptions = new PortBOptionsWidget(this);
-    otherOptions = new OtherOptionsWidget(this);
-    summary = new SummaryWidget(this);
+    basicWidget = new BasicWidget(this);
+    connect(basicWidget, &BasicWidget::memoryTypeComboBoxChangeSignal, this, &BlockMemoryGenerator::updateMemoryType);
+    portAOptionsWidget = new PortAOptionsWidget(this);
+    portBOptionsWidget = new PortBOptionsWidget(this);
+    otherOptionsWidget = new OtherOptionsWidget(this);
+    summaryWidget = new SummaryWidget(this);
 
-    tabWidget->addTab(basic, "Basic");
-    tabWidget->addTab(portAOptions, "Port A Options");
-    tabWidget->addTab(otherOptions, "Other Options");
-    tabWidget->addTab(summary, "Summary");
+    tabWidget->addTab(basicWidget, "Basic");
+    tabWidget->addTab(portAOptionsWidget, "Port A Options");
+    tabWidget->addTab(otherOptionsWidget, "Other Options");
+    tabWidget->addTab(summaryWidget, "Summary");
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
     // QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
@@ -103,16 +103,15 @@ int BlockMemoryGenerator::exec()
 
 void BlockMemoryGenerator::updateMemoryType(const QString &option)
 {
+    //! 更新summary
     qDebug() << "Memory Type : " << option;
-    summary->setMemoryTypeInformation(option);
-    // ! 当option为Simple Dual Port RAM |
-    // ！          True Dual Port RAM  |
-    // !           Dual Port ROM
-    // ! 显示Port B Options
+    summaryWidget->setMemoryTypeInformation(option);
+
+    //! Simple Dual Port RAM, True Dual Port RAM, Dual Port ROM 显示Port B Options
     if (option == "Simple Dual Port RAM" ||
         option == "True Dual Port RAM" ||
         option == "Dual Port ROM") {
-        tabWidget->insertTab(2, portBOptions, "Port B Options");
+        tabWidget->insertTab(2, portBOptionsWidget, "Port B Options");
         return;
     }
     if (tabWidget->count() == 5) {
@@ -124,5 +123,7 @@ void BlockMemoryGenerator::updateMemoryType(const QString &option)
 void BlockMemoryGenerator::onipLocActionTrigger()
 {
     IPlocationDialog dialog(this);
+    QPoint globalPos = this->mapToGlobal(QPoint(0, 0));
+    dialog.move(globalPos.x() + 200, globalPos.y() + 100);
     dialog.exec();
 }

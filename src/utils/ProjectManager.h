@@ -91,6 +91,8 @@ public slots:
 private:
     ProjectManager();
 
+    ~ProjectManager();
+
     // ! 指向当前打开的工程
     Project *_project = nullptr;
 };

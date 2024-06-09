@@ -14,6 +14,11 @@ Project::Project()
     qDebug() << "[Project] Constructing...";
 }
 
+Project::~Project()
+{
+    qDebug() << "[Project] Distructing...";
+}
+
 /**
  * 初始化工程参数，仅在新建工程时使用
  * @param name
@@ -28,17 +33,18 @@ void Project::initProject(QString &name,
                           QString &arch,
                           QString &archName)
 {
-    param["name"] = name;          // 工程名称
-    param["path"] = path;          // 工程路径(绝对)
-    param["part"] = part;
-    param["arch"] = arch;
-    param["archName"] = archName;
-    param["top"] = "top";
+    param[Project::Name] = name;         // 工程名称
+    param[Project::Path] = path;         // 工程路径(绝对)
+    param[Project::Part] = part;
+    param[Project::Arch] = arch;
+    param[Project::ArchName] = archName;
+    param[Project::TopModule] = "top";
 }
 
 bool Project::writeProject()
 {
-    QString hprPath = QString("%1/%2.hpr").arg(param["path"], param["name"]);
+    //! 工程文件的路径为: path/name.hpr
+    QString hprPath = QString("%1/%2.hpr").arg(param[Project::Path], param[Project::Name]);
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLDeclaration* decl = doc.NewDeclaration("xml version=\"1.0\" encoding=\"UTF-8\"");
     doc.InsertFirstChild(decl);
@@ -57,23 +63,23 @@ bool Project::writeProject()
 
     tinyxml2::XMLElement* prjNameOption = doc.NewElement("Option");
     prjNameOption->SetAttribute("Name", "PrjName");
-    prjNameOption->SetAttribute("Val", param["name"].toStdString().c_str());
+    prjNameOption->SetAttribute("Val", param[Project::Name].toStdString().c_str());
     configuration->InsertEndChild(prjNameOption);
 
     // <Option Name="Part" Val="xc7a35tfgg484-2"/>
     tinyxml2::XMLElement* partOption = doc.NewElement("Option");
     partOption->SetAttribute("Name", "Part");
-    partOption->SetAttribute("Val", param["part"].toStdString().c_str());
+    partOption->SetAttribute("Val", param[Project::Part].toStdString().c_str());
     configuration->InsertEndChild(partOption);
 
     tinyxml2::XMLElement* archOption = doc.NewElement("Option");
     archOption->SetAttribute("Name", "Arch");
-    archOption->SetAttribute("Val", param["arch"].toStdString().c_str());
+    archOption->SetAttribute("Val", param[Project::Arch].toStdString().c_str());
     configuration->InsertEndChild(archOption);
 
     tinyxml2::XMLElement* archNameOption = doc.NewElement("Option");
     archNameOption->SetAttribute("Name", "ArchName");
-    archNameOption->SetAttribute("Val", param["archName"].toStdString().c_str());
+    archNameOption->SetAttribute("Val", param[Project::ArchName].toStdString().c_str());
     configuration->InsertEndChild(archNameOption);
 
     // ------------------ Design Sources --------------------
@@ -93,7 +99,7 @@ bool Project::writeProject()
     designSrcsfileSet->InsertEndChild(config);
     tinyxml2::XMLElement* TopModuleOption = doc.NewElement("Option");
     TopModuleOption->SetAttribute("Name", "TopModule");
-    TopModuleOption->SetAttribute("Val", param["top"].toStdString().c_str());
+    TopModuleOption->SetAttribute("Val", param[Project::TopModule].toStdString().c_str());
     config->InsertEndChild(TopModuleOption);
 
     // ------------------- Constraints -----------------------
@@ -132,7 +138,7 @@ bool Project::parseProject(const QString &hprPath)
         return false;
     }
     QString prjDir = QFileInfo(hprPath).path();
-    param["path"] = prjDir;  // 获取项目文件夹绝对路径
+    param[Project::Path] = prjDir;  // 获取项目文件夹绝对路径
 
     // ------------------------------ Configuration --------------------------------
     tinyxml2::XMLElement* configuration = root->FirstChildElement("Configuration");
@@ -142,13 +148,13 @@ bool Project::parseProject(const QString &hprPath)
     tinyxml2::XMLElement* option = configuration->FirstChildElement("Option");
     while (option) {
         if (std::string(option->Attribute("Name")) == "PrjName")
-            param["name"] = option->Attribute("Val");
+            param[Project::Name] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "Part")
-            param["part"] = option->Attribute("Val");
+            param[Project::Part] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "Arch")
-            param["arch"] = option->Attribute("Val");
+            param[Project::Arch] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "ArchName")
-            param["archName"] = option->Attribute("Val");
+            param[Project::ArchName] = option->Attribute("Val");
         option = option->NextSiblingElement("Option");
     }
 
@@ -176,7 +182,7 @@ bool Project::parseProject(const QString &hprPath)
             const char* name = option->Attribute("Name");
             const char* value = option->Attribute("Val");
             if (std::string(option->Attribute("Name")) == "TopModule")
-                param["top"] = value;
+                param[Project::TopModule] = value;
             option = option->NextSiblingElement("Option");
         }
     }
@@ -202,11 +208,11 @@ bool Project::parseProject(const QString &hprPath)
     
     // 输出解析结果
     qDebug() << "---------------------------------------------------------------";
-    qDebug() << "Project Name:" << param["name"];
-    qDebug() << "Part        :" << param["part"];
-    qDebug() << "ArchName    :" << param["archName"];
-    qDebug() << "Arch        :" << param["arch"];
-    qDebug() << "TopModule   :" << param["top"];
+    qDebug() << "Project Name:" << param[Project::Name];
+    qDebug() << "Part        :" << param[Project::Part];
+    qDebug() << "Arch        :" << param[Project::Arch];
+    qDebug() << "ArchName    :" << param[Project::ArchName];
+    qDebug() << "TopModule   :" << param[Project::TopModule];
     qDebug() << "Design Sources-------------------------------------------------";
     foreach (const QString& source , this->sourceList) {
         qDebug() << " " << source;
@@ -224,7 +230,7 @@ bool Project::parseProject(const QString &hprPath)
  * @param key
  * @return
  */
-QString Project::getParam(const QString &key)
+QString Project::getParam(ParamKey key) const
 {
     return param[key];
 }
@@ -233,14 +239,14 @@ QString Project::getParam(const QString &key)
  * 获取所有工程参数
  * @return
  */
-QMap<QString, QString> Project::getAllParams()
+QMap<Project::ParamKey, QString> Project::getAllParams() const
 {
     return param;
 }
 
 void Project::setTopModule(const QString &topName)
 {
-    param["top"] = topName;
+    param[Project::TopModule] = topName;
     writeProject();
 }
 
