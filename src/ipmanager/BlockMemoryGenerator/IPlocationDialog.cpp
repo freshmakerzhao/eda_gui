@@ -3,13 +3,17 @@
 IPlocationDialog::IPlocationDialog(QWidget *parent) :
     QDialog(parent)
 {
-    setFixedHeight(70);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    // setFixedHeight(70);
+    setFixedSize(700, 50);
     QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(9, 0, 9, 0);
     layout->addWidget(new QLabel("IP location"));
     locationLineEdit = new QLineEdit(this);
     locationLineEdit->setClearButtonEnabled(true);
     layout->addWidget(locationLineEdit);
     locationButton = new QPushButton("...", this);
+    locationButton->setFixedWidth(40);
     layout->addWidget(locationButton);
     connect(locationButton, &QPushButton::clicked, this, &IPlocationDialog::onLocationButtonClicked);
 }

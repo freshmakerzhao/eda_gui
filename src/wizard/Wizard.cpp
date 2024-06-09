@@ -129,7 +129,7 @@ void Wizard::onAddFinish()
     if (current_project == nullptr) {
         return;
     }
-    QString path = current_project->getParam("path");
+    QString path = current_project->getParam(Project::Path);
     qDebug() << path;
     QString addSourcesPath = path + "/sources/";
     QStringList files = sourcesFilesList;

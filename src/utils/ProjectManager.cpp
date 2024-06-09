@@ -70,10 +70,10 @@ bool ProjectManager::startProcess(Project *project)
     // 创建一个新进程
     QProcess *process = new QProcess();
     // 传入新打开工程路径
-    QString hprfile = project->getParam("path") +  "/" + project->getParam("name") + ".hpr";
-    qDebug() << hprfile;
+    QString hprPath = QString("%1/%2.hpr").arg(project->getParam(Project::Path), project->getParam(Project::Name));
+    // qDebug() << "Start New Process : " << hprPath;
     // 启动程序本身
-    process->start(programPath, QStringList() << hprfile);
+    process->start(programPath, QStringList() << hprPath);
 
     return true;
 }
@@ -156,7 +156,7 @@ void ProjectManager::loadFiles(Project *project)
     FileManager::instance()->updateDesignSources(_project->sourceList);
     FileManager::instance()->updateConstraints(_project->constraintList);
     // UI反馈
-    MainWindow::instance()->showProjectTitle(0, _project->getParam("path") + "/" + _project->getParam("name") + ".hpr");
+    MainWindow::instance()->showProjectTitle(0, _project->getParam(Project::Path) + "/" + _project->getParam(Project::Name) + ".hpr");
     MainWindow::instance()->setForm(0);
 }
 
@@ -213,7 +213,7 @@ void ProjectManager::setTopModule(const QString &topModule)
 QString ProjectManager::getTopModule()
 {
     if (_project) {
-        return _project->getParam("top");
+        return _project->getParam(Project::TopModule);
     }
     return QString();
 }
@@ -247,3 +247,10 @@ void ProjectManager::closeProject()
 }
 
 ProjectManager::ProjectManager() {}
+
+ProjectManager::~ProjectManager()
+{
+    if (_project) {
+        delete _project;
+    }
+}

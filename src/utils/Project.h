@@ -24,6 +24,17 @@ class Project
 public:
     Project();
 
+    ~Project();
+
+    enum ParamKey {
+        Name,
+        Path,
+        Part,
+        Arch,
+        ArchName,
+        TopModule
+    };
+
     /**
      * 初始化工程参数，仅在新建工程时使用
      * @param name
@@ -52,21 +63,23 @@ public:
      * @param key
      * @return
      */
-    QString getParam(const QString& key);
+    QString getParam(ParamKey key) const;
 
     /**
      * 获取所有工程参数
      * @return
      */
-    QMap<QString, QString> getAllParams();
+    QMap<ParamKey, QString> getAllParams() const;
 
     void setTopModule(const QString &topName);
 
     QStringList sourceList;     // Sources(绝对路径)
     QStringList constraintList; // Constraints(绝对路径)
 
+
+
 private:
-    QMap<QString, QString> param;    // 工程参数
+    QMap<ParamKey, QString> param;    // 工程参数
 
     // QMap<QString, QStringList> files; // 工程文件
 };

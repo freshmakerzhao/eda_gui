@@ -23,7 +23,7 @@ public:
 
     QLabel *portADepthRangeLabel;
 
-    // ! Port A Depth Range动态更新接口
+    //! Port A Depth Range动态更新接口
     void updatePortADepthRange();
 
 private:

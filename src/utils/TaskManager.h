@@ -4,6 +4,8 @@
 #include <QTreeWidget>
 #include <QDebug>
 #include <QMessageBox>
+#include "utils/Project.h"
+
 class TaskManager : public QObject
 {
     Q_OBJECT
@@ -15,7 +17,7 @@ public:
     /**
      * 设置工程参数
      */
-    void setParams(const QMap<QString, QString> &params);
+    void setParams(const QMap<Project::ParamKey, QString> &params);
 
     /**
      * 任务分配器
@@ -35,10 +37,6 @@ public:
      * 关闭工程清除参数
     */
     void cleanParams();
-
-    // QString getTopModule();
-
-    // void setTopModule(const QString &topModule);
 
 //    QStringList sourceList;
     // 存储设计与约束文件
