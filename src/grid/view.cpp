@@ -98,7 +98,7 @@ View::View(const QString &name, QWidget *parent)
     zoomInIcon->setAutoRepeat(true); // 允许长按触发（自动重复）
     zoomInIcon->setAutoRepeatInterval(33); // 设置放大按钮的触发间隔为33毫秒
     zoomInIcon->setAutoRepeatDelay(0); // 设置放大按钮的延迟为0毫秒
-    zoomInIcon->setIcon(QPixmap(":/gridview/resource/gridview/zoomin.png"));
+    zoomInIcon->setIcon(QPixmap(":/gridview/resource/gridview/22-1icon_zoom_in.png"));
     zoomInIcon->setIconSize(iconSize); // 设置放大按钮的图标尺寸为iconSize
 
     // 缩小按钮
@@ -106,7 +106,7 @@ View::View(const QString &name, QWidget *parent)
     zoomOutIcon->setAutoRepeat(true);
     zoomOutIcon->setAutoRepeatInterval(33);
     zoomOutIcon->setAutoRepeatDelay(0);
-    zoomOutIcon->setIcon(QPixmap(":/gridview/resource/gridview/zoomout.png"));
+    zoomOutIcon->setIcon(QPixmap(":/gridview/resource/gridview/22-2icon_zoom_out.png"));
     zoomOutIcon->setIconSize(iconSize);
 
     zoomSlider = new QSlider;
@@ -123,10 +123,10 @@ View::View(const QString &name, QWidget *parent)
 
     // 左旋右旋按钮
     QToolButton *rotateLeftIcon = new QToolButton;
-    rotateLeftIcon->setIcon(QPixmap(":/gridview/resource/gridview/rotateleft.png"));
+    rotateLeftIcon->setIcon(QPixmap(":/gridview/resource/gridview/36-2icon_anticlockwise_rotate.png"));
     rotateLeftIcon->setIconSize(iconSize);
     QToolButton *rotateRightIcon = new QToolButton;
-    rotateRightIcon->setIcon(QPixmap(":/gridview/resource/gridview/rotateright.png"));
+    rotateRightIcon->setIcon(QPixmap(":/gridview/resource/gridview/36-1icon_clockwise_rotate.png"));
     rotateRightIcon->setIconSize(iconSize);
 
     // 设置刻度等，与缩放类似

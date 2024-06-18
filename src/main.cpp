@@ -11,7 +11,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // 加载字体文件
-    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF");// LFT Etica Mono
+//    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF");// LFT Etica Mono
+    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
     QFontDatabase::addApplicationFont(":/resource/fonts/AlibabaPuHuiTi3.0-55Regular.ttf");
 
     QString fontName = "Alibaba PuHuiTi 3.0";
@@ -27,8 +28,12 @@ int main(int argc, char *argv[])
     InitialConfig::instance().initializeRoamingPath();
 
     // 启动画面
-    QPixmap pix(":/resource/logo.png");
-    QSplashScreen splash(pix.scaled(440, 440, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+//    QPixmap pix(":/resource/logo.png");
+//    QPixmap pix(":/resource/start01.jpg");
+    QPixmap pix(":/resource/start02.jpg");
+
+//    QSplashScreen splash(pix.scaled(440, 440, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    QSplashScreen splash(pix.scaled(640, 640, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     splash.show();
     a.processEvents();
     splash.finish(MainWindow::instance()); // 启动画面结束

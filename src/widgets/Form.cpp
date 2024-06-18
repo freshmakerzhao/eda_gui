@@ -51,68 +51,127 @@ Form::Form(QWidget *parent)
     // 水平布局，存放下方两个区域，左侧区域为功能按钮，右侧区域为recentList
     QHBoxLayout *contentLayout = new QHBoxLayout;
     // ========================== 左侧功能区域 ==========================
-    // ========================== Quick Start ==========================
     QVBoxLayout *leftLayout = new QVBoxLayout; // 左侧功能布局
-    QGroupBox *leftGroupBoxOne = new QGroupBox("Quick Start");
-    QVBoxLayout *leftGroupLayoutOne = new QVBoxLayout(leftGroupBoxOne);
+    // ========================== Quick Start ==========================
+    QWidget *leftWidgetOne = new QWidget();
+    leftWidgetOne->setFixedHeight(195); // 设置固定高度
+    QVBoxLayout *leftGroupLayoutOne = new QVBoxLayout(leftWidgetOne);
+    // 创建标题
+    QLabel *titleLabelOne = new QLabel("Quick Start");
+    titleLabelOne->setStyleSheet("font-size: 30px;padding-left: 4px;color: white; ");
+    // 创建按钮
     QPushButton *leftCreateProjectBtn = new QPushButton("Create Project >");
-    leftCreateProjectBtn->setFixedWidth(300);
     connect(leftCreateProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onNewTriggered);
     QPushButton *leftOpenProjectBtn = new QPushButton("Open Project >");
-    leftOpenProjectBtn->setFixedWidth(300);
     connect(leftOpenProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onOpenTriggered);
     QPushButton *leftOpenExampleBtn = new QPushButton("Open Example Project >");
-    leftOpenExampleBtn->setEnabled(false);
+    // 将标题和按钮添加到布局中
+    leftGroupLayoutOne->addWidget(titleLabelOne);
     leftGroupLayoutOne->addWidget(leftCreateProjectBtn);
     leftGroupLayoutOne->addWidget(leftOpenProjectBtn);
     leftGroupLayoutOne->addWidget(leftOpenExampleBtn);
-    leftGroupBoxOne->setStyleSheet(
-           "QWidget { background-image: url(:/resource/white.png); }"
-           "QGroupBox { font-family: Console; font-size: 30px; }"
-           "QPushButton { border: none; text-align: left; font-size: 22px; }"
-           "QPushButton:hover { color: #4f7cce; text-decoration:underline;}"
+    // 设置 leftWidgetOne 的样式表
+    leftWidgetOne->setStyleSheet(
+            "QWidget {"
+            "    background-color: rgb(77, 128, 127);"
+            "    border: none;"
+            "}"
+            "QPushButton { "
+                "border: none; "
+                "text-align: left; "
+                "font-size: 18px; "
+                "background-color: transparent; " /* 设置背景为透明 */
+                "color: white; "
+                "padding-left: 10px; "
+            "} "
+            "QPushButton:hover { "
+                "text-decoration: underline; "
+            "}"
     );
-    leftLayout->addWidget(leftGroupBoxOne);
+
+    // 将 QWidget 添加到左侧布局
+    leftLayout->addWidget(leftWidgetOne);
+    leftLayout->addSpacing(20); // 间距
+
     // ========================== Tasks ==========================
-    QGroupBox *leftGroupBoxTwo = new QGroupBox("Tasks");
-    QVBoxLayout *leftGroupLayoutTwo = new QVBoxLayout(leftGroupBoxTwo);
+    QWidget *leftWidgetTwo = new QWidget();
+    leftWidgetTwo->setFixedHeight(195); // 设置固定高度
+    QVBoxLayout *leftGroupLayoutTwo = new QVBoxLayout(leftWidgetTwo);
+    // 创建标题
+    QLabel *titleLabelTwo = new QLabel("Tasks");
+    titleLabelTwo->setStyleSheet("font-size: 30px;padding-left: 4px;");
+    // 创建按钮
     QPushButton *button4 = new QPushButton("Manage IP >");
     QPushButton *button5 = new QPushButton("Open Hardware Manager >");
     QPushButton *button6 = new QPushButton("XHub Store >");
-    button4->setEnabled(false);
-    button5->setEnabled(false);
-    button6->setEnabled(false);
+
+    leftGroupLayoutTwo->addWidget(titleLabelTwo);
     leftGroupLayoutTwo->addWidget(button4);
     leftGroupLayoutTwo->addWidget(button5);
     leftGroupLayoutTwo->addWidget(button6);
-    leftGroupBoxTwo->setStyleSheet(
-            "QWidget { background-image: url(:/resource/white.png); }"
-            "QGroupBox { font-family: Console; font-size: 30px; }"
-            "QPushButton { border: none; text-align: left; font-size: 22px; }"
-            "QPushButton:hover { color: #4f7cce; text-decoration:underline;}"
+    leftWidgetTwo->setStyleSheet(
+            "QWidget {"
+            "    background-color: rgb(156, 201, 223);"
+            "    border: none;"
+            "}"
+            "QPushButton { "
+                "padding-left: 10px; "
+                "border: none; "
+                "text-align: left; "
+                "font-size: 18px; "
+                "background-color: transparent; "
+                "color: rgb(64, 64, 64); "
+            "} "
+            "QPushButton:hover { "
+                "text-decoration: underline; "
+            "}"
     );
-    leftLayout->addWidget(leftGroupBoxTwo);
+    leftLayout->addWidget(leftWidgetTwo);
+    leftLayout->addSpacing(20); // 间距
+
     // ========================== Learning Center ==========================
-    QGroupBox *leftGroupBoxThree = new QGroupBox("Learning Center");
-    QVBoxLayout *leftGroupLayoutThree = new QVBoxLayout(leftGroupBoxThree);
+
+    QWidget *leftWidgetThree = new QWidget();
+    leftWidgetThree->setFixedHeight(195); // 设置固定高度
+    QVBoxLayout *leftGroupLayoutThree = new QVBoxLayout(leftWidgetThree);
+    // 创建标题
+    QLabel *titleLabelThree = new QLabel("Learning Center");
+    titleLabelThree->setStyleSheet("font-size: 30px;padding-left: 4px;");
+    // 创建按钮
     QPushButton *button7 = new QPushButton("Documention One >");
     QPushButton *button8 = new QPushButton("Documention Two >");
     QPushButton *button9 = new QPushButton("Documention Three >");
-    button7->setEnabled(false);
-    button8->setEnabled(false);
-    button9->setEnabled(false);
+
+    leftGroupLayoutThree->addWidget(titleLabelThree);
     leftGroupLayoutThree->addWidget(button7);
     leftGroupLayoutThree->addWidget(button8);
     leftGroupLayoutThree->addWidget(button9);
-    leftGroupBoxThree->setStyleSheet(
-            "QWidget { background-image: url(:/resource/white.png); }"
-            "QGroupBox { font-family: Console; font-size: 30px; }"
-            "QPushButton { border: none; text-align: left; font-size: 22px; }"
-            "QPushButton:hover { color: #4f7cce; text-decoration:underline;}"
+    leftWidgetThree->setStyleSheet(
+            "QWidget {"
+            "    background-color: rgb(156, 201, 223);"
+            "    border: none;"
+            "}"
+            "QPushButton { "
+                "padding-left: 10px; "
+                "border: none; "
+                "text-align: left; "
+                "font-size: 18px; "
+                "background-color: transparent; "
+                "color: rgb(64, 64, 64); "
+            "} "
+            "QPushButton:hover { "
+                "text-decoration:underline;"
+            "}"
     );
-    leftLayout->addWidget(leftGroupBoxThree);
-    contentLayout->addLayout(leftLayout);
+    leftLayout->addWidget(leftWidgetThree);
 
+    // ========================== 调整左侧部分布局 ==========================
+    QWidget *leftWidget = new QWidget;
+    leftWidget->setLayout(leftLayout);
+//    leftWidget->setFixedHeight(600); // 设置左侧布局的固定高度
+
+    contentLayout->addWidget(leftWidget);
+    contentLayout->setAlignment(leftWidget, Qt::AlignTop); // 设置顶部对齐
 
     // ========================== 右侧功能区域 ==========================
     QVBoxLayout *rightLayout = new QVBoxLayout; // 右侧功能区域
@@ -146,7 +205,7 @@ Form::Form(QWidget *parent)
             "QListWidget::item:hover {"
             "    background-color: #ccdefd;"
             "}"
-            "QGroupBox { font-family: Console; font-size: 30px; }"
+            "QGroupBox { font-size: 30px; }"
     );
     rightGroupLayoutOne->addWidget(listWidget1);
     // ========================== Recent IP ============================
@@ -173,7 +232,7 @@ Form::Form(QWidget *parent)
             "QListWidget::item:hover {"
             "    background-color: #ccdefd;"
             "}"
-            "QGroupBox { font-family: Console; font-size: 30px; }"
+            "QGroupBox { font-size: 30px; }"
     );
     rightGroupLayoutTwo->addWidget(listWidget2);
     // ========================== 绑定右侧布局 ============================
