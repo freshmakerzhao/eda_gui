@@ -23,6 +23,7 @@ CustomListWidget::CustomListWidget(const QString &projectName, const QString &pr
     QFont pathFont = pathLabel->font();
     pathFont.setPointSize(10);
     pathLabel->setFont(pathFont);
+    pathLabel->setStyleSheet("QLabel { color: rgb(134, 135, 135); }");
 
     layout->addWidget(titleLabel);
     layout->addWidget(pathLabel);

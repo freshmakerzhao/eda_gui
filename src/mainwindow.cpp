@@ -255,11 +255,11 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu = menuBar->addMenu("View");
     helpMenu = menuBar->addMenu("Help");
     // ===================== FILE ======================
-    newAction = new QAction("New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-    openAction = new QAction("Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    newAction = new QAction(QIcon(":icons/resource/icons/35-icon_new_project.png"),"New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    openAction = new QAction(QIcon(":icons/resource/icons/21-icon_open_extend.png"), "Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     closeAction = new QAction("Close Project", this);
     openFileAction = new QAction("Open File", this);
-    saveAction = new QAction("Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+    saveAction = new QAction(QIcon(":icons/resource/icons/30-icon_save.png"), "Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     saveasAction = new QAction("Save As", this);
     exitAction = new QAction("Exit", this), exitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F4));
     fileMenu->addActions({newAction, openAction, closeAction}), fileMenu->addSeparator();
@@ -279,11 +279,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     // ===================== EDIT ======================
-    cutAction = new QAction("Cut", this), cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
-    copyAction = new QAction("Copy", this), copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-    pasteAction = new QAction("Paste", this), pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
-    undoAction = new QAction("Undo", this), undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
-    redoAction = new QAction("Redo", this), redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
+    cutAction = new QAction(QIcon(":icons/resource/icons/31-icon_cut.png"), "Cut", this), cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    copyAction = new QAction(QIcon(":icons/resource/icons/14-icon_copy.png"),"Copy", this), copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    pasteAction = new QAction(QIcon(":icons/resource/icons/32-icon_paste.png"), "Paste", this), pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    undoAction = new QAction(QIcon(":icons/resource/icons/29-1icon_undo.png"), "Undo", this), undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
+    redoAction = new QAction(QIcon(":icons/resource/icons/29-2icon_redo.png"), "Redo", this), redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
     editMenu->addActions({cutAction, copyAction, pasteAction}), editMenu->addSeparator();
     editMenu->addActions({undoAction, redoAction});
     // ================== 编辑器按钮绑定 ==================
@@ -307,6 +307,8 @@ MainWindow::MainWindow(QWidget *parent)
     toolbar->addActions({newAction, openAction, saveAction}), toolbar->addSeparator();
     toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
     toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
+    // 设置工具栏图标的大小
+    toolbar->setIconSize(QSize(16, 16));
     // toolbar->addActions({chipPlannerAction});
     addToolBar(toolbar);
     // ================= EDITOR TAB ====================

@@ -28,7 +28,7 @@ void FileManager::showContextMenu(const QPoint &pos)
     // 获取选中项的索引
     QModelIndex currentIndex = indexAt(pos);
 
-    QAction addSourcesAction("Add Sources...", this);
+    QAction addSourcesAction(QIcon(":icons/resource/icons/12-1icon_add.png"),"Add Sources...", this);
     // addSourcesAction.setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
     QAction openFileAction("Open File", this);
     // openFileAction.setShortcut(QKeySequence(Qt::ALT + Qt::Key_O));
@@ -62,7 +62,7 @@ void FileManager::updateDesignSources(const QStringList &list)
 {
     designsources->removeRows(0, designsources->rowCount());
     foreach (const QString &file, list) {
-        QStandardItem* node = new QStandardItem(QFileInfo(file).fileName());
+        QStandardItem* node = new QStandardItem(QIcon(":/icons/resource/icons/38-1icon_source_file.png"),QFileInfo(file).fileName());
         node->setData(QFileInfo(file).filePath(), Qt::UserRole); // 设置Qt::UserRole数据
         designsources->appendRow(node);
     }
@@ -76,7 +76,7 @@ void FileManager::updateConstraints(const QStringList &list)
 {
     constraints->removeRows(0, constraints->rowCount());
     foreach (const QString &file, list) {
-        QStandardItem* node = new QStandardItem(QFileInfo(file).fileName());
+        QStandardItem* node = new QStandardItem(QIcon(":/icons/resource/icons/39-icon_constraints_file.png"),QFileInfo(file).fileName());
         node->setData(QFileInfo(file).filePath(), Qt::UserRole); // 设置Qt::UserRole数据
         constraints->appendRow(node);
     }

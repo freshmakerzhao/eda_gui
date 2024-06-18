@@ -111,7 +111,7 @@ InfoWidget::InfoWidget(QWidget *parent)
     tabWidget->addTab(msg, "Messages");
     tabWidget->setTabEnabled(1, false);
     // =========================== Log =============================
-    tabWidget->addTab(LogWidget::instance(), "Log");
+    tabWidget->addTab(LogWidget::instance(),"Log");
     tabWidget->setCurrentIndex(2);
     // ============================ Rpt ============================
     rpt = new QPlainTextEdit(this), rpt->setReadOnly(true);
