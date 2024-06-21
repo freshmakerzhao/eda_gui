@@ -17,11 +17,11 @@ CustomListWidget::CustomListWidget(const QString &projectName, const QString &pr
     pathLabel = new QLabel(projectPath);
 
     QFont titleFont = titleLabel->font();
-    titleFont.setPointSize(14);
+    titleFont.setPointSize(10);
     titleLabel->setFont(titleFont);
 
     QFont pathFont = pathLabel->font();
-    pathFont.setPointSize(10);
+    pathFont.setPointSize(9);
     pathLabel->setFont(pathFont);
     pathLabel->setStyleSheet("QLabel { color: rgb(134, 135, 135); }");
 

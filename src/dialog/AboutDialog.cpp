@@ -29,7 +29,7 @@ AboutDialog::AboutDialog(QWidget *parent)
                           "<p>Build Date Time: %1</p>"
                           "<p>Compiler: %2</p>"
                           "<p>Version: %3</p>"
-                          "<p>© 2024 Power by HybrdChip Zhongke Xin Magnetic Technology Co., Ltd.</p>"
+                          "<p>© 2024 Power by HybrdChip Technology (Zhuhai) Co., Ltd.</p>"
                           "<p><a href='https://www.hybrdchip.com/about'>https://www.hybrdchip.com/about</a></p>"
                           "</html>";
     QLabel *textLabel = new QLabel(this);
