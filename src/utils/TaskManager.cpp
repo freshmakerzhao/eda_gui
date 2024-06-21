@@ -89,6 +89,8 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     } else if (mode == 13) {
         SettingsDialog dialog;
         dialog.exec();
+    } else if (mode == 14) {
+        MainWindow::instance()->showPrjSummary();
     }
 }
 /**

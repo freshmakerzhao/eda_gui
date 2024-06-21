@@ -22,6 +22,7 @@
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "ipmanager/IPManager.h"
+#include "prjsummary/PrjSummary.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -136,6 +137,12 @@ void MainWindow::showIPCatalog()
 {
     DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
     IPManagerWidget->show();
+}
+
+void MainWindow::showPrjSummary()
+{
+    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
+    PrjSummaryWidget->show();
 }
 
 
@@ -255,7 +262,7 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu = menuBar->addMenu("View");
     helpMenu = menuBar->addMenu("Help");
     // ===================== FILE ======================
-    newAction = new QAction(QIcon(":icons/resource/icons/35-icon_new_project.png"),"New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    newAction = new QAction(QIcon(":icons/resource/icons/35-icon_new_project_2.png"),"New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     openAction = new QAction(QIcon(":icons/resource/icons/21-icon_open_extend.png"), "Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     closeAction = new QAction("Close Project", this);
     openFileAction = new QAction("Open File", this);
@@ -280,8 +287,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     // ===================== EDIT ======================
     cutAction = new QAction(QIcon(":icons/resource/icons/31-icon_cut.png"), "Cut", this), cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
-    copyAction = new QAction(QIcon(":icons/resource/icons/14-icon_copy.png"),"Copy", this), copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-    pasteAction = new QAction(QIcon(":icons/resource/icons/32-icon_paste.png"), "Paste", this), pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    copyAction = new QAction(QIcon(":icons/resource/icons/14-icon_copy_2.png"),"Copy", this), copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    pasteAction = new QAction(QIcon(":icons/resource/icons/32-icon_paste_2.png"), "Paste", this), pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
     undoAction = new QAction(QIcon(":icons/resource/icons/29-1icon_undo.png"), "Undo", this), undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
     redoAction = new QAction(QIcon(":icons/resource/icons/29-2icon_redo.png"), "Redo", this), redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
     editMenu->addActions({cutAction, copyAction, pasteAction}), editMenu->addSeparator();
@@ -328,6 +335,7 @@ MainWindow::MainWindow(QWidget *parent)
     BottomDock->setFeatures(QDockWidget::DockWidgetClosable);
     BottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
     BottomDock->setWidget(InfoWidget::instance());
+
     // 隐藏TitleBar
     // QWidget* lTitleBar = BottomDock->titleBarWidget();
     // QWidget* lEmptyWidget = new QWidget();
@@ -335,6 +343,7 @@ MainWindow::MainWindow(QWidget *parent)
     // delete lTitleBar;
     // 垂直TitleBar
     // BottomDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
+
     addDockWidget(Qt::BottomDockWidgetArea, BottomDock);
 
     ManagerDock = new QDockWidget(this);
@@ -380,6 +389,11 @@ MainWindow::MainWindow(QWidget *parent)
     IPManagerWidget->hide();
     // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
     IPManagerWidget->setWidget(IPManager::instance());
+
+    PrjSummaryWidget = new ads::CDockWidget("Project Summary", DockManager);
+    PrjSummaryWidget->hide();
+    // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
+    PrjSummaryWidget->setWidget(PrjSummary::instance());
 }
 
 MainWindow::~MainWindow()
