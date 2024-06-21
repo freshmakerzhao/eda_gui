@@ -4,7 +4,6 @@
 #include <QLineEdit>
 #include <QPixmap>
 #include <QHBoxLayout>
-#include <QDebug>
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QToolBar>

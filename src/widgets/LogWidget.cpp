@@ -24,7 +24,6 @@ void LogWidget::init()
 {
     QToolBar *toolBar = new QToolBar(this);
     toolBar->addSeparator();
-    toolBar->setIconSize(QSize(22, 22));
     QAction *searchAction = new QAction(QIcon(":/icons/resource/icons/9-icon_search.png"),"Search", this);
     // searchAction->setIcon(QIcon(":/resource/search.ico"));
     toolBar->addAction(searchAction);
@@ -33,8 +32,9 @@ void LogWidget::init()
     // cleanAction->setIcon(QIcon(":/resource/clean.ico"));
     toolBar->addAction(cleanAction);
     toolBar->addSeparator();
-    QAction *copyAction = new QAction(QIcon(":/icons/resource/icons/14-icon_copy.png"),"Copy", this);
+    QAction *copyAction = new QAction(QIcon(":/icons/resource/icons/14-icon_copy_2.png"),"Copy", this);
     toolBar->addAction(copyAction);
+    toolBar->setIconSize(QSize(18, 18));
     toolBar->addSeparator();
 
     // Widget

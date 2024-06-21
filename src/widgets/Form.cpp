@@ -41,7 +41,7 @@ Form::Form(QWidget *parent)
     qDebug() << "[Form] Constructing...";
     QPixmap logoPixmap(":/resource/logo.png");
     QLabel *logoLabel = new QLabel(this);
-    logoLabel->setPixmap(logoPixmap.scaled(350, 260, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    logoLabel->setPixmap(logoPixmap.scaled(250, 260, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     logoLabel->setFixedHeight(75);
     // 整体布局
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -54,22 +54,29 @@ Form::Form(QWidget *parent)
     QVBoxLayout *leftLayout = new QVBoxLayout; // 左侧功能布局
     // ========================== Quick Start ==========================
     QWidget *leftWidgetOne = new QWidget();
-    leftWidgetOne->setFixedHeight(195); // 设置固定高度
+    leftWidgetOne->setFixedHeight(190); // 设置固定高度
     QVBoxLayout *leftGroupLayoutOne = new QVBoxLayout(leftWidgetOne);
     // 创建标题
     QLabel *titleLabelOne = new QLabel("Quick Start");
-    titleLabelOne->setStyleSheet("font-size: 30px;padding-left: 4px;color: white; ");
+    titleLabelOne->setStyleSheet("font-size: 32px;padding-left: 4px;color: white; ");
     // 创建按钮
     QPushButton *leftCreateProjectBtn = new QPushButton("Create Project >");
     connect(leftCreateProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onNewTriggered);
     QPushButton *leftOpenProjectBtn = new QPushButton("Open Project >");
     connect(leftOpenProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onOpenTriggered);
     QPushButton *leftOpenExampleBtn = new QPushButton("Open Example Project >");
+
+    leftCreateProjectBtn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    leftOpenProjectBtn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    leftOpenExampleBtn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
     // 将标题和按钮添加到布局中
     leftGroupLayoutOne->addWidget(titleLabelOne);
     leftGroupLayoutOne->addWidget(leftCreateProjectBtn);
     leftGroupLayoutOne->addWidget(leftOpenProjectBtn);
     leftGroupLayoutOne->addWidget(leftOpenExampleBtn);
+    // 添加弹簧固定下方尺寸
+    leftGroupLayoutOne->addSpacerItem(new QSpacerItem(10, 14, QSizePolicy::Expanding, QSizePolicy::Minimum));
     // 设置 leftWidgetOne 的样式表
     leftWidgetOne->setStyleSheet(
             "QWidget {"
@@ -79,7 +86,7 @@ Form::Form(QWidget *parent)
             "QPushButton { "
                 "border: none; "
                 "text-align: left; "
-                "font-size: 18px; "
+                "font-size: 15px; "
                 "background-color: transparent; " /* 设置背景为透明 */
                 "color: white; "
                 "padding-left: 10px; "
@@ -95,20 +102,25 @@ Form::Form(QWidget *parent)
 
     // ========================== Tasks ==========================
     QWidget *leftWidgetTwo = new QWidget();
-    leftWidgetTwo->setFixedHeight(195); // 设置固定高度
+    leftWidgetTwo->setFixedHeight(190); // 设置固定高度
     QVBoxLayout *leftGroupLayoutTwo = new QVBoxLayout(leftWidgetTwo);
     // 创建标题
     QLabel *titleLabelTwo = new QLabel("Tasks");
-    titleLabelTwo->setStyleSheet("font-size: 30px;padding-left: 4px;");
+    titleLabelTwo->setStyleSheet("font-size: 32px;padding-left: 4px;");
     // 创建按钮
     QPushButton *button4 = new QPushButton("Manage IP >");
     QPushButton *button5 = new QPushButton("Open Hardware Manager >");
-    QPushButton *button6 = new QPushButton("XHub Store >");
+    QPushButton *button6 = new QPushButton("Hub Store >");
+    button4->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    button5->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    button6->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
     leftGroupLayoutTwo->addWidget(titleLabelTwo);
     leftGroupLayoutTwo->addWidget(button4);
     leftGroupLayoutTwo->addWidget(button5);
     leftGroupLayoutTwo->addWidget(button6);
+    leftGroupLayoutTwo->addSpacerItem(new QSpacerItem(10, 14, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
     leftWidgetTwo->setStyleSheet(
             "QWidget {"
             "    background-color: rgb(156, 201, 223);"
@@ -116,9 +128,9 @@ Form::Form(QWidget *parent)
             "}"
             "QPushButton { "
                 "padding-left: 10px; "
-                "border: none; "
+            "    border: none;"
                 "text-align: left; "
-                "font-size: 18px; "
+                "font-size: 15px; "
                 "background-color: transparent; "
                 "color: rgb(64, 64, 64); "
             "} "
@@ -132,20 +144,25 @@ Form::Form(QWidget *parent)
     // ========================== Learning Center ==========================
 
     QWidget *leftWidgetThree = new QWidget();
-    leftWidgetThree->setFixedHeight(195); // 设置固定高度
+    leftWidgetThree->setFixedHeight(190); // 设置固定高度
     QVBoxLayout *leftGroupLayoutThree = new QVBoxLayout(leftWidgetThree);
     // 创建标题
     QLabel *titleLabelThree = new QLabel("Learning Center");
-    titleLabelThree->setStyleSheet("font-size: 30px;padding-left: 4px;");
+    titleLabelThree->setStyleSheet("font-size: 32px;padding-left: 4px;");
     // 创建按钮
     QPushButton *button7 = new QPushButton("Documention One >");
     QPushButton *button8 = new QPushButton("Documention Two >");
     QPushButton *button9 = new QPushButton("Documention Three >");
+    button7->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    button8->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    button9->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
     leftGroupLayoutThree->addWidget(titleLabelThree);
     leftGroupLayoutThree->addWidget(button7);
     leftGroupLayoutThree->addWidget(button8);
     leftGroupLayoutThree->addWidget(button9);
+    leftGroupLayoutThree->addSpacerItem(new QSpacerItem(10, 14, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
     leftWidgetThree->setStyleSheet(
             "QWidget {"
             "    background-color: rgb(156, 201, 223);"
@@ -155,7 +172,7 @@ Form::Form(QWidget *parent)
                 "padding-left: 10px; "
                 "border: none; "
                 "text-align: left; "
-                "font-size: 18px; "
+                "font-size: 15px; "
                 "background-color: transparent; "
                 "color: rgb(64, 64, 64); "
             "} "
@@ -205,7 +222,7 @@ Form::Form(QWidget *parent)
             "QListWidget::item:hover {"
             "    background-color: #ccdefd;"
             "}"
-            "QGroupBox { font-size: 30px; }"
+            "QGroupBox { font-size: 28px; }"
     );
     rightGroupLayoutOne->addWidget(listWidget1);
     // ========================== Recent IP ============================
@@ -232,7 +249,7 @@ Form::Form(QWidget *parent)
             "QListWidget::item:hover {"
             "    background-color: #ccdefd;"
             "}"
-            "QGroupBox { font-size: 30px; }"
+            "QGroupBox { font-size: 28px; }"
     );
     rightGroupLayoutTwo->addWidget(listWidget2);
     // ========================== 绑定右侧布局 ============================
