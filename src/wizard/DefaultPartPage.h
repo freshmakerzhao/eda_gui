@@ -24,7 +24,7 @@ protected:
 
 private:
     QTableView *tableView;
-
+    QString partFile = ":/resource/parts_hybrdchip.yaml";
 private slots:
     void selectPart(const QModelIndex &index);
 

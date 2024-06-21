@@ -30,6 +30,9 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // IP Catalog
     QTreeWidgetItem *ipCatalogItem = new QTreeWidgetItem(proMgrItem, QStringList() << "IP Catalog");
     ipCatalogItem->setIcon(0, QIcon(":/icons/resource/icons/5-icon_ip_catalog.png"));
+    // Project Summary
+    QTreeWidgetItem *prjSummaryItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Project Summary");
+    prjSummaryItem->setIcon(0, QIcon(":/icons/resource/icons/20-icon_summary_2.png"));
     // ================== 综合 ==================
     QTreeWidgetItem *synthItem = new QTreeWidgetItem(this, QStringList() << "SYNTHESIS");
     synthItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
@@ -101,6 +104,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(12);
         } else if (item == settingsItem) {
             TaskManager::instance().handleTreeItemActivation(13);
+        } else if (item == prjSummaryItem) {
+            TaskManager::instance().handleTreeItemActivation(14);
         }
         clearSelection(); // 清除选中状态
     });

@@ -23,7 +23,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     QStringList headers = {"part", "device", "package", "speedgrade", "archName" , "arch"};
     model->setHorizontalHeaderLabels(headers);
 
-    QFile file(":/resource/parts.yaml");
+    QFile file(partFile);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         // 从资源读取YAML文件内容
         QTextStream in(&file);
