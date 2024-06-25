@@ -22,7 +22,7 @@
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "ipmanager/IPManager.h"
-#include "prjsummary/PrjSummary.h"
+#include "widgets/PrjSummary.h"
 
 MainWindow *MainWindow::instance()
 {

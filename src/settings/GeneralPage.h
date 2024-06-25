@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QPushButton>
 
 class GeneralPage : public QWidget
 {
@@ -14,7 +15,9 @@ public:
 private:
     QFormLayout *fLayout;
 
-    // QLineEdit *project_device;
+    QPushButton *project_device;
+    QPushButton *project_device_square_button;
+
     QLineEdit *top_module_name;
 };
 

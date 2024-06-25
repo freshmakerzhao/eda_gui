@@ -50,6 +50,8 @@ public:
     QStringList sourcesFilesList;
     QStringList constraintFilesList;
     QString part;
+    QString displayPart;
+    QString familyName;
     QString archName;
     QString arch;
 

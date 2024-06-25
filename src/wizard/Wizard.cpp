@@ -25,6 +25,8 @@ Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
     // QPixmap pix(":/resource/icon.png");
     // setPixmap(QWizard::LogoPixmap, pix);
     // setOption(QWizard::IndependentPages, true);
+
+    setWizardStyle(QWizard::ModernStyle);
     switch (mode) {
     case 0:     // 完整新建工程流程
         qDebug() << "[Wizard] mode 0";
@@ -115,7 +117,9 @@ void Wizard::onNewFinish()
                                              arch,
                                              archName,
                                              sourcetmp,
-                                             constrainttmp);
+                                             constrainttmp,
+                                             displayPart,
+                                             familyName);
     // ============================= 清除缓存 =================================
     QDir dircache("Cache");
     if (!dircache.isEmpty()) {

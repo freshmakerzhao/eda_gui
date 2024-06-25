@@ -58,13 +58,13 @@ void PrjSummary::init()
 
     // Project name
     QLabel *settingsPrjNameLabel = new QLabel("Project name:");
-    QLabel *settingsPrjNameValueLabel = new QLabel(settingsPrjName);
+    QLabel *settingsPrjNameValueLabel = settingsPrjName;
     // Project location
     QLabel *settingsPrjLocationLabel = new QLabel("Project location:");
-    QLabel *settingsPrjLocationValueLabel = new QLabel(settingsPrjLocation);
+    QLabel *settingsPrjLocationValueLabel = settingsPrjLocation;
     // Product family
     QLabel *settingsPrdFamilyLabel = new QLabel("Product family:");
-    QLabel *settingsPrdFamilyValueLabel = new QLabel(settingsPrjFamily);
+    QLabel *settingsPrdFamilyValueLabel = settingsPrjFamily;
 
     settingsPrjNameLabel->setFixedHeight(rowHeight);
     settingsPrjNameLabel->setFixedWidth(leftLabelWidth);
@@ -95,10 +95,10 @@ void PrjSummary::init()
 
     // Project part
     QLabel *settingsPrjPartLabel = new QLabel("Project part:");
-    QPushButton *settingsPrjPartValueButton = new QPushButton(settingsPrjPart);
+    QPushButton *settingsPrjPartValueButton = settingsPrjPart;
     // Top module name
     QLabel *settingsPrjTopModuleLabel = new QLabel("Top module name:");
-    QPushButton *settingsPrjTopModuleValueButton = new QPushButton(settingsPrjTopModuleName);
+    QPushButton *settingsPrjTopModuleValueButton = settingsPrjTopModuleName;
 
     settingsPrjPartLabel->setFixedHeight(rowHeight);
     settingsPrjPartLabel->setFixedWidth(leftLabelWidth);
@@ -157,10 +157,10 @@ void PrjSummary::init()
 
     // Synthesis Status
     QLabel *synthesisStatusLabel = new QLabel("Status:");
-    QLabel *synthesisStatusValueLabel = new QLabel(synthesisStatus);
+    QLabel *synthesisStatusValueLabel = synthesisStatus;
     // Synthesis Part
     QLabel *synthesisPartLabel = new QLabel("Part");
-    QLabel *synthesisPartValueLabel = new QLabel(synthesisPart);
+    QLabel *synthesisPartValueLabel = synthesisPart;
 
     synthesisStatusLabel->setFixedHeight(rowHeight);
     synthesisStatusLabel->setFixedWidth(leftLabelWidth);
@@ -250,10 +250,10 @@ void PrjSummary::init()
 
     // implementation Status
     QLabel *implementationStatusLabel = new QLabel("Status:");
-    QLabel *implementationStatusValueLabel = new QLabel(implementationStatus);
+    QLabel *implementationStatusValueLabel = implementationStatus;
     // implementation Part
     QLabel *implementationPartLabel = new QLabel("Part");
-    QLabel *implementationPartValueLabel = new QLabel(implementationPart);
+    QLabel *implementationPartValueLabel = implementationPart;
 
     implementationStatusLabel->setFixedHeight(rowHeight);
     implementationStatusLabel->setFixedWidth(rightlabelWidth);
@@ -287,19 +287,19 @@ void PrjSummary::init()
 
     // 最差的负的时差
     QLabel *timingWorstNegativeSlackLabel = new QLabel("Worst Negative Slack(WNS):");
-    QLabel *timingWorstNegativeSlackValueLabel = new QLabel(timingWorstNegativeSlack);
+    QLabel *timingWorstNegativeSlackValueLabel = timingWorstNegativeSlack;
 
     // 负的时差总数
     QLabel *timingTotalNegativeSlackLabel = new QLabel("Total Negative Slack(TNS):");
-    QLabel *timingTotalNegativeSlackValueLabel = new QLabel(timingTotalNegativeSlack);
+    QLabel *timingTotalNegativeSlackValueLabel = timingTotalNegativeSlack;
 
     // 失败端点的数量
     QLabel *timingNumberOfFailingEndpointsLabel = new QLabel("Number Of Failing Endpoints:");
-    QLabel *timingNumberOfFailingEndpointsValueLabel = new QLabel(timingNumberOfFailingEndpoints);
+    QLabel *timingNumberOfFailingEndpointsValueLabel = timingNumberOfFailingEndpoints;
 
     // 节点总数
     QLabel *timingTotalNumberOfEndpointsLabel = new QLabel("Total Number Of Endpoints:");
-    QLabel *timingTotalNumberOfEndpointsValueLabel = new QLabel(timingTotalNumberOfEndpoints);
+    QLabel *timingTotalNumberOfEndpointsValueLabel = timingTotalNumberOfEndpoints;
 
     timingWorstNegativeSlackLabel->setFixedHeight(rowHeight);
     timingWorstNegativeSlackLabel->setFixedWidth(rightlabelWidth);
@@ -346,3 +346,25 @@ void PrjSummary::init()
     setLayout(mainLayout);
     setStyleSheet("background-color: rgb(247, 247, 247);");
 }
+
+void PrjSummary::setParams(const QMap<Project::ParamKey, QString> &params) {
+
+    settingsPrjName->setText(params[Project::Name]);
+    settingsPrjLocation->setText(params[Project::Path]);
+    settingsPrjFamily->setText(params[Project::FamilyName]);
+    settingsPrjPart->setText(params[Project::DisplayPart]);
+    settingsPrjTopModuleName->setText(params[Project::TopModule]);
+
+//    QString synthesisStatus = "Complete";
+//    QString synthesisPart = "xc7a35tfgg484-2";
+
+//    QString implementationStatus = "Complete";
+//    QString implementationPart = "xc7a35tfgg484-2";
+
+    qDebug() << "[PrjSummary] settingsPrjName: " << params[Project::Name];
+    qDebug() << "[PrjSummary] settingsPrjLocation: " << params[Project::Path];
+    qDebug() << "[PrjSummary] settingsPrjFamily: " << params[Project::FamilyName];
+    qDebug() << "[PrjSummary] settingsPrjPart: " << params[Project::DisplayPart];
+    qDebug() << "[PrjSummary] settingsPrjTopModuleName: " << params[Project::TopModule];
+}
+

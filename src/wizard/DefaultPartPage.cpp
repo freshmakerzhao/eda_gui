@@ -18,10 +18,12 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 
     tableView = new QTableView(this);
     tableView->verticalHeader()->setVisible(false); // 不显示行号
-    QStandardItemModel *model = new QStandardItemModel(0, 4, this);
+
+    QStandardItemModel *model = new QStandardItemModel(0, 8, this);
     tableView->setModel(model);
-    QStringList headers = {"part", "device", "package", "speedgrade", "archName" , "arch"};
+    QStringList headers = {"Part", "I/O Pin Count", "Available IOBs", "LUT Elements", "FlipFlops" , "Block RAMs" , "DSPs" , "PCIe"};
     model->setHorizontalHeaderLabels(headers);
+
 
     QFile file(partFile);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -36,18 +38,33 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
             qDebug() << "YAML loaded successfully";
             int row = 0;
             for (auto it = config.begin(); it != config.end(); ++it) {
-                QString part = QString::fromStdString(it->first.as<std::string>());
-                QString device = QString::fromStdString(it->second["device"].as<std::string>());
-                QString package = QString::fromStdString(it->second["package"].as<std::string>());
-                QString speedgrade = QString::fromStdString(it->second["speedgrade"].as<std::string>());
+                QString displayPart = QString::fromStdString(it->first.as<std::string>());
+
+                QString io_pin_count = QString::fromStdString(it->second["io_pin_count"].as<std::string>());
+                QString iob_count = QString::fromStdString(it->second["iob_count"].as<std::string>());
+                QString lut_count = QString::fromStdString(it->second["lut_count"].as<std::string>());
+                QString ff_count = QString::fromStdString(it->second["ff_count"].as<std::string>());
+                QString bram_count = QString::fromStdString(it->second["bram_count"].as<std::string>());
+                QString dsp_count = QString::fromStdString(it->second["dsp_count"].as<std::string>());
+                QString pcie_count = QString::fromStdString(it->second["pcie_count"].as<std::string>());
                 QString archName = QString::fromStdString(it->second["archName"].as<std::string>());
                 QString arch = QString::fromStdString(it->second["arch"].as<std::string>());
-                model->setItem(row, 0, new QStandardItem(part));
-                model->setItem(row, 1, new QStandardItem(device));
-                model->setItem(row, 2, new QStandardItem(package));
-                model->setItem(row, 3, new QStandardItem(speedgrade));
-                model->setItem(row, 4, new QStandardItem(archName));
-                model->setItem(row, 5, new QStandardItem(arch));
+                QString family_name = QString::fromStdString(it->second["family_name"].as<std::string>());
+                QString part = QString::fromStdString(it->second["part"].as<std::string>());
+
+                model->setItem(row, 0, new QStandardItem(displayPart));
+                model->setItem(row, 1, new QStandardItem(io_pin_count));
+                model->setItem(row, 2, new QStandardItem(iob_count));
+                model->setItem(row, 3, new QStandardItem(lut_count));
+                model->setItem(row, 4, new QStandardItem(ff_count));
+                model->setItem(row, 5, new QStandardItem(bram_count));
+                model->setItem(row, 6, new QStandardItem(dsp_count));
+                model->setItem(row, 7, new QStandardItem(pcie_count));
+                model->setItem(row, 8, new QStandardItem(archName));
+                model->setItem(row, 9, new QStandardItem(arch));
+                model->setItem(row, 10, new QStandardItem(family_name));
+                model->setItem(row, 11, new QStandardItem(part));
+
                 row++;
             }
         } catch (const YAML::ParserException& e) {
@@ -62,14 +79,27 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 
     // 设置整个表格为只读
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // 设置第一列的宽度为200
+    tableView->setColumnWidth(0, 180);
+    // 获取表头视图
+    QHeaderView *header = tableView->horizontalHeader();
+    // 第一列设置为固定宽度
+    header->setSectionResizeMode(0, QHeaderView::Fixed);
+    // 其他列设置为自动分配剩余空间
+    for (int i = 1; i < model->columnCount(); ++i) {
+        header->setSectionResizeMode(i, QHeaderView::Stretch);
+    }
+
     // 设置宽度自适应
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+//    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     // 将同一行标记为选中状态
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
     tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
-    // 隐藏第四 第五列 archName/arch 仅供程序使用，用户无需获取
-    tableView->setColumnHidden(4, true);
-    tableView->setColumnHidden(5, true);
+    // 隐藏第四 第五列 archName/arch/family_name 仅供程序使用，用户无需获取
+    tableView->setColumnHidden(8, true);
+    tableView->setColumnHidden(9, true);
+    tableView->setColumnHidden(10, true);
+    tableView->setColumnHidden(11, true);
     QObject::connect(tableView, &QTableView::clicked, this, &DefaultPartPage::selectPart);
 
     // Filter
@@ -85,7 +115,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QFormLayout *formLayout = new QFormLayout;
-    formLayout->addRow("Filter:", lineEdit);
+    formLayout->addRow("Search:", lineEdit);
     layout->addLayout(formLayout);
 
     layout->addWidget(tableView);
@@ -106,11 +136,13 @@ void DefaultPartPage::selectPart(const QModelIndex &index) {
         QModelIndex idx = proxyModel->mapToSource(index);
 
         Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->part = idx.siblingAtColumn(0).data(Qt::DisplayRole).toString();     // 获取part
-        wizard->archName = idx.siblingAtColumn(4).data(Qt::DisplayRole).toString(); // 获取archName
-        wizard->arch = idx.siblingAtColumn(5).data(Qt::DisplayRole).toString();     // 获取arch
+        wizard->displayPart = idx.siblingAtColumn(0).data(Qt::DisplayRole).toString();     // 获取 displayPart
+        wizard->archName = idx.siblingAtColumn(8).data(Qt::DisplayRole).toString(); // 获取archName
+        wizard->arch = idx.siblingAtColumn(9).data(Qt::DisplayRole).toString();     // 获取arch
+        wizard->familyName = idx.siblingAtColumn(10).data(Qt::DisplayRole).toString();     // 获取family_name
+        wizard->part = idx.siblingAtColumn(11).data(Qt::DisplayRole).toString();     // 获取part
 
-        qDebug() << wizard->part << wizard->archName << wizard->arch;
+        qDebug() << "[DefaultPartPage] wizard param: "<< wizard->part << wizard->archName << wizard->arch << wizard->familyName << wizard->displayPart;
     }
 
     completeChanged();

@@ -15,6 +15,7 @@
 #include "dialog/CustomMessageBox.h"
 #include "XmlUtilities.h"
 #include "base/InitialConfig.h"
+#include "widgets/PrjSummary.h"
 
 ProjectManager &ProjectManager::instance()
 {
@@ -29,6 +30,8 @@ ProjectManager &ProjectManager::instance()
  * @param part
  * @param arch
  * @param archName
+ * @param displayPart
+ * @param familyName
  * @return
  */
 bool ProjectManager::createProject(QString &name,
@@ -37,7 +40,9 @@ bool ProjectManager::createProject(QString &name,
                                    QString &arch,
                                    QString &archName,
                                    QStringList &designSrcs,
-                                   QStringList &constraints)
+                                   QStringList &constraints,
+                                   const QString& displayPart,
+                                   const QString& familyName)
 {
     // 此处的project是一个临时对象，生成工程文件后销毁
     Project *project = new Project;
@@ -45,7 +50,9 @@ bool ProjectManager::createProject(QString &name,
                          path,
                          part,
                          arch,
-                         archName);
+                         archName,
+                         displayPart,
+                         familyName);
     project->sourceList = designSrcs;
     project->constraintList = constraints;
     project->writeProject();
@@ -152,6 +159,8 @@ void ProjectManager::loadFiles(Project *project)
     TaskManager::instance().constraintPathList = _project->constraintList;
     // 设置工程参数
     TaskManager::instance().setParams(_project->getAllParams());
+    // 设置工程参数
+    PrjSummary::instance()->setParams(_project->getAllParams());
     // 加载文件树
     FileManager::instance()->updateDesignSources(_project->sourceList);
     FileManager::instance()->updateConstraints(_project->constraintList);
@@ -214,6 +223,13 @@ QString ProjectManager::getTopModule()
 {
     if (_project) {
         return _project->getParam(Project::TopModule);
+    }
+    return QString();
+}
+
+QString ProjectManager::getDeviceInfo(){
+    if (_project) {
+        return _project->getParam(Project::Part);
     }
     return QString();
 }
