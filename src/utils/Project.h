@@ -32,7 +32,9 @@ public:
         Part,
         Arch,
         ArchName,
-        TopModule
+        TopModule,
+        DisplayPart,
+        FamilyName,
     };
 
     /**
@@ -42,12 +44,16 @@ public:
      * @param part
      * @param arch
      * @param archName
+     * @param displayPart
+     * @param familyName
      */
     void initProject(QString &name,
                      QString &path,
                      QString &part,
                      QString &arch,
-                     QString &archName);
+                     QString &archName,
+                     const QString& displayPart = QString("MC1P110-FC484L-1"),
+                     const QString& familyName = QString("MgiCubo"));
 
     bool writeProject();
 

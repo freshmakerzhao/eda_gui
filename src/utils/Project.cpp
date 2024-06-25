@@ -26,12 +26,16 @@ Project::~Project()
  * @param part
  * @param arch
  * @param archName
+ * @param displayPart
+ * @param familyName
  */
 void Project::initProject(QString &name,
                           QString &path,
                           QString &part,
                           QString &arch,
-                          QString &archName)
+                          QString &archName,
+                          const QString& displayPart,
+                          const QString& familyName)
 {
     param[Project::Name] = name;         // 工程名称
     param[Project::Path] = path;         // 工程路径(绝对)
@@ -39,10 +43,11 @@ void Project::initProject(QString &name,
     param[Project::Arch] = arch;
     param[Project::ArchName] = archName;
     param[Project::TopModule] = "top";
+    param[Project::DisplayPart] = displayPart;
+    param[Project::FamilyName] = familyName;
 }
 
-bool Project::writeProject()
-{
+bool Project::writeProject(){
     //! 工程文件的路径为: path/name.hpr
     QString hprPath = QString("%1/%2.hpr").arg(param[Project::Path], param[Project::Name]);
     tinyxml2::XMLDocument doc;
@@ -52,7 +57,7 @@ bool Project::writeProject()
     tinyxml2::XMLComment* versionComment = doc.NewComment("               Product Version: HybrdLink v2024.1                   ");
     doc.InsertEndChild(versionComment);
     // 版权注释
-    tinyxml2::XMLComment* copyrightComment = doc.NewComment(" © Copyright 2024 Zhongke Xin Magnetic Technology(Zhuhai) Co., Ltd. ");
+    tinyxml2::XMLComment* copyrightComment = doc.NewComment(" © Copyright 2024 HybrdChip Technology (Zhuhai) Co., Ltd. ");
     doc.InsertEndChild(copyrightComment);
     // Root
     tinyxml2::XMLElement* project = doc.NewElement("Project");
@@ -81,6 +86,16 @@ bool Project::writeProject()
     archNameOption->SetAttribute("Name", "ArchName");
     archNameOption->SetAttribute("Val", param[Project::ArchName].toStdString().c_str());
     configuration->InsertEndChild(archNameOption);
+
+    tinyxml2::XMLElement* familyNameOption = doc.NewElement("Option");
+    familyNameOption->SetAttribute("Name", "FamilyName");
+    familyNameOption->SetAttribute("Val", param[Project::FamilyName].toStdString().c_str());
+    configuration->InsertEndChild(familyNameOption);
+
+    tinyxml2::XMLElement* displayPartOption = doc.NewElement("Option");
+    displayPartOption->SetAttribute("Name", "DisplayPart");
+    displayPartOption->SetAttribute("Val", param[Project::DisplayPart].toStdString().c_str());
+    configuration->InsertEndChild(displayPartOption);
 
     // ------------------ Design Sources --------------------
     tinyxml2::XMLElement* designSrcsfileSet = doc.NewElement("FileSet");
@@ -155,6 +170,10 @@ bool Project::parseProject(const QString &hprPath)
             param[Project::Arch] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "ArchName")
             param[Project::ArchName] = option->Attribute("Val");
+        if (std::string(option->Attribute("Name")) == "FamilyName")
+            param[Project::FamilyName] = option->Attribute("Val");
+        if (std::string(option->Attribute("Name")) == "DisplayPart")
+            param[Project::DisplayPart] = option->Attribute("Val");
         option = option->NextSiblingElement("Option");
     }
 
@@ -212,6 +231,8 @@ bool Project::parseProject(const QString &hprPath)
     qDebug() << "Part        :" << param[Project::Part];
     qDebug() << "Arch        :" << param[Project::Arch];
     qDebug() << "ArchName    :" << param[Project::ArchName];
+    qDebug() << "FamilyName    :" << param[Project::FamilyName];
+    qDebug() << "DisplayPart    :" << param[Project::DisplayPart];
     qDebug() << "TopModule   :" << param[Project::TopModule];
     qDebug() << "Design Sources-------------------------------------------------";
     foreach (const QString& source , this->sourceList) {

@@ -30,6 +30,8 @@ public:
      * @param part
      * @param arch
      * @param archName
+     * @param displayPart
+     * @param familyName
      * @return
      */
     bool createProject(QString &name,
@@ -38,7 +40,9 @@ public:
                        QString &arch,
                        QString &archName,
                        QStringList &designSrcs,
-                       QStringList &constraints);
+                       QStringList &constraints,
+                       const QString &displayPart = QString("MC1P110-FC484L-1"),
+                       const QString &familyName = QString("MgiCubo"));
 
     /**
      * ! Reopen project on startup
@@ -84,6 +88,7 @@ public:
     void setTopModule(const QString &topModule);
 
     QString getTopModule();
+    QString getDeviceInfo();
 
 public slots:
     void closeProject();

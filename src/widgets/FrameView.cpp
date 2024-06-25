@@ -41,8 +41,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     QWidget *rightTopWidget = new QWidget(splitterRight);
     QVBoxLayout *rightTopLayout = new QVBoxLayout(rightTopWidget);
 
-
-
     // 上部分的按钮
     // QPushButton* right_top_load_arch = new QPushButton("加载架构信息");
     QPushButton* rightTopBlockName = new QPushButton("Tile Name Off");

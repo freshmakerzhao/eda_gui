@@ -1,9 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>resource/keywords.txt</file>
+        <file>resource/leftPixmap.jpg</file>
         <file>resource/icon.png</file>
         <file>resource/parts_xilinx.yaml</file>
         <file>resource/parts_hybrdchip.yaml</file>
+        <file>resource/parts_hybrdchip_for_display.yaml</file>
         <file>resource/white.png</file>
         <file>resource/black.png</file>
         <file>resource/logo.png</file>
