@@ -58,7 +58,7 @@ Form::Form(QWidget *parent)
     QVBoxLayout *leftGroupLayoutOne = new QVBoxLayout(leftWidgetOne);
     // 创建标题
     QLabel *titleLabelOne = new QLabel("Quick Start");
-    titleLabelOne->setStyleSheet("font-size: 32px;padding-left: 4px;color: white; ");
+    titleLabelOne->setStyleSheet("font-size: 32px;padding-left: 4px;color: white; border: none;");
     // 创建按钮
     QPushButton *leftCreateProjectBtn = new QPushButton("Create Project >");
     connect(leftCreateProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onNewTriggered);
@@ -78,10 +78,16 @@ Form::Form(QWidget *parent)
     // 添加弹簧固定下方尺寸
     leftGroupLayoutOne->addSpacerItem(new QSpacerItem(10, 14, QSizePolicy::Expanding, QSizePolicy::Minimum));
     // 设置 leftWidgetOne 的样式表
+//    "    background-color: rgb(77, 128, 127);"
+//    "    background-image: url(:/resource/form_logo_2.png); "
+//    "    background-repeat: no-repeat; "
+//    "    background-position: center;"
+//    "    background-size: cover;"
+//    "    border-image: url(:/resource/form_logo_2_rorate.png);"
     leftWidgetOne->setStyleSheet(
             "QWidget {"
-            "    background-color: rgb(77, 128, 127);"
-            "    border: none;"
+//            "    border: 1px solid red;"
+                "border-image: url(:/resource/form_logo_2_rorate.png);"
             "}"
             "QPushButton { "
                 "border: none; "
