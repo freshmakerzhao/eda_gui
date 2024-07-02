@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     // 启动画面
 //    QPixmap pix(":/resource/logo.png");
 //    QPixmap pix(":/resource/start01.jpg");
-    QPixmap pix(":/resource/start03.jpg");
+    QPixmap pix(":/resource/start05.jpg");
 
 //    QSplashScreen splash(pix.scaled(440, 440, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     QSplashScreen splash(pix.scaled(640, 640, Qt::KeepAspectRatio, Qt::SmoothTransformation));
