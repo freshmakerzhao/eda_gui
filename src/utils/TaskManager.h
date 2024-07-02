@@ -52,6 +52,8 @@ private:
     QString projectImplPath;
     // part name
     QString partName;
+    // display Part Name （临时解决）
+    QString displayPartName;
     // arch name xc7a50t
     QString archName;
     // arch 50t

@@ -21,10 +21,10 @@ QProcess *ProcessManager::getProcess()
     return process;
 }
 
-void ProcessManager::checkCall(const QString &phase, const QString &path, const QString &script, const QString &pName) {
+void ProcessManager::checkCall(const QString &phase, const QString &path, const QString &script, const QString &displayPartName) {
     this->curPhase = phase;
     this->curProjectPath = path;
-    this->partName = pName;
+    this->displayPartName = displayPartName;
     QStringList arguments;
     arguments << "/c" << script;
     process->terminate(); // 开始前先终止
@@ -36,10 +36,10 @@ void ProcessManager::checkCall(const QString &phase, const QString &path, const 
     process->start("cmd.exe", arguments);
 }
 
-void ProcessManager::checkCallSpecific(const QString &phase, const QString &path, const QStringList& arguments , const QString &pName) {
+void ProcessManager::checkCallSpecific(const QString &phase, const QString &path, const QStringList& arguments , const QString &displayPartName) {
     this->curPhase = phase;
     this->curProjectPath = path;
-    this->partName = pName;
+    this->displayPartName = displayPartName;
     process->terminate(); // 开始前先终止
     configWorkPath(path);
     qDebug() << arguments;
@@ -188,7 +188,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
                     this->curPhase + " Complete!",
                     this->startTime,
                     this->elapsedTime,
-                    this->partName);
+                    this->displayPartName);
             if(showSynthSuccessMsg){
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
@@ -206,7 +206,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
                     this->curPhase + " Complete!",
                     this->startTime,
                     this->elapsedTime,
-                    this->partName);
+                    this->displayPartName);
             // 跳转到资源展示窗口
             InfoWidget::instance()->setCurrentPage(4);
         } else if (this->curPhase == "Implementation"){
@@ -215,12 +215,12 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
                     this->curPhase + " Complete!",
                     this->startTime,
                     this->elapsedTime,
-                    this->partName);
+                    this->displayPartName);
             if (showImplementSuccessMsg){
-                CustomMessageBox::showSuccess(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
                 // Implementation结束后，读取资源统计信息
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
+                CustomMessageBox::showSuccess(MainWindow::instance(), this->curPhase + " Completed", this->curPhase + " successfully completed.");
             }
         } else {
             // 生成码流结束提示，后续在此扩展

@@ -21,7 +21,7 @@ public:
         const QString &phase,
         const QString &path,
         const QString &script,
-        const QString &pName);
+        const QString &displayPartName);
 
     /**
      * 执行特殊命令（包含双引号、括号等字符时）
@@ -33,7 +33,7 @@ public:
         const QString &phase,
         const QString &path,
         const QStringList& arguments,
-        const QString &pName);
+        const QString &displayPartName);
 
     void configWorkPath(const QString &path);
 
@@ -55,6 +55,8 @@ public:
     QString elapsedTime;
     // partName
     QString partName;
+    // displayPart
+    QString displayPartName;
 
     // 下一阶段使用的命令
     QString nextPhase = nullptr;
