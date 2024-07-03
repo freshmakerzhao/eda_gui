@@ -12,8 +12,14 @@
 
 
 #include <QString>
+#include <QDateTime>
 
 class LicenseUtilities {
+public:
+    static bool checkMacAddress(const QString& expectedMacAddress);
+    static int isWithinValidPeriod(const QString& compileDateTimeStr, int validDays = 7);
+    static void writeExpiryDateToFile(const QString& expiryDate);
+private:
     static QString getMacAddress();
 };
 

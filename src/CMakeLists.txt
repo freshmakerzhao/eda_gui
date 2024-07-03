@@ -6,6 +6,24 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# 是否需要检查 MAC 地址 ，默认需要
+option(ENABLE_MAC_CHECK "Enable MAC address check" ON)
+# 是否需要检查 软件有效期 ，默认关闭
+option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" OFF)
+
+if (ENABLE_MAC_CHECK)
+    message(STATUS "ENABLE_MAC_CHECK ON.")
+    add_definitions(-DENABLE_MAC_CHECK)
+else ()
+    message(STATUS "ENABLE_MAC_CHECK OFF.")
+endif()
+
+if (ENABLE_EXPIRATION_CHECK)
+    message(STATUS "ENABLE_EXPIRATION_CHECK ON.")
+    add_definitions(-DENABLE_EXPIRATION_CHECK)
+else ()
+    message(STATUS "ENABLE_EXPIRATION_CHECK OFF.")
+endif()
 
 # 检测操作系统
 if(WIN32)
@@ -34,6 +52,7 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS PrintSupport)
 find_package(Qt5 COMPONENTS OpenGL)
+find_package(Qt5 COMPONENTS Core Network REQUIRED)
 
 # Include the QScintilla library
 set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Qsci")
@@ -55,6 +74,13 @@ set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${QADVANCEDDOCK_INCLUDE_DIR})
 link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
+
+# Include the OpenSSL library
+set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/openssl")
+set(OPENSSL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
+
+include_directories(${OPENSSL_INCLUDE_DIR})
+link_directories(${OPENSSL_LIBRARY_DIR})
 
 # Add source files
 file(GLOB PROJECT_SOURCES
@@ -108,9 +134,13 @@ add_executable(${PROJECT_NAME}
 # Link the Qt5 Widgets library and the QScintilla library to the executable
 target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
+    Qt5::Core
+    Qt5::Network
     qscintilla2_qt5
     libyaml-cpp.a
     qtadvanceddocking
+    libcrypto-1_1-x64
+    libssl-1_1-x64
 )
 
 # Specify installation paths (if required)

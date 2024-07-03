@@ -11,6 +11,8 @@
 #define CHIP_GLOBALS_H
 #include <string>
 #include <map>
+#include <QString>
+
 static int GLOBAL_TILE_BLOCK_WIDTH  = 210;
 static int GLOBAL_TILE_BLOCK_HEIGHT = 100;
 
