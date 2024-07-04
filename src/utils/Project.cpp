@@ -29,11 +29,11 @@ Project::~Project()
  * @param displayPart
  * @param familyName
  */
-void Project::initProject(QString &name,
-                          QString &path,
-                          QString &part,
-                          QString &arch,
-                          QString &archName,
+void Project::initProject(const QString &name,
+                          const QString &path,
+                          const QString &part,
+                          const QString &arch,
+                          const QString &archName,
                           const QString& displayPart,
                           const QString& familyName)
 {

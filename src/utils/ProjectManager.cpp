@@ -34,13 +34,13 @@ ProjectManager &ProjectManager::instance()
  * @param familyName
  * @return
  */
-bool ProjectManager::createProject(QString &name,
-                                   QString &path,
-                                   QString &part,
-                                   QString &arch,
-                                   QString &archName,
-                                   QStringList &designSrcs,
-                                   QStringList &constraints,
+bool ProjectManager::createProject(const QString &name,
+                                   const QString &path,
+                                   const QString &part,
+                                   const QString &arch,
+                                   const QString &archName,
+                                   const QStringList &designSrcs,
+                                   const QStringList &constraints,
                                    const QString& displayPart,
                                    const QString& familyName)
 {

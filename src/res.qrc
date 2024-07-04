@@ -18,7 +18,6 @@
         <file>resource/start05.jpg</file>
         <file>resource/start06.jpg</file>
         <file>resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF</file>
-        <file>resource/fonts/AlibabaPuHuiTi3.0-55Regular.ttf</file>
         <file>resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf</file>
     </qresource>
     <qresource prefix="/gridview">

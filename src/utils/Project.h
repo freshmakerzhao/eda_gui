@@ -47,11 +47,11 @@ public:
      * @param displayPart
      * @param familyName
      */
-    void initProject(QString &name,
-                     QString &path,
-                     QString &part,
-                     QString &arch,
-                     QString &archName,
+    void initProject(const QString &name,
+                     const QString &path,
+                     const QString &part,
+                     const QString &arch,
+                     const QString &archName,
                      const QString& displayPart = QString("MC1P110-FC484L-1"),
                      const QString& familyName = QString("MgiCubo"));
 
