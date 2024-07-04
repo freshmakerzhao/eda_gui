@@ -391,8 +391,8 @@ MainWindow::MainWindow(QWidget *parent)
     IPManagerWidget->setWidget(IPManager::instance());
 
     PrjSummaryWidget = new ads::CDockWidget("Project Summary", DockManager);
-    PrjSummaryWidget->hide();
-    // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
+    // PrjSummaryWidget->hide();
+    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
     PrjSummaryWidget->setWidget(PrjSummary::instance());
 }
 
