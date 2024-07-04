@@ -8,12 +8,25 @@
 #include <QFontDatabase>
 #include <QSplashScreen>
 #include <QDateTime>
+#include <utils/FontsUtilities.h>
 
 const int VALID_DAYS = 7;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    //! ----- Fonts -----
+    QString appDirPath = QCoreApplication::applicationDirPath();
+    // 加载字体并获取字体名
+    QString fontName = FontsUtilities::instance().loadFont(appDirPath);
+    if (fontName.isEmpty()) {
+        qCritical() << "Failed to load any font. Exiting.";
+        fontName = a.font().family();
+    }
+    QFont font(fontName, 9);
+    a.setFont(font);
+    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
 
     const std::string plain_text = "z22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222h";
 
@@ -64,20 +77,6 @@ int main(int argc, char *argv[])
 #else
     qDebug() << "[MAIN] Software expiration check is disabled.";
 #endif
-
-    // 加载字体文件
-//    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF");// LFT Etica Mono
-    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
-    QFontDatabase::addApplicationFont(":/resource/fonts/AlibabaPuHuiTi3.0-55Regular.ttf");
-
-    QString fontName = "Alibaba PuHuiTi 3.0";
-    QFontDatabase database;
-    QStringList fontFamilies = database.families();
-    if (!fontFamilies.contains(fontName)) {
-        fontName = "Microsoft YaHei UI";
-    }
-    QFont font(fontName, 9);
-    a.setFont(font);
 
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();

@@ -26,7 +26,22 @@ Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
     // setPixmap(QWizard::LogoPixmap, pix);
     // setOption(QWizard::IndependentPages, true);
 
-    setWizardStyle(QWizard::ModernStyle);
+#ifdef Q_OS_WIN
+    // 设置自定义按钮可用
+    setOption (QWizard::HaveCustomButton1, true);
+    // 获取并设置自定义按钮的文本
+    auto *customButton = this->button(QWizard::CustomButton1);
+    customButton->setText("Back");
+    // 连接自定义按钮的点击信号到槽函数
+    connect(customButton, &QPushButton::clicked, this, &Wizard::back);
+    // 绑定来更新按钮状态
+    connect(this, &QWizard::currentIdChanged, this, [=](int id) {
+        customButton->setEnabled(id != 0);
+    });
+    // 初始化按钮状态
+    customButton->setEnabled(currentId() != 0);
+#endif
+
     switch (mode) {
     case 0:     // 完整新建工程流程
         qDebug() << "[Wizard] mode 0";

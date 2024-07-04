@@ -34,13 +34,13 @@ public:
      * @param familyName
      * @return
      */
-    bool createProject(QString &name,
-                       QString &path,
-                       QString &part,
-                       QString &arch,
-                       QString &archName,
-                       QStringList &designSrcs,
-                       QStringList &constraints,
+    bool createProject(const QString &name,
+                       const QString &path,
+                       const QString &part,
+                       const QString &arch,
+                       const QString &archName,
+                       const QStringList &designSrcs,
+                       const QStringList &constraints,
                        const QString &displayPart = QString("MC1P110-FC484L-1"),
                        const QString &familyName = QString("MgiCubo"));
 
