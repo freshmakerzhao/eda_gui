@@ -9,6 +9,7 @@
   */
 #include <QDebug>
 #include <fstream>
+#include <iostream>
 #include "AESUtilities.h"
 #include "aes.h"
 #include "sha.h"
@@ -30,14 +31,11 @@ void printHex(const unsigned char* data, int length) {
     for (int i = 0; i < length; ++i) {
         hexString.append(QString("%1 ").arg(data[i], 2, 16, QChar('0')).toUpper());
     }
-    qDebug() << hexString;
 }
 
 /**
  * AES CBC 加密函数
  * @param plain_text 待加密数据
- * @param plain_text_len 待加密数据长度,字符长度
- * @param iv  初始向量,与明文块进行异或运算，然后再加密
  * @param encrypt_text 加密后结果
  */
 void AESUtilities::aesEncrypt(
@@ -51,7 +49,8 @@ void AESUtilities::aesEncrypt(
     // ============= 设置 AES 加密密钥 ==================
     if(AES_set_encrypt_key(key_hex,128,&en_key) < 0){
         // 密钥设置失败
-        qDebug("[AESUtilities] set encrypt key failed ! ");
+//        qDebug("[AESUtilities] set encrypt key failed ! ");
+        std::cerr << "[AESUtilities] set encrypt key failed ! " << std::endl;
     }
 
     // 计算填充长度
@@ -76,7 +75,8 @@ void AESUtilities::aesEncrypt(
     if (!encrypt_file_path.empty()) {
         std::ofstream outfile(encrypt_file_path, std::ios::binary);
         if (!outfile) {
-            qDebug("[AESUtilities] encrypt_file_path open failed ! ");
+//            qDebug("[AESUtilities] encrypt_file_path open failed ! ");
+            std::cerr << "[AESUtilities] encrypt_file_path open failed ! " << std::endl;
         } else {
             outfile.write(reinterpret_cast<char*>(encrypt_text), total_len);
             outfile.close();
@@ -87,9 +87,7 @@ void AESUtilities::aesEncrypt(
 
 /**
  * AES CBC 解密函数
- * @param key_hex
- * @param iv
- * @param encrypt_file_path
+ * @param encrypt_file_path 待解密文件路径
  * @return
  */
 unsigned char * AESUtilities::aesDecrypt(
@@ -101,12 +99,14 @@ unsigned char * AESUtilities::aesDecrypt(
     AES_KEY de_key;
     // ============= 设置 AES 解密密钥 ==================
     if (AES_set_decrypt_key(key_hex, 128, &de_key) < 0) {
-        qDebug("[AESUtilities] set decrypt key failed ! ");
+//        qDebug("[AESUtilities] set decrypt key failed ! ");
+        std::cerr << "[AESUtilities] set decrypt key failed!" << std::endl;
     }
     // 从文件中以二进制模式读取密文
     std::ifstream encrypt_file(encrypt_file_path, std::ios::binary);
     if (!encrypt_file) {
-        qDebug("[AESUtilities] encrypt_file_path open failed ! ");
+//        qDebug("[AESUtilities] encrypt_file_path open failed ! ");
+        std::cerr << "[AESUtilities] encrypt_file_path open failed ! " << std::endl;
     }
 
     // 读取文件内容到 vector 中
