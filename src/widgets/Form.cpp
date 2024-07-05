@@ -85,10 +85,10 @@ Form::Form(QWidget *parent)
 //    "    background-size: cover;"
 //    "    border-image: url(:/resource/form_logo_2_rorate.png);"
     leftWidgetOne->setStyleSheet(
-            "QWidget {"
+            ".QWidget {"
                 "background-color: rgb(77, 128, 127);"
 //            "    border: 1px solid red;"
-//                "border-image: url(:/resource/form_logo_2_rorate.png);"
+               "border-image: url(:/resource/form_logo_2_rorate.png);"
             "}"
             "QPushButton { "
                 "border: none; "

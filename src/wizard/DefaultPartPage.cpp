@@ -107,6 +107,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     proxyModel->setSourceModel(model);
     tableView->setModel(proxyModel);
     QLineEdit *lineEdit = new QLineEdit(this);
+    lineEdit->setClearButtonEnabled(true);
     lineEdit->setFixedSize(220, 30);
     connect(lineEdit, &QLineEdit::textChanged, [proxyModel](const QString &text){
         proxyModel->setFilterFixedString(text);

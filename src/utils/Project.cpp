@@ -34,8 +34,8 @@ void Project::initProject(const QString &name,
                           const QString &part,
                           const QString &arch,
                           const QString &archName,
-                          const QString& displayPart,
-                          const QString& familyName)
+                          const QString &displayPart,
+                          const QString &familyName)
 {
     param[Project::Name] = name;         // 工程名称
     param[Project::Path] = path;         // 工程路径(绝对)

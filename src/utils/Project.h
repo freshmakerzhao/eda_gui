@@ -52,8 +52,8 @@ public:
                      const QString &part,
                      const QString &arch,
                      const QString &archName,
-                     const QString& displayPart = QString("MC1P110-FC484L-1"),
-                     const QString& familyName = QString("MgiCubo"));
+                     const QString &displayPart = QString("MC1P110-FC484L-1"),
+                     const QString &familyName = QString("MgiCubo"));
 
     bool writeProject();
 

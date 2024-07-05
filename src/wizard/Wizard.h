@@ -38,7 +38,7 @@ class Wizard : public QWizard
 {
     Q_OBJECT
 public:
-    Wizard(QWidget *parent = nullptr, const int mode = 0, Project *pro = nullptr);
+    Wizard(QWidget *parent = nullptr, const int &mode = 0);
     ~Wizard();
 
 private slots:
@@ -65,7 +65,7 @@ public:
     };
 
 private:
-    Project *current_project;
+
 };
 
 #endif // WIZARD_H
