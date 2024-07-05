@@ -77,6 +77,11 @@ public:
      */
     void addSourcesAction();
 
+    /*
+     *
+     */
+    void addSourcesInProject(const QStringList &src, const int &mode);
+
     /**
      * 移除工程中的文件
      * @param path 目标文件路径

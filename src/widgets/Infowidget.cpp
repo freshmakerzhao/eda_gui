@@ -60,6 +60,9 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     runsModel->setItem(0, 7, new QStandardItem(startTime)); // 开始时间
     runsModel->setItem(0, 8, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(0, 9, new QStandardItem(partName)); // 封装名称
+
+
+    // Display_Synth_Usage
 }
 
 void InfoWidget::updateImplItem(const QString& implPath, const QString& status, const QString& startTime, const QString& Elapsed , const QString& partName){
@@ -91,6 +94,8 @@ void InfoWidget::updateImplItem(const QString& implPath, const QString& status, 
     runsModel->setItem(1, 7, new QStandardItem(startTime)); // 开始时间
     runsModel->setItem(1, 8, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(1, 9, new QStandardItem(partName)); // 封装名称
+
+
 }
 
 InfoWidget::InfoWidget(QWidget *parent)

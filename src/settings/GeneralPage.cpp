@@ -39,6 +39,7 @@ GeneralPage::GeneralPage(QWidget *parent)
     hLayout->addWidget(project_device_square_button);
 
     top_module_name = new QLineEdit(this);
+    top_module_name->setClearButtonEnabled(true);
     top_module_name->setFixedHeight(25);
 
     fLayout = new QFormLayout(this);

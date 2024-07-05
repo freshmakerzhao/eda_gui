@@ -16,7 +16,7 @@
 #include "DefaultPartPage.h"
 #include "utils/ProjectManager.h"
 
-Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
+Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
 {
     qDebug() << "[Wizard] Constructing...";
     resize(960, 640);
@@ -53,7 +53,6 @@ Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
         connect(this, &QWizard::accepted, this, &Wizard::onNewFinish);
         break;
     case 1:     // 添加Sources
-        current_project = pro;
         qDebug() << "[Wizard] mode 1";
         setPage(Page_AddGuide, new AddGuidePage);
         setPage(Page_Source, new SourcesPage(this, 1));
@@ -145,27 +144,12 @@ void Wizard::onNewFinish()
 void Wizard::onAddFinish()
 {
     qDebug() << "Add Finish";
-    if (current_project == nullptr) {
-        return;
-    }
-    QString path = current_project->getParam(Project::Path);
-    qDebug() << path;
-    QString addSourcesPath = path + "/sources/";
-    QStringList files = sourcesFilesList;
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, addSourcesPath + QFileInfo(file).fileName());
-            current_project->sourceList.append(addSourcesPath + QFileInfo(file).fileName());
-        }
+    if (!sourcesFilesList.empty()) {
+        ProjectManager::instance().addSourcesInProject(sourcesFilesList, 0);
     }
 
-    QString constrainsPath = path + "/constraints/";
-    files = constraintFilesList;
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, constrainsPath + QFileInfo(file).fileName());
-            current_project->constraintList.append(constrainsPath + QFileInfo(file).fileName());
-        }
+    if (!constraintFilesList.empty()){
+        ProjectManager::instance().addSourcesInProject(constraintFilesList, 1);
     }
 }
 

@@ -41,8 +41,8 @@ bool ProjectManager::createProject(const QString &name,
                                    const QString &archName,
                                    const QStringList &designSrcs,
                                    const QStringList &constraints,
-                                   const QString& displayPart,
-                                   const QString& familyName)
+                                   const QString &displayPart,
+                                   const QString &familyName)
 {
     // 此处的project是一个临时对象，生成工程文件后销毁
     Project *project = new Project;
@@ -75,12 +75,12 @@ bool ProjectManager::startProcess(Project *project)
     // 获取程序路径
     QString programPath = QCoreApplication::applicationFilePath();
     // 创建一个新进程
-    QProcess *process = new QProcess();
+    QProcess process;
     // 传入新打开工程路径
     QString hprPath = QString("%1/%2.hpr").arg(project->getParam(Project::Path), project->getParam(Project::Name));
     // qDebug() << "Start New Process : " << hprPath;
     // 启动程序本身
-    process->start(programPath, QStringList() << hprPath);
+    process.startDetached(programPath, QStringList() << hprPath);
 
     return true;
 }
@@ -179,10 +179,41 @@ void ProjectManager::addSourcesAction()
                                       "Please select or create a project.");
         return;
     }
-    Wizard wizard(MainWindow::instance(), 1, _project);
+    Wizard wizard(MainWindow::instance(), 1);
     wizard.exec();
     _project->writeProject();
     loadFiles(_project);
+}
+
+void ProjectManager::addSourcesInProject(const QStringList &src, const int &mode)
+{
+    if (_project == nullptr) {
+        return;
+    }
+    QString path = _project->getParam(Project::Path);
+    qDebug() << path;
+
+    QString targetPath;
+    //! 0: Design Sources
+    //! 1: Constraints
+    switch (mode) {
+    case 0:
+        targetPath = path + "/sources/";
+        foreach (const QString &file, src) {
+            QFile::copy(file, targetPath + QFileInfo(file).fileName());
+            _project->sourceList.append(targetPath + QFileInfo(file).fileName());
+        }
+        break;
+    case 1:
+        targetPath = path + "/constraints/";
+        foreach (const QString &file, src) {
+            QFile::copy(file, targetPath + QFileInfo(file).fileName());
+            _project->constraintList.append(targetPath + QFileInfo(file).fileName());
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 /**
