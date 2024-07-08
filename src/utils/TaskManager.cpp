@@ -432,7 +432,13 @@ void TaskManager::buildBit(int mode) {
 
 void TaskManager::downloadBit() {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath,"digilent_hs3","top.bit");
+    std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath, partName, topName);
+    ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),displayPartName);
+}
+
+void TaskManager::downloadFlash() {
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath, partName, topName);
     ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),displayPartName);
 }
 
