@@ -86,6 +86,7 @@ private:
     void buildRoute();
     void buildBit(int mode);
     void downloadBit();
+    void downloadFlash();
     QWidget* gridView = nullptr;
 
 };
