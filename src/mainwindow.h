@@ -38,10 +38,13 @@ public:
     bool saveAllFile();
 
     void showProjectTitle(const int mode = 0, const QString &title = "");
-    void setForm(const int mode = 0);
+    void setForm(const int &mode = 0);
     void setRecentMenu();
     void showIPCatalog();
     void showPrjSummary();
+    void setCurrentDock(const int &type); // 跳转到对应的DockWidget
+
+    void resizeUi();
 
 public slots:
     void onNewTriggered();

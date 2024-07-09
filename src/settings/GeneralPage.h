@@ -12,13 +12,14 @@ public:
     GeneralPage(QWidget *parent = nullptr);
 
     void setTopModule();
+
 private:
     QFormLayout *fLayout;
 
-    QPushButton *project_device;
-    QPushButton *project_device_square_button;
+    QPushButton *projectDeviceButton;
+    QPushButton *projectDeviceSquareButton;
 
-    QLineEdit *top_module_name;
+    QLineEdit *topModuleNameLineEdit;
 };
 
 #endif // GENERALPAGE_H

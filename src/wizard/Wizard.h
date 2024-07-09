@@ -32,8 +32,6 @@
 #include <QFormLayout>
 #include <QDebug>
 
-#include "utils/Project.h"
-
 class Wizard : public QWizard
 {
     Q_OBJECT

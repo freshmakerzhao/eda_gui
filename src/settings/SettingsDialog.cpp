@@ -106,8 +106,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
 }
 
-int SettingsDialog::exec()
-{
-    QDialog::exec();
-    return 0;
-}
+// int SettingsDialog::exec()
+// {
+//     QDialog::exec();
+//     return 0;
+// }

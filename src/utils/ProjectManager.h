@@ -45,12 +45,12 @@ public:
                        const QString &familyName = QString("MgiCubo"));
 
     /**
-     * ! Reopen project on startup
-     * ! Open project in New window
-     * @param project 工程实例
+     * Reopen project on startup
+     * Open project in New window
+     * @param hprPath 工程文件路径
      * @return
      */
-    bool startProcess(Project *project);
+    bool startProcess(const QString &hprPath);
 
     /**
      * 接收工程文件(*.hpr)路径，打开工程
@@ -77,8 +77,8 @@ public:
      */
     void addSourcesAction();
 
-    /*
-     *
+    /**
+     * 将Wizard传入的Sources添加到工程
      */
     void addSourcesInProject(const QStringList &src, const int &mode);
 
@@ -103,7 +103,7 @@ private:
 
     ~ProjectManager();
 
-    // ! 指向当前打开的工程
+    //! 指向当前打开的工程
     Project *_project = nullptr;
 };
 

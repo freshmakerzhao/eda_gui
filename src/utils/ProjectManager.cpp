@@ -65,20 +65,19 @@ bool ProjectManager::createProject(const QString &name,
 }
 
 /**
- * ! Reopen project on startup
- * ! Open project in New window
- * @param project 工程实例
+ * Reopen project on startup
+ * Open project in New window
+ * @param hprPath 工程文件路径
  * @return
  */
-bool ProjectManager::startProcess(Project *project)
+bool ProjectManager::startProcess(const QString &hprPath)
 {
+    // TODO: This Window
     // 获取程序路径
     QString programPath = QCoreApplication::applicationFilePath();
     // 创建一个新进程
     QProcess process;
     // 传入新打开工程路径
-    QString hprPath = QString("%1/%2.hpr").arg(project->getParam(Project::Path), project->getParam(Project::Name));
-    // qDebug() << "Start New Process : " << hprPath;
     // 启动程序本身
     process.startDetached(programPath, QStringList() << hprPath);
 
@@ -107,14 +106,14 @@ bool ProjectManager::openProject(const QString &hprPath)
         qDebug() << "[ProjectManager] An error occurred from openProject: " << e.what();
     }
 
-    Project *new_open_project = new Project;
-    if (!new_open_project->parseProject(hprPath)) {
+    Project *newOpenProject = new Project;
+    if (!newOpenProject->parseProject(hprPath)) {
         CustomMessageBox::showError(MainWindow::instance(), "Error",
                                     "Failed to open project, File parsing error.");
-        delete new_open_project;
+        delete newOpenProject;
         return false;
     }
-    ProjectManager::instance().loadFiles(new_open_project);
+    ProjectManager::instance().loadFiles(newOpenProject);
     return true;
 }
 
@@ -146,7 +145,9 @@ void ProjectManager::loadFiles(Project *project)
     // 加载的不是同一个工程
     if (_project != nullptr && _project != project) {
         // 运行新进程，在新进程加载工程
-        ProjectManager::instance().startProcess(project);
+        QString hprPath = QString("%1/%2.hpr").arg(project->getParam(Project::Path), project->getParam(Project::Name));
+        ProjectManager::instance().startProcess(hprPath);
+        delete project;
         return;
     }
 
@@ -185,6 +186,9 @@ void ProjectManager::addSourcesAction()
     loadFiles(_project);
 }
 
+/**
+ * 将Wizard传入的Sources添加到工程
+ */
 void ProjectManager::addSourcesInProject(const QStringList &src, const int &mode)
 {
     if (_project == nullptr) {

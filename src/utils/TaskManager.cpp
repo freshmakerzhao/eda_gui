@@ -11,6 +11,7 @@
 #include "dialog/CustomMessageBox.h"
 #include "FileHelper.h"
 #include "settings/SettingsDialog.h"
+#include "HardWareManager.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -79,7 +80,8 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // frameView->resize(1000, 800);
         // frameView->show();
     } else if (mode == 10) {
-        downloadBit();
+        // downloadBit();
+        HardWareManager::instance().openProgramDevice();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 11) {
@@ -430,10 +432,15 @@ void TaskManager::buildBit(int mode) {
     }
 }
 
-void TaskManager::downloadBit() {
+void TaskManager::downloadBit(const QString &projectImplPath1, const QString &topName1) {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath, partName, topName);
-    ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),displayPartName);
+    if (projectImplPath1.isEmpty() && topName1.isEmpty()) {
+        std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath, partName, topName);
+        ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),displayPartName);
+    } else {
+        std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath1, partName, topName1);
+        ProcessManager::instance().checkCall("Bitstream Download", projectImplPath1, QString::fromStdString(script),displayPartName);
+    }
 }
 
 void TaskManager::downloadFlash() {

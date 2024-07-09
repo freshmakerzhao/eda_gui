@@ -1,14 +1,15 @@
 #include "GeneralPage.h"
 #include "utils/ProjectManager.h"
+#include "wizard/Wizard.h"
 
 GeneralPage::GeneralPage(QWidget *parent)
 {
     setStyleSheet(".QWidget { background-image: url(:/resource/white.png); }"
                   ".QWidget { border:4px solid #DCDCDC; }"
     );
-    project_device = new QPushButton(this);
-    project_device->setFixedHeight(25);
-    project_device->setStyleSheet(
+    projectDeviceButton = new QPushButton(this);
+    projectDeviceButton->setFixedHeight(25);
+    projectDeviceButton->setStyleSheet(
             "QPushButton { "
                 "text-align: left; "
                 "background-color: rgb(239, 239, 239);"
@@ -16,10 +17,9 @@ GeneralPage::GeneralPage(QWidget *parent)
             "} "
     );
 
-
-    project_device_square_button = new QPushButton(this);
-    project_device_square_button->setFixedSize(25, 25); // 设置为方形
-    project_device_square_button->setStyleSheet(
+    projectDeviceSquareButton = new QPushButton(this);
+    projectDeviceSquareButton->setFixedSize(25, 25); // 设置为方形
+    projectDeviceSquareButton->setStyleSheet(
             "QPushButton { "
                 "text-align: center; "
                 "background-color: rgb(255, 255, 255);"
@@ -32,30 +32,31 @@ GeneralPage::GeneralPage(QWidget *parent)
             "} "
     );
 
-    // 将 project_device 和 project_device_square_button 放在一起
     QHBoxLayout *hLayout = new QHBoxLayout();
-    hLayout->addWidget(project_device);
+    hLayout->addWidget(projectDeviceButton);
     hLayout->addSpacing(5); // 添加一点间距
-    hLayout->addWidget(project_device_square_button);
+    hLayout->addWidget(projectDeviceSquareButton);
 
-    top_module_name = new QLineEdit(this);
-    top_module_name->setClearButtonEnabled(true);
-    top_module_name->setFixedHeight(25);
+    topModuleNameLineEdit = new QLineEdit(this);
+    topModuleNameLineEdit->setClearButtonEnabled(true);
+    topModuleNameLineEdit->setFixedHeight(25);
 
     fLayout = new QFormLayout(this);
     fLayout->addRow("Project device:", hLayout);
-    fLayout->addRow("Top module name:", top_module_name);
+    fLayout->addRow("Top module name:", topModuleNameLineEdit);
 
     QString topName = ProjectManager::instance().getTopModule();
     QString deviceInfo = ProjectManager::instance().getDeviceInfo();
     qDebug() << "[GeneralPage] GeneralPage device info :" << deviceInfo;
-    project_device->setText(deviceInfo);
-    project_device_square_button->setText("...");
-    top_module_name->setText(topName);
+    projectDeviceButton->setText(deviceInfo);
+    projectDeviceSquareButton->setText("...");
+    topModuleNameLineEdit->setText(topName);
 }
 
 void GeneralPage::setTopModule()
 {
-    // TaskManager::instance().setTopModule(top_module_name->text());
-    ProjectManager::instance().setTopModule(top_module_name->text());
+    ProjectManager::instance().setTopModule(topModuleNameLineEdit->text());
 }
+
+
+

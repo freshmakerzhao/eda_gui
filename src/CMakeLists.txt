@@ -129,6 +129,8 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_HEADERS}
     ${PROJECT_RESOURCES}
     win32.rc
+    utils/HardWareManager.h utils/HardWareManager.cpp
+    dialog/ProgramDeviceDialog.h dialog/ProgramDeviceDialog.cpp
 )
 
 # Link the Qt5 Widgets library and the QScintilla library to the executable

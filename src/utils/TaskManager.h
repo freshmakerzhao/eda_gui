@@ -85,7 +85,8 @@ private:
     void buildPlace(int mode);
     void buildRoute();
     void buildBit(int mode);
-    void downloadBit();
+public:
+    void downloadBit(const QString &projectImplPath1, const QString &topName1);
     void downloadFlash();
     QWidget* gridView = nullptr;
 

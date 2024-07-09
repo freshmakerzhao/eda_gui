@@ -15,7 +15,7 @@ class SettingsDialog : public QDialog
 public:
     explicit SettingsDialog(QWidget *parent = nullptr);
 
-    int exec() override;
+    // int exec() override;
 
 signals:
 public slots:
