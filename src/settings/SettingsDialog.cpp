@@ -5,6 +5,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 {
     setWindowTitle("Settings");
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
+    // setWindowFlags(topWindow->windowFlags() | Qt::WindowStaysOnTopHint); // 将窗口置顶
     setFixedSize(1000, 800);
     // 创建一个QTreeWidget控件 并向其中添加列表项
     treeWidget = new QTreeWidget(this);
@@ -91,14 +92,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         "   margin-right: 10px;"
         "}");
 
-    connect(buttonBox, &QDialogButtonBox::accepted, [this](){
-        generalPage->setTopModule();
-        this->accept();
-    });
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 
-    connect(buttonBox, &QDialogButtonBox::rejected, [this](){
-        this->accept();
-    });
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     QVBoxLayout *vLayout = new QVBoxLayout(this);
     vLayout->addLayout(hLayout);
@@ -106,8 +102,15 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
 }
 
-int SettingsDialog::exec()
+void SettingsDialog::accept()
 {
-    QDialog::exec();
-    return 0;
+    generalPage->setDevicePart();
+    generalPage->setTopModule();
+    QDialog::accept();
 }
+
+// int SettingsDialog::exec()
+// {
+//     QDialog::exec();
+//     return 0;
+// }

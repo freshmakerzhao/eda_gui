@@ -65,20 +65,19 @@ bool ProjectManager::createProject(const QString &name,
 }
 
 /**
- * ! Reopen project on startup
- * ! Open project in New window
- * @param project 工程实例
+ * Reopen project on startup
+ * Open project in New window
+ * @param hprPath 工程文件路径
  * @return
  */
-bool ProjectManager::startProcess(Project *project)
+bool ProjectManager::startProcess(const QString &hprPath)
 {
+    // TODO: This Window
     // 获取程序路径
     QString programPath = QCoreApplication::applicationFilePath();
     // 创建一个新进程
     QProcess process;
     // 传入新打开工程路径
-    QString hprPath = QString("%1/%2.hpr").arg(project->getParam(Project::Path), project->getParam(Project::Name));
-    // qDebug() << "Start New Process : " << hprPath;
     // 启动程序本身
     process.startDetached(programPath, QStringList() << hprPath);
 
@@ -107,14 +106,14 @@ bool ProjectManager::openProject(const QString &hprPath)
         qDebug() << "[ProjectManager] An error occurred from openProject: " << e.what();
     }
 
-    Project *new_open_project = new Project;
-    if (!new_open_project->parseProject(hprPath)) {
+    Project *newOpenProject = new Project;
+    if (!newOpenProject->parseProject(hprPath)) {
         CustomMessageBox::showError(MainWindow::instance(), "Error",
                                     "Failed to open project, File parsing error.");
-        delete new_open_project;
+        delete newOpenProject;
         return false;
     }
-    ProjectManager::instance().loadFiles(new_open_project);
+    ProjectManager::instance().loadFiles(newOpenProject);
     return true;
 }
 
@@ -146,7 +145,9 @@ void ProjectManager::loadFiles(Project *project)
     // 加载的不是同一个工程
     if (_project != nullptr && _project != project) {
         // 运行新进程，在新进程加载工程
-        ProjectManager::instance().startProcess(project);
+        QString hprPath = QString("%1/%2.hpr").arg(project->getParameter(Project::Path), project->getParameter(Project::Name));
+        ProjectManager::instance().startProcess(hprPath);
+        delete project;
         return;
     }
 
@@ -158,14 +159,14 @@ void ProjectManager::loadFiles(Project *project)
     TaskManager::instance().sourcePathList = _project->sourceList;
     TaskManager::instance().constraintPathList = _project->constraintList;
     // 设置工程参数
-    TaskManager::instance().setParams(_project->getAllParams());
+    TaskManager::instance().setParams(_project->getAllParameters());
     // 设置工程参数
-    PrjSummary::instance()->setParams(_project->getAllParams());
+    PrjSummary::instance()->setParams(_project->getAllParameters());
     // 加载文件树
     FileManager::instance()->updateDesignSources(_project->sourceList);
     FileManager::instance()->updateConstraints(_project->constraintList);
     // UI反馈
-    MainWindow::instance()->showProjectTitle(0, _project->getParam(Project::Path) + "/" + _project->getParam(Project::Name) + ".hpr");
+    MainWindow::instance()->showProjectTitle(0, _project->getParameter(Project::Path) + "/" + _project->getParameter(Project::Name) + ".hpr");
     MainWindow::instance()->setForm(0);
 }
 
@@ -185,12 +186,15 @@ void ProjectManager::addSourcesAction()
     loadFiles(_project);
 }
 
+/**
+ * 将Wizard传入的Sources添加到工程
+ */
 void ProjectManager::addSourcesInProject(const QStringList &src, const int &mode)
 {
     if (_project == nullptr) {
         return;
     }
-    QString path = _project->getParam(Project::Path);
+    QString path = _project->getParameter(Project::Path);
     qDebug() << path;
 
     QString targetPath;
@@ -250,20 +254,36 @@ void ProjectManager::setTopModule(const QString &topModule)
     }
 }
 
-QString ProjectManager::getTopModule()
+void ProjectManager::setDevicePart(const QStringList &deviceInfo)
 {
     if (_project) {
-        return _project->getParam(Project::TopModule);
+        _project->setDevicePart(deviceInfo);
+        loadFiles(_project);
     }
-    return QString();
 }
 
-QString ProjectManager::getDeviceInfo(){
-    if (_project) {
-        return _project->getParam(Project::Part);
+QString ProjectManager::getParameter(const Project::ParamKey key) const
+{
+    if (!_project) {
+        return QString();
     }
-    return QString();
+    return _project->getParameter(key);
 }
+
+// QString ProjectManager::getTopModule()
+// {
+//     if (_project) {
+//         return _project->getParam(Project::TopModule);
+//     }
+//     return QString();
+// }
+
+// QString ProjectManager::getDeviceInfo(){
+//     if (_project) {
+//         return _project->getParam(Project::DisplayPart);
+//     }
+//     return QString();
+// }
 
 void ProjectManager::closeProject()
 {

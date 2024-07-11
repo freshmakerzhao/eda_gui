@@ -32,8 +32,6 @@
 #include <QFormLayout>
 #include <QDebug>
 
-#include "utils/Project.h"
-
 class Wizard : public QWizard
 {
     Q_OBJECT
@@ -46,7 +44,11 @@ private slots:
 
     void onAddFinish();
 
+    // void onPartFinish();
+
 public:
+    QStringList getDeviceInfo() const;
+
     QStringList sourcesFilesList;
     QStringList constraintFilesList;
     QString part;

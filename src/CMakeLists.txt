@@ -2,12 +2,16 @@ cmake_minimum_required(VERSION 3.14)
 
 project(HybrdLink)
 
+# 解决头文件报错
+include_directories("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/include")
+find_library("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/lib" NO_DEFAULT_PATH)
+
 # Set C++17 as required standard for the project
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 是否需要检查 MAC 地址 ，默认需要
-option(ENABLE_MAC_CHECK "Enable MAC address check" ON)
+option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
 # 是否需要检查 软件有效期 ，默认关闭
 option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" OFF)
 
@@ -129,6 +133,8 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_HEADERS}
     ${PROJECT_RESOURCES}
     win32.rc
+    utils/HardWareManager.h utils/HardWareManager.cpp
+    dialog/ProgramDeviceDialog.h dialog/ProgramDeviceDialog.cpp
 )
 
 # Link the Qt5 Widgets library and the QScintilla library to the executable

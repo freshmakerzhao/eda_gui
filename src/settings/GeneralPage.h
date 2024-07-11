@@ -5,6 +5,8 @@
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QLabel>
+#include <QAction>
 
 class GeneralPage : public QWidget
 {
@@ -12,13 +14,22 @@ public:
     GeneralPage(QWidget *parent = nullptr);
 
     void setTopModule();
+
+    void setDevicePart();
+
 private:
     QFormLayout *fLayout;
 
-    QPushButton *project_device;
-    QPushButton *project_device_square_button;
+    QLineEdit *projectDeviceLineEdit;
 
-    QLineEdit *top_module_name;
+    QPushButton *projectDeviceSquareButton;
+
+    QLineEdit *topModuleNameLineEdit;
+
+    QStringList deviceInfo;
+
+public slots:
+    void startWizard();
 };
 
 #endif // GENERALPAGE_H

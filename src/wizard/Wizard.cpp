@@ -59,6 +59,10 @@ Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
         setPage(Page_Constraint, new ConstraintPage);
         connect(this, &QWizard::accepted, this, &Wizard::onAddFinish);
         break;
+    case 2:
+        qDebug() << "[Wizard] mode 2";
+        addPage(new DefaultPartPage);
+        // connect(this, &QWizard::accepted, this, &Wizard::onPartFinish);
     default:
         break;
     }
@@ -151,6 +155,11 @@ void Wizard::onAddFinish()
     if (!constraintFilesList.empty()){
         ProjectManager::instance().addSourcesInProject(constraintFilesList, 1);
     }
+}
+
+QStringList Wizard::getDeviceInfo() const
+{
+    return QStringList() << part << arch << archName  << displayPart << familyName;
 }
 
 

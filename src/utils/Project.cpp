@@ -21,13 +21,13 @@ Project::~Project()
 
 /**
  * 初始化工程参数，仅在新建工程时使用
- * @param name
- * @param path
- * @param part
- * @param arch
- * @param archName
- * @param displayPart
- * @param familyName
+ * @parameters name
+ * @parameters path
+ * @parameters part
+ * @parameters arch
+ * @parameters archName
+ * @parameters displayPart
+ * @parameters familyName
  */
 void Project::initProject(const QString &name,
                           const QString &path,
@@ -37,19 +37,19 @@ void Project::initProject(const QString &name,
                           const QString &displayPart,
                           const QString &familyName)
 {
-    param[Project::Name] = name;         // 工程名称
-    param[Project::Path] = path;         // 工程路径(绝对)
-    param[Project::Part] = part;
-    param[Project::Arch] = arch;
-    param[Project::ArchName] = archName;
-    param[Project::TopModule] = "top";
-    param[Project::DisplayPart] = displayPart;
-    param[Project::FamilyName] = familyName;
+    parameters[Project::Name] = name;         // 工程名称
+    parameters[Project::Path] = path;         // 工程路径(绝对)
+    parameters[Project::Part] = part;
+    parameters[Project::Arch] = arch;
+    parameters[Project::ArchName] = archName;
+    parameters[Project::TopModule] = "top";
+    parameters[Project::DisplayPart] = displayPart;
+    parameters[Project::FamilyName] = familyName;
 }
 
 bool Project::writeProject(){
     //! 工程文件的路径为: path/name.hpr
-    QString hprPath = QString("%1/%2.hpr").arg(param[Project::Path], param[Project::Name]);
+    QString hprPath = QString("%1/%2.hpr").arg(parameters[Project::Path], parameters[Project::Name]);
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLDeclaration* decl = doc.NewDeclaration("xml version=\"1.0\" encoding=\"UTF-8\"");
     doc.InsertFirstChild(decl);
@@ -68,33 +68,33 @@ bool Project::writeProject(){
 
     tinyxml2::XMLElement* prjNameOption = doc.NewElement("Option");
     prjNameOption->SetAttribute("Name", "PrjName");
-    prjNameOption->SetAttribute("Val", param[Project::Name].toStdString().c_str());
+    prjNameOption->SetAttribute("Val", parameters[Project::Name].toStdString().c_str());
     configuration->InsertEndChild(prjNameOption);
 
     // <Option Name="Part" Val="xc7a35tfgg484-2"/>
     tinyxml2::XMLElement* partOption = doc.NewElement("Option");
     partOption->SetAttribute("Name", "Part");
-    partOption->SetAttribute("Val", param[Project::Part].toStdString().c_str());
+    partOption->SetAttribute("Val", parameters[Project::Part].toStdString().c_str());
     configuration->InsertEndChild(partOption);
 
     tinyxml2::XMLElement* archOption = doc.NewElement("Option");
     archOption->SetAttribute("Name", "Arch");
-    archOption->SetAttribute("Val", param[Project::Arch].toStdString().c_str());
+    archOption->SetAttribute("Val", parameters[Project::Arch].toStdString().c_str());
     configuration->InsertEndChild(archOption);
 
     tinyxml2::XMLElement* archNameOption = doc.NewElement("Option");
     archNameOption->SetAttribute("Name", "ArchName");
-    archNameOption->SetAttribute("Val", param[Project::ArchName].toStdString().c_str());
+    archNameOption->SetAttribute("Val", parameters[Project::ArchName].toStdString().c_str());
     configuration->InsertEndChild(archNameOption);
 
     tinyxml2::XMLElement* familyNameOption = doc.NewElement("Option");
     familyNameOption->SetAttribute("Name", "FamilyName");
-    familyNameOption->SetAttribute("Val", param[Project::FamilyName].toStdString().c_str());
+    familyNameOption->SetAttribute("Val", parameters[Project::FamilyName].toStdString().c_str());
     configuration->InsertEndChild(familyNameOption);
 
     tinyxml2::XMLElement* displayPartOption = doc.NewElement("Option");
     displayPartOption->SetAttribute("Name", "DisplayPart");
-    displayPartOption->SetAttribute("Val", param[Project::DisplayPart].toStdString().c_str());
+    displayPartOption->SetAttribute("Val", parameters[Project::DisplayPart].toStdString().c_str());
     configuration->InsertEndChild(displayPartOption);
 
     // ------------------ Design Sources --------------------
@@ -114,7 +114,7 @@ bool Project::writeProject(){
     designSrcsfileSet->InsertEndChild(config);
     tinyxml2::XMLElement* TopModuleOption = doc.NewElement("Option");
     TopModuleOption->SetAttribute("Name", "TopModule");
-    TopModuleOption->SetAttribute("Val", param[Project::TopModule].toStdString().c_str());
+    TopModuleOption->SetAttribute("Val", parameters[Project::TopModule].toStdString().c_str());
     config->InsertEndChild(TopModuleOption);
 
     // ------------------- Constraints -----------------------
@@ -137,7 +137,7 @@ bool Project::writeProject(){
 
 /**
  * 解析工程文件，将工程参数保存在Map
- * @param hprPath 工程文件(*.hpr)路径
+ * @parameters hprPath 工程文件(*.hpr)路径
  * @return
  */
 bool Project::parseProject(const QString &hprPath)
@@ -153,7 +153,7 @@ bool Project::parseProject(const QString &hprPath)
         return false;
     }
     QString prjDir = QFileInfo(hprPath).path();
-    param[Project::Path] = prjDir;  // 获取项目文件夹绝对路径
+    parameters[Project::Path] = prjDir;  // 获取项目文件夹绝对路径
 
     // ------------------------------ Configuration --------------------------------
     tinyxml2::XMLElement* configuration = root->FirstChildElement("Configuration");
@@ -163,17 +163,17 @@ bool Project::parseProject(const QString &hprPath)
     tinyxml2::XMLElement* option = configuration->FirstChildElement("Option");
     while (option) {
         if (std::string(option->Attribute("Name")) == "PrjName")
-            param[Project::Name] = option->Attribute("Val");
+            parameters[Project::Name] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "Part")
-            param[Project::Part] = option->Attribute("Val");
+            parameters[Project::Part] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "Arch")
-            param[Project::Arch] = option->Attribute("Val");
+            parameters[Project::Arch] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "ArchName")
-            param[Project::ArchName] = option->Attribute("Val");
+            parameters[Project::ArchName] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "FamilyName")
-            param[Project::FamilyName] = option->Attribute("Val");
+            parameters[Project::FamilyName] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "DisplayPart")
-            param[Project::DisplayPart] = option->Attribute("Val");
+            parameters[Project::DisplayPart] = option->Attribute("Val");
         option = option->NextSiblingElement("Option");
     }
 
@@ -201,7 +201,7 @@ bool Project::parseProject(const QString &hprPath)
             const char* name = option->Attribute("Name");
             const char* value = option->Attribute("Val");
             if (std::string(option->Attribute("Name")) == "TopModule")
-                param[Project::TopModule] = value;
+                parameters[Project::TopModule] = value;
             option = option->NextSiblingElement("Option");
         }
     }
@@ -227,13 +227,13 @@ bool Project::parseProject(const QString &hprPath)
     
     // 输出解析结果
     qDebug() << "---------------------------------------------------------------";
-    qDebug() << "Project Name:" << param[Project::Name];
-    qDebug() << "Part        :" << param[Project::Part];
-    qDebug() << "Arch        :" << param[Project::Arch];
-    qDebug() << "ArchName    :" << param[Project::ArchName];
-    qDebug() << "FamilyName    :" << param[Project::FamilyName];
-    qDebug() << "DisplayPart    :" << param[Project::DisplayPart];
-    qDebug() << "TopModule   :" << param[Project::TopModule];
+    qDebug() << "Project Name:" << parameters[Project::Name];
+    qDebug() << "Part        :" << parameters[Project::Part];
+    qDebug() << "Arch        :" << parameters[Project::Arch];
+    qDebug() << "ArchName    :" << parameters[Project::ArchName];
+    qDebug() << "FamilyName    :" << parameters[Project::FamilyName];
+    qDebug() << "DisplayPart    :" << parameters[Project::DisplayPart];
+    qDebug() << "TopModule   :" << parameters[Project::TopModule];
     qDebug() << "Design Sources-------------------------------------------------";
     foreach (const QString& source , this->sourceList) {
         qDebug() << " " << source;
@@ -248,26 +248,36 @@ bool Project::parseProject(const QString &hprPath)
 
 /**
  * 获取工程参数
- * @param key
+ * @parameters key
  * @return
  */
-QString Project::getParam(ParamKey key) const
+QString Project::getParameter(const ParamKey key) const
 {
-    return param[key];
+    return parameters[key];
 }
 
 /**
  * 获取所有工程参数
  * @return
  */
-QMap<Project::ParamKey, QString> Project::getAllParams() const
+QMap<Project::ParamKey, QString> Project::getAllParameters() const
 {
-    return param;
+    return parameters;
 }
 
 void Project::setTopModule(const QString &topName)
 {
-    param[Project::TopModule] = topName;
+    parameters[Project::TopModule] = topName;
+    writeProject();
+}
+
+void Project::setDevicePart(const QStringList &deviceInfo)
+{
+    parameters[Project::Part] = deviceInfo.at(0);
+    parameters[Project::Arch] = deviceInfo.at(1);
+    parameters[Project::ArchName]= deviceInfo.at(2);
+    parameters[Project::DisplayPart] = deviceInfo.at(3);
+    parameters[Project::FamilyName] = deviceInfo.at(4);
     writeProject();
 }
 

@@ -69,15 +69,17 @@ public:
      * @param key
      * @return
      */
-    QString getParam(ParamKey key) const;
+    QString getParameter(const Project::ParamKey key) const;
 
     /**
      * 获取所有工程参数
      * @return
      */
-    QMap<ParamKey, QString> getAllParams() const;
+    QMap<Project::ParamKey, QString> getAllParameters() const;
 
     void setTopModule(const QString &topName);
+
+    void setDevicePart(const QStringList &deviceInfo);
 
     QStringList sourceList;     // Sources(绝对路径)
     QStringList constraintList; // Constraints(绝对路径)
@@ -85,7 +87,7 @@ public:
 
 
 private:
-    QMap<ParamKey, QString> param;    // 工程参数
+    QMap<Project::ParamKey, QString> parameters;    // 工程参数
 
     // QMap<QString, QStringList> files; // 工程文件
 };

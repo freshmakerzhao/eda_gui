@@ -24,7 +24,7 @@ private:
                                   "font-size: 20px;"
                                   "font-weight: bold;"
                                   "border-bottom: 2px solid #DCDCDC;"
-                                  "border-radius: 0px;"
+                                  "border-radius: 0px;" // 不能删除，我也不知道为什么
                                   "}";
 
     QLabel *memoryTypeLabel;

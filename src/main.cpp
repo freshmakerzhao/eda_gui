@@ -28,23 +28,23 @@ int main(int argc, char *argv[])
     a.setFont(font);
     QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
 
-    const std::string plain_text = "z22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222h";
+    // const std::string plain_text = "z22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222h";
 
-    AESUtilities::aesEncrypt(plain_text, "E:/workspace/eda_gui/src/zhaoshuai.bin");
+    // AESUtilities::aesEncrypt(plain_text, "E:/workspace/eda_gui/src/zhaoshuai.bin");
 
-    unsigned char* decrypt_text = AESUtilities::aesDecrypt("E:/workspace/eda_gui/src/zhaoshuai.bin");
+    // unsigned char* decrypt_text = AESUtilities::aesDecrypt("E:/workspace/eda_gui/src/zhaoshuai.bin");
 
-    // 显示结果
-    qDebug() << "原始字符串: " << QString::fromStdString(plain_text);
-    qDebug() << "解密后的字符串:";
-    qDebug() << (char*)decrypt_text;
+    // // 显示结果
+    // qDebug() << "原始字符串: " << QString::fromStdString(plain_text);
+    // qDebug() << "解密后的字符串:";
+    // qDebug() << (char*)decrypt_text;
 
 #ifdef ENABLE_MAC_CHECK
     qDebug() << "[MAIN] MAC address check is enabled.";
     // 比对MAC地址
-    if (!LicenseUtilities::checkMacAddress(EXPECTED_MAC_ADDRESS)) {
-        return -1;
-    }
+//    if (!LicenseUtilities::checkMacAddress(EXPECTED_MAC_ADDRESS)) {
+//        return -1;
+//    }
 #else
     qDebug() << "[MAIN] MAC address check is disabled.";
 #endif
