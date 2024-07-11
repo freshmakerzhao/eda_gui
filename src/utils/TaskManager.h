@@ -4,7 +4,8 @@
 #include <QTreeWidget>
 #include <QDebug>
 #include <QMessageBox>
-#include "utils/Project.h"
+#include "utils/ProjectManager.h"
+#include "settings/SettingsDialog.h"
 
 class TaskManager : public QObject
 {
@@ -85,7 +86,11 @@ private:
     void buildPlace(int mode);
     void buildRoute();
     void buildBit(int mode);
-    void downloadBit();
+
+    // SettingsDialog *settingDialog = nullptr;
+
+public:
+    void downloadBit(const QString &projectImplPath1, const QString &topName1);
     void downloadFlash();
     QWidget* gridView = nullptr;
 

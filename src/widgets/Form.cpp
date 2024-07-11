@@ -15,6 +15,7 @@
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "utils/ProjectManager.h"
+#include "utils/HardWareManager.h"
 
 Form *Form::instance()
 {
@@ -122,6 +123,8 @@ Form::Form(QWidget *parent)
     button5->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     button6->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
+    connect(button5, &QPushButton::clicked, &HardWareManager::instance(), &HardWareManager::openProgramDevice);
+
     leftGroupLayoutTwo->addWidget(titleLabelTwo);
     leftGroupLayoutTwo->addWidget(button4);
     leftGroupLayoutTwo->addWidget(button5);
@@ -129,19 +132,20 @@ Form::Form(QWidget *parent)
     leftGroupLayoutTwo->addSpacerItem(new QSpacerItem(10, 14, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
     leftWidgetTwo->setStyleSheet(
-            "QWidget {"
-            "    background-color: rgb(156, 201, 223);"
-            "    border: none;"
+            ".QWidget {"
+                "background-color: rgb(77, 128, 127);"
+//              "    border: 1px solid red;"
+                "border-image: url(:/resource/form_logo_1.png);"
             "}"
             "QPushButton { "
-                "padding-left: 10px; "
-            "    border: none;"
+                "border: none; "
                 "text-align: left; "
                 "font-size: 15px; "
-                "background-color: transparent; "
-                "color: rgb(64, 64, 64); "
-            "} "
-            "QPushButton:hover { "
+                "background-color: transparent; " /* 设置背景为透明 */
+                "color: white; "
+                "padding-left: 10px; "
+                "} "
+                "QPushButton:hover { "
                 "text-decoration: underline; "
             "}"
     );
@@ -171,20 +175,21 @@ Form::Form(QWidget *parent)
     leftGroupLayoutThree->addSpacerItem(new QSpacerItem(10, 14, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
     leftWidgetThree->setStyleSheet(
-            "QWidget {"
-            "    background-color: rgb(156, 201, 223);"
-            "    border: none;"
+            ".QWidget {"
+                "background-color: rgb(77, 128, 127);"
+                //            "    border: 1px solid red;"
+                "border-image: url(:/resource/form_logo_1.png);"
             "}"
             "QPushButton { "
-                "padding-left: 10px; "
                 "border: none; "
                 "text-align: left; "
                 "font-size: 15px; "
-                "background-color: transparent; "
-                "color: rgb(64, 64, 64); "
+                "background-color: transparent; " /* 设置背景为透明 */
+                "color: white; "
+                "padding-left: 10px; "
             "} "
             "QPushButton:hover { "
-                "text-decoration:underline;"
+                "text-decoration: underline; "
             "}"
     );
     leftLayout->addWidget(leftWidgetThree);

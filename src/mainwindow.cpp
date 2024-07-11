@@ -48,6 +48,7 @@ void MainWindow::updateActionState()
 void MainWindow::createEditorTab(const QString& path)
 {
     EditorManager::instance()->createEditorTab(path);
+    setCurrentDock(0);
 }
 
 bool MainWindow::cleanEditorTab()
@@ -73,7 +74,7 @@ void MainWindow::showProjectTitle(const int mode, const QString &title)
     setWindowTitle("HybrdLink");
 }
 
-void MainWindow::setForm(const int mode)
+void MainWindow::setForm(const int &mode)
 {
     if (mode == 0) {
         Form::instance()->hide();
@@ -84,8 +85,7 @@ void MainWindow::setForm(const int mode)
         ManagerDock->toggleViewAction()->setEnabled(true);
         BottomDock->toggleViewAction()->setEnabled(true);
         NavigationBar->toggleViewAction()->setEnabled(true);
-        resize(this->size() - QSize(1, 0));
-        resize(this->size() + QSize(1, 0));
+        resizeUi();
         return;
     }
     Form::instance()->show();
@@ -96,8 +96,7 @@ void MainWindow::setForm(const int mode)
     ManagerDock->toggleViewAction()->setEnabled(false);
     BottomDock->toggleViewAction()->setEnabled(false);
     NavigationBar->toggleViewAction()->setEnabled(false);
-    resize(this->size() - QSize(1, 0));
-    resize(this->size() + QSize(1, 0));
+    resizeUi();
 }
 
 
@@ -145,6 +144,34 @@ void MainWindow::showPrjSummary()
     PrjSummaryWidget->show();
 }
 
+void MainWindow::setCurrentDock(const int &type)
+{
+    switch (type) {
+    case 0:
+        EditWidget->setAsCurrentTab();
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::resizeUi()
+{
+    QFontMetrics fontMetrics(this->font());
+    int width = fontMetrics.horizontalAdvance(QChar('A'))*20+60;
+    float per = width*1.0/this->width();
+    // qDebug() << per;
+    // NavigationBar->setFixedWidth(width * 20 + 60);
+    // resizeDocks({ManagerDock}, {100}, Qt::Vertical);
+    int leftwidth = int(this->width()*per);
+    int rightwidth = int(this->width()*((this->width()-width)*1.0/this->width()));
+    // qDebug() << leftwidth << " " << rightwidth;
+    // int leftwidth = int(this->width() * 0.18);//左边的停靠窗宽是主界面的0.18倍
+    // int rightwidth = int(this->width() * 0.82);//右边的停靠窗宽是主界面的0.82倍
+    resizeDocks({ManagerDock, BottomDock}, {42, 18}, Qt::Vertical);//右侧上下布局42 : 18
+    resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
+}
+
 
 void MainWindow::onNewTriggered()
 {
@@ -162,6 +189,8 @@ void MainWindow::onOpenFileTriggered()
 void MainWindow::onOpenTriggered()
 {
     QFileDialog dialog(this);
+    // dialog.setOption(QFileDialog::DontUseNativeDialog,true);
+
     dialog.setWindowTitle("Open Project");
     dialog.setNameFilter("HybrdLink Project File (*.hpr)");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -240,10 +269,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    int leftwidth = int(this->width() * 0.18);//左边的停靠窗宽是主界面的0.18倍
-    int rightwidth = int(this->width() * 0.82);//右边的停靠窗宽是主界面的0.82倍
-    resizeDocks({ManagerDock, BottomDock}, {42, 18}, Qt::Vertical);//右侧上下布局42 : 18
-    resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
+    resizeUi();
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -315,7 +341,7 @@ MainWindow::MainWindow(QWidget *parent)
     toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
     toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
     // 设置工具栏图标的大小
-    toolbar->setIconSize(QSize(16, 16));
+    toolbar->setIconSize(QSize(20, 20));
     // toolbar->addActions({chipPlannerAction});
     addToolBar(toolbar);
     // ================= EDITOR TAB ====================
