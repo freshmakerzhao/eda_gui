@@ -19,6 +19,8 @@ class FlowNavigator : public QTreeWidget
 public:
     explicit FlowNavigator(QWidget *parent = nullptr);
 
+    void downloadBitstreamMode();
+
 signals:
 };
 

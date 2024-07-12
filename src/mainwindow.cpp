@@ -23,6 +23,7 @@
 #include "base/InitialConfig.h"
 #include "ipmanager/IPManager.h"
 #include "widgets/PrjSummary.h"
+#include "dialog/AdvancedFileDialog.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -61,7 +62,7 @@ bool MainWindow::saveAllFile()
     return EditorManager::instance()->saveAllFiles();
 }
 
-void MainWindow::showProjectTitle(const int mode, const QString &title)
+void MainWindow::showProjectTitle(const int &mode, const QString &title)
 {
     /*
      * mode 0 设置工程目录Title
@@ -181,16 +182,22 @@ void MainWindow::onNewTriggered()
 
 void MainWindow::onOpenFileTriggered()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open File");
+    AdvancedFileDialog dialog(this);
+    dialog.setWindowTitle("Open File");
+    dialog.setNameFilter("All Files (*.*)");
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    if (dialog.exec() != QDialog::Accepted) {
+        return; // 用户取消了操作
+    }
+    QString path = dialog.selectedFiles().value(0, "");
     createEditorTab(path);
     setForm(0);
 }
 
 void MainWindow::onOpenTriggered()
 {
-    QFileDialog dialog(this);
-    // dialog.setOption(QFileDialog::DontUseNativeDialog,true);
-
+    // QFileDialog dialog(this);
+    AdvancedFileDialog dialog(this);
     dialog.setWindowTitle("Open Project");
     dialog.setNameFilter("HybrdLink Project File (*.hpr)");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -253,10 +260,9 @@ void MainWindow::onAboutTriggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (EditorManager::instance()->isModified()) {
-        // CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(this, "Warning", "There are unsaved files,"
-        //                                                                                        " are you sure you want to close?",
-        //                                                                       QMessageBox::Yes, QMessageBox::No);
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(this, "Warning", "There are unsaved files, are you sure you want to close?", QMessageBox::Yes | QMessageBox::No);
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(this,
+                                                                              "Warning", "There are unsaved files, are you sure you want to close?",
+                                                                              QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::Yes) {
             ProjectManager::instance().closeProject();
             event->accept();

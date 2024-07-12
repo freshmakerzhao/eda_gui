@@ -1,0 +1,49 @@
+QDialogButtonBox > QPushButton[text='OK'] {
+    background-color: #4f7cce;
+    color: white;
+    font-size: 10pt;
+    border-width: 2px;
+    border-color: #4f7cce;
+    border-style: solid;
+    min-width: 60px;
+    height: 22px;
+    padding: 6px;
+}
+
+QDialogButtonBox > QPushButton[text='OK']:hover {
+    background-color: #3a5b98;
+    color: white;
+    font-size: 10pt;
+    border-width: 2px;
+    border-color: #4f7cce;
+    border-style: solid;
+    min-width: 60px;
+    padding: 4px;
+    height: 22px;
+    margin: 2px;
+}
+
+QDialogButtonBox > QPushButton[text='Cancel'] {
+    background-color: #ffffff;
+    color: black;
+    font-size: 10pt;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
+    width: 60px;
+    height: 24px;
+    padding: 6px;
+}
+
+QDialogButtonBox > QPushButton[text='Cancel']:hover {
+    background-color: #ededed;
+    color: black;
+    font-size: 10pt;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
+    width: 60px;
+    height: 24px;
+    padding: 4px;
+    margin: 2px;
+}

@@ -1,5 +1,6 @@
 #include "ProgramDeviceDialog.h"
 #include "utils/HardWareManager.h"
+#include "dialog/AdvancedFileDialog.h"
 
 ProgramDeviceDialog::ProgramDeviceDialog(QWidget *parent)
 {
@@ -62,11 +63,16 @@ void ProgramDeviceDialog::accept()
 
 void ProgramDeviceDialog::onbitStreamFilePathBrowseButtonClicked()
 {
-    QFileDialog dialog(this);
+    // QFileDialog dialog(this);
+    AdvancedFileDialog dialog(this);
     // dialog.setOption(QFileDialog::DontUseNativeDialog,true);
 
     dialog.setWindowTitle("Open Project");
-    dialog.setNameFilter("Bitstream Files(*.bit)");
+    //! Filters
+    QStringList filters;
+    filters << "Bitstream Files (*.bit *.bin)"
+            << "All Files (*.*)";
+    dialog.setNameFilters(filters);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     if (dialog.exec() != QDialog::Accepted) {
         return; // 用户取消了操作

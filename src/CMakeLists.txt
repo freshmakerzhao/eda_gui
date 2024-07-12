@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.14)
 
 project(HybrdLink)
 
-# 解决头文件报错
-include_directories("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/include")
-find_library("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/lib" NO_DEFAULT_PATH)
+# # 解决头文件报错
+# include_directories("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/include")
+# find_library("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/lib" NO_DEFAULT_PATH)
 
 # Set C++17 as required standard for the project
 set(CMAKE_CXX_STANDARD 17)
@@ -133,11 +133,9 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_HEADERS}
     ${PROJECT_RESOURCES}
     win32.rc
-    utils/HardWareManager.h utils/HardWareManager.cpp
-    dialog/ProgramDeviceDialog.h dialog/ProgramDeviceDialog.cpp
 )
 
-# Link the Qt5 Widgets library and the QScintilla library to the executable
+# Link the Qt5 Widgets library and Third-Party library to the executable
 target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     Qt5::Core

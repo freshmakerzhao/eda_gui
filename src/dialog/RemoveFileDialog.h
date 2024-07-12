@@ -17,7 +17,7 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 
-class RemoveFileDialog : QDialog
+class RemoveFileDialog :  public QDialog
 {
     Q_OBJECT
 public:
@@ -25,10 +25,21 @@ public:
 
     int exec() override;
 
+    enum Result {
+        AcceptedChecked,
+        AcceptedUnchecked,
+        Rejected
+    };
+
+private slots:
+    void accept() override;
+
+    void reject() override;
+
 private:
+    Result result = Rejected;
     QLabel *filePathLabel;
     QCheckBox *checkBox;
-    int op = 0;
 };
 
 #endif // REMOVEFILEDIALOG_H

@@ -17,7 +17,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
-#include <tinyxml2/tinyxml2.h>
+#include "tinyxml2/tinyxml2.h"
 
 class Project
 {

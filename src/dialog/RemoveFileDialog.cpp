@@ -30,70 +30,31 @@ RemoveFileDialog::RemoveFileDialog(QWidget *parent, const QString &path)
     layout->addWidget(filePathLabel);
     layout->addWidget(checkBox);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
-    QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
-    QPushButton *cancelButton = buttonBox->button(QDialogButtonBox::Cancel);
-    okButton->setStyleSheet("QPushButton {"
-                            "   background-color: #4f7cce; "   // 背景色
-                            "   color: white; "                // 白色文字
-                            "   font-size: 10pt;"              // 字号
-                            "   border-width: 2px; "           // 边框宽度
-                            "   border-color: #4f7cce; "       // 边框颜色
-                            "   border-style: solid; "         // 边框样式
-                            "   min-width: 60px; "             // 最小宽度
-                            "   padding: 6px; "                // 内边距
-                            "}"
-                            "QPushButton:hover {"
-                            "   background-color: #3a5b98; "   // 背景色
-                            "   color: white; "                // 白色文字
-                            "   font-size: 10pt;"              // 字号
-                            "   border-width: 2px; "           // 边框宽度
-                            "   border-color: #4f7cce; "       // 边框颜色
-                            "   border-style: solid; "         // 边框样式
-                            "   min-width: 60px; "             // 最小宽度
-                            "   padding: 4px;"                // 内边距
-                            "   margin: 2px;"
-                            "}");
-    cancelButton->setStyleSheet("QPushButton {"
-                                "   background-color: #ffffff; "   // 背景色
-                                "   color: black; "                // 白色文字
-                                "   font-size: 10pt;"              // 字号
-                                "   border-width: 1px; "           // 边框宽度
-                                "   border-color: black; "       // 边框颜色
-                                "   border-style: solid; "         // 边框样式
-                                "   width: 60px; "                 // 宽度
-                                "   height: 20px; "                 // 高度
-                                "   padding: 6px; "                // 内边距
-                                "}"
-                                "QPushButton:hover {"
-                                "   background-color: #ededed; "   // 背景色
-                                "   color: black; "                // 白色文字
-                                "   font-size: 10pt;"              // 字号
-                                "   border-width: 1px; "           // 边框宽度
-                                "   border-color: black; "       // 边框颜色
-                                "   border-style: solid; "         // 边框样式
-                                "   width: 60px; "                 // 宽度
-                                "   height: 20px; "                 // 高度
-                                "   padding: 4px;"                // 内边距
-                                "}");
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     layout->addWidget(buttonBox);
 
-    connect(buttonBox, &QDialogButtonBox::accepted, [this](){
-        op = 1; // 仅移除
-        if (checkBox->isChecked()) { // 移除+删除
-            op = 2;
-        }
-        this->accept();
-    });
-
-    connect(buttonBox, &QDialogButtonBox::rejected, [this](){
-        op = -1; // 忽略
-        this->accept();
-    });
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &RemoveFileDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &RemoveFileDialog::reject);
 }
 
 int RemoveFileDialog::exec()
 {
     QDialog::exec();
-    return op;
+    return result;
+}
+
+void RemoveFileDialog::accept()
+{
+    if (checkBox->isChecked()) {
+        result = AcceptedChecked;
+    } else {
+        result = AcceptedUnchecked;
+    }
+    QDialog::accept();
+}
+
+void RemoveFileDialog::reject()
+{
+    result = Rejected;
+    QDialog::reject();
 }

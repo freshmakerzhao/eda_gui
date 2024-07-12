@@ -115,13 +115,13 @@ void FileManager::removeFileAction()
     const QString path = index.data(Qt::UserRole).toString();
 
     RemoveFileDialog dialog(MainWindow::instance(), path);
-    const int op = dialog.exec();
+    const int result = dialog.exec();
     bool isRemove = false;
-    switch (op) {
-    case 1: // 仅移除
+    switch (result) {
+    case RemoveFileDialog::AcceptedUnchecked: // 仅移除
         isRemove = ProjectManager::instance().removeFileAction(path, false);
         break;
-    case 2: // 移除+删除
+    case  RemoveFileDialog::AcceptedChecked: // 移除+删除
         isRemove = ProjectManager::instance().removeFileAction(path, true);
         break;
     default: // 忽略
