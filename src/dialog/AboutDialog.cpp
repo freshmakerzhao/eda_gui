@@ -49,9 +49,3 @@ AboutDialog::AboutDialog(QWidget *parent)
     layout->addWidget(textLabel);
     layout->addWidget(imageLabel);
 }
-
-int AboutDialog::exec()
-{
-    QDialog::exec();
-    return 0;
-}

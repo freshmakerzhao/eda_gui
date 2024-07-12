@@ -19,6 +19,7 @@
         <file>resource/start06.jpg</file>
         <file>resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF</file>
         <file>resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf</file>
+        <file>resource/Global.qss</file>
     </qresource>
     <qresource prefix="/gridview">
         <file>resource/gridview/22-1icon_zoom_in.png</file>

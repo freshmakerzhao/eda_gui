@@ -16,13 +16,12 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-class AboutDialog : QDialog
+class AboutDialog : public QDialog
 {
     Q_OBJECT
 public:
     AboutDialog(QWidget *parent = nullptr);
 
-    int exec() override;
 };
 
 #endif // ABOUTDIALOG_H

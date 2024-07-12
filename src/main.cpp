@@ -16,6 +16,13 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    //! ------ QSS ------
+    QFile qss(":/resource/Global.qss");
+    if (qss.open(QFile::ReadOnly)) {
+        a.setStyleSheet(qss.readAll());
+    }
+    qss.close();
+
     //! ----- Fonts -----
     QString appDirPath = QCoreApplication::applicationDirPath();
     // 加载字体并获取字体名

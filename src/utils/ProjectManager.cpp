@@ -72,7 +72,15 @@ bool ProjectManager::createProject(const QString &name,
  */
 bool ProjectManager::startProcess(const QString &hprPath)
 {
-    // TODO: This Window
+    CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(),
+                                                                          "Question", "Open this Window?",
+                                                                          QMessageBox::Yes | QMessageBox::No);
+    if (btn == QMessageBox::Yes) {
+        closeProject();
+        openProject(hprPath);
+        return false;
+    }
+
     // 获取程序路径
     QString programPath = QCoreApplication::applicationFilePath();
     // 创建一个新进程
@@ -269,21 +277,6 @@ QString ProjectManager::getParameter(const Project::ParamKey key) const
     }
     return _project->getParameter(key);
 }
-
-// QString ProjectManager::getTopModule()
-// {
-//     if (_project) {
-//         return _project->getParam(Project::TopModule);
-//     }
-//     return QString();
-// }
-
-// QString ProjectManager::getDeviceInfo(){
-//     if (_project) {
-//         return _project->getParam(Project::DisplayPart);
-//     }
-//     return QString();
-// }
 
 void ProjectManager::closeProject()
 {

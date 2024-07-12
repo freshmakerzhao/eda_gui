@@ -9,6 +9,7 @@
   */
 
 #include "ConstraintPage.h"
+#include "dialog/AdvancedFileDialog.h"
 
 ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
 {
@@ -56,7 +57,15 @@ ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
 void ConstraintPage::onAddFiles()
 {
     int currentIndex = model->rowCount() + 1; // 用于记录当前索引
-    QStringList fileNames = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.xdc)");
+    // QStringList fileNames = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.xdc)");
+    AdvancedFileDialog dialog(this);
+    dialog.setWindowTitle("Select Files");
+    dialog.setNameFilter("Verilog Source Files (*.xdc)");
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    if (dialog.exec() != QDialog::Accepted) {
+        return; // 用户取消了操作
+    }
+    QStringList fileNames = dialog.selectedFiles();
     for (const QString &fileName : fileNames) {
         QFileInfo fileInfo(fileName);
         QList<QStandardItem *> items;

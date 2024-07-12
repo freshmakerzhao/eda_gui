@@ -37,7 +37,7 @@ public:
     bool cleanEditorTab();
     bool saveAllFile();
 
-    void showProjectTitle(const int mode = 0, const QString &title = "");
+    void showProjectTitle(const int &mode = 0, const QString &title = "");
     void setForm(const int &mode = 0);
     void setRecentMenu();
     void showIPCatalog();

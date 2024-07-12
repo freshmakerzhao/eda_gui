@@ -111,3 +111,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     });
 
 }
+
+void FlowNavigator::downloadBitstreamMode()
+{
+
+}
