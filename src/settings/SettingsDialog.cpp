@@ -5,6 +5,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 {
     setWindowTitle("Settings");
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
+    // setWindowFlags(topWindow->windowFlags() | Qt::WindowStaysOnTopHint); // 将窗口置顶
     setFixedSize(1000, 800);
     // 创建一个QTreeWidget控件 并向其中添加列表项
     treeWidget = new QTreeWidget(this);
@@ -37,68 +38,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         }
     });
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
-    QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
-    okButton->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #4f7cce; "   // 背景色
-        "   color: white; "                // 白色文字
-        "   font-size: 10pt;"              // 字号
-        "   border-width: 2px; "           // 边框宽度
-        "   border-color: #4f7cce; "       // 边框颜色
-        "   border-style: solid; "         // 边框样式
-        "   min-width: 60px; "             // 最小宽度
-        "   padding: 6px; "                // 内边距
-        "   margin-right: 10px;"
-        "}"
-        "QPushButton:hover {"
-        "   background-color: #3a5b98; "   // 背景色
-        "   color: white; "                // 白色文字
-        "   font-size: 10pt;"              // 字号
-        "   border-width: 2px; "           // 边框宽度
-        "   border-color: #4f7cce; "       // 边框颜色
-        "   border-style: solid; "         // 边框样式
-        "   min-width: 60px; "             // 最小宽度
-        "   padding: 4px;"                // 内边距
-        "   margin: 2px;"
-        "   margin-right: 10px;"
-        "}");
-    QPushButton *cancelButton = buttonBox->button(QDialogButtonBox::Cancel);
-    cancelButton->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #ffffff; "   // 背景色
-        "   color: black; "                // 白色文字
-        "   font-size: 10pt;"              // 字号
-        "   border-width: 1px; "           // 边框宽度
-        "   border-color: black; "       // 边框颜色
-        "   border-style: solid; "         // 边框样式
-        "   width: 60px; "                 // 宽度
-        "   height: 20px; "                 // 高度
-        "   padding: 6px; "                // 内边距
-        "   margin-right: 10px;"
-        "}"
-        "QPushButton:hover {"
-        "   background-color: #ededed; "   // 背景色
-        "   color: black; "                // 白色文字
-        "   font-size: 10pt;"              // 字号
-        "   border-width: 1px; "           // 边框宽度
-        "   border-color: black; "       // 边框颜色
-        "   border-style: solid; "         // 边框样式
-        "   width: 60px; "                 // 宽度
-        "   height: 20px; "                 // 高度
-        "   padding: 4px;"                // 内边距
-        "   margin: 2px;"
-        "   margin-right: 10px;"
-        "}");
-
-    connect(buttonBox, &QDialogButtonBox::accepted, [this](){
-        generalPage->setTopModule();
-        this->accept();
-    });
-
-    connect(buttonBox, &QDialogButtonBox::rejected, [this](){
-        this->accept();
-    });
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     QVBoxLayout *vLayout = new QVBoxLayout(this);
     vLayout->addLayout(hLayout);
@@ -106,8 +48,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
 }
 
-int SettingsDialog::exec()
+void SettingsDialog::accept()
 {
-    QDialog::exec();
-    return 0;
+    generalPage->setDevicePart();
+    generalPage->setTopModule();
+    QDialog::accept();
 }

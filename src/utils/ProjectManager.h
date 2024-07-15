@@ -24,12 +24,33 @@ public:
     static ProjectManager& instance();
 
     /**
-     * ! Reopen project on startup
-     * ! Open project in New window
-     * @param project 工程实例
+     * 创建一个新的HybrdLink工程
+     * @param name
+     * @param path
+     * @param part
+     * @param arch
+     * @param archName
+     * @param displayPart
+     * @param familyName
      * @return
      */
-    bool startProcess(Project *project);
+    bool createProject(const QString &name,
+                       const QString &path,
+                       const QString &part,
+                       const QString &arch,
+                       const QString &archName,
+                       const QStringList &designSrcs,
+                       const QStringList &constraints,
+                       const QString &displayPart = QString("MC1P110-FC484L-1"),
+                       const QString &familyName = QString("MgiCubo"));
+
+    /**
+     * Reopen project on startup
+     * Open project in New window
+     * @param hprPath 工程文件路径
+     * @return
+     */
+    bool startProcess(const QString &hprPath);
 
     /**
      * 接收工程文件(*.hpr)路径，打开工程
@@ -57,6 +78,11 @@ public:
     void addSourcesAction();
 
     /**
+     * 将Wizard传入的Sources添加到工程
+     */
+    void addSourcesInProject(const QStringList &src, const int &mode);
+
+    /**
      * 移除工程中的文件
      * @param path 目标文件路径
      * @param erase false:仅移除 true:彻底删除文件
@@ -66,7 +92,9 @@ public:
 
     void setTopModule(const QString &topModule);
 
-    QString getTopModule();
+    void setDevicePart(const QStringList &deviceInfo);
+
+    QString getParameter(const Project::ParamKey key) const;
 
 public slots:
     void closeProject();
@@ -74,6 +102,9 @@ public slots:
 private:
     ProjectManager();
 
+    ~ProjectManager();
+
+    //! 指向当前打开的工程
     Project *_project = nullptr;
 };
 

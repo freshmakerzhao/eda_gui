@@ -26,34 +26,6 @@ xc7a100tcsg324-3:
   family: xc7
   archName: xc7a100t
   arch: 100t
-xc7a100tfgg484-1:
-  device: xc7a100t
-  package: fgg484
-  speedgrade: '1'
-  family: xc7
-  archName: xc7a100t
-  arch: 100t
-xc7a100tfgg484-2:
-  device: xc7a100t
-  package: fgg484
-  speedgrade: '2'
-  family: xc7
-  archName: xc7a100t
-  arch: 100t
-xc7a100tfgg484-2L:
-  device: xc7a100t
-  package: fgg484
-  speedgrade: 2L
-  family: xc7
-  archName: xc7a100t
-  arch: 100t
-xc7a100tfgg484-3:
-  device: xc7a100t
-  package: fgg484
-  speedgrade: '3'
-  family: xc7
-  archName: xc7a100t
-  arch: 100t
 xc7a100tfgg676-1:
   device: xc7a100t
   package: fgg676
@@ -110,34 +82,6 @@ xc7a100tftg256-3:
   family: xc7
   archName: xc7a100t
   arch: 100t
-xc7a200tfbg484-1:
-  device: xc7a200t
-  package: fbg484
-  speedgrade: '1'
-  family: xc7
-  archName: xc7a200t
-  arch: 200t
-xc7a200tfbg484-2:
-  device: xc7a200t
-  package: fbg484
-  speedgrade: '2'
-  family: xc7
-  archName: xc7a200t
-  arch: 200t
-xc7a200tfbg484-2L:
-  device: xc7a200t
-  package: fbg484
-  speedgrade: 2L
-  family: xc7
-  archName: xc7a200t
-  arch: 200t
-xc7a200tfbg484-3:
-  device: xc7a200t
-  package: fbg484
-  speedgrade: '3'
-  family: xc7
-  archName: xc7a200t
-  arch: 200t
 xc7a200tfbg676-1:
   device: xc7a200t
   package: fbg676

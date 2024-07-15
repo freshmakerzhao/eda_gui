@@ -22,6 +22,8 @@
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "ipmanager/IPManager.h"
+#include "widgets/PrjSummary.h"
+#include "dialog/AdvancedFileDialog.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -47,6 +49,7 @@ void MainWindow::updateActionState()
 void MainWindow::createEditorTab(const QString& path)
 {
     EditorManager::instance()->createEditorTab(path);
+    setCurrentDock(0);
 }
 
 bool MainWindow::cleanEditorTab()
@@ -59,7 +62,7 @@ bool MainWindow::saveAllFile()
     return EditorManager::instance()->saveAllFiles();
 }
 
-void MainWindow::showProjectTitle(const int mode, const QString &title)
+void MainWindow::showProjectTitle(const int &mode, const QString &title)
 {
     /*
      * mode 0 设置工程目录Title
@@ -72,7 +75,7 @@ void MainWindow::showProjectTitle(const int mode, const QString &title)
     setWindowTitle("HybrdLink");
 }
 
-void MainWindow::setForm(const int mode)
+void MainWindow::setForm(const int &mode)
 {
     if (mode == 0) {
         Form::instance()->hide();
@@ -83,8 +86,7 @@ void MainWindow::setForm(const int mode)
         ManagerDock->toggleViewAction()->setEnabled(true);
         BottomDock->toggleViewAction()->setEnabled(true);
         NavigationBar->toggleViewAction()->setEnabled(true);
-        resize(this->size() - QSize(1, 0));
-        resize(this->size() + QSize(1, 0));
+        resizeUi();
         return;
     }
     Form::instance()->show();
@@ -95,8 +97,7 @@ void MainWindow::setForm(const int mode)
     ManagerDock->toggleViewAction()->setEnabled(false);
     BottomDock->toggleViewAction()->setEnabled(false);
     NavigationBar->toggleViewAction()->setEnabled(false);
-    resize(this->size() - QSize(1, 0));
-    resize(this->size() + QSize(1, 0));
+    resizeUi();
 }
 
 
@@ -138,6 +139,40 @@ void MainWindow::showIPCatalog()
     IPManagerWidget->show();
 }
 
+void MainWindow::showPrjSummary()
+{
+    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
+    PrjSummaryWidget->show();
+}
+
+void MainWindow::setCurrentDock(const int &type)
+{
+    switch (type) {
+    case 0:
+        EditWidget->setAsCurrentTab();
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::resizeUi()
+{
+    QFontMetrics fontMetrics(this->font());
+    int width = fontMetrics.horizontalAdvance(QChar('A'))*20+60;
+    float per = width*1.0/this->width();
+    // qDebug() << per;
+    // NavigationBar->setFixedWidth(width * 20 + 60);
+    // resizeDocks({ManagerDock}, {100}, Qt::Vertical);
+    int leftwidth = int(this->width()*per);
+    int rightwidth = int(this->width()*((this->width()-width)*1.0/this->width()));
+    // qDebug() << leftwidth << " " << rightwidth;
+    // int leftwidth = int(this->width() * 0.18);//左边的停靠窗宽是主界面的0.18倍
+    // int rightwidth = int(this->width() * 0.82);//右边的停靠窗宽是主界面的0.82倍
+    resizeDocks({ManagerDock, BottomDock}, {42, 18}, Qt::Vertical);//右侧上下布局42 : 18
+    resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
+}
+
 
 void MainWindow::onNewTriggered()
 {
@@ -147,14 +182,22 @@ void MainWindow::onNewTriggered()
 
 void MainWindow::onOpenFileTriggered()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open File");
+    AdvancedFileDialog dialog(this);
+    dialog.setWindowTitle("Open File");
+    dialog.setNameFilter("All Files (*.*)");
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    if (dialog.exec() != QDialog::Accepted) {
+        return; // 用户取消了操作
+    }
+    QString path = dialog.selectedFiles().value(0, "");
     createEditorTab(path);
     setForm(0);
 }
 
 void MainWindow::onOpenTriggered()
 {
-    QFileDialog dialog(this);
+    // QFileDialog dialog(this);
+    AdvancedFileDialog dialog(this);
     dialog.setWindowTitle("Open Project");
     dialog.setNameFilter("HybrdLink Project File (*.hpr)");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -217,10 +260,9 @@ void MainWindow::onAboutTriggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (EditorManager::instance()->isModified()) {
-        // CustomMessageBox::StandardButton btn = CustomMessageBox::showTwoOptionQuestion(this, "Warning", "There are unsaved files,"
-        //                                                                                        " are you sure you want to close?",
-        //                                                                       QMessageBox::Yes, QMessageBox::No);
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(this, "Warning", "There are unsaved files, are you sure you want to close?", QMessageBox::Yes | QMessageBox::No);
+        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(this,
+                                                                              "Warning", "There are unsaved files, are you sure you want to close?",
+                                                                              QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::Yes) {
             ProjectManager::instance().closeProject();
             event->accept();
@@ -233,10 +275,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    int leftwidth = int(this->width() * 0.18);//左边的停靠窗宽是主界面的0.18倍
-    int rightwidth = int(this->width() * 0.82);//右边的停靠窗宽是主界面的0.82倍
-    resizeDocks({ManagerDock, BottomDock}, {42, 18}, Qt::Vertical);//右侧上下布局42 : 18
-    resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
+    resizeUi();
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -255,11 +294,11 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu = menuBar->addMenu("View");
     helpMenu = menuBar->addMenu("Help");
     // ===================== FILE ======================
-    newAction = new QAction("New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-    openAction = new QAction("Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    newAction = new QAction(QIcon(":icons/resource/icons/35-icon_new_project_2.png"),"New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    openAction = new QAction(QIcon(":icons/resource/icons/21-icon_open_extend.png"), "Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     closeAction = new QAction("Close Project", this);
     openFileAction = new QAction("Open File", this);
-    saveAction = new QAction("Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+    saveAction = new QAction(QIcon(":icons/resource/icons/30-icon_save.png"), "Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     saveasAction = new QAction("Save As", this);
     exitAction = new QAction("Exit", this), exitAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_F4));
     fileMenu->addActions({newAction, openAction, closeAction}), fileMenu->addSeparator();
@@ -279,11 +318,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(saveasAction, &QAction::triggered, this, &MainWindow::onSaveAsTriggered);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     // ===================== EDIT ======================
-    cutAction = new QAction("Cut", this), cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
-    copyAction = new QAction("Copy", this), copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-    pasteAction = new QAction("Paste", this), pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
-    undoAction = new QAction("Undo", this), undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
-    redoAction = new QAction("Redo", this), redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
+    cutAction = new QAction(QIcon(":icons/resource/icons/31-icon_cut.png"), "Cut", this), cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    copyAction = new QAction(QIcon(":icons/resource/icons/14-icon_copy_2.png"),"Copy", this), copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    pasteAction = new QAction(QIcon(":icons/resource/icons/32-icon_paste_2.png"), "Paste", this), pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    undoAction = new QAction(QIcon(":icons/resource/icons/29-1icon_undo.png"), "Undo", this), undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
+    redoAction = new QAction(QIcon(":icons/resource/icons/29-2icon_redo.png"), "Redo", this), redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
     editMenu->addActions({cutAction, copyAction, pasteAction}), editMenu->addSeparator();
     editMenu->addActions({undoAction, redoAction});
     // ================== 编辑器按钮绑定 ==================
@@ -307,6 +346,8 @@ MainWindow::MainWindow(QWidget *parent)
     toolbar->addActions({newAction, openAction, saveAction}), toolbar->addSeparator();
     toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
     toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
+    // 设置工具栏图标的大小
+    toolbar->setIconSize(QSize(20, 20));
     // toolbar->addActions({chipPlannerAction});
     addToolBar(toolbar);
     // ================= EDITOR TAB ====================
@@ -326,6 +367,7 @@ MainWindow::MainWindow(QWidget *parent)
     BottomDock->setFeatures(QDockWidget::DockWidgetClosable);
     BottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
     BottomDock->setWidget(InfoWidget::instance());
+
     // 隐藏TitleBar
     // QWidget* lTitleBar = BottomDock->titleBarWidget();
     // QWidget* lEmptyWidget = new QWidget();
@@ -333,6 +375,7 @@ MainWindow::MainWindow(QWidget *parent)
     // delete lTitleBar;
     // 垂直TitleBar
     // BottomDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
+
     addDockWidget(Qt::BottomDockWidgetArea, BottomDock);
 
     ManagerDock = new QDockWidget(this);
@@ -378,6 +421,11 @@ MainWindow::MainWindow(QWidget *parent)
     IPManagerWidget->hide();
     // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
     IPManagerWidget->setWidget(IPManager::instance());
+
+    PrjSummaryWidget = new ads::CDockWidget("Project Summary", DockManager);
+    // PrjSummaryWidget->hide();
+    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
+    PrjSummaryWidget->setWidget(PrjSummary::instance());
 }
 
 MainWindow::~MainWindow()

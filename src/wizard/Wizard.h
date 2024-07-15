@@ -32,13 +32,11 @@
 #include <QFormLayout>
 #include <QDebug>
 
-#include "utils/Project.h"
-
 class Wizard : public QWizard
 {
     Q_OBJECT
 public:
-    Wizard(QWidget *parent = nullptr, const int mode = 0, Project *pro = nullptr);
+    Wizard(QWidget *parent = nullptr, const int &mode = 0);
     ~Wizard();
 
 private slots:
@@ -46,10 +44,16 @@ private slots:
 
     void onAddFinish();
 
+    // void onPartFinish();
+
 public:
+    QStringList getDeviceInfo() const;
+
     QStringList sourcesFilesList;
     QStringList constraintFilesList;
     QString part;
+    QString displayPart;
+    QString familyName;
     QString archName;
     QString arch;
 
@@ -63,9 +67,7 @@ public:
     };
 
 private:
-    Project *new_project;
 
-    Project *current_project;
 };
 
 #endif // WIZARD_H
