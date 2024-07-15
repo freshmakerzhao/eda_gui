@@ -19,18 +19,7 @@ GeneralPage::GeneralPage(QWidget *parent)
     projectDeviceSquareButton = new QPushButton(this);
     connect(projectDeviceSquareButton, &QPushButton::clicked, this, &GeneralPage::startWizard);
     projectDeviceSquareButton->setFixedSize(25, 25); // 设置为方形
-    projectDeviceSquareButton->setStyleSheet(
-            "QPushButton { "
-                "text-align: center; "
-                "background-color: rgb(255, 255, 255);"
-                "border: 1px solid black;"
-            "} "
-            "QPushButton:hover { "
-                "text-align: center; "
-                "background-color: rgb(237, 237, 237);"
-                "border: 1px solid black;"
-            "} "
-    );
+    projectDeviceSquareButton->setObjectName("squareButton");
 
     QHBoxLayout *hLayout = new QHBoxLayout();
     hLayout->addWidget(projectDeviceLineEdit);
@@ -47,7 +36,8 @@ GeneralPage::GeneralPage(QWidget *parent)
     fLayout->addRow("Top module name:", topModuleNameLineEdit);
 
     QString topName = ProjectManager::instance().getParameter(Project::TopModule);
-    QString deviceInfo = QString("%1 (active)").arg(ProjectManager::instance().getParameter(Project::DisplayPart));
+    tempDeviceName = ProjectManager::instance().getParameter(Project::DisplayPart);
+    QString deviceInfo = QString("%1 (active)").arg(tempDeviceName);
     projectDeviceLineEdit->setText(deviceInfo);
     projectDeviceSquareButton->setText("...");
     topModuleNameLineEdit->setText(topName);
@@ -73,7 +63,11 @@ void GeneralPage::startWizard()
     }
     deviceInfo = w.getDeviceInfo();
     qDebug() << "DeviceInfo: " << deviceInfo;
-    projectDeviceLineEdit->setText(deviceInfo.at(3));
+    if (deviceInfo.at(3) == tempDeviceName) {
+        projectDeviceLineEdit->setText(QString("%1 (active)").arg(deviceInfo.at(3)));
+    } else {
+        projectDeviceLineEdit->setText(deviceInfo.at(3));
+    }
 }
 
 

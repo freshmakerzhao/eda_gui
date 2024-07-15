@@ -62,7 +62,6 @@ Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
     case 2:
         qDebug() << "[Wizard] mode 2";
         addPage(new DefaultPartPage);
-        // connect(this, &QWizard::accepted, this, &Wizard::onPartFinish);
     default:
         break;
     }

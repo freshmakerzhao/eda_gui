@@ -1,5 +1,5 @@
-#ifndef ADVANCEDFILEDIALOG_H
-#define ADVANCEDFILEDIALOG_H
+#ifndef HBDFILEDIALOG_H
+#define HBDFILEDIALOG_H
 
 #include <QFileDialog>
 #include <QVBoxLayout>
@@ -29,6 +29,7 @@ public:
 
     //! 设置当前工作路径
     void setCurWorkDir(const QString &dir);
+
 
 private slots:
     void updateMetadata(const QString &path);
@@ -62,4 +63,4 @@ private:
 };
 
 
-#endif // ADVANCEDFILEDIALOG_H
+#endif // HBDFILEDIALOG_H

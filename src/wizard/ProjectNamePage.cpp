@@ -9,6 +9,7 @@
   */
 
 #include "ProjectNamePage.h"
+#include "dialog/AdvancedFileDialog.h"
 
 ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
 {
@@ -26,7 +27,8 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
     pathLineEdit->setText(QDir::homePath());
     QPushButton *browseButton = new QPushButton("Browse");
     connect(browseButton, &QPushButton::clicked, [=]() {
-        QString path = QFileDialog::getExistingDirectory(this, "Select Directory", QDir::homePath());
+        // QString path = QFileDialog::getExistingDirectory(this, "Select Directory", QDir::homePath());
+        QString path = AdvancedFileDialog::getExistingDirectory(this, "Select Directory", QDir::homePath(), QFileDialog::DontUseNativeDialog);
         if (!path.isEmpty()) {
             pathLineEdit->setText(path);
         }

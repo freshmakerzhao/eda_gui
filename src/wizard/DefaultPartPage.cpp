@@ -9,7 +9,7 @@
   */
 
 #include "DefaultPartPage.h"
-#include <yaml-cpp/yaml.h>
+#include "yaml-cpp/yaml.h"
 
 DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 {
