@@ -13,7 +13,9 @@ IPlocationDialog::IPlocationDialog(QWidget *parent) :
     locationLineEdit->setClearButtonEnabled(true);
     layout->addWidget(locationLineEdit);
     locationButton = new QPushButton("...", this);
-    locationButton->setFixedWidth(40);
+    // locationButton->setFixedWidth(40);
+    locationButton->setFixedSize(25, 25);
+    locationButton->setObjectName("squareButton");
     layout->addWidget(locationButton);
     connect(locationButton, &QPushButton::clicked, this, &IPlocationDialog::onLocationButtonClicked);
 }

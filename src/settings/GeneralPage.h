@@ -18,6 +18,8 @@ public:
     void setDevicePart();
 
 private:
+    QString tempDeviceName;
+
     QFormLayout *fLayout;
 
     QLineEdit *projectDeviceLineEdit;

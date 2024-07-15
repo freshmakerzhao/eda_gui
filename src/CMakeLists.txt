@@ -59,28 +59,28 @@ find_package(Qt5 COMPONENTS OpenGL)
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
 
 # Include the QScintilla library
-set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Qsci")
+set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/Qsci")
 set(QSCINTILLA_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${QSCINTILLA_INCLUDE_DIR})
 link_directories(${QSCINTILLA_LIBRARY_DIR})
 
 # Include the YAML library
-set(YAML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp")
+set(YAML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/yaml-cpp")
 set(YAML_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${YAML_INCLUDE_DIR})
 link_directories(${YAML_LIBRARY_DIR})
 
 # Include the QADVANCEDDOCK library
-set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ads")
+set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/ads")
 set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${QADVANCEDDOCK_INCLUDE_DIR})
 link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
 
 # Include the OpenSSL library
-set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/openssl")
+set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/openssl")
 set(OPENSSL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${OPENSSL_INCLUDE_DIR})
@@ -98,7 +98,7 @@ file(GLOB PROJECT_SOURCES
     ipmanager/*.cpp
     ipmanager/BlockMemoryGenerator/*.cpp
     settings/*.cpp
-    tinyxml2/*.cpp
+    include/tinyxml2/*.cpp
     entity/*.cpp
     *.cpp
 )
@@ -116,11 +116,14 @@ file(GLOB PROJECT_HEADERS
     ipmanager/*.h
     ipmanager/BlockMemoryGenerator/*.h
     settings/*.h
-    Qsci/*.h
-    yaml-cpp/*.h
-    tinyxml2/*.h
+    include/Qsci/*.h
+    include/yaml-cpp/*.h
+    include/tinyxml2/*.h
     *.h
 )
+
+# Add include directories
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Add resource files
 set(PROJECT_RESOURCES
