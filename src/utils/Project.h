@@ -17,16 +17,44 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
-#include <tinyxml2/tinyxml2.h>
+#include "tinyxml2/tinyxml2.h"
+// #include "tinyxml2.h"
 
 class Project
 {
 public:
-    Project(QString name = "",
-            QString path = "",
-            QString part = "",
-            QString arch = "",
-            QString archName = "");
+    Project();
+
+    ~Project();
+
+    enum ParamKey {
+        Name,
+        Path,
+        Part,
+        Arch,
+        ArchName,
+        TopModule,
+        DisplayPart,
+        FamilyName,
+    };
+
+    /**
+     * 初始化工程参数，仅在新建工程时使用
+     * @param name
+     * @param path
+     * @param part
+     * @param arch
+     * @param archName
+     * @param displayPart
+     * @param familyName
+     */
+    void initProject(const QString &name,
+                     const QString &path,
+                     const QString &part,
+                     const QString &arch,
+                     const QString &archName,
+                     const QString &displayPart = QString("MC1P110-FC484L-1"),
+                     const QString &familyName = QString("MgiCubo"));
 
     bool writeProject();
 
@@ -42,21 +70,25 @@ public:
      * @param key
      * @return
      */
-    QString getParam(const QString& key);
+    QString getParameter(const Project::ParamKey key) const;
 
     /**
      * 获取所有工程参数
      * @return
      */
-    QMap<QString, QString> getAllParams();
+    QMap<Project::ParamKey, QString> getAllParameters() const;
 
     void setTopModule(const QString &topName);
+
+    void setDevicePart(const QStringList &deviceInfo);
 
     QStringList sourceList;     // Sources(绝对路径)
     QStringList constraintList; // Constraints(绝对路径)
 
+
+
 private:
-    QMap<QString, QString> param;    // 工程参数
+    QMap<Project::ParamKey, QString> parameters;    // 工程参数
 
     // QMap<QString, QStringList> files; // 工程文件
 };

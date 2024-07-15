@@ -2,10 +2,32 @@ cmake_minimum_required(VERSION 3.14)
 
 project(HybrdLink)
 
+# # 解决头文件报错
+# include_directories("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/include")
+# find_library("C:/Qt/Qt5.14.2/5.14.2/mingw73_64/lib" NO_DEFAULT_PATH)
+
 # Set C++17 as required standard for the project
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# 是否需要检查 MAC 地址 ，默认需要
+option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
+# 是否需要检查 软件有效期 ，默认关闭
+option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" OFF)
+
+if (ENABLE_MAC_CHECK)
+    message(STATUS "ENABLE_MAC_CHECK ON.")
+    add_definitions(-DENABLE_MAC_CHECK)
+else ()
+    message(STATUS "ENABLE_MAC_CHECK OFF.")
+endif()
+
+if (ENABLE_EXPIRATION_CHECK)
+    message(STATUS "ENABLE_EXPIRATION_CHECK ON.")
+    add_definitions(-DENABLE_EXPIRATION_CHECK)
+else ()
+    message(STATUS "ENABLE_EXPIRATION_CHECK OFF.")
+endif()
 
 # 检测操作系统
 if(WIN32)
@@ -34,27 +56,35 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS PrintSupport)
 find_package(Qt5 COMPONENTS OpenGL)
+find_package(Qt5 COMPONENTS Core Network REQUIRED)
 
 # Include the QScintilla library
-set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Qsci")
+set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/Qsci")
 set(QSCINTILLA_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${QSCINTILLA_INCLUDE_DIR})
 link_directories(${QSCINTILLA_LIBRARY_DIR})
 
 # Include the YAML library
-set(YAML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp")
+set(YAML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/yaml-cpp")
 set(YAML_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${YAML_INCLUDE_DIR})
 link_directories(${YAML_LIBRARY_DIR})
 
 # Include the QADVANCEDDOCK library
-set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ads")
+set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/ads")
 set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 
 include_directories(${QADVANCEDDOCK_INCLUDE_DIR})
 link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
+
+# Include the OpenSSL library
+set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/openssl")
+set(OPENSSL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
+
+include_directories(${OPENSSL_INCLUDE_DIR})
+link_directories(${OPENSSL_LIBRARY_DIR})
 
 # Add source files
 file(GLOB PROJECT_SOURCES
@@ -66,8 +96,9 @@ file(GLOB PROJECT_SOURCES
     base/*.cpp
     dialog/*.cpp
     ipmanager/*.cpp
+    ipmanager/BlockMemoryGenerator/*.cpp
     settings/*.cpp
-    tinyxml2/*.cpp
+    include/tinyxml2/*.cpp
     entity/*.cpp
     *.cpp
 )
@@ -83,12 +114,16 @@ file(GLOB PROJECT_HEADERS
     entity/*.h
     dialog/*.h
     ipmanager/*.h
+    ipmanager/BlockMemoryGenerator/*.h
     settings/*.h
-    Qsci/*.h
-    yaml-cpp/*.h
-    tinyxml2/*.h
+    include/Qsci/*.h
+    include/yaml-cpp/*.h
+    include/tinyxml2/*.h
     *.h
 )
+
+# Add include directories
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Add resource files
 set(PROJECT_RESOURCES
@@ -103,12 +138,16 @@ add_executable(${PROJECT_NAME}
     win32.rc
 )
 
-# Link the Qt5 Widgets library and the QScintilla library to the executable
+# Link the Qt5 Widgets library and Third-Party library to the executable
 target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
+    Qt5::Core
+    Qt5::Network
     qscintilla2_qt5
     libyaml-cpp.a
     qtadvanceddocking
+    libcrypto-1_1-x64
+    libssl-1_1-x64
 )
 
 # Specify installation paths (if required)

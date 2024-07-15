@@ -15,11 +15,8 @@
 #include "ConstraintPage.h"
 #include "DefaultPartPage.h"
 #include "utils/ProjectManager.h"
-#include "entity/XmlRecent.h"
-#include "utils/XmlUtilities.h"
-#include "base/InitialConfig.h"
 
-Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
+Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
 {
     qDebug() << "[Wizard] Constructing...";
     resize(960, 640);
@@ -28,6 +25,23 @@ Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
     // QPixmap pix(":/resource/icon.png");
     // setPixmap(QWizard::LogoPixmap, pix);
     // setOption(QWizard::IndependentPages, true);
+
+#ifdef Q_OS_WIN
+    // 设置自定义按钮可用
+    setOption (QWizard::HaveCustomButton1, true);
+    // 获取并设置自定义按钮的文本
+    auto *customButton = this->button(QWizard::CustomButton1);
+    customButton->setText("Back");
+    // 连接自定义按钮的点击信号到槽函数
+    connect(customButton, &QPushButton::clicked, this, &Wizard::back);
+    // 绑定来更新按钮状态
+    connect(this, &QWizard::currentIdChanged, this, [=](int id) {
+        customButton->setEnabled(id != 0);
+    });
+    // 初始化按钮状态
+    customButton->setEnabled(currentId() != 0);
+#endif
+
     switch (mode) {
     case 0:     // 完整新建工程流程
         qDebug() << "[Wizard] mode 0";
@@ -39,13 +53,15 @@ Wizard::Wizard(QWidget *parent, const int mode, Project *pro) : QWizard(parent)
         connect(this, &QWizard::accepted, this, &Wizard::onNewFinish);
         break;
     case 1:     // 添加Sources
-        current_project = pro;
         qDebug() << "[Wizard] mode 1";
         setPage(Page_AddGuide, new AddGuidePage);
         setPage(Page_Source, new SourcesPage(this, 1));
         setPage(Page_Constraint, new ConstraintPage);
         connect(this, &QWizard::accepted, this, &Wizard::onAddFinish);
         break;
+    case 2:
+        qDebug() << "[Wizard] mode 2";
+        addPage(new DefaultPartPage);
     default:
         break;
     }
@@ -91,7 +107,7 @@ void Wizard::onNewFinish()
         return;
     }
 
-    QString targetPath =  projectPath + "/" + projectName;
+    QString targetPath = QString("%1/%2").arg(projectPath, projectName);
     // 复制文件列表中的文件到项目文件夹sources
     foreach (const QString &file, sourcesFilesList) {
         QFile::copy(file, targetPath + "/sources/" + QFileInfo(file).fileName());
@@ -112,31 +128,15 @@ void Wizard::onNewFinish()
         constrainttmp.append(newPath);
     }
     // ============================= 生成工程 =================================
-    new_project = new Project(projectName, targetPath, part, arch, archName);
-    new_project->sourceList = sourcetmp;
-    new_project->constraintList = constrainttmp;
-    new_project->writeProject();
-    ProjectManager::instance().loadFiles(new_project);
-
-    qDebug() << " = = = = = = = = = = = = ";
-    qDebug() << new_project->getParam("path") +  "/" + new_project->getParam("name") + ".hpr";
-    qDebug() << " = = = = = = = = = = = = ";
-
-    std::vector<XmlRecent> recentLists = {
-        {0, (new_project->getParam("path") +  "/" + new_project->getParam("name") + ".hpr").toStdString()}
-    };
-    try {
-        XmlUtilities::instance().insertHybrdLinkXmlRecent(
-            InitialConfig::instance().xmlPath.toStdString().c_str(),
-            "RECENT_PROJECTS",
-            recentLists
-        );
-    } catch (const std::exception& e) {
-        // 异常
-        // 不让IO操作影响主进程
-        qDebug() << "[Wizard] An error occurred from createProject: " << e.what();
-    }
-
+    ProjectManager::instance().createProject(projectName,
+                                             targetPath,
+                                             part,
+                                             arch,
+                                             archName,
+                                             sourcetmp,
+                                             constrainttmp,
+                                             displayPart,
+                                             familyName);
     // ============================= 清除缓存 =================================
     QDir dircache("Cache");
     if (!dircache.isEmpty()) {
@@ -147,28 +147,18 @@ void Wizard::onNewFinish()
 void Wizard::onAddFinish()
 {
     qDebug() << "Add Finish";
-    if (current_project == nullptr) {
-        return;
-    }
-    QString path = current_project->getParam("path");
-    qDebug() << path;
-    QString addSourcesPath = path + "/sources/";
-    QStringList files = sourcesFilesList;
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, addSourcesPath + QFileInfo(file).fileName());
-            current_project->sourceList.append(addSourcesPath + QFileInfo(file).fileName());
-        }
+    if (!sourcesFilesList.empty()) {
+        ProjectManager::instance().addSourcesInProject(sourcesFilesList, 0);
     }
 
-    QString constrainsPath = path + "/constraints/";
-    files = constraintFilesList;
-    if (!files.isEmpty()) {
-        foreach (const QString &file, files) {
-            QFile::copy(file, constrainsPath + QFileInfo(file).fileName());
-            current_project->constraintList.append(constrainsPath + QFileInfo(file).fileName());
-        }
+    if (!constraintFilesList.empty()){
+        ProjectManager::instance().addSourcesInProject(constraintFilesList, 1);
     }
+}
+
+QStringList Wizard::getDeviceInfo() const
+{
+    return QStringList() << part << arch << archName  << displayPart << familyName;
 }
 
 

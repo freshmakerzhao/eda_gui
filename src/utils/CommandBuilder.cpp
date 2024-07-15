@@ -311,14 +311,41 @@ std::string CommandBuilder::generateBitCommands(const QString& projectImplPath,c
 
 std::string CommandBuilder::generateDownloadBitCommands(
         const QString& projectImplPath,
-        const std::string& digilentName,
-        const std::string& bitName){
+        const QString& partName,
+        const QString& topName){
     std::stringstream cmd;
+    cmd << ProcessManager::instance().getProperty("openFPGALoader_path");
 
-    cmd << ProcessManager::instance().getProperty("openFPGALoader_path") << " -c " << digilentName << " " << StringUtilities::concatPath({projectImplPath.toStdString(), bitName});
+    if (partName.contains("a100t")){
+        //  100t 黑金
+        cmd << " -c ft2232";
+    } else if (partName.contains("a35t")){
+        //  35t 野火
+        cmd << " -c digilent_hs3";
+
+    };
+    cmd << " " << (projectImplPath + "/" + topName + ".bit").toStdString();
     return cmd.str();
 }
 
+std::string CommandBuilder::generateDownloadFlashCommands(
+        const QString& projectImplPath,
+        const QString& partName,
+        const QString& topName){
+    std::stringstream cmd;
+    cmd << ProcessManager::instance().getProperty("openFPGALoader_path");
+
+    if (partName.contains("a100t")){
+        //  100t 黑金
+        cmd << " -c ft2232-b arty";
+    } else if (partName.contains("a35t")){
+        //  35t 野火
+        cmd << " -c digilent_hs3 -b alinx_ax7102";
+
+    };
+    cmd << " -f " << (projectImplPath + "/" + topName + ".bit").toStdString();
+    return cmd.str();
+}
 
 std::string CommandBuilder::generateImpementationCommands(const QString& projectSynthPath,const QString& archName,const QString& topName){
     std::map<std::string,std::string> parameters;

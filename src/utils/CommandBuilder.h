@@ -24,7 +24,15 @@ public:
     std::string generateImpementationCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
     std::string generateFasmCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
     std::string generateBitCommands(const QString& projectImplPath,const std::string& pythonPath,const QString& topName = "top");
-    std::string generateDownloadBitCommands(const QString& projectImplPath, const std::string& digilentName,const std::string& bitName);
+    /**
+     * 下载码流
+     * @param projectImplPath 项目路径\runs\impl
+     * @param bitName
+     * @param partName
+     * @return
+     */
+    std::string generateDownloadBitCommands(const QString& projectImplPath, const QString& partName, const QString& topName = "top");
+    std::string generateDownloadFlashCommands(const QString& projectImplPath, const QString& partName, const QString& topName = "top");
 
 private:
     CommandBuilder();

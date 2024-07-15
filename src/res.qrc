@@ -1,16 +1,86 @@
 <RCC>
     <qresource prefix="/">
+        <file>resource/form_logo_1.png</file>
+        <file>resource/form_logo_2.png</file>
+        <file>resource/form_logo_2_rorate.png</file>
         <file>resource/keywords.txt</file>
         <file>resource/icon.png</file>
-        <file>resource/parts.yaml</file>
+        <file>resource/parts_xilinx.yaml</file>
+        <file>resource/parts_hybrdchip.yaml</file>
+        <file>resource/parts_hybrdchip_for_display.yaml</file>
         <file>resource/white.png</file>
+        <file>resource/black.png</file>
         <file>resource/logo.png</file>
+        <file>resource/start01.jpg</file>
+        <file>resource/start02.jpg</file>
+        <file>resource/start03.jpg</file>
+        <file>resource/start04.jpg</file>
+        <file>resource/start05.jpg</file>
+        <file>resource/start06.jpg</file>
+        <file>resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF</file>
+        <file>resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf</file>
+        <file>resource/Global.qss</file>
     </qresource>
     <qresource prefix="/gridview">
+        <file>resource/gridview/22-1icon_zoom_in.png</file>
+        <file>resource/gridview/22-2icon_zoom_out.png</file>
+        <file>resource/gridview/23-icon_zoom_fit.png</file>
+        <file>resource/gridview/24-icon_fit_selection.png</file>
+        <file>resource/gridview/36-1icon_clockwise_rotate.png</file>
+        <file>resource/gridview/36-2icon_anticlockwise_rotate.png</file>
         <file>resource/gridview/zoomin.png</file>
         <file>resource/gridview/zoomout.png</file>
         <file>resource/gridview/rotateleft.png</file>
         <file>resource/gridview/rotateright.png</file>
         <file>resource/gridview/fileprint.png</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file>resource/icons/0-icon_transparent.png</file>
+        <file>resource/icons/1-icon_start_process.png</file>
+        <file>resource/icons/10-icon_collapse.png</file>
+        <file>resource/icons/11-icon_expand.png</file>
+        <file>resource/icons/12-1icon_add.png</file>
+        <file>resource/icons/12-2icon_remove_sources.png</file>
+        <file>resource/icons/12-3icon_pause.png</file>
+        <file>resource/icons/13-icon_add_options.png</file>
+        <file>resource/icons/14-icon_copy_1.png</file>
+        <file>resource/icons/14-icon_copy_2.png</file>
+        <file>resource/icons/15-icon_discard.png</file>
+        <file>resource/icons/16-1icon_error_status.png</file>
+        <file>resource/icons/16-2icon_warning_status.png</file>
+        <file>resource/icons/17-1icon_info_status_1.png</file>
+        <file>resource/icons/17-2icon_info_status_2.png</file>
+        <file>resource/icons/18-icon_refresh.png</file>
+        <file>resource/icons/19-icon_group.png</file>
+        <file>resource/icons/2-icon_start_process_extend.png</file>
+        <file>resource/icons/20-icon_summary_1.png</file>
+        <file>resource/icons/20-icon_summary_2.png</file>
+        <file>resource/icons/21-icon_open_extend.png</file>
+        <file>resource/icons/25-icon_processing_completed.png</file>
+        <file>resource/icons/25-icon_processing_running.png</file>
+        <file>resource/icons/27-icon_processing_out_1.png</file>
+        <file>resource/icons/27-icon_processing_out_2.png</file>
+        <file>resource/icons/28-icon_grid_view.png</file>
+        <file>resource/icons/29-1icon_undo.png</file>
+        <file>resource/icons/29-2icon_redo.png</file>
+        <file>resource/icons/3-icon_generate_bitstream.png</file>
+        <file>resource/icons/30-icon_save.png</file>
+        <file>resource/icons/31-icon_cut.png</file>
+        <file>resource/icons/32-icon_paste_1.png</file>
+        <file>resource/icons/32-icon_paste_2.png</file>
+        <file>resource/icons/33-icon_delete.png</file>
+        <file>resource/icons/34-icon_annotation.png</file>
+        <file>resource/icons/35-icon_new_project_1.png</file>
+        <file>resource/icons/35-icon_new_project_2.png</file>
+        <file>resource/icons/37-icon_set_as_top.png</file>
+        <file>resource/icons/38-1icon_source_file.png</file>
+        <file>resource/icons/39-icon_constraints_file.png</file>
+        <file>resource/icons/4-icon_setting.png</file>
+        <file>resource/icons/40-icon_help.png</file>
+        <file>resource/icons/5-icon_ip_catalog.png</file>
+        <file>resource/icons/6-icon_report.png</file>
+        <file>resource/icons/7-icon_schematic.png</file>
+        <file>resource/icons/8-icon_timing.png</file>
+        <file>resource/icons/9-icon_search.png</file>
     </qresource>
 </RCC>

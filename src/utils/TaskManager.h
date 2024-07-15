@@ -4,6 +4,9 @@
 #include <QTreeWidget>
 #include <QDebug>
 #include <QMessageBox>
+#include "utils/ProjectManager.h"
+#include "settings/SettingsDialog.h"
+
 class TaskManager : public QObject
 {
     Q_OBJECT
@@ -15,7 +18,7 @@ public:
     /**
      * 设置工程参数
      */
-    void setParams(const QMap<QString, QString> &params);
+    void setParams(const QMap<Project::ParamKey, QString> &params);
 
     /**
      * 任务分配器
@@ -36,10 +39,6 @@ public:
     */
     void cleanParams();
 
-    // QString getTopModule();
-
-    // void setTopModule(const QString &topModule);
-
 //    QStringList sourceList;
     // 存储设计与约束文件
     QList<QString> sourcePathList;
@@ -54,6 +53,8 @@ private:
     QString projectImplPath;
     // part name
     QString partName;
+    // display Part Name （临时解决）
+    QString displayPartName;
     // arch name xc7a50t
     QString archName;
     // arch 50t
@@ -85,7 +86,12 @@ private:
     void buildPlace(int mode);
     void buildRoute();
     void buildBit(int mode);
-    void downloadBit();
+
+    // SettingsDialog *settingDialog = nullptr;
+
+public:
+    void downloadBit(const QString &projectImplPath1, const QString &topName1);
+    void downloadFlash();
     QWidget* gridView = nullptr;
 
 };

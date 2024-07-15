@@ -15,6 +15,7 @@ void InfoWidget::setCurrentPage(int index) {
 }
 
 void InfoWidget::updateSynthItem(const QString synthPath, const QString status, const QString startTime, const QString Elapsed , const QString partName){
+    initSummary("synth"); // 初始化数据
     // 解析资源使用报告
     QFile file(synthPath + "/synth_stat.json");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -59,10 +60,13 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     runsModel->setItem(0, 7, new QStandardItem(startTime)); // 开始时间
     runsModel->setItem(0, 8, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(0, 9, new QStandardItem(partName)); // 封装名称
+
+
+    // Display_Synth_Usage
 }
 
 void InfoWidget::updateImplItem(const QString& implPath, const QString& status, const QString& startTime, const QString& Elapsed , const QString& partName){
-
+    initSummary("impl"); // 初始化数据
     QFile file(implPath + "/pb_type_count.json");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;// 文件打开失败
@@ -73,7 +77,6 @@ void InfoWidget::updateImplItem(const QString& implPath, const QString& status, 
     QJsonObject object = doc.object();
     // 配置表格数据
     runsModel->setItem(1, 0, new QStandardItem(QString("impl")));
-
     for (auto it = object.begin(); it != object.end(); ++it) {
         if (it.key() == "BLK-TL-DSP48E1") {
             dspNumImpl += it.value().toInt();
@@ -91,6 +94,8 @@ void InfoWidget::updateImplItem(const QString& implPath, const QString& status, 
     runsModel->setItem(1, 7, new QStandardItem(startTime)); // 开始时间
     runsModel->setItem(1, 8, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(1, 9, new QStandardItem(partName)); // 封装名称
+
+
 }
 
 InfoWidget::InfoWidget(QWidget *parent)
@@ -111,7 +116,7 @@ InfoWidget::InfoWidget(QWidget *parent)
     tabWidget->addTab(msg, "Messages");
     tabWidget->setTabEnabled(1, false);
     // =========================== Log =============================
-    tabWidget->addTab(LogWidget::instance(), "Log");
+    tabWidget->addTab(LogWidget::instance(),"Log");
     tabWidget->setCurrentIndex(2);
     // ============================ Rpt ============================
     rpt = new QPlainTextEdit(this), rpt->setReadOnly(true);
@@ -141,4 +146,15 @@ InfoWidget::~InfoWidget()
 {
     qDebug() << "[InfoWidget] Distructing...";
 }
+
+void InfoWidget::initSummary(const QString phase) {
+    if (phase == "synth"){
+        // 初始化综合阶段资源统计数据
+        lut6NumSynth = 0 , lutNumSynth = 0, muxf6NumSynth = 0 , ffNumSynth = 0 , bramNumSynth = 0 , fifo18NumSynth = 0 , ranb18NumSynth = 0 , ranb36NumSynth = 0 , dspNumSynth = 0 ,carry4NumSynth = 0;
+    } else if (phase == "impl"){
+        // 初始化布局布线阶段资源统计数据
+        lut6NumImpl = 0 , lutNumImpl = 0, muxf6NumImpl = 0 , ffNumImpl = 0 , bramNumImpl = 0 , fifo18NumImpl = 0 , ranb18NumImpl = 0 , ranb36NumImpl = 0 , dspNumImpl = 0 ,carry4NumImpl = 0;
+    }
+}
+
 

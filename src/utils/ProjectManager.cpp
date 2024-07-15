@@ -15,6 +15,7 @@
 #include "dialog/CustomMessageBox.h"
 #include "XmlUtilities.h"
 #include "base/InitialConfig.h"
+#include "widgets/PrjSummary.h"
 
 ProjectManager &ProjectManager::instance()
 {
@@ -23,22 +24,70 @@ ProjectManager &ProjectManager::instance()
 }
 
 /**
- * ! Reopen project on startup
- * ! Open project in New window
- * @param project 工程实例
+ * 创建一个新的HybrdLink工程
+ * @param name
+ * @param path
+ * @param part
+ * @param arch
+ * @param archName
+ * @param displayPart
+ * @param familyName
  * @return
  */
-bool ProjectManager::startProcess(Project *project)
+bool ProjectManager::createProject(const QString &name,
+                                   const QString &path,
+                                   const QString &part,
+                                   const QString &arch,
+                                   const QString &archName,
+                                   const QStringList &designSrcs,
+                                   const QStringList &constraints,
+                                   const QString &displayPart,
+                                   const QString &familyName)
 {
+    // 此处的project是一个临时对象，生成工程文件后销毁
+    Project *project = new Project;
+    project->initProject(name,
+                         path,
+                         part,
+                         arch,
+                         archName,
+                         displayPart,
+                         familyName);
+    project->sourceList = designSrcs;
+    project->constraintList = constraints;
+    project->writeProject();
+    delete project;
+    QString hprPath = QString("%1/%2.hpr").arg(path, name);
+    if (!openProject(hprPath)) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Reopen project on startup
+ * Open project in New window
+ * @param hprPath 工程文件路径
+ * @return
+ */
+bool ProjectManager::startProcess(const QString &hprPath)
+{
+    CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(),
+                                                                          "Question", "Open this Window?",
+                                                                          QMessageBox::Yes | QMessageBox::No);
+    if (btn == QMessageBox::Yes) {
+        closeProject();
+        openProject(hprPath);
+        return false;
+    }
+
     // 获取程序路径
     QString programPath = QCoreApplication::applicationFilePath();
     // 创建一个新进程
-    QProcess *process = new QProcess();
+    QProcess process;
     // 传入新打开工程路径
-    QString hprfile = project->getParam("path") +  "/" + project->getParam("name") + ".hpr";
-    qDebug() << hprfile;
     // 启动程序本身
-    process->start(programPath, QStringList() << hprfile);
+    process.startDetached(programPath, QStringList() << hprPath);
 
     return true;
 }
@@ -65,14 +114,14 @@ bool ProjectManager::openProject(const QString &hprPath)
         qDebug() << "[ProjectManager] An error occurred from openProject: " << e.what();
     }
 
-    Project *new_open_project = new Project;
-    if (!new_open_project->parseProject(hprPath)) {
+    Project *newOpenProject = new Project;
+    if (!newOpenProject->parseProject(hprPath)) {
         CustomMessageBox::showError(MainWindow::instance(), "Error",
                                     "Failed to open project, File parsing error.");
-        delete new_open_project;
+        delete newOpenProject;
         return false;
     }
-    ProjectManager::instance().loadFiles(new_open_project);
+    ProjectManager::instance().loadFiles(newOpenProject);
     return true;
 }
 
@@ -104,7 +153,9 @@ void ProjectManager::loadFiles(Project *project)
     // 加载的不是同一个工程
     if (_project != nullptr && _project != project) {
         // 运行新进程，在新进程加载工程
-        ProjectManager::instance().startProcess(project);
+        QString hprPath = QString("%1/%2.hpr").arg(project->getParameter(Project::Path), project->getParameter(Project::Name));
+        ProjectManager::instance().startProcess(hprPath);
+        delete project;
         return;
     }
 
@@ -116,12 +167,14 @@ void ProjectManager::loadFiles(Project *project)
     TaskManager::instance().sourcePathList = _project->sourceList;
     TaskManager::instance().constraintPathList = _project->constraintList;
     // 设置工程参数
-    TaskManager::instance().setParams(_project->getAllParams());
+    TaskManager::instance().setParams(_project->getAllParameters());
+    // 设置工程参数
+    PrjSummary::instance()->setParams(_project->getAllParameters());
     // 加载文件树
     FileManager::instance()->updateDesignSources(_project->sourceList);
     FileManager::instance()->updateConstraints(_project->constraintList);
     // UI反馈
-    MainWindow::instance()->showProjectTitle(0, _project->getParam("path") + "/" + _project->getParam("name") + ".hpr");
+    MainWindow::instance()->showProjectTitle(0, _project->getParameter(Project::Path) + "/" + _project->getParameter(Project::Name) + ".hpr");
     MainWindow::instance()->setForm(0);
 }
 
@@ -135,10 +188,44 @@ void ProjectManager::addSourcesAction()
                                       "Please select or create a project.");
         return;
     }
-    Wizard wizard(MainWindow::instance(), 1, _project);
+    Wizard wizard(MainWindow::instance(), 1);
     wizard.exec();
     _project->writeProject();
     loadFiles(_project);
+}
+
+/**
+ * 将Wizard传入的Sources添加到工程
+ */
+void ProjectManager::addSourcesInProject(const QStringList &src, const int &mode)
+{
+    if (_project == nullptr) {
+        return;
+    }
+    QString path = _project->getParameter(Project::Path);
+    qDebug() << path;
+
+    QString targetPath;
+    //! 0: Design Sources
+    //! 1: Constraints
+    switch (mode) {
+    case 0:
+        targetPath = path + "/sources/";
+        foreach (const QString &file, src) {
+            QFile::copy(file, targetPath + QFileInfo(file).fileName());
+            _project->sourceList.append(targetPath + QFileInfo(file).fileName());
+        }
+        break;
+    case 1:
+        targetPath = path + "/constraints/";
+        foreach (const QString &file, src) {
+            QFile::copy(file, targetPath + QFileInfo(file).fileName());
+            _project->constraintList.append(targetPath + QFileInfo(file).fileName());
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 /**
@@ -175,12 +262,20 @@ void ProjectManager::setTopModule(const QString &topModule)
     }
 }
 
-QString ProjectManager::getTopModule()
+void ProjectManager::setDevicePart(const QStringList &deviceInfo)
 {
     if (_project) {
-        return _project->getParam("top");
+        _project->setDevicePart(deviceInfo);
+        loadFiles(_project);
     }
-    return QString();
+}
+
+QString ProjectManager::getParameter(const Project::ParamKey key) const
+{
+    if (!_project) {
+        return QString();
+    }
+    return _project->getParameter(key);
 }
 
 void ProjectManager::closeProject()
@@ -212,3 +307,10 @@ void ProjectManager::closeProject()
 }
 
 ProjectManager::ProjectManager() {}
+
+ProjectManager::~ProjectManager()
+{
+    if (_project) {
+        delete _project;
+    }
+}
