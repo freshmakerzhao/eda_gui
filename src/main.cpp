@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
 #ifdef ENABLE_MAC_CHECK
     qDebug() << "[MAIN] MAC address check is enabled.";
     // 比对MAC地址
-//    if (!LicenseUtilities::checkMacAddress(EXPECTED_MAC_ADDRESS)) {
-//        return -1;
-//    }
+    if (!LicenseUtilities::checkMacAddress("123")) {
+        return -1;
+    }
 #else
     qDebug() << "[MAIN] MAC address check is disabled.";
 #endif
@@ -90,8 +90,7 @@ int main(int argc, char *argv[])
 
     // 启动画面
 //    QPixmap pix(":/resource/logo.png");
-//    QPixmap pix(":/resource/start01.jpg");
-    QPixmap pix(":/resource/start06.jpg");
+   QPixmap pix(":/resource/start.jpg");
 
 //    QSplashScreen splash(pix.scaled(440, 440, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     QSplashScreen splash(pix.scaled(640, 640, Qt::KeepAspectRatio, Qt::SmoothTransformation));
