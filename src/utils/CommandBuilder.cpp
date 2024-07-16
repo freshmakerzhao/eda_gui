@@ -318,11 +318,10 @@ std::string CommandBuilder::generateDownloadBitCommands(
 
     if (partName.contains("a100t")){
         //  100t 黑金
-        cmd << " -c ft2232";
+        cmd << " -c digilent_hs3";
     } else if (partName.contains("a35t")){
         //  35t 野火
-        cmd << " -c digilent_hs3";
-
+        cmd << " -c ft2232";
     };
     cmd << " " << (projectImplPath + "/" + topName + ".bit").toStdString();
     return cmd.str();
