@@ -42,7 +42,7 @@ int LicenseUtilities::loadLicense()
     QString licensePath = QFileInfo(appDataPath).path() + "/HybrdChip/Common/license.lic";
     if (!QFileInfo(licensePath).isFile()) {
         // 证书不存在
-        return -2;
+        return -1;
     }
     const std::string str = licensePath.toStdString();
     qDebug() << "[LicenseUtilities] LicensePath: " <<licensePath;
@@ -50,7 +50,7 @@ int LicenseUtilities::loadLicense()
     if (!decrypt_text) {
         // 证书解码失败
         qDebug() << "[LicenseUtilities] Decryption failed: null pointer returned.";
-        return -1;
+        return -2;
     }
     qDebug() << "[LicenseUtilities] Decode: " << (char*)decrypt_text;
     QString decryptText = QString((char*)decrypt_text);
@@ -77,7 +77,7 @@ int LicenseUtilities::loadLicense()
         return -4;
     }
 #else
-    qDebug() << Software expiration check is disabled.
+    qDebug() << "Software expiration check is disabled.";
 #endif
     return 0;
 }
