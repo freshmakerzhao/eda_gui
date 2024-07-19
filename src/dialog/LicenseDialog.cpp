@@ -9,24 +9,32 @@ LicenseDialog::LicenseDialog(QWidget *parent, const int &mode)
     QFormLayout *formLayout = new QFormLayout(this);
 
     QString title;
-    if (mode == -1) {
+    switch (mode) {
+    case -1:
         title = "Please load the license.lic file. "
                 "This step is essential to ensure the application can verify and activate the corresponding license, "
                 "allowing you to access all features. If you encounter any issues during this process, "
                 "please refer to the documentation or contact support for further assistance.";
-    } else if (mode == -2) {
+        break;
+    case -2:
         title = "The license. lic file could not be parsed."
                 "Please ensure that the file is correctly formatted and valid.  "
                 "If the issue persists, refer to the documentation or contact support for further assistance.";
-    } else if (mode == -3) {
+        break;
+    case -3:
         title = "License verification failed."
                 "If the issue persists, please refer to the documentation or contact support for further assistance.";
-    } else if (mode == -4) {
+        break;
+    case -4:
         title = "Your software has expired."
                 "Please request the latest license."
                 "lic to continue using it. "
                 "If you need assistance, please refer to the documentation or contact support.";
+        break;
+    default:
+        break;
     }
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, this);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &LicenseDialog::reject);
     QPushButton *loadLicenseButton = new QPushButton("Load License");

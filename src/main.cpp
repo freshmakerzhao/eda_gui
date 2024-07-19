@@ -32,10 +32,11 @@ int main(int argc, char *argv[])
     a.setFont(font);
     QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
 
+#if defined(ENABLE_MAC_CHECK) || defined(ENABLE_EXPIRATION_CHECK)
     if (!LicenseUtilities::instance()->checkLicense()) {
         return -1;  // License check failed or user rejected dialog
     }
-    
+#endif
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();
 
