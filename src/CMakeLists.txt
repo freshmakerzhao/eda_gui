@@ -11,9 +11,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 是否需要检查 MAC 地址 ，默认需要
-option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
+option(ENABLE_MAC_CHECK "Enable MAC address check" ON)
 # 是否需要检查 软件有效期 ，默认关闭
-option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" OFF)
+option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" ON)
 
 if (ENABLE_MAC_CHECK)
     message(STATUS "ENABLE_MAC_CHECK ON.")

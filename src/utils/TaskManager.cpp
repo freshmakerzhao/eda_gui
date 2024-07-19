@@ -313,7 +313,7 @@ void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
     arch = params[Project::Arch];
 
     // 测试用
-    QString TEST_PATH1 = "E:/workspace/qt_demo/resource_win";
+    QString TEST_PATH1 = "E:/workspace/hybrdlink/resource_win";
     QString TEST_PATH2 = "C:/HybrdLink/resource_win";
     QString TEST_PATH3 = "C:/Users/INTEL/Desktop/Work/VMwareFileWorkspace/HybrdLink/resource_win";
     // 打包用

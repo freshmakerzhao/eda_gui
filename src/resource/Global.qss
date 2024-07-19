@@ -1,3 +1,4 @@
+/*
 QDialogButtonBox > QPushButton[text='OK'] {
     background-color: #4f7cce;
     color: white;
@@ -47,7 +48,7 @@ QDialogButtonBox > QPushButton[text='Cancel']:hover {
     padding: 4px;
     margin: 2px;
 }
-
+*/
 #squareButton {
     text-align: center;
     background-color: rgb(255, 255, 255);

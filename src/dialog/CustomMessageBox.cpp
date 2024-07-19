@@ -19,6 +19,7 @@ CustomMessageBox::CustomMessageBox(QWidget *parent) : QMessageBox(parent)
                   "   border-color: #4f7cce; "       // 边框颜色
                   "   border-style: solid; "         // 边框样式
                   "   min-width: 60px; "             // 最小宽度
+                  "   height: 18px;"
                   "   padding: 6px; "                // 内边距
                   "}"
                   "QPushButton:hover {"
@@ -30,6 +31,7 @@ CustomMessageBox::CustomMessageBox(QWidget *parent) : QMessageBox(parent)
                   "   border-style: solid; "         // 边框样式
                   "   min-width: 60px; "             // 最小宽度
                   "   padding: 4px;"                // 内边距
+                  "   height: 18px;"
                   "   margin: 2px;"
                   "}"
                   );

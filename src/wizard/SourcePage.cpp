@@ -58,15 +58,7 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
 void SourcesPage::onAddFiles()
 {
     int currentIndex = model->rowCount() + 1; // 用于记录当前索引
-    // QStringList fileNames = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.v)");
-    AdvancedFileDialog dialog(this);
-    dialog.setWindowTitle("Select Files");
-    dialog.setNameFilter("Verilog Source Files (*.v)");
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    if (dialog.exec() != QDialog::Accepted) {
-        return; // 用户取消了操作
-    }
-    QStringList fileNames = dialog.selectedFiles();
+    QStringList fileNames = AdvancedFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.v)");
     for (const QString &fileName : fileNames) {
         QFileInfo fileInfo(fileName);
         QList<QStandardItem *> items;
