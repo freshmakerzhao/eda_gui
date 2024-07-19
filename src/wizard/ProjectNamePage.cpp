@@ -17,17 +17,17 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
     setSubTitle("Enter a name for your project and specify a directory "
                 "where the project data files will be stored.");
 
-    QLabel *nameLabel = new QLabel("Project name:");
-    nameLineEdit = new QLineEdit;
+    QLabel *nameLabel = new QLabel("Project name:", this);
+    nameLineEdit = new QLineEdit(this);
+    nameLineEdit->setClearButtonEnabled(true);
     nameLineEdit->setText("project_1");
     registerField("projectName*", nameLineEdit);
 
     QLabel *pathLabel = new QLabel("Project path:");
-    pathLineEdit = new QLineEdit;
-    pathLineEdit->setText(QDir::homePath());
+    pathLineEdit = new QLineEdit(QDir::homePath(), this);
+    pathLineEdit->setClearButtonEnabled(true);
     QPushButton *browseButton = new QPushButton("Browse");
     connect(browseButton, &QPushButton::clicked, [=]() {
-        // QString path = QFileDialog::getExistingDirectory(this, "Select Directory", QDir::homePath());
         QString path = AdvancedFileDialog::getExistingDirectory(this, "Select Directory", QDir::homePath(), QFileDialog::DontUseNativeDialog);
         if (!path.isEmpty()) {
             pathLineEdit->setText(path);
@@ -35,17 +35,16 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
     });
     registerField("projectPath*", pathLineEdit);
 
-    warningLabel = new QLabel;
+    warningLabel = new QLabel(this);
     warningLabel->setStyleSheet("color: red;");
 
-    QGridLayout *layout = new QGridLayout;
+    QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(nameLabel, 0, 0);
     layout->addWidget(nameLineEdit, 0, 1);
     layout->addWidget(pathLabel, 1, 0);
     layout->addWidget(pathLineEdit, 1, 1);
     layout->addWidget(browseButton, 1, 2);
     layout->addWidget(warningLabel, 2, 1);
-    setLayout(layout);
 }
 
 bool ProjectNamePage::isComplete() const

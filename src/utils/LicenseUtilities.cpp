@@ -1,28 +1,94 @@
 /**
   ******************************************************************************
   * @file           : LicenseUtilities.cpp
-  * @author         : zs
+  * @author         : ksy
   * @description    : None
   * @attention      : None
-  * @date           : 2/7/2024
+  * @date           : 2024/7/18
   ******************************************************************************
   */
 #include "LicenseUtilities.h"
-#include "base/Globals.h"
+#include "AESUtilities.h"
 #include <QCoreApplication>
 #include <QNetworkInterface>
-#include <QMessageBox>
 #include <QDate>
-#include <cmath>
-#include <QFile>
+
+LicenseUtilities *LicenseUtilities::instance()
+{
+    static LicenseUtilities *_instance = nullptr;
+    if (!_instance) {
+        _instance = new LicenseUtilities;
+    }
+    return _instance;
+}
+
+bool LicenseUtilities::checkLicense() {
+    while (true) {
+        const int result = LicenseUtilities::instance()->loadLicense();
+        if (result == 0) {
+            return true;  // License check passed
+        }
+
+        LicenseDialog dialog(nullptr, result);
+        if (dialog.exec() == QFileDialog::Rejected) {
+            return false;  // User rejected the dialog
+        }
+    }
+}
+
+int LicenseUtilities::loadLicense()
+{
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString licensePath = QFileInfo(appDataPath).path() + "/HybrdChip/Common/license.lic";
+    if (!QFileInfo(licensePath).isFile()) {
+        // 证书不存在
+        return -2;
+    }
+    const std::string str = licensePath.toStdString();
+    qDebug() << "[LicenseUtilities] LicensePath: " <<licensePath;
+    unsigned char* decrypt_text = AESUtilities::aesDecrypt(str);
+    if (!decrypt_text) {
+        // 证书解码失败
+        qDebug() << "[LicenseUtilities] Decryption failed: null pointer returned.";
+        return -1;
+    }
+    qDebug() << "[LicenseUtilities] Decode: " << (char*)decrypt_text;
+    QString decryptText = QString((char*)decrypt_text);
+    free(decrypt_text);
+
+#ifdef ENABLE_MAC_CHECK
+    static QRegularExpression macRegex("MAC_ADDRESS->([0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2})");
+    QRegularExpressionMatch macMatch = macRegex.match(decryptText);
+    QString macAddress;
+    if (macMatch.hasMatch()) macAddress = macMatch.captured(1);
+
+    if (!LicenseUtilities::checkMacAddress(macAddress)) {
+        // MAC_ADDRESS检查失败
+        return -3;
+    }
+#else
+    qDebug() << "MAC address check is disabled.";
+#endif
+
+#ifdef ENABLE_EXPIRATION_CHECK
+    int remainingDays = LicenseUtilities::isWithinValidPeriod(decryptText);
+    if (remainingDays == -1) {
+        // 证书过期
+        return -4;
+    }
+#else
+    qDebug() << Software expiration check is disabled.
+#endif
+    return 0;
+}
 
 QString LicenseUtilities::getMacAddress() {
-    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+    foreach (QNetworkInterface intf, QNetworkInterface::allInterfaces()) {
         // 判断接口是否为有效的网卡并且处于活动状态
-        if (interface.flags().testFlag(QNetworkInterface::IsUp) &&
-            interface.flags().testFlag(QNetworkInterface::IsRunning) &&
-            !interface.hardwareAddress().isEmpty()) {
-            return interface.hardwareAddress();
+        if (intf.flags().testFlag(QNetworkInterface::IsUp) &&
+            intf.flags().testFlag(QNetworkInterface::IsRunning) &&
+            !intf.hardwareAddress().isEmpty()) {
+            return intf.hardwareAddress();
         }
     }
     return {};
@@ -35,13 +101,6 @@ bool LicenseUtilities::checkMacAddress(const QString& expectedMacAddress) {
     // 判读 mac 地址是否一致
     if (localMacAddress != expectedMacAddress) {
         qDebug() << "[LicenseUtilities] Error: MAC address does not match the expected value.";
-        // 校验失败
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText("Error: Software activation failed.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.exec();
         return false;
     }
     // 校验成功
@@ -49,40 +108,28 @@ bool LicenseUtilities::checkMacAddress(const QString& expectedMacAddress) {
     return true;
 }
 
-int LicenseUtilities::isWithinValidPeriod(const QString& compileDateTimeStr, int validDays) {
-    // 解析 compileDateTimeStr
-    QDateTime compileDateTime = QLocale::c().toDateTime(compileDateTimeStr, "MMM  d yyyy HH:mm:ss");
-    // 获取当前系统时间
-    QDateTime curDateTime = QDateTime::currentDateTime();
-
-    // compileDateTime 转换失败
-    if (!compileDateTime.isValid()) {
-        qWarning() << "[LicenseUtilities] Invalid compile date-time format.";
-        return 0;
+int LicenseUtilities::isWithinValidPeriod(const QString& compileDateTimeStr) {
+    int daysDiff = 0;
+    QDate expirationDate;
+    static QRegularExpression regex("EXPIRATION->(\\d{4}\\.\\d{2}\\.\\d{2})");
+    QRegularExpressionMatch match = regex.match(compileDateTimeStr);
+    if (!match.hasMatch()) {
+        return -1;
     }
-    // 计算 validDays 后，的时间
-    QDateTime expiryDateTime = compileDateTime.addDays(validDays);
-    if (curDateTime > expiryDateTime) {
-        // 已过期
-        return 0;
-    } else {
-        // 未过期，计算差值
-        // 计算差值（以秒为单位），然后转换为天数
-        qint64 secondsToExpiry = curDateTime.secsTo(expiryDateTime); // 得到秒数
-        // 计算天数，向上取整那，如0.1为1
-        int daysToExpiry = static_cast<int>(std::ceil(static_cast<double>(secondsToExpiry) / (24 * 3600)));
-        return daysToExpiry;
+    // 获取匹配的日期部分
+    QString expirationDateStr = match.captured(1);
+    expirationDate = QDate::fromString(expirationDateStr, "yyyy.MM.dd");
+    if (!expirationDate.isValid()) {
+        return -1;
     }
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    // 计算日期差值
+    daysDiff = currentDate.daysTo(expirationDate);
+    qDebug() << "Days to expiration:" << daysDiff;
+    if (daysDiff <= 0) {
+        return -1;
+    }
+    return daysDiff;
 }
 
-void LicenseUtilities::writeExpiryDateToFile(const QString& expiryDate) {
-    QFile file("expiry_date.txt");
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&file);
-        out.setCodec("UTF-8"); // 设置编码为 UTF-8
-        out << expiryDate << "\n";
-        file.close();
-    } else {
-        qWarning() << "[LicenseUtilities] Failed to write expiry date to file.";
-    }
-}

@@ -3,13 +3,21 @@
 #include "wizard/Wizard.h"
 
 GeneralPage::GeneralPage(QWidget *parent)
+    : QWidget(parent)
 {
-    setStyleSheet(".QWidget { background-image: url(:/resource/white.png); }"
-                  ".QWidget { border:4px solid #DCDCDC; }"
+    this->setObjectName("GeneralPage");
+    setStyleSheet("#GeneralPage { background-image: url(:/resource/white.png); }"
+                  "#GeneralPage { border:4px solid #DCDCDC; }"
     );
-    // QLabel *label = new QLabel("General Specify values for various settings used throughout the design flow. "
-    //                            "These settingsapply to the current project.", this);
-    // label->setWordWrap(true);
+
+    QLabel *label = new QLabel("<b>General</b><br> Specify values for various settings used throughout the design flow. "
+                               "These settings apply to the current project.", this);
+    label->setStyleSheet("border-bottom: 3px dashed #DCDCDC;"
+                        "border-radius: 0px;");
+    label->setWordWrap(true);
+    QHBoxLayout *hBoxLayout = new QHBoxLayout;
+    hBoxLayout->addWidget(label);
+
     projectDeviceLineEdit = new QLineEdit(this);
     projectDeviceLineEdit->setReadOnly(true);
     QAction *action = new QAction(this);
@@ -21,17 +29,16 @@ GeneralPage::GeneralPage(QWidget *parent)
     projectDeviceSquareButton->setFixedSize(25, 25); // 设置为方形
     projectDeviceSquareButton->setObjectName("squareButton");
 
-    QHBoxLayout *hLayout = new QHBoxLayout();
+    QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addWidget(projectDeviceLineEdit);
-    hLayout->addSpacing(5); // 添加一点间距
+    // hLayout->addSpacing(5); // 添加一点间距
     hLayout->addWidget(projectDeviceSquareButton);
 
     topModuleNameLineEdit = new QLineEdit(this);
     topModuleNameLineEdit->setClearButtonEnabled(true);
-    topModuleNameLineEdit->setFixedHeight(25);
 
     fLayout = new QFormLayout(this);
-    // fLayout->addWidget(label);
+    fLayout->addRow(hBoxLayout);
     fLayout->addRow("Project device:", hLayout);
     fLayout->addRow("Top module name:", topModuleNameLineEdit);
 

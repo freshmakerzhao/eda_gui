@@ -2,15 +2,12 @@
 #include "utils/ProjectManager.h"
 #include "widgets/Form.h"
 #include "base/InitialConfig.h"
-#include "utils/LicenseUtilities.h"
-#include "utils/AESUtilities.h"
 #include <QApplication>
 #include <QFontDatabase>
 #include <QSplashScreen>
 #include <QDateTime>
 #include <utils/FontsUtilities.h>
-
-const int VALID_DAYS = 7;
+#include "utils/LicenseUtilities.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,65 +32,15 @@ int main(int argc, char *argv[])
     a.setFont(font);
     QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
 
-    // const std::string plain_text = "z22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222hz22222222222222222222222h";
-
-    // AESUtilities::aesEncrypt(plain_text, "E:/workspace/eda_gui/src/zhaoshuai.bin");
-
-    // unsigned char* decrypt_text = AESUtilities::aesDecrypt("E:/workspace/eda_gui/src/zhaoshuai.bin");
-
-    // // 显示结果
-    // qDebug() << "原始字符串: " << QString::fromStdString(plain_text);
-    // qDebug() << "解密后的字符串:";
-    // qDebug() << (char*)decrypt_text;
-
-#ifdef ENABLE_MAC_CHECK
-    qDebug() << "[MAIN] MAC address check is enabled.";
-    // 比对MAC地址
-//    if (!LicenseUtilities::checkMacAddress(EXPECTED_MAC_ADDRESS)) {
-//        return -1;
-//    }
-#else
-    qDebug() << "[MAIN] MAC address check is disabled.";
-#endif
-
-
-#ifdef ENABLE_EXPIRATION_CHECK
-    qDebug() << "[MAIN] Software expiration check is enabled.";
-    QString buildDateTime = QString("%1 %2").arg(__DATE__, __TIME__); // Jul  xx 20xx xx:xx:xx
-
-    qDebug() << "[MAIN] Current build data is ." << buildDateTime;
-    // 检查软件的剩余有效天数
-    int remainingDays = LicenseUtilities::isWithinValidPeriod(buildDateTime, VALID_DAYS);
-
-    if (remainingDays == 0) {
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText("Error: Software has expired.");
-        msgBox.setInformativeText("This software is no longer valid. Please contact support.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.exec();
-        return -1;
-    } else {
-        qDebug() << "[MAIN] Software is valid for" << remainingDays << "more days.";
-        // 计算有效期的截止时间并写入文件
-        QDateTime compileDateTime = QLocale::c().toDateTime(buildDateTime, "MMM  d yyyy HH:mm:ss");
-        QDateTime expiryDateTime = compileDateTime.addDays(VALID_DAYS);
-        LicenseUtilities::writeExpiryDateToFile(expiryDateTime.toString());
+    if (!LicenseUtilities::instance()->checkLicense()) {
+        return -1;  // License check failed or user rejected dialog
     }
-#else
-    qDebug() << "[MAIN] Software expiration check is disabled.";
-#endif
 
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();
 
     // 启动画面
-//    QPixmap pix(":/resource/logo.png");
-//    QPixmap pix(":/resource/start01.jpg");
-    QPixmap pix(":/resource/start06.jpg");
-
-//    QSplashScreen splash(pix.scaled(440, 440, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    QPixmap pix(":/resource/start.jpg");
     QSplashScreen splash(pix.scaled(640, 640, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     splash.show();
     a.processEvents();

@@ -30,6 +30,32 @@ public:
     //! 设置当前工作路径
     void setCurWorkDir(const QString &dir);
 
+    static QString getOpenFileName(QWidget *parent = nullptr,
+                                   const QString &caption = QString(),
+                                   const QString &dir = QString(),
+                                   const QString &filter = QString(),
+                                   QString *selectedFilter = nullptr,
+                                   Options options = Options());
+
+    static QStringList getOpenFileNames(QWidget *parent = nullptr,
+                                        const QString &caption = QString(),
+                                        const QString &dir = QString(),
+                                        const QString &filter = QString(),
+                                        QString *selectedFilter = nullptr,
+                                        Options options = Options());
+
+    static QString getSaveFileName(QWidget *parent = nullptr,
+                                   const QString &caption = QString(),
+                                   const QString &dir = QString(),
+                                   const QString &filter = QString(),
+                                   QString *selectedFilter = nullptr,
+                                   Options options = Options());
+
+    static QString getExistingDirectory(QWidget *parent = nullptr,
+                                        const QString &caption = QString(),
+                                        const QString &dir = QString(),
+                                        Options options = ShowDirsOnly);
+
 
 private slots:
     void updateMetadata(const QString &path);
@@ -37,10 +63,15 @@ private slots:
 protected:
 
 private:
+    void setRecPrjDir(const QString &dir);
+
     const QString promptText = "File metadata will be shown here";
 
     //! 当前工作路径
     QString curWorkDir;
+
+    //! 最近使用的工程路径
+    QString recPrjDir;
 
     QString formatDateTime(const QDateTime &dateTime);
 
@@ -50,7 +81,9 @@ private:
 
     QMap<QString, QString> suffixToDescription{
         {"json", "JSON"},
-        {"bit", "Bistream File"}
+        {"bit", "Bistream File"},
+        {"hpr", "HybrdLink Project File"},
+        {"v", "Verilog Source Files"}
     };
 
     QToolBar *toolBar;

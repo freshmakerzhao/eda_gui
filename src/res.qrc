@@ -11,15 +11,14 @@
         <file>resource/white.png</file>
         <file>resource/black.png</file>
         <file>resource/logo.png</file>
-        <file>resource/start01.jpg</file>
-        <file>resource/start02.jpg</file>
-        <file>resource/start03.jpg</file>
-        <file>resource/start04.jpg</file>
-        <file>resource/start05.jpg</file>
-        <file>resource/start06.jpg</file>
+        <file>resource/start.jpg</file>
         <file>resource/fonts/LFTEtica/LFTEticaMono-Regular.TTF</file>
         <file>resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf</file>
         <file>resource/Global.qss</file>
+        <file>resource/computer.png</file>
+        <file>resource/home.png</file>
+        <file>resource/icons/CollapseAll.png</file>
+        <file>resource/icons/ExpandAll.png</file>
     </qresource>
     <qresource prefix="/gridview">
         <file>resource/gridview/22-1icon_zoom_in.png</file>
@@ -43,7 +42,6 @@
         <file>resource/icons/12-2icon_remove_sources.png</file>
         <file>resource/icons/12-3icon_pause.png</file>
         <file>resource/icons/13-icon_add_options.png</file>
-        <file>resource/icons/14-icon_copy_1.png</file>
         <file>resource/icons/14-icon_copy_2.png</file>
         <file>resource/icons/15-icon_discard.png</file>
         <file>resource/icons/16-1icon_error_status.png</file>

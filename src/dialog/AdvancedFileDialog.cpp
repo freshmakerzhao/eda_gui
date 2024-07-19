@@ -1,4 +1,6 @@
 #include "AdvancedFileDialog.h"
+#include "utils/XmlUtilities.h"
+#include "base/InitialConfig.h"
 
 AdvancedFileDialog::AdvancedFileDialog(QWidget *parent) :
     QFileDialog(parent),
@@ -48,14 +50,14 @@ AdvancedFileDialog::AdvancedFileDialog(QWidget *parent) :
     toolBar->setIconSize(QSize(22, 22));
 
     jumpToHomeDirAction = new QAction("Jump To Home Directory", this);
-    jumpToHomeDirAction->setIcon(QIcon(":/resources/home.png"));
+    jumpToHomeDirAction->setIcon(QIcon(":/resource/home.png"));
     connect(jumpToHomeDirAction, &QAction::triggered, [this]() {
         setDirectory(QDir::homePath());
     });
     toolBar->addAction(jumpToHomeDirAction);
 
     jumpToCurWorkDirAction = new QAction("Jump To Current Working Directory", this);
-    jumpToCurWorkDirAction->setIcon(QIcon(":/resources/computer.png"));
+    jumpToCurWorkDirAction->setIcon(QIcon(":/resource/computer.png"));
     connect(jumpToCurWorkDirAction, &QAction::triggered, [this]() {
         setDirectory(curWorkDir);
     });
@@ -63,12 +65,114 @@ AdvancedFileDialog::AdvancedFileDialog(QWidget *parent) :
 
     jumpToRecPrjDirAction = new QAction("Jump To Recent Project Directory", this);
     jumpToRecPrjDirAction->setIcon(QIcon(":/resource/icon.png"));
+    connect(jumpToRecPrjDirAction, &QAction::triggered, [this]() {
+        // setRecPrjDir(recPrjDir);
+        setDirectory(recPrjDir);
+    });
     toolBar->addAction(jumpToRecPrjDirAction);
+
+    try {
+        std::vector<XmlRecent> recentList = XmlUtilities::instance().getRecentListFromFatherElementName(
+            InitialConfig::instance().xmlPath.toStdString().c_str(),
+            "RECENT_PROJECTS"
+            );
+        if (!recentList.empty()) {
+            QFileInfo fileInfo(QString::fromStdString(recentList.at(0).getPath()));
+            setRecPrjDir(fileInfo.path());
+        }
+    } catch (const std::exception& e) {
+        // 异常
+        qDebug() << "[MainWindow] An error occurred from MainWindow recentList: " << e.what();
+    }
 }
 
 void AdvancedFileDialog::setCurWorkDir(const QString &dir)
 {
     curWorkDir = dir;
+}
+
+QString AdvancedFileDialog::getOpenFileName(QWidget *parent,
+                                            const QString &caption,
+                                            const QString &dir,
+                                            const QString &filter,
+                                            QString *selectedFilter,
+                                            Options options)
+{
+    AdvancedFileDialog dialog(parent);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setWindowTitle(caption);
+    dialog.setDirectory(dir);
+    dialog.setNameFilter(filter);
+    if (selectedFilter != nullptr) {
+        dialog.selectNameFilter(*selectedFilter);  // 设置初始选择的文件类型过滤器
+    }
+    dialog.setOptions(options);
+    if (dialog.exec() == QDialog::Accepted) {
+        return dialog.selectedFiles().at(0);
+    }
+    return QString();
+}
+
+QStringList AdvancedFileDialog::getOpenFileNames(QWidget *parent,
+                                                 const QString &caption,
+                                                 const QString &dir,
+                                                 const QString &filter,
+                                                 QString *selectedFilter,
+                                                 Options options)
+{
+    AdvancedFileDialog dialog(parent);
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+    dialog.setWindowTitle(caption);
+    dialog.setDirectory(dir);
+    dialog.setNameFilter(filter);
+    dialog.setOptions(options);
+    if (dialog.exec() == QDialog::Accepted) {
+        return dialog.selectedFiles();
+    }
+    return QStringList();
+}
+
+QString AdvancedFileDialog::getSaveFileName(QWidget *parent,
+                                            const QString &caption,
+                                            const QString &dir,
+                                            const QString &filter,
+                                            QString *selectedFilter,
+                                            Options options)
+{
+    AdvancedFileDialog dialog(parent);
+    dialog.setWindowTitle(caption);
+    dialog.setDirectory(dir);
+    dialog.setNameFilter(filter);
+    dialog.setOptions(options);
+
+    if (selectedFilter != nullptr) {
+        dialog.selectNameFilter(*selectedFilter);
+    }
+
+    if (dialog.exec() == QDialog::Accepted) {
+        if (selectedFilter != nullptr) {
+            *selectedFilter = dialog.selectedNameFilter();
+        }
+        return dialog.selectedFiles().at(0);
+    }
+
+    return QString();
+}
+
+QString AdvancedFileDialog::getExistingDirectory(QWidget *parent,
+                                                 const QString &caption,
+                                                 const QString &dir,
+                                                 Options options)
+{
+    AdvancedFileDialog dialog(parent);
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setWindowTitle(caption);
+    dialog.setDirectory(dir);
+    dialog.setOptions(options);
+    if (dialog.exec() == QDialog::Accepted) {
+        return dialog.selectedFiles().at(0);
+    }
+    return QString();
 }
 
 void AdvancedFileDialog::updateMetadata(const QString &path) {
@@ -97,6 +201,12 @@ void AdvancedFileDialog::updateMetadata(const QString &path) {
     } else {
         metadataEdit->setHtml(promptText);
     }
+}
+
+void AdvancedFileDialog::setRecPrjDir(const QString &dir)
+{
+    recPrjDir = dir;
+    qDebug() << recPrjDir;
 }
 
 QString AdvancedFileDialog::formatDateTime(const QDateTime &dateTime) {

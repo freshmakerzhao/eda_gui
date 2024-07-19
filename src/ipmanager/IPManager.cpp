@@ -20,9 +20,9 @@ IPManager::IPManager(QWidget* parent)
 void IPManager::init()
 {
     QToolBar *toolBar = new QToolBar(this);
-    toolBar->setIconSize(QSize(32, 32));
-    QAction *expandAllAction = new QAction("ExpandAll", this);
-    QAction *collapseAllAction = new QAction("CollapseAll", this);
+    toolBar->setIconSize(QSize(28, 28));
+    QAction *expandAllAction = new QAction(QIcon(":/resource/icons/ExpandAll.png"),"ExpandAll", this);
+    QAction *collapseAllAction = new QAction(QIcon(":/resource/icons/CollapseAll.png"),"CollapseAll", this);
     toolBar->addAction(expandAllAction);
     toolBar->addSeparator();
     toolBar->addAction(collapseAllAction);

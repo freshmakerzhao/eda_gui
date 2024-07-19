@@ -11,67 +11,86 @@
 #include "FlowNavigator.h"
 #include "utils/TaskManager.h"
 
-FlowNavigator::FlowNavigator(QWidget *parent)
-    : QTreeWidget(parent)
+FlowNavigator *FlowNavigator::instance()
 {
+    static FlowNavigator *_instance = nullptr;
+    if (!_instance) {
+        _instance = new FlowNavigator(nullptr);
+    }
+    return _instance;
+}
+
+void FlowNavigator::downloadBitMode(const bool &f)
+{
+    proMgrItem->setDisabled(f);
+    synthItem->setDisabled(f);
+    impItem->setDisabled(f);
+
+    settingsItem->setDisabled(f);
+    addSourcesItem->setDisabled(f);
+    ipCatalogItem->setDisabled(f);
+    prjSummaryItem->setDisabled(f);
+
+    synthRunItem->setDisabled(f);
+    synthReportItem->setDisabled(f);
+    impAllItem->setDisabled(f);
+    impPackReportItem->setDisabled(f);
+
+    proNetlistViewItem->setDisabled(f);
+    proBitItem->setDisabled(f);
+    proBitViewItem->setDisabled(f);
+    proDownloadBitItem->setDisabled(f);
+}
+
+FlowNavigator::FlowNavigator(QWidget *parent)
+    : QTreeWidget(parent),
+    proMgrItem(new QTreeWidgetItem(this, QStringList() << "PROJECT MANAGER")),
+    synthItem(new QTreeWidgetItem(this, QStringList() << "SYNTHESIS")),
+    impItem(new QTreeWidgetItem(this, QStringList() << "IMPLEMENTATION")),
+    proItem(new QTreeWidgetItem(this, QStringList() << "PROGRAM AND DEBUG"))
+{
+    // proMgrItem->setDisabled(true);
     setColumnCount(1);
     setHeaderHidden(true);
     // setIndentation(20);
     setStyleSheet("QTreeWidget::item { height: 45px; }");
     // ============ PROJECT MANAGER ============
-    QTreeWidgetItem *proMgrItem = new QTreeWidgetItem(this, QStringList() << "PROJECT MANAGER");
-    proMgrItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
     // Settings
-    QTreeWidgetItem *settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");
+    settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");
     settingsItem->setIcon(0, QIcon(":/icons/resource/icons/4-icon_setting.png"));
     // Add Sources
-    QTreeWidgetItem *addSourcesItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Add Sources");
+    addSourcesItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Add Sources");
     addSourcesItem->setIcon(0, QIcon(":/icons/resource/icons/12-1icon_add.png"));
     // IP Catalog
-    QTreeWidgetItem *ipCatalogItem = new QTreeWidgetItem(proMgrItem, QStringList() << "IP Catalog");
+    ipCatalogItem = new QTreeWidgetItem(proMgrItem, QStringList() << "IP Catalog");
     ipCatalogItem->setIcon(0, QIcon(":/icons/resource/icons/5-icon_ip_catalog.png"));
     // Project Summary
-    QTreeWidgetItem *prjSummaryItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Project Summary");
+    prjSummaryItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Project Summary");
     prjSummaryItem->setIcon(0, QIcon(":/icons/resource/icons/20-icon_summary_2.png"));
     // ================== 综合 ==================
-    QTreeWidgetItem *synthItem = new QTreeWidgetItem(this, QStringList() << "SYNTHESIS");
-    synthItem->setIcon(0, QIcon(""));// 在QIcon("")放置图标地址:/QIcon.ico
-    QTreeWidgetItem *synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run Synthesis");
+    synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run Synthesis");
     synthRunItem->setIcon(0, QIcon(":/icons/resource/icons/1-icon_start_process.png"));
     // run synth
     QTreeWidgetItem *synthReportItem = new QTreeWidgetItem(synthItem, QStringList() << "Report");
     synthReportItem->setIcon(0, QIcon(":/icons/resource/icons/6-icon_report.png"));
     synthReportItem->setDisabled(true);
     // ================== imp ==================
-    QTreeWidgetItem *impItem = new QTreeWidgetItem(this, QStringList() << "IMPLEMENTATION");
-    impItem->setIcon(0, QIcon(""));
     // pack_place_route
-    QTreeWidgetItem *impAllItem = new QTreeWidgetItem(impItem, QStringList() << "Run Implementation");
+    impAllItem = new QTreeWidgetItem(impItem, QStringList() << "Run Implementation");
     impAllItem->setIcon(0, QIcon(":/icons/resource/icons/1-icon_start_process.png"));
-    // 仅pack
-//    QTreeWidgetItem *impPackItem = new QTreeWidgetItem(impItem, QStringList() << "Only pack");
-//    impPackItem->setIcon(0, QIcon(""));
-    // 仅place
-//    QTreeWidgetItem *impPlaceItem = new QTreeWidgetItem(impItem, QStringList() << "Only place");
-//    impPlaceItem->setIcon(0, QIcon(""));
-    // 仅route
-//    QTreeWidgetItem *impRouteItem = new QTreeWidgetItem(impItem, QStringList() << "Only route");
-//    impRouteItem->setIcon(0, QIcon(""));
-    QTreeWidgetItem *impPackReportItem = new QTreeWidgetItem(impItem, QStringList() << "Report");
+    impPackReportItem = new QTreeWidgetItem(impItem, QStringList() << "Report");
     // 查看 Pack 日志
     impPackReportItem->setIcon(0, QIcon(":/icons/resource/icons/6-icon_report.png"));
     impPackReportItem->setDisabled(true);
     // ================== 码流及可视化 ==================
-    QTreeWidgetItem *proItem = new QTreeWidgetItem(this, QStringList() << "PROGRAM AND DEBUG");
-    proItem->setIcon(0, QIcon(""));
-    QTreeWidgetItem *proNetlistViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate NetlistView");
+    proNetlistViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate NetlistView");
     proNetlistViewItem->setDisabled(true);
     proNetlistViewItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
-    QTreeWidgetItem *proBitItem = new QTreeWidgetItem(proItem, QStringList() << "Generate Bitstream");
+    proBitItem = new QTreeWidgetItem(proItem, QStringList() << "Generate Bitstream");
     proBitItem->setIcon(0, QIcon(":/icons/resource/icons/3-icon_generate_bitstream.png"));
-    QTreeWidgetItem *proBitViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate GridView");
+    proBitViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate GridView");
     proBitViewItem->setIcon(0, QIcon(":/icons/resource/icons/28-icon_grid_view.png"));
-    QTreeWidgetItem *proDownloadBitItem = new QTreeWidgetItem(proItem, QStringList() << "Download Bit");
+    proDownloadBitItem = new QTreeWidgetItem(proItem, QStringList() << "Download Bit");
     proDownloadBitItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
     expandAll();
 
@@ -82,12 +101,6 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(1);
         } else if (item == impAllItem) {
             TaskManager::instance().handleTreeItemActivation(2);
-//        } else if (item == impPackItem) {
-//            TaskManager::instance().handleTreeItemActivation(3);
-//        } else if (item == impPlaceItem) {
-//            TaskManager::instance().handleTreeItemActivation(4);
-//        } else if (item == impRouteItem) {
-//            TaskManager::instance().handleTreeItemActivation(5);
         } else if (item == impPackReportItem) {
             TaskManager::instance().handleTreeItemActivation(6);
         } else if (item == proNetlistViewItem) {
@@ -109,10 +122,5 @@ FlowNavigator::FlowNavigator(QWidget *parent)
         }
         clearSelection(); // 清除选中状态
     });
-
-}
-
-void FlowNavigator::downloadBitstreamMode()
-{
 
 }
