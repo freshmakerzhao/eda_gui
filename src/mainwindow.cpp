@@ -159,7 +159,7 @@ void MainWindow::setCurrentDock(const int &type)
 void MainWindow::resizeUi()
 {
     QFontMetrics fontMetrics(this->font());
-    int width = fontMetrics.horizontalAdvance(QChar('A'))*20+60;
+    int width = fontMetrics.horizontalAdvance(QChar('A'))*20+80;
     float per = width*1.0/this->width();
     // qDebug() << per;
     // NavigationBar->setFixedWidth(width * 20 + 60);
@@ -173,7 +173,6 @@ void MainWindow::resizeUi()
     resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
 }
 
-
 void MainWindow::onNewTriggered()
 {
     Wizard wizard(this);
@@ -182,21 +181,13 @@ void MainWindow::onNewTriggered()
 
 void MainWindow::onOpenFileTriggered()
 {
-    AdvancedFileDialog dialog(this);
-    dialog.setWindowTitle("Open File");
-    dialog.setNameFilter("All Files (*.*)");
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    if (dialog.exec() != QDialog::Accepted) {
-        return; // 用户取消了操作
-    }
-    QString path = dialog.selectedFiles().value(0, "");
+    QString path = AdvancedFileDialog::getOpenFileName(this, "Open File", "", "All Files (*)");
     createEditorTab(path);
     setForm(0);
 }
 
 void MainWindow::onOpenTriggered()
 {
-    // QFileDialog dialog(this);
     AdvancedFileDialog dialog(this);
     dialog.setWindowTitle("Open Project");
     dialog.setNameFilter("HybrdLink Project File (*.hpr)");
@@ -292,10 +283,11 @@ MainWindow::MainWindow(QWidget *parent)
     fileMenu = menuBar->addMenu("File");
     editMenu = menuBar->addMenu("Edit");
     viewMenu = menuBar->addMenu("View");
+    windowMenu = menuBar->addMenu("Window");
     helpMenu = menuBar->addMenu("Help");
     // ===================== FILE ======================
     newAction = new QAction(QIcon(":icons/resource/icons/35-icon_new_project_2.png"),"New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-    openAction = new QAction(QIcon(":icons/resource/icons/21-icon_open_extend.png"), "Open", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    openAction = new QAction("Open Project", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     closeAction = new QAction("Close Project", this);
     openFileAction = new QAction("Open File", this);
     saveAction = new QAction(QIcon(":icons/resource/icons/30-icon_save.png"), "Save", this), saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
@@ -343,7 +335,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect(chipPlannerAction, &QAction::triggered, this, &MainWindow::onChipPlannerTriggered);
     // =================== TOOLBAR =====================
     toolbar = new QToolBar("Tools", this);
-    toolbar->addActions({newAction, openAction, saveAction}), toolbar->addSeparator();
+    QMenu *menu = new QMenu(this);
+    QToolButton *toolButton = new QToolButton;
+    toolButton->setText("Actions");
+    toolButton->setIcon(QIcon(":icons/resource/icons/21-icon_open_extend.png"));
+    toolButton->setMenu(menu);
+    toolButton->setPopupMode(QToolButton::InstantPopup);
+    toolButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+    toolbar->addWidget(toolButton);
+
+    menu->addAction(openAction);
+    menu->addSeparator();
+    menu->addAction(openFileAction);
+
+    // toolbar->addActions({newAction, saveAction}), toolbar->addSeparator();
     toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
     toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
     // 设置工具栏图标的大小
@@ -357,8 +362,8 @@ MainWindow::MainWindow(QWidget *parent)
     NavigationBar->setFeatures(QDockWidget::NoDockWidgetFeatures);
     NavigationBar->setFeatures(QDockWidget::DockWidgetClosable);
     NavigationBar->setWindowTitle("FLOW NAVIGATOR");
-    FlowNavigator *flowNavigator = new FlowNavigator(this);
-    NavigationBar->setWidget(flowNavigator);
+    // FlowNavigator *flowNavigator = new FlowNavigator(this);
+    NavigationBar->setWidget(FlowNavigator::instance());
     addDockWidget(Qt::LeftDockWidgetArea, NavigationBar, Qt::Vertical);
 
     BottomDock = new QDockWidget(this);
@@ -402,12 +407,16 @@ MainWindow::MainWindow(QWidget *parent)
 //    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget,SourcesWidget->dockAreaWidget());
 //    PropertiesWidget->setWidget(new QLabel("This is a test"));
 
-    EditWidget = new ads::CDockWidget("Editor", DockManager);
+    EditWidget = new ads::CDockWidget("Text Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
     EditWidget->setWidget(EditorManager::instance());
     EditWidget->setMinimumSize(450, 10);
     // EditWidget->setMinimumSize(1300, 10);
 
+    // ==================== Window =====================
+    projectSummaryAction = new QAction(QIcon(":/icons/resource/icons/20-icon_summary_2.png") ,"Project Summary", this);
+    windowMenu->addAction(projectSummaryAction);
+    connect(projectSummaryAction, &QAction::triggered, this, &MainWindow::showPrjSummary);
     // ===================== VIEW ======================
     viewMenu->addAction(NavigationBar->toggleViewAction());
     viewMenu->addAction(BottomDock->toggleViewAction());

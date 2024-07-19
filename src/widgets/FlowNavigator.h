@@ -17,9 +17,54 @@ class FlowNavigator : public QTreeWidget
 {
     Q_OBJECT
 public:
-    explicit FlowNavigator(QWidget *parent = nullptr);
+    static FlowNavigator *instance();
 
-    void downloadBitstreamMode();
+    // enum Task {
+    //     Settings,
+    //     AddSources,
+    //     IPCatalog,
+    //     ProjectSummary,
+    // };
+    void downloadBitMode(const bool &f = false);
+
+private:
+    FlowNavigator(QWidget *parent = nullptr);
+
+    QTreeWidgetItem *proMgrItem;
+    QTreeWidgetItem *synthItem;
+    QTreeWidgetItem *impItem;
+    QTreeWidgetItem *proItem;
+
+    // ============ PROJECT MANAGER ============
+    //! Settings
+    QTreeWidgetItem *settingsItem;
+    //! Add Sources
+    QTreeWidgetItem *addSourcesItem;
+    //! IP Catalog
+    QTreeWidgetItem *ipCatalogItem;
+    //! Project Summary
+    QTreeWidgetItem *prjSummaryItem;
+
+    // ============== SYNTHESIS ================
+    //! run synth
+    QTreeWidgetItem *synthRunItem;
+    //! synth report
+    QTreeWidgetItem *synthReportItem;
+
+    // =========== Implementation ==============
+    //! pack_place_route
+    QTreeWidgetItem *impAllItem;
+    //! impl report
+    QTreeWidgetItem *impPackReportItem;
+    // ========== PROGRAM AND DEBUG ============
+    //! netlist
+    QTreeWidgetItem *proNetlistViewItem;
+    //! bitstream
+    QTreeWidgetItem *proBitItem;
+    //! gridview
+    QTreeWidgetItem *proBitViewItem;
+    //! download bit
+    QTreeWidgetItem *proDownloadBitItem;
 
 signals:
 };
