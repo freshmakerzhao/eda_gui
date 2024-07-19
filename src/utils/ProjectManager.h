@@ -15,7 +15,6 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include "Project.h"
-#include "TaskManager.h"
 
 class ProjectManager :  public QObject
 {

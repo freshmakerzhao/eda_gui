@@ -13,7 +13,7 @@
 
 ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
 {
-    setTitle("Add Constrains");
+    setTitle("Add Constraints");
     setSubTitle("Specify or create constraint files for physical and "
                 "timing constraints.");
 
@@ -57,15 +57,7 @@ ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
 void ConstraintPage::onAddFiles()
 {
     int currentIndex = model->rowCount() + 1; // 用于记录当前索引
-    // QStringList fileNames = QFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.xdc)");
-    AdvancedFileDialog dialog(this);
-    dialog.setWindowTitle("Select Files");
-    dialog.setNameFilter("Verilog Source Files (*.xdc)");
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    if (dialog.exec() != QDialog::Accepted) {
-        return; // 用户取消了操作
-    }
-    QStringList fileNames = dialog.selectedFiles();
+    QStringList fileNames = AdvancedFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.xdc)");
     for (const QString &fileName : fileNames) {
         QFileInfo fileInfo(fileName);
         QList<QStandardItem *> items;

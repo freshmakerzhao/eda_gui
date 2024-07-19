@@ -19,6 +19,17 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView = new QTableView(this);
     tableView->verticalHeader()->setVisible(false); // 不显示行号
 
+    // 启用水平滚动条
+    tableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    tableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+    // // 设置表头可以滚动
+    // tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    // // 根据内容自动调整列宽
+    // tableView->resizeColumnsToContents();
+    // // 为列设置初始宽度，但仍然允许用户调整列宽
+    // tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
     QStandardItemModel *model = new QStandardItemModel(0, 8, this);
     tableView->setModel(model);
     QStringList headers = {"Part", "I/O Pin Count", "Available IOBs", "LUT Elements", "FlipFlops" , "Block RAMs" , "DSPs" , "PCIe"};
@@ -79,16 +90,16 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 
     // 设置整个表格为只读
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // 设置第一列的宽度为200
+    // 设置第一列的宽度为180
     tableView->setColumnWidth(0, 180);
     // 获取表头视图
-    QHeaderView *header = tableView->horizontalHeader();
-    // 第一列设置为固定宽度
-    header->setSectionResizeMode(0, QHeaderView::Fixed);
-    // 其他列设置为自动分配剩余空间
-    for (int i = 1; i < model->columnCount(); ++i) {
-        header->setSectionResizeMode(i, QHeaderView::Stretch);
-    }
+    // QHeaderView *header = tableView->horizontalHeader();
+    // // 第一列设置为固定宽度
+    // header->setSectionResizeMode(0, QHeaderView::Fixed);
+    // // 其他列设置为自动分配剩余空间
+    // for (int i = 1; i < model->columnCount(); ++i) {
+    //     header->setSectionResizeMode(i, QHeaderView::Stretch);
+    // }
 
     // 设置宽度自适应
 //    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);

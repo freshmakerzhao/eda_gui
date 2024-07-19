@@ -12,14 +12,10 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
-
-#include <QFileDialog>
-#include <QFileDialog>
 #include <QDockWidget>
 #include <QTextCodec>
 #include <QCoreApplication>
-#include <QSharedPointer>
-
+#include <QToolButton>
 // #include "grid/ChipPlanner.h"
 #include "ads/DockManager.h"
 #include "ads/DockWidget.h"
@@ -73,6 +69,7 @@ private:
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QMenu *editMenu;
+    QMenu *windowMenu;
     QMenu *viewMenu;
     QMenu *helpMenu;
 
@@ -92,6 +89,8 @@ private:
     QAction *pasteAction;
     QAction *undoAction;
     QAction *redoAction;
+
+    QAction *projectSummaryAction;
 
     QAction *documentation;
     QAction *aboutAction;

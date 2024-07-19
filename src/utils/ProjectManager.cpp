@@ -16,6 +16,7 @@
 #include "XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "widgets/PrjSummary.h"
+#include "TaskManager.h"
 
 ProjectManager &ProjectManager::instance()
 {
