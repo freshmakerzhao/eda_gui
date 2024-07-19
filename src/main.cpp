@@ -35,12 +35,13 @@ int main(int argc, char *argv[])
     if (!LicenseUtilities::instance()->checkLicense()) {
         return -1;  // License check failed or user rejected dialog
     }
-
+    
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();
 
     // 启动画面
     QPixmap pix(":/resource/start.jpg");
+
     QSplashScreen splash(pix.scaled(640, 640, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     splash.show();
     a.processEvents();
