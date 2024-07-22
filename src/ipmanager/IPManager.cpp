@@ -36,8 +36,7 @@ void IPManager::init()
     QStringList headers = {"Name",
                            "AXI4",
                            "Status",
-                           "License",
-                           "VLNV"
+                           "License"
     };
     model->setHorizontalHeaderLabels(headers);
     treeView->setModel(model);
@@ -83,7 +82,7 @@ void IPManager::init()
     rowItems.append(new QStandardItem(QString("AXI4")));
     rowItems.append(new QStandardItem(QString("Production")));
     rowItems.append(new QStandardItem(QString("Included")));
-    rowItems.append(new QStandardItem(QString("xilinx.com:ip:blk_mem_gen:8.4")));
+    // rowItems.append(new QStandardItem(QString("xilinx.com:ip:blk_mem_gen:8.4")));
     // memoryelementsitem->appendRow(blockmemorygeneratoritem);
     memoryelementsitem->appendRow(rowItems);
     blockmemorygeneratoritem->setData("blockmemorygenerator", Qt::UserRole);

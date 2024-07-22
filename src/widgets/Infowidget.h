@@ -27,6 +27,7 @@ public:
 
     void updateSynthItem(const QString synthPath, const QString status, const QString startTime, const QString Elapsed , const QString partName);
     void updateImplItem(const QString& implPath, const QString& status, const QString& startTime, const QString& Elapsed , const QString& partName);
+    void initDesignRunsView();
 private:
     InfoWidget(QWidget *parent = nullptr);
     ~InfoWidget();
