@@ -34,13 +34,13 @@ void LogWidget::init()
     toolBar->addSeparator();
     QAction *copyAction = new QAction(QIcon(":/icons/resource/icons/14-icon_copy_2.png"),"Copy", this);
     toolBar->addAction(copyAction);
-    toolBar->setIconSize(QSize(18, 18));
+    toolBar->setIconSize(QSize(20, 20));
     toolBar->addSeparator();
 
     // Widget
     baseWidget = new QWidget;
     baseWidget->setParent(this);
-    baseWidget->setFixedHeight(65);
+    // baseWidget->setFixedHeight(65);
     baseWidget->setVisible(false);
 
     QPushButton *backWardBtn = new QPushButton("Backward", baseWidget);
@@ -51,15 +51,17 @@ void LogWidget::init()
     clearBtn->setFixedWidth(90);
 
     QLineEdit *lineEdit = new QLineEdit(this);
+    lineEdit->setFixedWidth(250);
 
     QFormLayout *fLayout = new QFormLayout(baseWidget);
     fLayout->setMargin(0);
-    fLayout->addRow("Search:", lineEdit);
+    // fLayout->addRow("Search:", lineEdit);
     QHBoxLayout *hLayout = new QHBoxLayout;
+    hLayout->addWidget(lineEdit);
     hLayout->addWidget(backWardBtn);
     hLayout->addWidget(forWardBtn);
     hLayout->addWidget(clearBtn);
-    fLayout->addRow(hLayout);
+    fLayout->addRow("Search:", hLayout);
 
     logTextEdit = new SearchTextEdit(this);
     logTextEdit->setReadOnly(true);

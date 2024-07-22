@@ -17,6 +17,7 @@
 #include "base/InitialConfig.h"
 #include "widgets/PrjSummary.h"
 #include "TaskManager.h"
+#include "widgets/InfoWidget.h"
 
 ProjectManager &ProjectManager::instance()
 {
@@ -123,6 +124,7 @@ bool ProjectManager::openProject(const QString &hprPath)
         return false;
     }
     ProjectManager::instance().loadFiles(newOpenProject);
+    InfoWidget::instance()->initDesignRunsView();
     return true;
 }
 
@@ -305,6 +307,8 @@ void ProjectManager::closeProject()
     MainWindow::instance()->showProjectTitle(1);
     // 显示起始页
     MainWindow::instance()->setForm(1);
+    // 重新初始化DesignRuns表
+    InfoWidget::instance()->initDesignRunsView();
 }
 
 ProjectManager::ProjectManager() {}

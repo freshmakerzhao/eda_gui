@@ -5,7 +5,6 @@
 #include <QApplication>
 #include <QFontDatabase>
 #include <QSplashScreen>
-#include <QDateTime>
 #include <utils/FontsUtilities.h>
 #include "utils/LicenseUtilities.h"
 

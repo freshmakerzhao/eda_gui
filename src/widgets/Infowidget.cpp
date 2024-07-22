@@ -26,7 +26,7 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
     QJsonObject object = doc.object();
     // 配置表格数据
-    runsModel->setItem(0, 0, new QStandardItem(QString("synth")));
+    // runsModel->setItem(0, 0, new QStandardItem(QString("synth")));
     for (auto it = object.begin(); it != object.end(); ++it) {
         if (it.key() == "$lut") {
             lutNumSynth += it.value().toInt();
@@ -76,7 +76,7 @@ void InfoWidget::updateImplItem(const QString& implPath, const QString& status, 
     QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
     QJsonObject object = doc.object();
     // 配置表格数据
-    runsModel->setItem(1, 0, new QStandardItem(QString("impl")));
+    // runsModel->setItem(1, 0, new QStandardItem(QString("impl")));
     for (auto it = object.begin(); it != object.end(); ++it) {
         if (it.key() == "BLK-TL-DSP48E1") {
             dspNumImpl += it.value().toInt();
@@ -95,6 +95,34 @@ void InfoWidget::updateImplItem(const QString& implPath, const QString& status, 
     runsModel->setItem(1, 8, new QStandardItem(Elapsed)); // 持续时间
     runsModel->setItem(1, 9, new QStandardItem(partName)); // 封装名称
 
+
+}
+
+void InfoWidget::initDesignRunsView()
+{
+    // 配置表格数据
+    // ---------- synth ---------
+    runsModel->setItem(0, 0, new QStandardItem(QString("synth")));
+    runsModel->setItem(0, 1, new QStandardItem(QString("Not started"))); // Status
+    runsModel->setItem(0, 2, new QStandardItem()); // LUT6
+    runsModel->setItem(0, 3, new QStandardItem()); // ff
+    runsModel->setItem(0, 4, new QStandardItem()); // BRAM
+    runsModel->setItem(0, 5, new QStandardItem()); // dsp
+    runsModel->setItem(0, 6, new QStandardItem()); // carry4
+    runsModel->setItem(0, 7, new QStandardItem()); // 开始时间
+    runsModel->setItem(0, 8, new QStandardItem()); // 持续时间
+    runsModel->setItem(0, 9, new QStandardItem()); // 封装名称
+    // ---------- impl ----------
+    runsModel->setItem(1, 0, new QStandardItem(QString("impl")));
+    runsModel->setItem(1, 1, new QStandardItem(QString("Not started"))); // Status
+    runsModel->setItem(1, 2, new QStandardItem()); // LUT6
+    runsModel->setItem(1, 3, new QStandardItem()); // ff
+    runsModel->setItem(1, 4, new QStandardItem()); // BRAM
+    runsModel->setItem(1, 5, new QStandardItem()); // dsp
+    runsModel->setItem(1, 6, new QStandardItem()); // carry
+    runsModel->setItem(1, 7, new QStandardItem()); // 开始时间
+    runsModel->setItem(1, 8, new QStandardItem()); // 持续时间
+    runsModel->setItem(1, 9, new QStandardItem()); // 封装名称
 
 }
 
@@ -124,6 +152,9 @@ InfoWidget::InfoWidget(QWidget *parent)
     tabWidget->setTabEnabled(3, false);
     // ======================== Design Runs ========================
     runsView = new QTreeView(this);
+    runsView->setStyleSheet("QTreeView { border: 1px solid #999; }"
+                            "QTreeView::item { border-bottom: 1px solid #999; border-right: 1px solid #999;}"
+                            "QTreeView::item:selected { background-color: #4f7cce; }");
     tabWidget->addTab(runsView, "Design Runs");
     runsModel = new QStandardItemModel(runsView);
     QStringList headers = {"Name",
@@ -137,6 +168,7 @@ InfoWidget::InfoWidget(QWidget *parent)
                            "Elapsed",
                            "Part"};
     runsModel->setHorizontalHeaderLabels(headers);
+    initDesignRunsView();
     runsView->setModel(runsModel);
     runsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     runsView->expandAll();
