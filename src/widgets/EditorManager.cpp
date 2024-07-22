@@ -68,6 +68,7 @@ bool EditorManager::saveAllFiles()
                 return false;
             }
         }
+        setTabText(i, QFileInfo(editor->property("filePath").toString()).fileName());
     }
 
     MainWindow::instance()->updateActionState();
