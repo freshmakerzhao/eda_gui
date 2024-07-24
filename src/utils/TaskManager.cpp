@@ -4,11 +4,10 @@
 #include "utils/StringUtilities.h"
 #include "utils/CommandBuilder.h"
 #include "ProjectManager.h"
-#include "widgets/Infowidget.h"
+#include "widgets/InfoWidget.h"
 #include "widgets/FrameView.h"
-#include "widgets/EditorManager.h"
+// #include "widgets/EditorManager.h"
 #include "mainwindow.h"
-#include "dialog/CustomMessageBox.h"
 #include "FileHelper.h"
 #include "HardWareManager.h"
 
@@ -105,9 +104,10 @@ void TaskManager::handleTreeItemActivation(const int &mode)
  * @param mode 待执行任务
  */
 void TaskManager::taskController(const int mode) {
-    bool sourceModified = EditorManager::instance()->isModified();
+    // bool sourceModified = EditorManager::instance()->isModified();
+    const bool sourceModified = fileChanged;
     std::string netlistPath = StringUtilities::concatPath({projectSynthPath.toStdString(), (topName + netlistType).toStdString()});
-    bool netlistExist = FileHelper::fileExists(netlistPath);
+    const bool netlistExist = FileHelper::fileExists(netlistPath);
     // 准备环境
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
     if (mode == 0){
@@ -126,6 +126,7 @@ void TaskManager::taskController(const int mode) {
                     QStringList arguments = buildSynthScript();
                     qDebug() << arguments;
                     ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,displayPartName);
+                    fileChanged = false;
                     return;
                 } else {
                     // 取消操作
@@ -143,6 +144,7 @@ void TaskManager::taskController(const int mode) {
                     // 执行综合
                     QStringList arguments = buildSynthScript();
                     ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,displayPartName);
+                    fileChanged = false;
                     return;
                 } else {
                     // 取消操作
@@ -154,6 +156,7 @@ void TaskManager::taskController(const int mode) {
             // 直接执行
             QStringList arguments = buildSynthScript();
             ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,displayPartName);
+            fileChanged = false;
             return;
         }
     } else if (mode == 2){
@@ -170,7 +173,7 @@ void TaskManager::taskController(const int mode) {
                 if (sourceModified){
                     // 设计文件有改动
                     if(twoOptionMsg(
-                            "Synthesis is Out-of-data",
+                            "Synthesis is Out-of-date",
                             "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
                             QMessageBox::Ok,
                             QMessageBox::Cancel
@@ -181,11 +184,12 @@ void TaskManager::taskController(const int mode) {
                         // implement命令
                         std::string script = buildImpScript();
                         // 定义综合后执行的命令
-                        ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                        ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script), displayPartName);
                         // 不显示综合成功弹窗
                         ProcessManager::instance().setSynthSuccessMsgStatus(false);
                         ProcessManager::instance().setNextImplementProcessStatus(true);
                         ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,displayPartName);
+                        fileChanged = false;
                         return;
                     } else {
                         // 不操作
@@ -202,6 +206,7 @@ void TaskManager::taskController(const int mode) {
                         // 重新implement
                         std::string script = buildImpScript();
                         ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script),displayPartName);
+                        fileChanged = false;
                         return;
                     } else {
                         // 不操作
@@ -213,7 +218,7 @@ void TaskManager::taskController(const int mode) {
                 if (sourceModified){
                     // 设计文件有改动
                     if(twoOptionMsg(
-                            "Synthesis is Out-of-data",
+                            "Synthesis is Out-of-date",
                             "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
                             QMessageBox::Ok,
                             QMessageBox::Cancel
@@ -224,11 +229,12 @@ void TaskManager::taskController(const int mode) {
                         // implement命令
                         std::string script = buildImpScript();
                         // 定义综合后执行的命令
-                        ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                        ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script), displayPartName);
                         // 不显示综合成功弹窗
                         ProcessManager::instance().setSynthSuccessMsgStatus(false);
                         ProcessManager::instance().setNextImplementProcessStatus(true);
                         ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments, displayPartName);
+                        fileChanged = false;
                         return;
                     } else {
                         // 不操作
@@ -240,6 +246,7 @@ void TaskManager::taskController(const int mode) {
                     std::string script = buildImpScript();
                     qDebug() << QString::fromStdString(script);
                     ProcessManager::instance().checkCall("Implementation", projectImplPath, QString::fromStdString(script),displayPartName);
+                    fileChanged = false;
                     return;
                 }
             }
@@ -260,8 +267,9 @@ void TaskManager::taskController(const int mode) {
                 ProcessManager::instance().setSynthSuccessMsgStatus(false);
                 ProcessManager::instance().setNextImplementProcessStatus(true);
                 // 定义综合后执行的命令
-                ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script),partName);
+                ProcessManager::instance().setNextImplementProcessScript("Implementation", projectImplPath, QString::fromStdString(script), displayPartName);
                 ProcessManager::instance().checkCallSpecific("Synthesis", projectSynthPath, arguments,displayPartName);
+                fileChanged = false;
                 return;
             } else {
                 // 取消操作
@@ -349,11 +357,34 @@ void TaskManager::cleanParams()
     partName = "";
     archName = "";
     arch = "";
+    removeWatchFiles();
+    fileChanged = false;
+}
+
+void TaskManager::setWatchFiles() {
+    fileWatcher->addPaths(sourcePathList);
+    fileWatcher->addPaths(constraintPathList);
+}
+
+void TaskManager::addWatchFiles(const QStringList &filePath)
+{
+    fileWatcher->addPaths(filePath);
+}
+
+void TaskManager::removeWatchFiles() {
+    fileWatcher->removePaths(fileWatcher->files());
+}
+
+void TaskManager::removeWatchFile(const QString &filePath)
+{
+    fileWatcher->removePath(filePath);
 }
 
 TaskManager::TaskManager()
 {
     qDebug() << "[TaskManager] Constructing...";
+    fileWatcher = new QFileSystemWatcher(this);
+    connect(fileWatcher, &QFileSystemWatcher::fileChanged, this, &TaskManager::onFileChanged);
 }
 
 TaskManager::~TaskManager()
@@ -435,6 +466,11 @@ void TaskManager::buildBit(int mode) {
         script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%",topName);
         ProcessManager::instance().checkCall("Bitstream Generation", projectImplPath, QString::fromStdString(script),displayPartName);
     }
+}
+
+void TaskManager::onFileChanged() {
+    fileChanged = true;
+    qDebug("\033[43m[FileWatcher]\033[0m File Changed");
 }
 
 void TaskManager::downloadBit(const QString &projectImplPath1, const QString &topName1) {
