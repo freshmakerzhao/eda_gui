@@ -91,7 +91,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     // 设置整个表格为只读
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // 设置第一列的宽度为180
-    tableView->setColumnWidth(0, 180);
+    tableView->setColumnWidth(0, 190);
     // 获取表头视图
     // QHeaderView *header = tableView->horizontalHeader();
     // // 第一列设置为固定宽度
