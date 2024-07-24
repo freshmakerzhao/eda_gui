@@ -124,7 +124,8 @@ bool ProjectManager::openProject(const QString &hprPath)
         return false;
     }
     ProjectManager::instance().loadFiles(newOpenProject);
-    InfoWidget::instance()->initDesignRunsView();
+    InfoWidget::instance()->initDesignRunsView(newOpenProject->getParameter(Project::Path));
+    TaskManager::instance().setWatchFiles();
     return true;
 }
 
@@ -229,6 +230,9 @@ void ProjectManager::addSourcesInProject(const QStringList &src, const int &mode
     default:
         break;
     }
+
+    //! 添加文件监控
+    TaskManager::instance().addWatchFiles(src);
 }
 
 /**
@@ -250,6 +254,7 @@ bool ProjectManager::removeFileAction(const QString &path, const bool &erase)
 
     if (erase) {
         QFile::remove(path);
+        TaskManager::instance().removeWatchFile(path);
     }
 
     _project->writeProject();
@@ -280,6 +285,22 @@ QString ProjectManager::getParameter(const Project::ParamKey key) const
     }
     return _project->getParameter(key);
 }
+
+// QStringList ProjectManager::getDesignSrcs() const
+// {
+//     if (!_project) {
+//         return QStringList();
+//     }
+//     return _project->sourceList;
+// }
+
+// QStringList ProjectManager::getConstraints() const
+// {
+//     if (!_project) {
+//         return QStringList();
+//     }
+//     return _project->constraintList;
+// }
 
 void ProjectManager::closeProject()
 {
