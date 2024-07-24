@@ -1,5 +1,6 @@
 #include "InfoWidget.h"
 #include "LogWidget.h"
+#include "utils/json.hpp"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
@@ -14,7 +15,11 @@ void InfoWidget::setCurrentPage(int index) {
     tabWidget->setCurrentIndex(index);
 }
 
-void InfoWidget::updateSynthItem(const QString synthPath, const QString status, const QString startTime, const QString Elapsed , const QString partName){
+void InfoWidget::updateSynthItem(const QString synthPath,
+                                 const QString status,
+                                 const QString startTime,
+                                 const QString Elapsed,
+                                 const QString partName){
     initSummary("synth"); // 初始化数据
     // 解析资源使用报告
     QFile file(synthPath + "/synth_stat.json");
@@ -23,49 +28,59 @@ void InfoWidget::updateSynthItem(const QString synthPath, const QString status, 
     }
     QString jsonData = file.readAll();
     file.close();
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-    QJsonObject object = doc.object();
-    // 配置表格数据
-    // runsModel->setItem(0, 0, new QStandardItem(QString("synth")));
-    for (auto it = object.begin(); it != object.end(); ++it) {
-        if (it.key() == "$lut") {
-            lutNumSynth += it.value().toInt();
-        } else if (it.key() == "MUXF6") {
-            muxf6NumSynth += it.value().toInt();
-        } else if (it.key() == "FDRE_ZINI" || it.key() == "FDSE_ZINI" || it.key() == "FDCE_ZINI" || it.key() == "FDPE_ZINI") {
-            ffNumSynth += it.value().toInt();
-        } else if (it.key() == "FDRE_ZINI_1" || it.key() == "FDSE_ZINI_1" || it.key() == "FDCE_ZINI_1" || it.key() == "FDPE_ZINI_1") {
-            ffNumSynth += it.value().toInt();
-        } else if (it.key() == "FIFO18E1_VPR") {
-            fifo18NumSynth += it.value().toInt();
-        } else if (it.key() == "RAMB18E1_VPR") {
-            ranb18NumSynth += it.value().toInt();
-        } else if (it.key() == "RAMB36E1_PRIM") {
-            ranb36NumSynth += it.value().toInt();
-        } else if (it.key() == "DSP48E1_VPR") {
-            dspNumSynth += it.value().toInt();
-        } else if (it.key() == "CARRY4_VPR") {
-            carry4NumSynth += it.value().toInt();
+
+    nlohmann::json j = nlohmann::json::parse(jsonData.toStdString());
+    for (auto& [key, value] : j.items()) {
+        auto it = keyMapSynth.find(key);
+        if (it != keyMapSynth.end()) {
+            *(it->second) += value.get<int>();
         }
     }
+
     lut6NumSynth = lutNumSynth - muxf6NumSynth; // LUT6
     bramNumSynth = fifo18NumSynth + (ranb18NumSynth+1)/2 + ranb36NumSynth; // BRAM
 
-    runsModel->setItem(0, 1, new QStandardItem(status)); // Status
-    runsModel->setItem(0, 2, new QStandardItem(QString::number(lut6NumSynth))); // LUT6
-    runsModel->setItem(0, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
-    runsModel->setItem(0, 4, new QStandardItem(QString::number(bramNumSynth))); // BRAM
-    runsModel->setItem(0, 5, new QStandardItem(QString::number(dspNumSynth))); // dsp
-    runsModel->setItem(0, 6, new QStandardItem(QString::number(carry4NumSynth))); // carry4
-    runsModel->setItem(0, 7, new QStandardItem(startTime)); // 开始时间
-    runsModel->setItem(0, 8, new QStandardItem(Elapsed)); // 持续时间
-    runsModel->setItem(0, 9, new QStandardItem(partName)); // 封装名称
+    runsModel->item(0, 1)->setText(status); // Status
+    runsModel->item(0, 2)->setText(QString::number(lut6NumSynth)); // LUT6
+    runsModel->item(0, 3)->setText(QString::number(ffNumSynth)); // ff
+    runsModel->item(0, 4)->setText(QString::number(bramNumSynth)); // BRAM
+    runsModel->item(0, 5)->setText(QString::number(dspNumSynth)); // dsp
+    runsModel->item(0, 6)->setText(QString::number(carry4NumSynth)); // carry4
+    runsModel->item(0, 7)->setText(startTime); // 开始时间
+    runsModel->item(0, 8)->setText(Elapsed); // 持续时间
+    runsModel->item(0, 9)->setText(partName); // 封装名称
 
+    nlohmann::json outputJson;
+    outputJson["status"] = status.toStdString();
+    outputJson["LUT6"] = lut6NumSynth;
+    outputJson["ff"] = ffNumSynth;
+    outputJson["BRAM"] = bramNumSynth;
+    outputJson["dsp"] = dspNumSynth;
+    outputJson["carry4"] = carry4NumSynth;
+    outputJson["startTime"] = startTime.toStdString();
+    outputJson["Elapsed"] = Elapsed.toStdString();
+    outputJson["partName"] = partName.toStdString();
 
+    // Convert JSON object to QString
+    QString jsonString = QString::fromStdString(outputJson.dump(4));
+
+    // Write to gen_run.json file
+    QFile outFile(synthPath + "/gen_run.json");
+    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return;
+    }
+
+    QTextStream outStream(&outFile);
+    outStream << jsonString;
+    outFile.close();
     // Display_Synth_Usage
 }
 
-void InfoWidget::updateImplItem(const QString& implPath, const QString& status, const QString& startTime, const QString& Elapsed , const QString& partName){
+void InfoWidget::updateImplItem(const QString& implPath,
+                                const QString& status,
+                                const QString& startTime,
+                                const QString& Elapsed,
+                                const QString& partName){
     initSummary("impl"); // 初始化数据
     QFile file(implPath + "/pb_type_count.json");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -73,33 +88,56 @@ void InfoWidget::updateImplItem(const QString& implPath, const QString& status, 
     }
     QString jsonData = file.readAll();
     file.close();
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-    QJsonObject object = doc.object();
-    // 配置表格数据
-    // runsModel->setItem(1, 0, new QStandardItem(QString("impl")));
-    for (auto it = object.begin(); it != object.end(); ++it) {
-        if (it.key() == "BLK-TL-DSP48E1") {
-            dspNumImpl += it.value().toInt();
-        } else if (it.key() == "BLK-TL-BRAM_L") {
-            bramNumImpl += it.value().toInt();
+    nlohmann::json j = nlohmann::json::parse(jsonData.toStdString());
+
+    for (auto& [key, value] : j.items()) {
+        auto itImpl = keyMapImpl.find(key);
+        if (itImpl != keyMapImpl.end()) {
+            *(itImpl->second) += value.get<int>();
         }
     }
 
-    runsModel->setItem(1, 1, new QStandardItem(status)); // Status
-    runsModel->setItem(1, 2, new QStandardItem(QString::number(lut6NumSynth))); // LUT6
-    runsModel->setItem(1, 3, new QStandardItem(QString::number(ffNumSynth))); // ff
-    runsModel->setItem(1, 4, new QStandardItem(QString::number(bramNumImpl))); // BRAM
-    runsModel->setItem(1, 5, new QStandardItem(QString::number(dspNumImpl))); // dsp
-    runsModel->setItem(1, 6, new QStandardItem(QString::number(carry4NumSynth))); // carry
-    runsModel->setItem(1, 7, new QStandardItem(startTime)); // 开始时间
-    runsModel->setItem(1, 8, new QStandardItem(Elapsed)); // 持续时间
-    runsModel->setItem(1, 9, new QStandardItem(partName)); // 封装名称
+    qDebug() << "Impl:" << lut6NumSynth << ffNumSynth;
 
+    runsModel->item(1, 1)->setText(status); // Status
+    runsModel->item(1, 2)->setText(QString::number(lut6NumSynth)); // LUT6
+    runsModel->item(1, 3)->setText(QString::number(ffNumSynth)); // ff
+    runsModel->item(1, 4)->setText(QString::number(bramNumImpl)); // BRAM
+    runsModel->item(1, 5)->setText(QString::number(dspNumImpl)); // dsp
+    runsModel->item(1, 6)->setText(QString::number(carry4NumSynth)); // carry
+    runsModel->item(1, 7)->setText(startTime); // 开始时间
+    runsModel->item(1, 8)->setText(Elapsed); // 持续时间
+    runsModel->item(1, 9)->setText(partName); // 封装名称
 
+    nlohmann::json outputJson;
+    outputJson["status"] = status.toStdString();
+    outputJson["LUT6"] = lut6NumSynth;
+    outputJson["ff"] = ffNumSynth;
+    outputJson["BRAM"] = bramNumImpl;
+    outputJson["dsp"] = dspNumImpl;
+    outputJson["carry4"] = carry4NumSynth;
+    outputJson["startTime"] = startTime.toStdString();
+    outputJson["Elapsed"] = Elapsed.toStdString();
+    outputJson["partName"] = partName.toStdString();
+
+    // Convert JSON object to QString
+    QString jsonString = QString::fromStdString(outputJson.dump(4));
+
+    // Write to gen_run.json file
+    QFile outFile(implPath + "/gen_run.json");
+    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return;
+    }
+
+    QTextStream outStream(&outFile);
+    outStream << jsonString;
+    outFile.close();
 }
 
-void InfoWidget::initDesignRunsView()
+void InfoWidget::initDesignRunsView(const QString &prjPath)
 {
+    const QString synthPath = prjPath + "/runs/synth";
+    const QString implPath = prjPath + "/runs/impl";
     // 配置表格数据
     // ---------- synth ---------
     runsModel->setItem(0, 0, new QStandardItem(QString("synth")));
@@ -124,6 +162,37 @@ void InfoWidget::initDesignRunsView()
     runsModel->setItem(1, 8, new QStandardItem()); // 持续时间
     runsModel->setItem(1, 9, new QStandardItem()); // 封装名称
 
+    QFile synthInFile(synthPath + "/gen_run.json");
+    if (synthInFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QString jsonData = synthInFile.readAll();
+        synthInFile.close();
+        nlohmann::json j = nlohmann::json::parse(jsonData.toStdString());
+        runsModel->item(0, 1)->setText(QString::fromStdString(j.value("status", ""))); // Status
+        runsModel->item(0, 2)->setText(QString::number(j.value("LUT6", 0))); // LUT6
+        runsModel->item(0, 3)->setText(QString::number(j.value("ff", 0))); // ff
+        runsModel->item(0, 4)->setText(QString::number(j.value("BRAM", 0))); // BRAM
+        runsModel->item(0, 5)->setText(QString::number(j.value("dsp", 0))); // dsp
+        runsModel->item(0, 6)->setText(QString::number(j.value("carry4", 0))); // carry4
+        runsModel->item(0, 7)->setText(QString::fromStdString(j.value("startTime", ""))); // 开始时间
+        runsModel->item(0, 8)->setText(QString::fromStdString(j.value("Elapsed", ""))); // 持续时间
+        runsModel->item(0, 9)->setText(QString::fromStdString(j.value("partName", ""))); // 封装名称
+    }
+
+    QFile implInFile(implPath + "/gen_run.json");
+    if (implInFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QString jsonData = implInFile.readAll();
+        implInFile.close();
+        nlohmann::json j = nlohmann::json::parse(jsonData.toStdString());
+        runsModel->item(1, 1)->setText(QString::fromStdString(j.value("status", ""))); // Status
+        runsModel->item(1, 2)->setText(QString::number(j.value("LUT6", 0))); // LUT6
+        runsModel->item(1, 3)->setText(QString::number(j.value("ff", 0))); // ff
+        runsModel->item(1, 4)->setText(QString::number(j.value("BRAM", 0))); // BRAM
+        runsModel->item(1, 5)->setText(QString::number(j.value("dsp", 0))); // dsp
+        runsModel->item(1, 6)->setText(QString::number(j.value("carry4", 0))); // carry4
+        runsModel->item(1, 7)->setText(QString::fromStdString(j.value("startTime", ""))); // 开始时间
+        runsModel->item(1, 8)->setText(QString::fromStdString(j.value("Elapsed", ""))); // 持续时间
+        runsModel->item(1, 9)->setText(QString::fromStdString(j.value("partName", ""))); // 封装名称
+    }
 }
 
 InfoWidget::InfoWidget(QWidget *parent)
@@ -145,17 +214,17 @@ InfoWidget::InfoWidget(QWidget *parent)
     tabWidget->setTabEnabled(1, false);
     // =========================== Log =============================
     tabWidget->addTab(LogWidget::instance(),"Log");
-    tabWidget->setCurrentIndex(2);
     // ============================ Rpt ============================
     rpt = new QPlainTextEdit(this), rpt->setReadOnly(true);
     tabWidget->addTab(rpt, "Reports");
     tabWidget->setTabEnabled(3, false);
     // ======================== Design Runs ========================
     runsView = new QTreeView(this);
-    runsView->setStyleSheet("QTreeView { border: 1px solid #999; }"
-                            "QTreeView::item { border-bottom: 1px solid #999; border-right: 1px solid #999;}"
+    runsView->setStyleSheet("QTreeView { border: 1px solid #DCDCDC; }"
+                            "QTreeView::item { border-bottom: 1px solid #DCDCDC; border-right: 1px solid #DCDCDC;}"
                             "QTreeView::item:selected { background-color: #4f7cce; }");
     tabWidget->addTab(runsView, "Design Runs");
+    tabWidget->setCurrentIndex(4);
     runsModel = new QStandardItemModel(runsView);
     QStringList headers = {"Name",
                            "Status",
@@ -168,10 +237,14 @@ InfoWidget::InfoWidget(QWidget *parent)
                            "Elapsed",
                            "Part"};
     runsModel->setHorizontalHeaderLabels(headers);
+    // runsView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     initDesignRunsView();
     runsView->setModel(runsModel);
     runsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     runsView->expandAll();
+    runsView->setColumnWidth(1, 240);
+    runsView->setColumnWidth(7, 200);
+    runsView->setColumnWidth(9, 200);
 }
 
 InfoWidget::~InfoWidget()
