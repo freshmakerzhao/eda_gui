@@ -173,7 +173,7 @@ void ProjectManager::loadFiles(Project *project)
         // 运行新进程，在新进程加载工程
         QString hprPath = QString("%1/%2.hpr").arg(project->getParameter(Project::Path), project->getParameter(Project::Name));
         ProjectManager::instance().startProcess(hprPath);
-        // delete project;
+        // delete project; // 待解决
         return;
     }
 
