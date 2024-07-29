@@ -24,6 +24,7 @@
 #include "ipmanager/IPManager.h"
 #include "widgets/PrjSummary.h"
 #include "dialog/AdvancedFileDialog.h"
+#include "base/TreeViewBase.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -49,6 +50,7 @@ void MainWindow::updateActionState()
 void MainWindow::createEditorTab(const QString& path)
 {
     EditorManager::instance()->createEditorTab(path);
+    EditWidget->toggleView(true);
     setCurrentDock(0);
 }
 
@@ -142,6 +144,7 @@ void MainWindow::showIPCatalog()
 void MainWindow::showPrjSummary()
 {
     DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
+    // PrjSummaryWidget->toggleView(true);
     PrjSummaryWidget->show();
 }
 
@@ -272,6 +275,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent)
 {
+    ads::CDockManager::setConfigFlag(ads::CDockManager::DockAreaHasTabsMenuButton, false);
     qDebug() << "[MainWindow] Constructing...";
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("HybrdLink");
@@ -280,11 +284,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->resize(1700, 960);
     // =================== MENUBAR ====================
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
-    fileMenu = menuBar->addMenu("File");
-    editMenu = menuBar->addMenu("Edit");
-    viewMenu = menuBar->addMenu("View");
-    windowMenu = menuBar->addMenu("Window");
-    helpMenu = menuBar->addMenu("Help");
+    fileMenu = menuBar->addMenu("&File");
+    editMenu = menuBar->addMenu("&Edit");
+    viewMenu = menuBar->addMenu("&View");
+    windowMenu = menuBar->addMenu("&Window");
+    helpMenu = menuBar->addMenu("&Help");
     // ===================== FILE ======================
     newAction = new QAction(QIcon(":icons/resource/icons/35-icon_new_project_2.png"),"New", this), newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     openAction = new QAction("Open Project", this), openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
@@ -398,10 +402,10 @@ MainWindow::MainWindow(QWidget *parent)
     ManagerDock->setWidget(DockManager);
 
     SourcesWidget = new ads::CDockWidget("Sources", DockManager);
-//    SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
+    // SourcesWidget->setFeature(ads::CDockWidget::NoTab, true);
     DockManager->addDockWidget(ads::LeftDockWidgetArea, SourcesWidget);
-    // SourcesWidget->setWidget(Navigator::instance());
-    SourcesWidget->setWidget(FileManager::instance());
+    // SourcesWidget->setWidget(FileManager::instance());
+    SourcesWidget->setWidget(new TreeViewBase(FileManager::instance()));
 
 //    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
 //    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget,SourcesWidget->dockAreaWidget());
@@ -435,6 +439,9 @@ MainWindow::MainWindow(QWidget *parent)
     // PrjSummaryWidget->hide();
     DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
     PrjSummaryWidget->setWidget(PrjSummary::instance());
+
+    PrjSummaryWidget->setMinimumSize(770, 10);
+    SourcesWidget->setMinimumSize(40, 10);
 }
 
 MainWindow::~MainWindow()

@@ -1,6 +1,15 @@
 #ifndef FONTSUTILITIES_H
 #define FONTSUTILITIES_H
 
+/**
+  ******************************************************************************
+  * @file           : FontsUtilities.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/6/24
+  ******************************************************************************
+  */
 #include <QFontDatabase>
 #include <QRegularExpression>
 #include <QDir>

@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
 
     QSplashScreen splash(pix.scaled(640, 640, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     splash.show();
+    splash.showMessage("Loading...");
     a.processEvents();
     splash.finish(MainWindow::instance()); // 启动画面结束
     MainWindow::instance()->setCentralWidget(Form::instance());
