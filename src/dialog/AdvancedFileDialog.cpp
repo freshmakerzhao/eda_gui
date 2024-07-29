@@ -9,6 +9,8 @@ AdvancedFileDialog::AdvancedFileDialog(QWidget *parent) :
     toolBar(new QToolBar(this))
 {
     resize(1350, 600);
+    setOption(QFileDialog::DontUseNativeDialog, true);
+    setViewMode(QFileDialog::List);
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -25,16 +27,18 @@ AdvancedFileDialog::AdvancedFileDialog(QWidget *parent) :
 
     QHBoxLayout *hLayout = new QHBoxLayout;
 
-    QSplitter *splitter = new QSplitter(Qt::Horizontal);
     // Add the custom widget to the QFileDialog
-    setOption(QFileDialog::DontUseNativeDialog, true);
-    setViewMode(QFileDialog::List);
+    // 此对话框存在两个ListView，不能找错
     QGridLayout *gridLayout = qobject_cast<QGridLayout *>(this->layout());
+    QSplitter *pSplitter =  this->findChild<QSplitter *>();
+    QListView *listView = pSplitter->findChild<QListView *>();
+    listView->setParent(nullptr);
+
     // 调整布局
-    QListView *listView = this->findChild<QListView *>();
-    gridLayout->removeWidget(listView);
     QStackedWidget *stackedWidget = this->findChild<QStackedWidget *>("stackedWidget");
     gridLayout->removeWidget(stackedWidget);
+
+    QSplitter *splitter = new QSplitter(Qt::Horizontal);
     splitter->addWidget(listView);
     splitter->addWidget(stackedWidget);
     hLayout->addWidget(splitter);

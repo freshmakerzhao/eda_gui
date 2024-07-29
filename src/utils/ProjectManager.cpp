@@ -101,6 +101,20 @@ bool ProjectManager::startProcess(const QString &hprPath)
  */
 bool ProjectManager::openProject(const QString &hprPath)
 {
+    // // QProgressDialog *progressDialog = new QProgressDialog;
+    // progressDialog->setFixedSize(600, 60);
+    // progressDialog->setLabelText("Processing...");
+    // progressDialog->setCancelButton(nullptr); // 没有取消按钮
+    // progressDialog->setMinimum(0);
+    // progressDialog->setMaximum(0); // 无明确终点
+    // // progressDialog->setWindowModality(Qt::WindowModal); // 设置窗口模态
+    // progressDialog->setWindowModality(Qt::ApplicationModal); // 设置为应用模态
+    // progressDialog->show();
+    // // QTimer::singleShot(3000, progressDialog, &QProgressDialog::close); // 3秒后关闭对话框
+    // QTimer::singleShot(3000, progressDialog, &QProgressDialog::accept);
+    // progressDialog->exec();
+
+
     std::vector<XmlRecent> recentLists = {
         {0, hprPath.toStdString()}
     };
@@ -332,11 +346,17 @@ void ProjectManager::closeProject()
     InfoWidget::instance()->initDesignRunsView();
 }
 
-ProjectManager::ProjectManager() {}
+ProjectManager::ProjectManager()
+{
+    // progressDialog = new QProgressDialog;
+    // progressDialog->close();
+}
 
 ProjectManager::~ProjectManager()
 {
     if (_project) {
         delete _project;
     }
+
+    // progressDialog->deleteLater();
 }

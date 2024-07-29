@@ -1,7 +1,16 @@
 #ifndef LICENSEDIALOG_H
 #define LICENSEDIALOG_H
 
-#include <QtWidgets>
+#include <QDialog>
+#include <QFileDialog>
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QLabel>
+#include <QFile>
+#include <QFileInfo>
+#include <QStandardPaths>
+#include <QFormLayout>
+#include <QDebug>
 
 class LicenseDialog : public QDialog
 {
