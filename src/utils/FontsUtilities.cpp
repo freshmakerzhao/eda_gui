@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : FontsUtilities.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/6/24
+  ******************************************************************************
+  */
 #include "FontsUtilities.h"
 
 FontsUtilities &FontsUtilities::instance()
