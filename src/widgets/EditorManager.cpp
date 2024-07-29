@@ -226,6 +226,35 @@ void EditorManager::onTabWidgetTabCloseRequested(int index)
     MainWindow::instance()->updateActionState();
 }
 
+void EditorManager::paintEvent(QPaintEvent *event) {
+    QTabWidget::paintEvent(event);
+
+    // 如果没有标签页，则绘制自定义文本或图像
+    if (this->count() == 0) {
+        QPainter painter(this);
+        painter.fillRect(this->rect(), QColor(128, 128, 128)); // 深灰色背景
+
+        QString message = "HybrdLink";
+
+        // 设置字体等属性
+        QFont font(this->font());
+        font.setPointSize(50); // 设置字体大小
+        font.setWeight(QFont::ExtraBold);
+        painter.setFont(font);
+        painter.setPen(QColor(255, 255, 255));
+
+        // 计算文本的绘制位置
+        QRect rect = this->rect();
+        painter.drawText(rect, Qt::AlignCenter, message);
+
+        // 如果需要绘制图片，可以使用以下代码
+        // QPixmap logo(":/resource/logo.png");
+        // QSize size = logo.size();
+        // QPoint center((rect.width() - size.width()) / 2, (rect.height() - size.height()) / 2);
+        // painter.drawPixmap(center, logo);
+    }
+}
+
 EditorManager::EditorManager(QWidget *parent)
     : QTabWidget(parent)
 {

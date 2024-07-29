@@ -18,6 +18,7 @@
 #include <QKeyEvent>
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
+#include <QSortFilterProxyModel>
 #include <QFileInfo>
 #include <QDir>
 

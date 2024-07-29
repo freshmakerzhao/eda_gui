@@ -12,6 +12,7 @@
 #include "mainwindow.h"
 #include "utils/ProjectManager.h"
 #include "dialog/RemoveFileDialog.h"
+#include <QLineEdit>
 
 FileManager *FileManager::instance(QWidget *parent)
 {
@@ -195,8 +196,6 @@ FileManager::FileManager(QWidget *parent) : QTreeView(parent)
     constraints = new QStandardItem("Constraints");
     model->setItem(0, 0, designsources);
     model->setItem(1, 0, constraints);
-
-    expandAll();
 }
 
 FileManager::~FileManager()
