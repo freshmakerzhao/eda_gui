@@ -11,6 +11,8 @@
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
 
+#include <QProgressDialog>
+#include <QTimer>
 #include <QProcess>
 #include <QCoreApplication>
 #include <QDebug>
@@ -97,6 +99,10 @@ public:
 
     QString getParameter(const Project::ParamKey key) const;
 
+    // QStringList getDesignSrcs() const;
+
+    // QStringList getConstraints() const;
+
 public slots:
     void closeProject();
 
@@ -107,6 +113,8 @@ private:
 
     //! 指向当前打开的工程
     Project *_project = nullptr;
+
+    // QProgressDialog *progressDialog;
 };
 
 #endif // PROJECTMANAGER_H

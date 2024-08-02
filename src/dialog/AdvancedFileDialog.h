@@ -19,6 +19,7 @@
 #include <QSplitter>
 #include <QToolBar>
 #include <QListView>
+#include <QTreeView>
 #include <QDebug>
 
 class AdvancedFileDialog : public QFileDialog {

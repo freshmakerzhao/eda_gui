@@ -11,8 +11,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     treeWidget = new QTreeWidget(this);
     treeWidget->setFixedWidth(300);
     treeWidget->setHeaderLabel("Project Settings");
-    QTreeWidgetItem *generalitem = new QTreeWidgetItem;
-    generalitem->setText(0, "General");
+    QTreeWidgetItem *generalitem = new QTreeWidgetItem(QStringList() << "General");
     QList<QTreeWidgetItem *> settingsItemslist;
     settingsItemslist.append(generalitem);
     treeWidget->addTopLevelItems(settingsItemslist);
