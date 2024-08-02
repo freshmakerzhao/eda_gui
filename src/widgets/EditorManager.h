@@ -11,6 +11,8 @@
 #define EDITORMANAGER_H
 
 #include <QTabWidget>
+#include <QPainter>
+#include <QPainterPath>
 #include "Editor.h"
 
 class EditorManager : public QTabWidget
@@ -66,6 +68,9 @@ private slots:
     void onTabWidgetCurrentChanged(int index);
 
     void onTabWidgetTabCloseRequested(int index);
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
 
 private:
     EditorManager(QWidget *parent = nullptr);

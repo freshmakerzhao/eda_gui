@@ -3,9 +3,10 @@
 
 #include <QTreeWidget>
 #include <QDebug>
-#include <QMessageBox>
+#include <QFileSystemWatcher>
 #include "utils/ProjectManager.h"
 #include "settings/SettingsDialog.h"
+#include "dialog/CustomMessageBox.h"
 
 class TaskManager : public QObject
 {
@@ -38,6 +39,15 @@ public:
      * 关闭工程清除参数
     */
     void cleanParams();
+
+    //! 设置需要监控的文件列表
+    void setWatchFiles();
+    //! 添加需要监控的文件
+    void addWatchFiles(const QStringList &filePath);
+    //! 移除受监控的文件列表
+    void removeWatchFiles();
+    //! 移除受监控的文件
+    void removeWatchFile(const QString &filePath);
 
 //    QStringList sourceList;
     // 存储设计与约束文件
@@ -88,6 +98,12 @@ private:
     void buildBit(int mode);
 
     // SettingsDialog *settingDialog = nullptr;
+
+    QFileSystemWatcher *fileWatcher;
+
+    bool fileChanged = false;
+    //! 设计文件被修改的flag
+    void onFileChanged();
 
 public:
     void downloadBit(const QString &projectImplPath1, const QString &topName1);

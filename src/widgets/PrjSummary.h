@@ -13,6 +13,8 @@
 
 #include <QDebug>
 #include <QWidget>
+#include <QLabel>
+#include <QPushButton>
 #include "utils/Project.h"
 
 class PrjSummary : public QWidget
@@ -31,7 +33,7 @@ private:
 
     void init();
 
-    int rightlabelWidth = 185;
+    int rightlabelWidth = 265;
     int leftLabelWidth = 140;
     int rowHeight = 30;
     QLabel *settingsPrjName = new QLabel("NA");

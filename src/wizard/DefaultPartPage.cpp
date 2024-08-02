@@ -175,6 +175,6 @@ void DefaultPartPage::selectPart(const QModelIndex &index) {
         qDebug() << "[DefaultPartPage] wizard param: "<< wizard->part << wizard->archName << wizard->arch << wizard->familyName << wizard->displayPart;
     }
 
-    completeChanged();
+    emit completeChanged();
 }
 
