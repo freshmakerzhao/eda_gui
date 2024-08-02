@@ -220,9 +220,6 @@ InfoWidget::InfoWidget(QWidget *parent)
     tabWidget->setTabEnabled(3, false);
     // ======================== Design Runs ========================
     runsView = new QTreeView(this);
-    runsView->setStyleSheet("QTreeView { border: 1px solid #DCDCDC; }"
-                            "QTreeView::item { border-bottom: 1px solid #DCDCDC; border-right: 1px solid #DCDCDC;}"
-                            "QTreeView::item:selected { background-color: #4f7cce; }");
     tabWidget->addTab(runsView, "Design Runs");
     tabWidget->setCurrentIndex(4);
     runsModel = new QStandardItemModel(runsView);

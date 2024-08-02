@@ -377,27 +377,48 @@ CDockAreaTabBar* CDockAreaTitleBar::tabBar() const
 	return d->TabBar;
 }
 
+
+//============================================================================
+void CDockAreaTitleBar::resizeEvent(QResizeEvent *event)
+{
+	Super::resizeEvent(event);
+	if (CDockManager::testConfigFlag(CDockManager::DockAreaDynamicTabsMenuButtonVisibility)
+	 && CDockManager::testConfigFlag(CDockManager::DisableTabTextEliding))
+	{
+		markTabsMenuOutdated();
+	}
+}
+
+
 //============================================================================
 void CDockAreaTitleBar::markTabsMenuOutdated()
 {
-	if(DockAreaTitleBarPrivate::testConfigFlag(CDockManager::DockAreaDynamicTabsMenuButtonVisibility))
+	if (CDockManager::testConfigFlag(CDockManager::DockAreaDynamicTabsMenuButtonVisibility))
 	{
-		bool hasElidedTabTitle = false;
-		for (int i = 0; i < d->TabBar->count(); ++i)
+		bool TabsMenuButtonVisible = false;
+		if (CDockManager::testConfigFlag(CDockManager::DisableTabTextEliding))
 		{
-			if (!d->TabBar->isTabOpen(i))
-			{
-				continue;
-			}
-			CDockWidgetTab* Tab = d->TabBar->tab(i);
-			if(Tab->isTitleElided())
-			{
-				hasElidedTabTitle = true;
-				break;
-			}
+			TabsMenuButtonVisible = d->TabBar->areTabsOverflowing();
 		}
-		bool visible = (hasElidedTabTitle && (d->TabBar->count() > 1));
-		QMetaObject::invokeMethod(d->TabsMenuButton, "setVisible", Qt::QueuedConnection, Q_ARG(bool, visible));
+		else
+		{
+			bool hasElidedTabTitle = false;
+			for (int i = 0; i < d->TabBar->count(); ++i)
+			{
+				if (!d->TabBar->isTabOpen(i))
+				{
+					continue;
+				}
+				CDockWidgetTab* Tab = d->TabBar->tab(i);
+				if(Tab->isTitleElided())
+				{
+					hasElidedTabTitle = true;
+					break;
+				}
+			}
+			TabsMenuButtonVisible = (hasElidedTabTitle && (d->TabBar->count() > 1));
+		}
+		QMetaObject::invokeMethod(d->TabsMenuButton, "setVisible", Qt::QueuedConnection, Q_ARG(bool, TabsMenuButtonVisible));
 	}
 	d->MenuOutdated = true;
 }

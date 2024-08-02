@@ -82,7 +82,7 @@ Editor::~Editor()
     delete apis;
 }
 
-bool Editor::openFile(const QString path)
+bool Editor::openFile(const QString &path)
 {
     _path = path;
     QFile file(path);
@@ -157,7 +157,7 @@ bool Editor::saveFile()
 
 bool Editor::saveAsFile()
 {
-    QFileDialog dialog(this);
+    AdvancedFileDialog dialog(this);
     dialog.setWindowTitle("Save As");
 
     QFileInfo fileInfo(_path);

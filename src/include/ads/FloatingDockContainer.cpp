@@ -1331,7 +1331,8 @@ void CFloatingDockContainer::onMaximizeRequest()
 //============================================================================
 void CFloatingDockContainer::showNormal(bool fixGeometry)
 {
-	if (windowState() == Qt::WindowMaximized)
+    if ( (windowState() & Qt::WindowMaximized) != 0 ||
+         (windowState() & Qt::WindowFullScreen) != 0)
 	{
 		QRect oldNormal = normalGeometry();
 		Super::showNormal();

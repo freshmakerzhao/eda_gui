@@ -23,13 +23,6 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     tableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-    // // 设置表头可以滚动
-    // tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    // // 根据内容自动调整列宽
-    // tableView->resizeColumnsToContents();
-    // // 为列设置初始宽度，但仍然允许用户调整列宽
-    // tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-
     QStandardItemModel *model = new QStandardItemModel(0, 8, this);
     tableView->setModel(model);
     QStringList headers = {"Part", "I/O Pin Count", "Available IOBs", "LUT Elements", "FlipFlops" , "Block RAMs" , "DSPs" , "PCIe"};
@@ -90,16 +83,8 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 
     // 设置整个表格为只读
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // 设置第一列的宽度为180
-    tableView->setColumnWidth(0, 190);
-    // 获取表头视图
-    // QHeaderView *header = tableView->horizontalHeader();
-    // // 第一列设置为固定宽度
-    // header->setSectionResizeMode(0, QHeaderView::Fixed);
-    // // 其他列设置为自动分配剩余空间
-    // for (int i = 1; i < model->columnCount(); ++i) {
-    //     header->setSectionResizeMode(i, QHeaderView::Stretch);
-    // }
+    // 设置第一列的宽度为190
+    // tableView->setColumnWidth(0, 190);
 
     // 设置宽度自适应
 //    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -117,20 +102,53 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
     proxyModel->setSourceModel(model);
     tableView->setModel(proxyModel);
-    QLineEdit *lineEdit = new QLineEdit(this);
+    lineEdit = new QLineEdit(this);
     lineEdit->setClearButtonEnabled(true);
     lineEdit->setFixedSize(220, 30);
-    connect(lineEdit, &QLineEdit::textChanged, [proxyModel](const QString &text){
-        proxyModel->setFilterFixedString(text);
+
+    matchesLabel = new QLabel(this);
+
+    connect(lineEdit, &QLineEdit::textChanged, [proxyModel, this](const QString &text){
+        proxyModel->setFilterRegExp(QRegExp(text, Qt::CaseInsensitive, QRegExp::Wildcard));
+        QModelIndex rootIndex = QModelIndex();
+        int rowCount = proxyModel->rowCount(rootIndex);
+        if (lineEdit->text().isEmpty()) {
+            matchesLabel->setText("");
+        } else {
+            matchesLabel->setText(QString("Matches: %1").arg(rowCount));
+        }
     });
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
+
+    QHBoxLayout *hBoxLayout = new QHBoxLayout;
+    hBoxLayout->setMargin(0);
+    hBoxLayout->addWidget(lineEdit);
+    hBoxLayout->addWidget(matchesLabel);
+
     QFormLayout *formLayout = new QFormLayout;
-    formLayout->addRow("Search:", lineEdit);
+    formLayout->addRow("Search:", hBoxLayout);
     layout->addLayout(formLayout);
 
     layout->addWidget(tableView);
+
+    // Auto resize columns to fit content initially
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    // Store the widths of the columns
+    QVector<int> columnWidths;
+    for (int col = 0; col < model->columnCount(); ++col) {
+        columnWidths.append(tableView->columnWidth(col) + 20);
+    }
+
+    // Set the mode to Interactive to allow manual resizing after automatic adjustment
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+    // Set the widths back to the original sizes
+    for (int col = 0; col < model->columnCount(); ++col) {
+        tableView->setColumnWidth(col, columnWidths.at(col));
+    }
 }
 
 bool DefaultPartPage::isComplete() const

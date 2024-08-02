@@ -25,6 +25,11 @@ ProjectManager &ProjectManager::instance()
     return instance;
 }
 
+bool ProjectManager::hasProjectOpen()
+{
+    return _project == nullptr;
+}
+
 /**
  * 创建一个新的HybrdLink工程
  * @param name
@@ -348,8 +353,7 @@ void ProjectManager::closeProject()
 
 ProjectManager::ProjectManager()
 {
-    // progressDialog = new QProgressDialog;
-    // progressDialog->close();
+
 }
 
 ProjectManager::~ProjectManager()
