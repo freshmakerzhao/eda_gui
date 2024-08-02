@@ -43,9 +43,6 @@ void IPManager::init()
     treeView->setColumnWidth(0, 360);
     treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // treeView->setAlternatingRowColors(free); // 交替显示
-    treeView->setStyleSheet("QTreeView { border: 1px solid #999; }"
-                            "QTreeView::item { border-bottom: 1px solid #999; border-right: 1px solid #999;}"
-                            "QTreeView::item:selected { background-color: #4f7cce; }");
 
     connect(expandAllAction, &QAction::triggered, [this]() {
         treeView->expandAll();

@@ -75,8 +75,6 @@ private:
 
     QString formatDateTime(const QDateTime &dateTime);
 
-    QLabel *metadataLabel;
-
     QTextEdit *metadataEdit;
 
     QMap<QString, QString> suffixToDescription{
