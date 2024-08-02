@@ -13,7 +13,6 @@
 
 #include <QWidget>
 #include <QDebug>
-#include <QFileDialog>
 #include <QTextStream>
 #include <QMenu>
 #include <QContextMenuEvent>
@@ -26,6 +25,8 @@
 // #include <qscilexervhdl.h>      // VHDL词法分析器(未启用)
 #include <qscilexertcl.h>
 
+#include "dialog/AdvancedFileDialog.h"
+
 class Editor : public QsciScintilla
 {
     Q_OBJECT
@@ -34,7 +35,7 @@ public:
     ~Editor();
 
 public:
-    bool openFile(const QString path);
+    bool openFile(const QString &path);
     bool saveFile();
     bool saveAsFile();
 

@@ -60,3 +60,31 @@ QDialogButtonBox > QPushButton[text='Cancel']:hover {
     background-color: rgb(237, 237, 237);
     border: 1px solid black;
 }
+
+/*-------------------QListView, QListWidget,QTreeView, QTreeWidget -------------------*/
+.QTreeView, .QTableView {
+    border: 1px solid #DCDCDC;
+}
+
+.QTreeView::item, .QTableView::item {
+    border-bottom: 1px solid #DCDCDC;
+    border-right: 1px solid #DCDCDC;
+}
+
+.QTreeView::item:selected, .QTableView::item:selected {
+    background-color: #4f7cce;
+}
+/*
+.QTableView {
+    border: 1px solid #DCDCDC;
+}
+
+.QTableView::item {
+    border-bottom: 1px solid #DCDCDC;
+    border-right: 1px solid #DCDCDC;
+}
+
+.QTableView::item:selected {
+    background-color: #4f7cce;
+}
+*/

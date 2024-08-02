@@ -135,14 +135,16 @@ void MainWindow::setRecentMenu() {
 
 void MainWindow::showIPCatalog()
 {
-    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
-    IPManagerWidget->show();
+    // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
+    IPManagerWidget->toggleView(true);
+    // IPManagerWidget->show();
 }
 
 void MainWindow::showPrjSummary()
 {
-    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
-    PrjSummaryWidget->show();
+    // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
+    PrjSummaryWidget->toggleView(true);
+    // PrjSummaryWidget->show();
 }
 
 void MainWindow::setCurrentDock(const int &type)
@@ -427,8 +429,9 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(EditWidget->toggleViewAction());
 
     IPManagerWidget = new ads::CDockWidget("IP Catalog", DockManager);
-    IPManagerWidget->hide();
-    // DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
+    // IPManagerWidget->hide();
+    DockManager->addDockWidgetTab(ads::RightDockWidgetArea, IPManagerWidget);
+    IPManagerWidget->toggleView(false);
     IPManagerWidget->setWidget(IPManager::instance());
 
     PrjSummaryWidget = new ads::CDockWidget("Project Summary", DockManager);

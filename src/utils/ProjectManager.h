@@ -22,6 +22,8 @@ class ProjectManager :  public QObject
 public:
     static ProjectManager& instance();
 
+    bool hasProjectOpen();
+
     /**
      * 创建一个新的HybrdLink工程
      * @param name

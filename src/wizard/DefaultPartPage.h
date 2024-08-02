@@ -12,6 +12,7 @@
 #define DEFAULTPARTPAGE_H
 
 #include "Wizard.h"
+#include <QRegExp>
 
 class DefaultPartPage :  public QWizardPage
 {
@@ -25,6 +26,8 @@ protected:
 private:
     QTableView *tableView;
     QString partFile = ":/resource/parts_hybrdchip_for_display.yaml";
+    QLineEdit *lineEdit;
+    QLabel *matchesLabel;
 private slots:
     void selectPart(const QModelIndex &index);
 
