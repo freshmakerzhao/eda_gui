@@ -4,7 +4,6 @@
 
 AdvancedFileDialog::AdvancedFileDialog(QWidget *parent) :
     QFileDialog(parent),
-    metadataLabel(new QLabel("<b>Information</b>", this)),
     metadataEdit(new QTextEdit(promptText, this)),
     toolBar(new QToolBar(this))
 {
@@ -14,7 +13,6 @@ AdvancedFileDialog::AdvancedFileDialog(QWidget *parent) :
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
-    layout->addWidget(metadataLabel);
 
     metadataEdit->setReadOnly(true);
     metadataEdit->setWordWrapMode(QTextOption::NoWrap);
@@ -105,7 +103,9 @@ QString AdvancedFileDialog::getOpenFileName(QWidget *parent,
     AdvancedFileDialog dialog(parent);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setWindowTitle(caption);
-    dialog.setDirectory(dir);
+    if (!dir.isEmpty()) {
+        dialog.setDirectory(dir);
+    }
     dialog.setNameFilter(filter);
     if (selectedFilter != nullptr) {
         dialog.selectNameFilter(*selectedFilter);  // 设置初始选择的文件类型过滤器
@@ -127,7 +127,9 @@ QStringList AdvancedFileDialog::getOpenFileNames(QWidget *parent,
     AdvancedFileDialog dialog(parent);
     dialog.setFileMode(QFileDialog::ExistingFiles);
     dialog.setWindowTitle(caption);
-    dialog.setDirectory(dir);
+    if (!dir.isEmpty()) {
+        dialog.setDirectory(dir);
+    }
     dialog.setNameFilter(filter);
     dialog.setOptions(options);
     if (dialog.exec() == QDialog::Accepted) {
@@ -145,7 +147,9 @@ QString AdvancedFileDialog::getSaveFileName(QWidget *parent,
 {
     AdvancedFileDialog dialog(parent);
     dialog.setWindowTitle(caption);
-    dialog.setDirectory(dir);
+    if (!dir.isEmpty()) {
+        dialog.setDirectory(dir);
+    }
     dialog.setNameFilter(filter);
     dialog.setOptions(options);
 
@@ -171,7 +175,9 @@ QString AdvancedFileDialog::getExistingDirectory(QWidget *parent,
     AdvancedFileDialog dialog(parent);
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setWindowTitle(caption);
-    dialog.setDirectory(dir);
+    if (!dir.isEmpty()) {
+        dialog.setDirectory(dir);
+    }
     dialog.setOptions(options);
     if (dialog.exec() == QDialog::Accepted) {
         return dialog.selectedFiles().at(0);
