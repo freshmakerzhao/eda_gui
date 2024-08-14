@@ -51,7 +51,7 @@ private:
     int _width = 16; // 字符宽度
     QsciLexerVerilog *verilogLexer;
     QsciLexerTCL *tclLexer;
-    QsciAPIs *apis;
+    QsciAPIs *apis = nullptr;
     QString _path;
 };
 

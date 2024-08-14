@@ -37,7 +37,7 @@ void EditorManager::createEditorTab(const QString &path)
     editor->setProperty("filePath", path);
     if (!editor->openFile(path)) {
         CustomMessageBox::showError(MainWindow::instance(), "Failed", "Cannot open File.");
-        delete editor;
+        editor->deleteLater();
         return;
     }
     this->addTab(editor, QFileInfo(path).fileName()); // 添加tab

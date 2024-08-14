@@ -79,7 +79,9 @@ Editor::Editor(QWidget *parent)
 Editor::~Editor()
 {
     qDebug() << "[Editor] Distructing...";
-    delete apis;
+    if (apis)  {
+        apis->deleteLater();
+    }
 }
 
 bool Editor::openFile(const QString &path)
@@ -91,7 +93,6 @@ bool Editor::openFile(const QString &path)
         return false;
     }
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "Warning", "Cannot open file:\n" + file.errorString());
         return false;
     }
     if (fileInfo.suffix() == "v") {

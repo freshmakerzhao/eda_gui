@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
         fontName = a.font().family();
     }
     QFont font(fontName, 9);
+    font.setHintingPreference(QFont::PreferNoHinting); // 修复中文笔画粘连
     a.setFont(font);
     QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
 

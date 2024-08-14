@@ -66,6 +66,12 @@ private:
     //! download bit
     QTreeWidgetItem *proDownloadBitItem;
 
+    // QTreeWidgetItem *downFlashItem;
+
+    // QTreeWidgetItem *readBackRegItem;
+
+    // QTreeWidgetItem *readBackMemoryItem;
+
 signals:
 };
 

@@ -6,9 +6,9 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 是否需要检查 MAC 地址 ，默认需要
-option(ENABLE_MAC_CHECK "Enable MAC address check" ON)
-# 是否需要检查 软件有效期 ，默认关闭
+# 是否需要检查 MAC 地址
+option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
+# 是否需要检查 软件有效期
 option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" ON)
 
 if (ENABLE_MAC_CHECK)
@@ -140,6 +140,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     Qt5::Core
     Qt5::Network
+    # HybrdLinkPlugin # qscintilla2_qt5
     qscintilla2_qt5
     libyaml-cpp.a
     qtadvanceddocking
