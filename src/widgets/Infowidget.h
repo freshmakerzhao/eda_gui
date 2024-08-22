@@ -11,7 +11,7 @@
 #include <QHeaderView>
 #include <QStandardItemModel>
 #include <QDebug>
-
+#include "component/tclconsole/TclConsole.h"
 
 class InfoWidget : public QWidget
 {
@@ -41,7 +41,9 @@ private:
     InfoWidget(QWidget *parent = nullptr);
     ~InfoWidget();
 
-    QPlainTextEdit *csl;
+    // QPlainTextEdit *csl;
+    TclConsole *tclConsole;
+
     QPlainTextEdit *msg;
     QPlainTextEdit *log;
     QPlainTextEdit *rpt;

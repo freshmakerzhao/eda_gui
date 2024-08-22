@@ -2,7 +2,7 @@
 #include "utils/HardWareManager.h"
 #include "dialog/AdvancedFileDialog.h"
 
-ProgramDeviceDialog::ProgramDeviceDialog(QWidget *parent)
+ProgramDeviceDialog::ProgramDeviceDialog(QWidget *parent, const int &mode)
 {
     setFixedWidth(650);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

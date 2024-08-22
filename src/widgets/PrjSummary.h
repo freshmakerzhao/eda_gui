@@ -34,7 +34,7 @@ private:
     void init();
 
     int rightlabelWidth = 265;
-    int leftLabelWidth = 140;
+    int leftLabelWidth = 160;
     int rowHeight = 30;
     QLabel *settingsPrjName = new QLabel("NA");
     QLabel *settingsPrjLocation = new QLabel("NA");

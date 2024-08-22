@@ -34,6 +34,8 @@ public:
     std::string generateDownloadBitCommands(const QString& projectImplPath, const QString& partName, const QString& topName = "top");
     std::string generateDownloadFlashCommands(const QString& projectImplPath, const QString& partName, const QString& topName = "top");
 
+    std::string generateReadBackRegisterCommands(const QString &partName, const QString &registerAddress);
+    std::string generateReadMemoryCommands(const QString &partName, const QString &rbdFilePath);
 private:
     CommandBuilder();
     ~CommandBuilder();
