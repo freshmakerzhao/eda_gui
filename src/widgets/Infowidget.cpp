@@ -205,9 +205,10 @@ InfoWidget::InfoWidget(QWidget *parent)
     layout->addWidget(tabWidget);
 
     // =========================== Csg =============================
-    csl = new QPlainTextEdit(this);
-    tabWidget->addTab(csl, "Tcl Console");
-    tabWidget->setTabEnabled(0, false);
+    // csl = new QPlainTextEdit(this);
+    tclConsole = new TclConsole(this);
+    tabWidget->addTab(tclConsole, "Tcl Console");
+    // tabWidget->setTabEnabled(0, false);
     // =========================== Msg =============================
     msg = new QPlainTextEdit(this), msg->setReadOnly(true);
     tabWidget->addTab(msg, "Messages");

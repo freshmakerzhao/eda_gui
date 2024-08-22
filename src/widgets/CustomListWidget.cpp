@@ -35,6 +35,20 @@ CustomListWidget::CustomListWidget(const QString &projectName, const QString &pr
     );
     this->setLayout(layout);
     this->installEventFilter(this);
+    // 设置大小策略
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+}
+
+QSize CustomListWidget::sizeHint() const
+{
+    int width = titleLabel->sizeHint().width() > pathLabel->sizeHint().width() ? titleLabel->sizeHint().width() : pathLabel->sizeHint().width();
+    int height = titleLabel->sizeHint().height() + pathLabel->sizeHint().height();
+    return QSize(width + layout->contentsMargins().left() + layout->contentsMargins().right(), height + layout->contentsMargins().top() + layout->contentsMargins().bottom());
+}
+
+QSize CustomListWidget::minimumSizeHint() const
+{
+    return sizeHint();
 }
 
 bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {

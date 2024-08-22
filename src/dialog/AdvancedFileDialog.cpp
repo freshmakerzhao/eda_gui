@@ -147,6 +147,7 @@ QString AdvancedFileDialog::getSaveFileName(QWidget *parent,
 {
     AdvancedFileDialog dialog(parent);
     dialog.setWindowTitle(caption);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
     if (!dir.isEmpty()) {
         dialog.setDirectory(dir);
     }

@@ -7,7 +7,7 @@ class ProgramDeviceDialog : public QDialog
 {
     Q_OBJECT
 public:
-    ProgramDeviceDialog(QWidget *parent = nullptr);
+    ProgramDeviceDialog(QWidget *parent = nullptr, const int &mode = 0);
 
 protected:
     void accept() override;

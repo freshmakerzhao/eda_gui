@@ -6,9 +6,9 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 是否需要检查 MAC 地址 ，默认需要
-option(ENABLE_MAC_CHECK "Enable MAC address check" ON)
-# 是否需要检查 软件有效期 ，默认关闭
+# 是否需要检查 MAC 地址
+option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
+# 是否需要检查 软件有效期
 option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" ON)
 
 if (ENABLE_MAC_CHECK)
@@ -82,6 +82,13 @@ set(OPENSSL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 include_directories(${OPENSSL_INCLUDE_DIR})
 link_directories(${OPENSSL_LIBRARY_DIR})
 
+# Include the TCL library
+set(TCL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/tcl")
+set(TCL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/tcl/bin")
+
+include_directories(${TCL_INCLUDE_DIR})
+link_directories(${TCL_LIBRARY_DIR})
+
 # Add source files
 file(GLOB PROJECT_SOURCES
     wizard/*.cpp
@@ -93,6 +100,8 @@ file(GLOB PROJECT_SOURCES
     dialog/*.cpp
     ipmanager/*.cpp
     ipmanager/BlockMemoryGenerator/*.cpp
+    component/tclconsole/TclConsole.cpp
+    component/tclconsole/LineEditor.cpp
     settings/*.cpp
     include/tinyxml2/*.cpp
     entity/*.cpp
@@ -112,6 +121,8 @@ file(GLOB PROJECT_HEADERS
     dialog/*.h
     ipmanager/*.h
     ipmanager/BlockMemoryGenerator/*.h
+    component/tclconsole/TclConsole.h
+    component/tclconsole/LineEditor.h
     settings/*.h
     include/Qsci/*.h
     include/yaml-cpp/*.h
@@ -140,11 +151,13 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     Qt5::Core
     Qt5::Network
+    # HybrdLinkPlugin # qscintilla2_qt5
     qscintilla2_qt5
     libyaml-cpp.a
     qtadvanceddocking
     libcrypto-1_1-x64
     libssl-1_1-x64
+    tcl86
 )
 
 # Specify installation paths (if required)
