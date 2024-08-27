@@ -82,28 +82,30 @@ void InfoWidget::updateImplItem(const QString& implPath,
                                 const QString& Elapsed,
                                 const QString& partName){
     initSummary("impl"); // 初始化数据
-    QFile file(implPath + "/pb_type_count.json");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return;// 文件打开失败
-    }
-    QString jsonData = file.readAll();
-    file.close();
-    nlohmann::json j = nlohmann::json::parse(jsonData.toStdString());
+//    QFile file(implPath + "/pb_type_count.json");
+//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//        return;// 文件打开失败
+//    }
+//    QString jsonData = file.readAll();
+//    file.close();
+//    nlohmann::json j = nlohmann::json::parse(jsonData.toStdString());
 
-    for (auto& [key, value] : j.items()) {
-        auto itImpl = keyMapImpl.find(key);
-        if (itImpl != keyMapImpl.end()) {
-            *(itImpl->second) += value.get<int>();
-        }
-    }
+//    for (auto& [key, value] : j.items()) {
+//        auto itImpl = keyMapImpl.find(key);
+//        if (itImpl != keyMapImpl.end()) {
+//            *(itImpl->second) += value.get<int>();
+//        }
+//    }
 
     qDebug() << "Impl:" << lut6NumSynth << ffNumSynth;
 
     runsModel->item(1, 1)->setText(status); // Status
     runsModel->item(1, 2)->setText(QString::number(lut6NumSynth)); // LUT6
     runsModel->item(1, 3)->setText(QString::number(ffNumSynth)); // ff
-    runsModel->item(1, 4)->setText(QString::number(bramNumImpl)); // BRAM
-    runsModel->item(1, 5)->setText(QString::number(dspNumImpl)); // dsp
+    runsModel->item(1, 4)->setText(QString::number(bramNumSynth)); // BRAM
+//    runsModel->item(1, 4)->setText(QString::number(bramNumImpl)); // BRAM
+//    runsModel->item(1, 5)->setText(QString::number(dspNumImpl)); // dsp
+    runsModel->item(1, 5)->setText(QString::number(dspNumSynth)); // dsp
     runsModel->item(1, 6)->setText(QString::number(carry4NumSynth)); // carry
     runsModel->item(1, 7)->setText(startTime); // 开始时间
     runsModel->item(1, 8)->setText(Elapsed); // 持续时间
@@ -113,8 +115,10 @@ void InfoWidget::updateImplItem(const QString& implPath,
     outputJson["status"] = status.toStdString();
     outputJson["LUT6"] = lut6NumSynth;
     outputJson["ff"] = ffNumSynth;
-    outputJson["BRAM"] = bramNumImpl;
-    outputJson["dsp"] = dspNumImpl;
+    outputJson["BRAM"] = bramNumSynth;
+//    outputJson["BRAM"] = bramNumImpl;
+//    outputJson["dsp"] = dspNumImpl;
+    outputJson["dsp"] = dspNumSynth;
     outputJson["carry4"] = carry4NumSynth;
     outputJson["startTime"] = startTime.toStdString();
     outputJson["Elapsed"] = Elapsed.toStdString();
@@ -206,8 +210,8 @@ InfoWidget::InfoWidget(QWidget *parent)
 
     // =========================== Csg =============================
     // csl = new QPlainTextEdit(this);
-    tclConsole = new TclConsole(this);
-    tabWidget->addTab(tclConsole, "Tcl Console");
+//    tclConsole = new TclConsole(this);
+    tabWidget->addTab(TclConsole::instance(), "Tcl Console");
     // tabWidget->setTabEnabled(0, false);
     // =========================== Msg =============================
     msg = new QPlainTextEdit(this), msg->setReadOnly(true);
