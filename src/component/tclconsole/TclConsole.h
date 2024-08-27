@@ -1,0 +1,61 @@
+#ifndef TCLCONSOLE_H
+#define TCLCONSOLE_H
+
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QTextEdit>
+#include <QColor>
+#include <QProcess>
+#include <QDebug>
+#include <tcl.h>
+#include "LineEditor.h"
+
+class TclConsole : public QWidget
+{
+    Q_OBJECT
+
+public:
+    static TclConsole *instance();
+
+    void executeTclCommand(const QString &command);
+
+private slots:
+    void onCommandEnter(QString text);
+
+private:
+    TclConsole(QWidget *parent = nullptr);
+    ~TclConsole();
+
+    static const QColor NORMAL_COLOR;
+    static const QColor ERROR_COLOR;
+    static const QColor OUTPUT_COLOR;
+
+    Tcl_Interp *interp;
+    Tcl_ChannelType *channelType;
+    QTextEdit *output;
+    LineEditor *input;
+
+    static QProcess *process;
+
+    // 自定义输出函数
+    static int QtTclOutput(ClientData clientData, const char *buf, int toWrite, int *errorCodePtr);
+
+    // 自定义关闭函数
+    static int QtTclClose(ClientData clientData, Tcl_Interp *interp);
+
+    // 自定义 watchProc 函数
+    static void QtTclWatch(ClientData clientData, int mask);
+
+    // 自定义 getHandleProc 函数
+    static int QtTclGetHandle(ClientData clientData, int direction, ClientData *handlePtr);
+
+
+    static int TclCmdParse(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclSetWorkDirCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+};
+
+
+#endif // TCLCONSOLE_H
