@@ -18,9 +18,9 @@ void HardWareManager::openProgramDevice(const int &mode)
         qDebug() << projectImplPath;
 
         if (mode == 0) {
-            TaskManager::instance().downloadBit(projectImplPath, topName);
+//            TaskManager::instance().downloadBit(projectImplPath, topName);
         } else if (mode == 1) {
-            TaskManager::instance().downloadFlash(projectImplPath, topName);
+//            TaskManager::instance().downloadFlash(projectImplPath, topName);
         }
     }
 }

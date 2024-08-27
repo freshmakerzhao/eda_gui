@@ -28,8 +28,8 @@ static std::map<std::string,std::string> GLOBAL_PART_TO_ARCH = {
         {"xc7a100tfgg484-2", "100t"}
 };
 
-//// 全局资源路径
-//extern std::string GLOBAL_RESOURCE_PATH;
+// 全局资源路径
+static QString GLOBAL_RESOURCE_PATH = "E:/workspace/HybrdLink_test/resource_win";
 //// 架构映射文件路径
 //extern std::string GLOBAL_TILE_INFO_MAP_PATH;
 //// 架构文件路径

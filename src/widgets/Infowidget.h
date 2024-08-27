@@ -60,15 +60,15 @@ private:
     std::unordered_map<std::string, int*> keyMapSynth = {
         {"$lut", &lutNumSynth},
         {"MUXF6", &muxf6NumSynth},
-        {"FDRE_ZINI", &ffNumSynth}, {"FDSE_ZINI", &ffNumSynth},
-        {"FDCE_ZINI", &ffNumSynth}, {"FDPE_ZINI", &ffNumSynth},
-        {"FDRE_ZINI_1", &ffNumSynth}, {"FDSE_ZINI_1", &ffNumSynth},
-        {"FDCE_ZINI_1", &ffNumSynth}, {"FDPE_ZINI_1", &ffNumSynth},
-        {"FIFO18E1_VPR", &fifo18NumSynth},
-        {"RAMB18E1_VPR", &ranb18NumSynth},
-        {"RAMB36E1_PRIM", &ranb36NumSynth},
-        {"DSP48E1_VPR", &dspNumSynth},
-        {"CARRY4_VPR", &carry4NumSynth}
+        {"FDRE", &ffNumSynth},
+        {"FDSE", &ffNumSynth},
+        {"FDCE", &ffNumSynth},
+        {"FDPE", &ffNumSynth},
+        {"FIFO18E1", &fifo18NumSynth},
+        {"RAMB18E1", &ranb18NumSynth},
+        {"RAMB36E1", &ranb36NumSynth},
+        {"DSP48E1", &dspNumSynth},
+        {"CARRY4", &carry4NumSynth}
     };
 
     std::unordered_map<std::string, int*> keyMapImpl = {

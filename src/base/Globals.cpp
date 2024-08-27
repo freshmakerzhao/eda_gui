@@ -7,9 +7,7 @@
   ******************************************************************************
   */
 #include "Globals.h"
-//
-//// 资源路径
-//std::string GLOBAL_RESOURCE_PATH;
+
 //// 架构映射文件路径
 //std::string GLOBAL_TILE_INFO_MAP_PATH;
 //// 架构文件路径

@@ -7,6 +7,7 @@
 #include "utils/ProjectManager.h"
 #include "settings/SettingsDialog.h"
 #include "dialog/CustomMessageBox.h"
+#include "ProcessManager.h"
 
 class TaskManager : public QObject
 {
@@ -54,6 +55,9 @@ public:
     QList<QString> sourcePathList;
     QList<QString> constraintPathList;
 
+public slots:
+    void handleMessage(ProcessMessage &msg);
+
 private:
     // 项目路径
     QString projectPath;
@@ -69,20 +73,23 @@ private:
     QString archName;
     // arch 50t
     QString arch;
-    // arch name
-    QString GLOBAL_RESOURCE_PATH;
     // top name
     QString topName = "top";
     // netlist type
-    QString netlistType = ".eblif";
-    // pack result type
-    QString packResultType = ".net";
-    // place result type
-    QString placeResultType = ".place";
-    // route result type
-    QString routeResultType = ".route";
+    QString netlistType = ".json";
+    // implementaion result type
+    QString implResultType = ".fasm";
     // family name xc7
     QString familyName = "xc7";
+
+    // 是否显示综合成功弹窗
+    bool _showSynthSuccessMsg = true;
+    // 是否显示布局布线成功弹窗
+    bool _showImplementSuccessMsg = true;
+    // 是否显示生成码流成功弹窗
+    bool _showGenBitSuccessMsg = true;
+    // 综合之后是否要执行implement
+    bool _hasNextImplementProcess = false;
 
 private:
     TaskManager();
@@ -90,11 +97,8 @@ private:
 
     QTreeWidget *taskTree;
 
-    QStringList buildSynthScript();
-    std::string buildImpScript();
-    void buildPack();
-    void buildPlace(int mode);
-    void buildRoute();
+    QString buildSynthScript();
+    QString buildImpScript();
     void buildBit(int mode);
 
     // SettingsDialog *settingDialog = nullptr;
@@ -104,11 +108,25 @@ private:
     bool fileChanged = false;
     //! 设计文件被修改的flag
     void onFileChanged();
+    // 将命令提交给tcl console
+    void publishScript(const QString &workPath, const QString &tclCommand);
 
+    void setNextPhaseParam(const QString &nextPhase, const QString &nextWorkPath, const QString &nextTclCommand);
+    void setSynthSuccessMsgStatus(bool status);
+    void setImplementSuccessMsgStatus(bool status);
+    void setNextImplementProcessStatus(bool status);
+    void initMessageStatus();
+    // 下一阶段使用的命令
+    QString _nextPhase = nullptr;
+    QString _nextWorkPath = nullptr;
+    QString _nextTclCommand = nullptr;
 public:
     void downloadBit(const QString &projectImplPath1, const QString &topName1);
-    void downloadFlash();
+    void downloadFlash(const QString &projectImplPath1, const QString &topName1);
     QWidget* gridView = nullptr;
+
+    void readBackMemory(const QString &rbdFilePath);
+    void readBackRegister(const QString &registerAddress);
 
 };
 

@@ -186,6 +186,12 @@ void ProjectManager::loadFiles(Project *project)
 
     qDebug() << "[ProjectManager] loadFiles...";
 
+    QString setDeviceCmd = QString("set_device %1").arg(_project->getParameter(Project::DisplayPart));
+    TclConsole::instance()->executeTclCommand(setDeviceCmd);
+
+    QString setWorkDirCmd = QString("set_work_dir %1").arg(_project->getParameter(Project::Path));
+    TclConsole::instance()->executeTclCommand(setWorkDirCmd);
+
     // 存储设计文件与约束文件
     TaskManager::instance().sourcePathList = _project->sourceList;
     TaskManager::instance().constraintPathList = _project->constraintList;
