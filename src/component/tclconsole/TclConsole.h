@@ -55,6 +55,18 @@ private:
     static int TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclSetWorkDirCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclPackCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclPlaceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclRouteCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 };
 
 

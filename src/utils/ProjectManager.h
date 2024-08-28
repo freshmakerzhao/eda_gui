@@ -99,9 +99,9 @@ public:
 
     QString getParameter(const Project::ParamKey key) const;
 
-    // QStringList getDesignSrcs() const;
+    QStringList getDesignSourcesList() const;
 
-    // QStringList getConstraints() const;
+    QStringList getConstraintsList() const;
 
 public slots:
     void closeProject();

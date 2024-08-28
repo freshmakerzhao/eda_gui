@@ -1,5 +1,7 @@
 #include "TclConsole.h"
 #include "utils/ProcessManager.h"
+#include "utils/ProjectManager.h"
+#include "base/Globals.h"
 
 const QColor TclConsole::NORMAL_COLOR = QColor::fromRgbF(0, 0, 0);
 const QColor TclConsole::ERROR_COLOR = QColor::fromRgbF(1.0, 0, 0);
@@ -54,8 +56,15 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     output->append("Tcl console initialized. Type your commands in the line edit below.");
     Tcl_CreateCommand(interp, "synthesizer", TclCmdParse, nullptr, nullptr);
     Tcl_CreateCommand(interp, "implementation", TclCmdParse, nullptr, nullptr);
+
     Tcl_CreateCommand(interp, "set_device", TclSetDeviceCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "set_work_dir", TclSetDeviceCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "set_work_dir", TclSetWorkDirCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "set_top_module", TclSetTopModuleCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "synth_design", TclSynthCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "pack_design", TclPackCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "place_design", TclPlaceCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "route_design", TclRouteCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
 
     // 读取标准输出并将其写入到 Tcl 标准输出通道
     connect(process, &QProcess::readyReadStandardOutput, [&]() {
@@ -183,7 +192,8 @@ int TclConsole::TclCmdParse(ClientData clientData, Tcl_Interp *interp, int argc,
     return TCL_OK;
 }
 
-int TclConsole::TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
+int TclConsole::TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
     if (argc != 2) {
         Tcl_SetResult(interp, const_cast<char*>("Usage: set_device <part>"), TCL_STATIC);
         return TCL_ERROR;
@@ -195,14 +205,253 @@ int TclConsole::TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int a
     return TCL_OK;
 }
 
-int TclConsole::TclSetWorkDirCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
+int TclConsole::TclSetWorkDirCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
     if (argc != 2) {
-        Tcl_SetResult(interp, const_cast<char*>("Usage: set_device <part>"), TCL_STATIC);
+        Tcl_SetResult(interp, const_cast<char*>("Usage: set_work_dir <dir>"), TCL_STATIC);
         return TCL_ERROR;
     }
     const char* varName = "work_dir";
     const char* workDir = argv[1];
     const char* result = Tcl_SetVar(interp, varName, workDir, TCL_GLOBAL_ONLY);
     Tcl_SetResult(interp, const_cast<char*>(workDir), TCL_VOLATILE);
+    return TCL_OK;
+}
+
+int TclConsole::TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    if (argc != 2) {
+        Tcl_SetResult(interp, const_cast<char*>("Usage: set_top_module <module>"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+    const char* varName = "top_module";
+    const char* topName = argv[1];
+    const char* result = Tcl_SetVar(interp, varName, topName, TCL_GLOBAL_ONLY);
+    Tcl_SetResult(interp, const_cast<char*>(topName), TCL_VOLATILE);
+    return TCL_OK;
+}
+
+int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    QString phase = "synthesizer";
+    std::map<std::string, std::string> args;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-top") {
+            if (i + 1 < argc) { // 确保参数后有值
+                args[arg] = argv[++i];
+            } else {
+                // std::cerr << "Error: Option " << arg << " requires a value." << std::endl;
+                std::string errorMsg = "Error: Option " + arg + " requires a value.";
+                Tcl_SetResult(interp, (char*)errorMsg.c_str(), TCL_VOLATILE);
+                return TCL_ERROR;
+            }
+        } else {
+            Tcl_SetResult(interp, (char*)"Warning: Unknown option ", TCL_STATIC);
+        }
+    }
+
+    const char* deviceModel = Tcl_GetVar(interp, "device_model", TCL_GLOBAL_ONLY);
+    if (deviceModel == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Device model not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+
+
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (args.find("-top") != args.end()) {
+        topVar = args.at("-top").c_str();
+    }
+
+
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+
+    const QString topName = QString(topVar);
+    // qDebug() << topName;
+
+    QStringList resultList;
+    const char *tclVarValue = Tcl_GetVar(interp, "source", 0);
+    if (tclVarValue != nullptr) {
+        // 将 Tcl 列表字符串转换为 QString
+        QString qStringList = QString::fromUtf8(tclVarValue);
+
+        // 将 QString 转换为 QStringList
+        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
+    }
+
+    QStringList script;
+    script << "-p";
+    script <<"synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top " + topName + "; write_json " + topName + ".json; write_edif -pvector bra " + topName + ".edn;";
+    // script << "top.v";
+    for (const QString &item : resultList) {
+        script << item;
+    }
+
+    // ProcessManager::instance().initEnvironment("xc7","C:/HybrdLink/resource_win","xc7a100t",deviceModel,QList<QString>(),topName);
+    ProcessManager::instance().initEnvironment();
+    ProcessManager::instance().excuteCommand(phase, script);
+
+    QString info = QString("Starting synth_design\n"
+                           "Using part: %1\n"
+                           "Top: %2").arg(deviceModel, topName);
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+    return TCL_OK;
+}
+
+int TclConsole::TclPackCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+
+    const QString topName = QString(topVar);
+
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+
+    QStringList script;
+    script << "--chipdb";
+    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
+
+    QStringList resultList;
+    const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
+    if (tclVarValue != nullptr) {
+        // 将 Tcl 列表字符串转换为 QString
+        QString qStringList = QString::fromUtf8(tclVarValue);
+
+        // 将 QString 转换为 QStringList
+        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
+    }
+
+    script << "--xdc";
+    script << resultList;
+    script << "--json";
+
+    script << workDir + "/runs/synth/" + topName + ".json";
+    script << "--write";
+    script << workDir + "/runs/impl/pack.json";
+    script << "--pack-only";
+    script << "--debug";
+
+    ProcessManager::instance().initEnvironment();
+    QString phase = "implementation";
+    ProcessManager::instance().excuteCommand(phase, script);
+    return TCL_OK;
+}
+
+int TclConsole::TclPlaceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+
+    const QString topName = QString(topVar);
+
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+
+    QStringList script;
+    script << "--chipdb";
+    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
+
+    QStringList resultList;
+    const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
+    if (tclVarValue != nullptr) {
+        // 将 Tcl 列表字符串转换为 QString
+        QString qStringList = QString::fromUtf8(tclVarValue);
+
+        // 将 QString 转换为 QStringList
+        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
+    }
+
+    script << "--xdc";
+    script << resultList;
+    script << "--json";
+
+    script << workDir + "/runs/impl/pack.json";
+    script << "--write";
+    script << workDir + "/runs/impl/place.json";
+    script << "--no-pack";
+    script << "--no-route";
+    script << "--debug";
+
+    ProcessManager::instance().initEnvironment();
+    QString phase = "implementation";
+    ProcessManager::instance().excuteCommand(phase, script);
+    return TCL_OK;
+}
+
+int TclConsole::TclRouteCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+
+    const QString topName = QString(topVar);
+
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+
+    QStringList script;
+    script << "--chipdb";
+    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
+
+    QStringList resultList;
+    const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
+    if (tclVarValue != nullptr) {
+        // 将 Tcl 列表字符串转换为 QString
+        QString qStringList = QString::fromUtf8(tclVarValue);
+
+        // 将 QString 转换为 QStringList
+        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
+    }
+
+    script << "--xdc";
+    script << resultList;
+    script << "--json";
+    script << workDir + "/runs/impl/place.json";
+    script << "--write";
+    script << workDir + "/runs/impl/route.json";
+    script << "--no-pack";
+    script << "--no-place";
+    script << "--debug";
+
+    ProcessManager::instance().initEnvironment();
+    QString phase = "implementation";
+    ProcessManager::instance().excuteCommand(phase, script);
+    return TCL_OK;
+}
+
+int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    QStringList stringList;
+    std::string fileset = argv[1];
+    if (fileset == "sources") {
+        stringList = ProjectManager::instance().getDesignSourcesList();
+        QString listStr;
+        listStr = stringList.join(" ");
+        listStr = listStr.trimmed();
+        Tcl_SetVar(interp, "source", listStr.toUtf8().constData(), 0);
+    } else if (fileset == "constrs") {
+        stringList = ProjectManager::instance().getConstraintsList();
+        QString listStr;
+        listStr = stringList.join(" ");
+        listStr = listStr.trimmed();
+        Tcl_SetVar(interp, "constrs", listStr.toUtf8().constData(), 0);
+    } else {
+        std::string errorMsg = "Error: Option " + fileset +  ".";
+        Tcl_SetResult(interp, (char*)errorMsg.c_str(), TCL_VOLATILE);
+        return TCL_ERROR;
+    }
+
     return TCL_OK;
 }
