@@ -44,26 +44,42 @@ void ProcessManager::handleReadyReadStandardOutput()
     QString errorOutputStr = tc->toUnicode(errorOutput);
 
     // 没有错误发生，输出 output
-//    qDebug() << "========output========== ";
-//    qDebug() << outputStr;
-//    qDebug() << "========output========== ";
-
-    qDebug() << "======== errorOutput ========== ";
-    qDebug() << errorOutput;
-    qDebug() << "======== errorOutput ========== ";
 
     // 判断是否报错
-    if (process->error() == QProcess::UnknownError) {
-//        // 没有错误发生，输出 output
-//        qDebug() << "================== ";
-//        qDebug() << outputStr;
-//        qDebug() << "================== ";
+    // if (process->error() == QProcess::UnknownError) {
+    //     // 没有错误发生，输出 output
+    //     LogWidget::instance()->appendLog(outputStr);
+    // } else {
+    //     // 发生错误，输出 errorOutput
+    //     LogWidget::instance()->appendLog(errorOutputStr);
+    // }
 
+    if (!outputStr.isEmpty()){
+        // if (outputStr.startsWith("Info:")) {
+        //     LogWidget::instance()->appendInfoLog(outputStr);  // 假设你有一个处理Info日志的函数
+        // } else if (outputStr.startsWith("Warning:")) {
+        //     LogWidget::instance()->appendWarningLog(outputStr);  // 假设你有一个处理Warning日志的函数
+        // } else if (outputStr.startsWith("ERROR:")) {
+        //     LogWidget::instance()->appendErrorLog(outputStr);  // 假设你有一个处理Error日志的函数
+        // } else {
+        //     LogWidget::instance()->appendLog(outputStr);  // 默认处理
+        // }
         LogWidget::instance()->appendLog(outputStr);
-    } else {
-        // 发生错误，输出 errorOutput
+    }
+
+    if (!errorOutputStr.isEmpty()){
+        // if (errorOutputStr.startsWith("Info:")) {
+        //     LogWidget::instance()->appendInfoLog(errorOutputStr);  // 假设你有一个处理Info日志的函数
+        // } else if (errorOutputStr.startsWith("Warning:")) {
+        //     LogWidget::instance()->appendWarningLog(errorOutputStr);  // 假设你有一个处理Warning日志的函数
+        // } else if (errorOutputStr.startsWith("ERROR:")) {
+        //     LogWidget::instance()->appendErrorLog(errorOutputStr);  // 假设你有一个处理Error日志的函数
+        // } else {
+        //     LogWidget::instance()->appendLog(errorOutputStr);  // 默认处理
+        // }
         LogWidget::instance()->appendLog(errorOutputStr);
     }
+
 }
 
 // process执行结束后触发
@@ -77,20 +93,33 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     QString outputStr = tc->toUnicode(remainingOutput);
     if (!remainingOutput.isEmpty()) {
         LogWidget::instance()->appendLog(outputStr);
+        // if (outputStr.startsWith("Info:")) {
+        //     LogWidget::instance()->appendInfoLog(outputStr);  // 假设你有一个处理Info日志的函数
+        // } else if (outputStr.startsWith("Warning:")) {
+        //     LogWidget::instance()->appendWarningLog(outputStr);  // 假设你有一个处理Warning日志的函数
+        // } else if (outputStr.startsWith("ERROR:")) {
+        //     LogWidget::instance()->appendErrorLog(outputStr);  // 假设你有一个处理Error日志的函数
+        // } else {
+        //     LogWidget::instance()->appendLog(outputStr);  // 默认处理
+        // }
     }
-    qDebug() << "1. =============================";
-    qDebug() << outputStr;
-    qDebug() << "1. =============================";
+
     // 读取可能剩余的标准错误
     QByteArray remainingError = process->readAllStandardError();
     // 转码
     outputStr = tc->toUnicode(remainingError);
     if (!remainingError.isEmpty()) {
         LogWidget::instance()->appendLog(outputStr);
+        // if (outputStr.startsWith("Info:")) {
+        //     LogWidget::instance()->appendInfoLog(outputStr);  // 假设你有一个处理Info日志的函数
+        // } else if (outputStr.startsWith("Warning:")) {
+        //     LogWidget::instance()->appendWarningLog(outputStr);  // 假设你有一个处理Warning日志的函数
+        // } else if (outputStr.startsWith("ERROR:")) {
+        //     LogWidget::instance()->appendErrorLog(outputStr);  // 假设你有一个处理Error日志的函数
+        // } else {
+        //     LogWidget::instance()->appendLog(outputStr);  // 默认处理
+        // }
     }
-//    qDebug() << "2. =============================";
-//    qDebug() << outputStr;
-//    qDebug() << "2. =============================";
 
     // 结束时间
     this->endTimeForCal = TimeUtilities::getCurTime();
@@ -115,7 +144,8 @@ ProcessManager::ProcessManager()
 {
     process = new QProcess();
     // readyReadStandardOutput 信号，有输出则显示在message中
-    connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(handleReadyReadStandardOutput()));
+    // connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(handleReadyReadStandardOutput()));
+    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleReadyReadStandardOutput);
     // finished 信号，process执行完毕后触发
     connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
 }

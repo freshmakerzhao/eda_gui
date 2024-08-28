@@ -189,8 +189,16 @@ void ProjectManager::loadFiles(Project *project)
     QString setDeviceCmd = QString("set_device %1").arg(_project->getParameter(Project::DisplayPart));
     TclConsole::instance()->executeTclCommand(setDeviceCmd);
 
-    QString setWorkDirCmd = QString("set_work_dir %1").arg(_project->getParameter(Project::Path));
-    TclConsole::instance()->executeTclCommand(setWorkDirCmd);
+    QString setSetWorkDirCmd = QString("set_work_dir %1").arg(_project->getParameter(Project::Path));
+    TclConsole::instance()->executeTclCommand(setSetWorkDirCmd);
+
+    QString setTopModuleCmd = QString("set_top_module %1").arg(_project->getParameter(Project::TopModule));
+    TclConsole::instance()->executeTclCommand(setTopModuleCmd);
+
+    QString updateFileSetCmd = "update_fileset sources";
+    TclConsole::instance()->executeTclCommand(updateFileSetCmd);
+    updateFileSetCmd = "update_fileset constrs";
+    TclConsole::instance()->executeTclCommand(updateFileSetCmd);
 
     // 存储设计文件与约束文件
     TaskManager::instance().sourcePathList = _project->sourceList;
@@ -311,21 +319,21 @@ QString ProjectManager::getParameter(const Project::ParamKey key) const
     return _project->getParameter(key);
 }
 
-// QStringList ProjectManager::getDesignSrcs() const
-// {
-//     if (!_project) {
-//         return QStringList();
-//     }
-//     return _project->sourceList;
-// }
+QStringList ProjectManager::getDesignSourcesList() const
+{
+    if (!_project) {
+        return QStringList();
+    }
+    return _project->sourceList;
+}
 
-// QStringList ProjectManager::getConstraints() const
-// {
-//     if (!_project) {
-//         return QStringList();
-//     }
-//     return _project->constraintList;
-// }
+QStringList ProjectManager::getConstraintsList() const
+{
+    if (!_project) {
+        return QStringList();
+    }
+    return _project->constraintList;
+}
 
 void ProjectManager::closeProject()
 {
