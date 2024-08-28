@@ -54,8 +54,7 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_RegisterChannel(interp, channel);
 
     output->append("Tcl console initialized. Type your commands in the line edit below.");
-    Tcl_CreateCommand(interp, "synthesizer", TclCmdParse, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "implementation", TclCmdParse, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "impl_design", TclImplCmd, nullptr, nullptr);
 
     Tcl_CreateCommand(interp, "set_device", TclSetDeviceCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "set_work_dir", TclSetWorkDirCmd, nullptr, nullptr);
@@ -181,14 +180,46 @@ void TclConsole::executeTclCommand(const QString &command) {
     output->moveCursor(QTextCursor::End);
 }
 
-int TclConsole::TclCmdParse(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
-    QStringList command;
-    for (int i = 1; i < argc; ++i) {
-        command << argv[i];
+int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
     }
 
-    QString phase = argv[0];
-    ProcessManager::instance().excuteCommand(phase, command);
+    const QString topName = QString(topVar);
+
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+
+    QStringList script;
+    script << "--chipdb";
+    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
+
+    QStringList resultList;
+    const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
+    if (tclVarValue != nullptr) {
+        // 将 Tcl 列表字符串转换为 QString
+        QString qStringList = QString::fromUtf8(tclVarValue);
+
+        // 将 QString 转换为 QStringList
+        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
+    }
+
+    script << "--xdc";
+    script << resultList;
+    script << "--json";
+    script << workDir + "/runs/synth/" + topName + ".json";
+    script << "--write";
+    script << workDir + "/runs/impl/route.json";
+    script << "--debug";
+
+    QString info = "Starting Implementation Task\n";
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
+    ProcessManager::instance().initEnvironment();
+    QString phase = "Implementation";
+    ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
 
@@ -233,7 +264,7 @@ int TclConsole::TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, in
 
 int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
-    QString phase = "synthesizer";
+    QString phase = "Synthesis";
     std::map<std::string, std::string> args;
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -282,22 +313,29 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
         resultList = qStringList.split(' ', Qt::SkipEmptyParts);
     }
 
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+
+    QDir dir(workDir);
+    QString jsonPath = dir.filePath("runs/synth/" + topName + ".json");
+    QString edifPath = dir.filePath("runs/synth/" + topName + ".edn");
+
     QStringList script;
     script << "-p";
-    script <<"synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top " + topName + "; write_json " + topName + ".json; write_edif -pvector bra " + topName + ".edn;";
-    // script << "top.v";
+    script << QString("synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top %1; write_json %2; write_edif -pvector bra %3;")
+                  .arg(topName, jsonPath, edifPath);
+    // Design Sources
     for (const QString &item : resultList) {
         script << item;
     }
-
-    // ProcessManager::instance().initEnvironment("xc7","C:/HybrdLink/resource_win","xc7a100t",deviceModel,QList<QString>(),topName);
-    ProcessManager::instance().initEnvironment();
-    ProcessManager::instance().excuteCommand(phase, script);
 
     QString info = QString("Starting synth_design\n"
                            "Using part: %1\n"
                            "Top: %2").arg(deviceModel, topName);
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
+    ProcessManager::instance().initEnvironment();
+    ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
 
@@ -338,8 +376,11 @@ int TclConsole::TclPackCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     script << "--pack-only";
     script << "--debug";
 
+    QString info = "Starting Pack Task\n";
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
     ProcessManager::instance().initEnvironment();
-    QString phase = "implementation";
+    QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
@@ -382,8 +423,11 @@ int TclConsole::TclPlaceCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     script << "--no-route";
     script << "--debug";
 
+    QString info = "Starting Place Task\n";
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
     ProcessManager::instance().initEnvironment();
-    QString phase = "implementation";
+    QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
@@ -425,8 +469,11 @@ int TclConsole::TclRouteCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     script << "--no-place";
     script << "--debug";
 
+    QString info = "Starting Route Task\n";
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
     ProcessManager::instance().initEnvironment();
-    QString phase = "implementation";
+    QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }

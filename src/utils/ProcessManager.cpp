@@ -162,9 +162,9 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
     process->terminate(); // 执行前中断process
 
     QStringList script;
-    if (phase == "synthesizer"){
+    if (phase == "Synthesis"){
         script << "/c" << projectProperty["synthesizer_path"] << command;
-    } else if (phase == "implementation"){
+    } else if (phase == "Implementation"){
         script << "/c" << projectProperty["implementation_path"] << command;
 
     }
