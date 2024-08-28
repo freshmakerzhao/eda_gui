@@ -330,18 +330,6 @@ void TaskManager::taskController(const int mode) {
 }
 
 /**
- * 返回综合命令
- * @return
- */
-QString TaskManager::buildSynthScript() {
-    QString script = "synthesizer -p \"synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top " + topName + "; write_json " + topName + ".json; write_edif -pvector bra " + topName + ".edn;\"";
-    for(const QString& sourcePath :sourcePathList){
-        script += " " + sourcePath;
-    }
-    return script;
-}
-
-/**
   * 设置工程参数
   */
 void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
@@ -409,23 +397,16 @@ TaskManager::~TaskManager()
     qDebug() << "[TaskManager] Distructing...";
 }
 
+/**
+ * 返回综合命令
+ * @return
+ */
+QString TaskManager::buildSynthScript() {
+    return QString("synth_design");
+}
+
 QString TaskManager::buildImpScript() {
-
-    qDebug() << " ============================================= ";
-    qDebug() << GLOBAL_RESOURCE_PATH;
-    qDebug() << archName;
-    qDebug() << " ============================================= ";
-
-    QString script = "implementation --chipdb " + GLOBAL_RESOURCE_PATH + "/common/archs/" + archName + ".bin" + " "\
-                    "--xdc " + constraintPathList.first() + " "\
-                    "--json " + projectSynthPath + "/" + topName + ".json" + " "\
-                    "--fasm " + topName + ".fasm" + " "\
-                    "-l impl.log" + " --debug";
-
-    qDebug() << " ====================== buildImpScript ======================= ";
-    qDebug() << script;
-    qDebug() << " ====================== buildImpScript ======================= ";
-    return script;
+    return QString("impl_design");
 }
 
 // 生成bit流 阶段

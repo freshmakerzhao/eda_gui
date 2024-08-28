@@ -50,7 +50,7 @@ private:
     static int QtTclGetHandle(ClientData clientData, int direction, ClientData *handlePtr);
 
 
-    static int TclCmdParse(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+    static int TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
