@@ -195,7 +195,7 @@ void ProcessManager::initEnvironment() {
     env.insert("FASM2FRAMES", GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\fasm2frames.exe)");
     env.insert("FRAMES2BIT", GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\xc7frames2bit.exe)");
     projectProperty["synthesizer_path"] = GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
-    projectProperty["implementation_path"] = GLOBAL_RESOURCE_PATH + R"(\nextpnr\bin\nextpnr-xilinx.exe)";
+    projectProperty["implementation_path"] = GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
 }
 
 void ProcessManager::configDisplay(const QString &partname) {
