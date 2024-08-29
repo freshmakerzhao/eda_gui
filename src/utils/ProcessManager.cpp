@@ -166,7 +166,7 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
         script << "/c" << projectProperty["synthesizer_path"] << command;
     } else if (phase == "Implementation"){
         script << "/c" << projectProperty["implementation_path"] << command;
-    } else if (phase == "GeneratorBitstream"){
+    } else if (phase == "Generate Bitstream"){
         script << "/c" << command;
     }
     qDebug() << " =================================== ";

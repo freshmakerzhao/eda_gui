@@ -6,7 +6,7 @@
 const QColor TclConsole::NORMAL_COLOR = QColor::fromRgbF(0, 0, 0);
 const QColor TclConsole::ERROR_COLOR = QColor::fromRgbF(1.0, 0, 0);
 const QColor TclConsole::OUTPUT_COLOR = QColor::fromRgbF(0, 0, 1.0);
-QProcess* TclConsole::process = new QProcess();
+// QProcess* TclConsole::process = new QProcess();
 
 TclConsole *TclConsole::instance()
 {
@@ -40,12 +40,16 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
 
     // 定义自定义通道类型
     channelType = new Tcl_ChannelType;
-    // memset(channelType, 0, sizeof(Tcl_ChannelType));
+    // 使用 memset 将结构体的所有字节设置为0
+    memset(channelType, 0, sizeof(Tcl_ChannelType));
+    // 设置结构体的字段
     channelType->typeName = "qtConsole";
     channelType->outputProc = &QtTclOutput;
     channelType->closeProc = &QtTclClose;
     channelType->watchProc = &QtTclWatch;
     channelType->getHandleProc = &QtTclGetHandle;
+    channelType->seekProc = &QtTclSeekProc;       // 添加 seekProc
+    channelType->wideSeekProc = &QtTclWideSeekProc; // 添加 wideSeekProc
 
     // 创建并注册通道
     Tcl_Channel channel = Tcl_CreateChannel(channelType, "qtConsoleChannel", reinterpret_cast<ClientData>(output), TCL_WRITABLE);
@@ -64,45 +68,45 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "place_design", TclPlaceCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "route_design", TclRouteCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "write_bitstream", TclBitstreamCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "write_bitstream", TclWriteBitstreamCmd, nullptr, nullptr);
 
     // 读取标准输出并将其写入到 Tcl 标准输出通道
-    connect(process, &QProcess::readyReadStandardOutput, [&]() {
-        QByteArray outputData = process->readAllStandardOutput();
-        Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
-        if (stdoutChannel) {
+    // connect(process, &QProcess::readyReadStandardOutput, [&]() {
+    //     QByteArray outputData = process->readAllStandardOutput();
+    //     Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
+    //     if (stdoutChannel) {
             // Tcl_Write(stdoutChannel, outputData.constData(), outputData.size());
             // output->setTextColor(OUTPUT_COLOR);
-            output->append(QString::fromUtf8(outputData));
+            // output->append(QString::fromUtf8(outputData));
             // output->setTextColor(NORMAL_COLOR);
-            Tcl_Flush(stdoutChannel);
-        }
-    });
+    //         Tcl_Flush(stdoutChannel);
+    //     }
+    // });
 
     // 读取标准错误并将其写入到 Tcl 标准输出通道
-    connect(process, &QProcess::readyReadStandardError, [&]() {
-        QByteArray errorData = process->readAllStandardError();
-        Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
-        if (stdoutChannel) {
+    // connect(process, &QProcess::readyReadStandardError, [&]() {
+    //     QByteArray errorData = process->readAllStandardError();
+    //     Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
+        // if (stdoutChannel) {
             // Tcl_Write(stdoutChannel, errorData.constData(), errorData.size());
             // output->setTextColor(ERROR_COLOR);
-            output->append(QString::fromUtf8(errorData));
+            // output->append(QString::fromUtf8(errorData));
             // output->setTextColor(NORMAL_COLOR);
-            Tcl_Flush(stdoutChannel);
-        }
-    });
+            // Tcl_Flush(stdoutChannel);
+    //     }
+    // });
 
     // 当进程结束时，进行清理
-    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [&](int exitCode, QProcess::ExitStatus exitStatus) {
-        Q_UNUSED(exitCode);
-        Q_UNUSED(exitStatus);
+    // connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [&](int exitCode, QProcess::ExitStatus exitStatus) {
+    //     Q_UNUSED(exitCode);
+    //     Q_UNUSED(exitStatus);
         // Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
         // QByteArray errorData = "Synthesis OK";
         // Tcl_Write(stdoutChannel, errorData.constData(), errorData.size());
         // output->append(QString::fromUtf8(errorData));
         // output->moveCursor(QTextCursor::End);
         // process->deleteLater();
-    });
+    // });
 }
 
 TclConsole::~TclConsole() {
@@ -143,6 +147,16 @@ void TclConsole::QtTclWatch(ClientData clientData, int mask) {
 
 int TclConsole::QtTclGetHandle(ClientData clientData, int direction, ClientData *handlePtr) {
     return TCL_ERROR;  // 由于我们不涉及系统级文件描述符，返回错误
+}
+
+int TclConsole::QtTclSeekProc(ClientData instanceData, long offset, int seekMode, int *errorCode) {
+    *errorCode = 0;
+    return -1;  // 或者根据需要返回0表示成功
+}
+
+Tcl_WideInt TclConsole::QtTclWideSeekProc(ClientData instanceData, Tcl_WideInt offset, int seekMode, int *errorCode) {
+    *errorCode = 0;
+    return -1;  // 或者根据需要返回0表示成功
 }
 
 void TclConsole::executeTclCommand(const QString &command) {
@@ -259,7 +273,8 @@ int TclConsole::TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, in
     const char* varName = "top_module";
     const char* topName = argv[1];
     const char* result = Tcl_SetVar(interp, varName, topName, TCL_GLOBAL_ONLY);
-    Tcl_SetResult(interp, const_cast<char*>(topName), TCL_VOLATILE);
+    QString info = QString("Top module: %1").arg(topName);
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -484,12 +499,14 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
         listStr = stringList.join(" ");
         listStr = listStr.trimmed();
         Tcl_SetVar(interp, "source", listStr.toUtf8().constData(), 0);
+        Tcl_SetResult(interp, const_cast<char*>("INFO: Update design sources"), TCL_VOLATILE);
     } else if (fileset == "constrs") {
         stringList = ProjectManager::instance().getConstraintsList();
         QString listStr;
         listStr = stringList.join(" ");
         listStr = listStr.trimmed();
         Tcl_SetVar(interp, "constrs", listStr.toUtf8().constData(), 0);
+        Tcl_SetResult(interp, const_cast<char*>("INFO: Update constraints"), TCL_VOLATILE);
     } else {
         std::string errorMsg = "Error: Option " + fileset +  ".";
         Tcl_SetResult(interp, (char*)errorMsg.c_str(), TCL_VOLATILE);
@@ -499,7 +516,7 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
     return TCL_OK;
 }
 
-int TclConsole::TclBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char **argv) {
+int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char **argv) {
 
 
     QStringList script;
@@ -539,10 +556,10 @@ int TclConsole::TclBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int a
     script << "--output_file";
     script << bitstreamPath;
 
-    QString info = "Starting Gen Bit Task\n";
+    QString info = "Starting Generate Bitstream Task\n";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    QString phase = "GeneratorBitstream";
+    QString phase = "Generate Bitstream";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
