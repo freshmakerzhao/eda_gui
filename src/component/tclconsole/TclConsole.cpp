@@ -6,7 +6,6 @@
 const QColor TclConsole::NORMAL_COLOR = QColor::fromRgbF(0, 0, 0);
 const QColor TclConsole::ERROR_COLOR = QColor::fromRgbF(1.0, 0, 0);
 const QColor TclConsole::OUTPUT_COLOR = QColor::fromRgbF(0, 0, 1.0);
-// QProcess* TclConsole::process = new QProcess();
 
 TclConsole *TclConsole::instance()
 {
@@ -28,7 +27,6 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     input = new LineEditor(this);
     layout->addWidget(input);
 
-    // connect(input, &QLineEdit::returnPressed, this, &TclConsole::onCommandEnter);
     connect(input, &LineEditor::textLineInserted, this, &TclConsole::onCommandEnter);
 
     interp = Tcl_CreateInterp();
@@ -69,44 +67,6 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "route_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "write_bitstream", TclWriteBitstreamCmd, nullptr, nullptr);
-
-    // 读取标准输出并将其写入到 Tcl 标准输出通道
-    // connect(process, &QProcess::readyReadStandardOutput, [&]() {
-    //     QByteArray outputData = process->readAllStandardOutput();
-    //     Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
-    //     if (stdoutChannel) {
-            // Tcl_Write(stdoutChannel, outputData.constData(), outputData.size());
-            // output->setTextColor(OUTPUT_COLOR);
-            // output->append(QString::fromUtf8(outputData));
-            // output->setTextColor(NORMAL_COLOR);
-    //         Tcl_Flush(stdoutChannel);
-    //     }
-    // });
-
-    // 读取标准错误并将其写入到 Tcl 标准输出通道
-    // connect(process, &QProcess::readyReadStandardError, [&]() {
-    //     QByteArray errorData = process->readAllStandardError();
-    //     Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
-        // if (stdoutChannel) {
-            // Tcl_Write(stdoutChannel, errorData.constData(), errorData.size());
-            // output->setTextColor(ERROR_COLOR);
-            // output->append(QString::fromUtf8(errorData));
-            // output->setTextColor(NORMAL_COLOR);
-            // Tcl_Flush(stdoutChannel);
-    //     }
-    // });
-
-    // 当进程结束时，进行清理
-    // connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [&](int exitCode, QProcess::ExitStatus exitStatus) {
-    //     Q_UNUSED(exitCode);
-    //     Q_UNUSED(exitStatus);
-        // Tcl_Channel stdoutChannel = Tcl_GetStdChannel(TCL_STDOUT);
-        // QByteArray errorData = "Synthesis OK";
-        // Tcl_Write(stdoutChannel, errorData.constData(), errorData.size());
-        // output->append(QString::fromUtf8(errorData));
-        // output->moveCursor(QTextCursor::End);
-        // process->deleteLater();
-    // });
 }
 
 TclConsole::~TclConsole() {
@@ -175,23 +135,8 @@ void TclConsole::executeTclCommand(const QString &command) {
     if (!channel) {
         return;
     }
-    // output->setTextColor(OUTPUT_COLOR);
+    output->setTextColor(OUTPUT_COLOR);
     Tcl_Flush(channel);
-    // output->setTextColor(NORMAL_COLOR);
-    // Tcl_Seek(channel, 0, SEEK_SET);
-    // char buffer[1024];
-    // int bytesRead = Tcl_Read(channel, buffer, sizeof(buffer) - 1);
-    // // Null-terminate the buffer
-    // if (bytesRead >= 0) {
-    //     buffer[bytesRead] = '\0';
-    //     // Convert to QString
-    //     QString result = QString::fromUtf8(buffer, bytesRead);
-    //     qDebug() << result << 1;
-    //     output->setTextColor(OUTPUT_COLOR);
-    //     output->append("\n" + result);
-    //     output->setTextColor(NORMAL_COLOR);
-    // }
-    // output->moveCursorToEnd();
     output->moveCursor(QTextCursor::End);
 }
 
@@ -224,7 +169,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
     QStringList script;
     script << "--chipdb";
-    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
     script << "--xdc" << resultList;
 
     QString info;
@@ -232,27 +177,27 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
         script << "--json" << synthJsonPath;
         script << "--write" << routeJsonPath;
         script << "--fasm" << fasmPath;
-        info = "Starting Implementation Task\n";
+        info = "Starting Implementation Task";
     } else if (QString(argv[0]) == "pack_design") {
         script << "--json" << synthJsonPath;
         script << "--write" << packJsonPath;
         script << "--pack-only";
-        info = "Starting Pack Task\n";
+        info = "Starting Pack Task";
     } else if (QString(argv[0]) == "place_design") {
         script << "--json" << packJsonPath;
         script << "--write" << placeJsonPath;
         script << "--no-pack";
         script << "--no-route";
-        info = "Starting Place Task\n";
+        info = "Starting Place Task";
     } else if (QString(argv[0]) == "route_design") {
         script << "--json" << placeJsonPath;
         script << "--write" << routeJsonPath;
         script << "--fasm" << fasmPath;
         script << "--no-pack";
         script << "--no-place";
-        info = "Starting Route Task\n";
+        info = "Starting Route Task";
     } else  {
-        info = "Unknown implement command\n";
+        info = "Unknown implement command";
     }
 
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
@@ -429,7 +374,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "--part";
     script << part_name;
     script << "--db-root";
-    script << GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\hybrdlink_db\MC7F)";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\hybrdlink_db\MC7F)";
     script << "--fn_out";
     script << framesPath;
     script << "--fn_in";
@@ -437,7 +382,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "&&";
     script << "%FRAMES2BIT%";
     script << "--part_file";
-    script << GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + part_name + "/part.yaml";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + part_name + "/part.yaml";
     script << "--part_name";
     script << part_name;
     script << "--frm_file";

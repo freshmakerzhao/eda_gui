@@ -188,14 +188,14 @@ void ProcessManager::initEnvironment() {
 //    qgetenv("WINDIR")
 
     QString system32_path =  QString("%1\\System32").arg(QString::fromLocal8Bit(qgetenv("WINDIR")));
-    QString yosys_lib_path =  QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));;
+    QString yosys_lib_path =  QString::fromStdString(StringUtilities::concatPath({GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));;
     QString path = system32_path + ";" + yosys_lib_path;
     env.insert("PATH", path);
-    env.insert("PYTHON3", GLOBAL_RESOURCE_PATH + R"(\common\python\python.exe)");
-    env.insert("FASM2FRAMES", GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\fasm2frames.exe)");
-    env.insert("FRAMES2BIT", GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\xc7frames2bit.exe)");
-    projectProperty["synthesizer_path"] = GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
-    projectProperty["implementation_path"] = GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
+    env.insert("PYTHON3", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\common\python\python.exe)");
+    env.insert("FASM2FRAMES", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\fasm2frames.exe)");
+    env.insert("FRAMES2BIT", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\xc7frames2bit.exe)");
+    projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
+    projectProperty["implementation_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
 }
 
 void ProcessManager::configDisplay(const QString &partname) {

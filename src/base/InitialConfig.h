@@ -16,6 +16,7 @@
 class InitialConfig {
 
 public:
+    InitialConfig();
     static void initializeApplicationConfig();
     void initializeRoamingPath();
     static InitialConfig& instance();
