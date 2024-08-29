@@ -58,15 +58,15 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_RegisterChannel(interp, channel);
 
     output->append("Tcl console initialized. Type your commands in the line edit below.");
-    Tcl_CreateCommand(interp, "impl_design", TclImplCmd, nullptr, nullptr);
 
     Tcl_CreateCommand(interp, "set_device", TclSetDeviceCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "set_work_dir", TclSetWorkDirCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "set_top_module", TclSetTopModuleCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "synth_design", TclSynthCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "pack_design", TclPackCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "place_design", TclPlaceCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "route_design", TclRouteCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "impl_design", TclImplCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "pack_design", TclImplCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "place_design", TclImplCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "route_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "write_bitstream", TclWriteBitstreamCmd, nullptr, nullptr);
 
@@ -207,30 +207,54 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
     const QString workDir = QString(workDirVar);
 
-    QStringList script;
-    script << "--chipdb";
-    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
-
     QStringList resultList;
     const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
     if (tclVarValue != nullptr) {
         // 将 Tcl 列表字符串转换为 QString
         QString qStringList = QString::fromUtf8(tclVarValue);
-
         // 将 QString 转换为 QStringList
         resultList = qStringList.split(' ', Qt::SkipEmptyParts);
     }
 
-    script << "--xdc";
-    script << resultList;
-    script << "--json";
-    script << workDir + "/runs/synth/" + topName + ".json";
-    script << "--write";
-    script << workDir + "/runs/impl/route.json";
-    script << "--fasm";
-    script << workDir + "/runs/impl/" + topName + ".fasm";
+    QDir dir(workDir);
+    QString synthJsonPath = dir.filePath("runs/synth/" + topName + ".json");
+    QString packJsonPath = dir.filePath("runs/impl/pack.json");
+    QString placeJsonPath = dir.filePath("runs/impl/place.json");
+    QString routeJsonPath = dir.filePath("runs/impl/route.json");
+    QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
+    QStringList script;
+    script << "--chipdb";
+    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
+    script << "--xdc" << resultList;
 
-    QString info = "Starting Implementation Task\n";
+    QString info;
+    if (QString(argv[0]) == "impl_design") {
+        script << "--json" << synthJsonPath;
+        script << "--write" << routeJsonPath;
+        script << "--fasm" << fasmPath;
+        info = "Starting Implementation Task\n";
+    } else if (QString(argv[0]) == "pack_design") {
+        script << "--json" << synthJsonPath;
+        script << "--write" << packJsonPath;
+        script << "--pack-only";
+        info = "Starting Pack Task\n";
+    } else if (QString(argv[0]) == "place_design") {
+        script << "--json" << packJsonPath;
+        script << "--write" << placeJsonPath;
+        script << "--no-pack";
+        script << "--no-route";
+        info = "Starting Place Task\n";
+    } else if (QString(argv[0]) == "route_design") {
+        script << "--json" << placeJsonPath;
+        script << "--write" << routeJsonPath;
+        script << "--fasm" << fasmPath;
+        script << "--no-pack";
+        script << "--no-place";
+        info = "Starting Route Task\n";
+    } else  {
+        info = "Unknown implement command\n";
+    }
+
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     QString phase = "Implementation";
@@ -350,141 +374,6 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
                            "Top: %2").arg(deviceModel, topName);
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    ProcessManager::instance().excuteCommand(phase, script);
-    return TCL_OK;
-}
-
-int TclConsole::TclPackCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
-{
-    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
-    if (topVar == nullptr) {
-        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
-        return TCL_ERROR;
-    }
-
-    const QString topName = QString(topVar);
-
-    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
-    const QString workDir = QString(workDirVar);
-
-    QStringList script;
-    script << "--chipdb";
-    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
-
-    QStringList resultList;
-    const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
-    if (tclVarValue != nullptr) {
-        // 将 Tcl 列表字符串转换为 QString
-        QString qStringList = QString::fromUtf8(tclVarValue);
-
-        // 将 QString 转换为 QStringList
-        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
-    }
-
-    script << "--xdc";
-    script << resultList;
-    script << "--json";
-
-    script << workDir + "/runs/synth/" + topName + ".json";
-    script << "--write";
-    script << workDir + "/runs/impl/pack.json";
-    script << "--pack-only";
-
-    QString info = "Starting Pack Task\n";
-    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
-
-    QString phase = "Implementation";
-    ProcessManager::instance().excuteCommand(phase, script);
-    return TCL_OK;
-}
-
-int TclConsole::TclPlaceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
-{
-    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
-    if (topVar == nullptr) {
-        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
-        return TCL_ERROR;
-    }
-
-    const QString topName = QString(topVar);
-
-    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
-    const QString workDir = QString(workDirVar);
-
-    QStringList script;
-    script << "--chipdb";
-    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
-
-    QStringList resultList;
-    const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
-    if (tclVarValue != nullptr) {
-        // 将 Tcl 列表字符串转换为 QString
-        QString qStringList = QString::fromUtf8(tclVarValue);
-
-        // 将 QString 转换为 QStringList
-        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
-    }
-
-    script << "--xdc";
-    script << resultList;
-    script << "--json";
-
-    script << workDir + "/runs/impl/pack.json";
-    script << "--write";
-    script << workDir + "/runs/impl/place.json";
-    script << "--no-pack";
-    script << "--no-route";
-
-    QString info = "Starting Place Task\n";
-    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
-
-    QString phase = "Implementation";
-    ProcessManager::instance().excuteCommand(phase, script);
-    return TCL_OK;
-}
-
-int TclConsole::TclRouteCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
-{
-    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
-    if (topVar == nullptr) {
-        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
-        return TCL_ERROR;
-    }
-
-    const QString topName = QString(topVar);
-
-    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
-    const QString workDir = QString(workDirVar);
-
-    QStringList script;
-    script << "--chipdb";
-    script << GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
-
-    QStringList resultList;
-    const char *tclVarValue = Tcl_GetVar(interp, "constrs", 0);
-    if (tclVarValue != nullptr) {
-        // 将 Tcl 列表字符串转换为 QString
-        QString qStringList = QString::fromUtf8(tclVarValue);
-
-        // 将 QString 转换为 QStringList
-        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
-    }
-
-    script << "--xdc";
-    script << resultList;
-    script << "--json";
-    script << workDir + "/runs/impl/place.json";
-    script << "--write";
-    script << workDir + "/runs/impl/route.json";
-    script << "--fasm";
-    script << workDir + "/runs/impl/" + topName + ".fasm";
-    script << "--no-pack";
-    script << "--no-place";
-
-    QString info = "Starting Route Task\n";
-    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
-
-    QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
