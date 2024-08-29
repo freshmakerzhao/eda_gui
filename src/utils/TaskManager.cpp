@@ -50,15 +50,16 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     } else if (mode == 6) {
         // impReport();
     } else if (mode == 4) {
-//        buildPlace(3);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 5) {
-//        buildRoute();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 8) {
-//        buildBit(2);
+
+        QString arguments = buildBitScript();
+        publishScript(projectSynthPath,arguments);
+
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 9) {
@@ -176,6 +177,8 @@ void TaskManager::taskController(const int mode) {
                         QMessageBox::Cancel
                 )){
                     // 用户点击OK
+                    this->setSynthSuccessMsgStatus(true);
+                    this->setNextImplementProcessStatus(false);
                     // 执行综合
                     QString arguments = buildSynthScript();
                     publishScript(projectSynthPath,arguments);
@@ -194,6 +197,8 @@ void TaskManager::taskController(const int mode) {
                         QMessageBox::Cancel
                 )){
                     // 用户点击OK
+                    this->setSynthSuccessMsgStatus(true);
+                    this->setNextImplementProcessStatus(false);
                     // 执行综合
                     QString arguments = buildSynthScript();
                     publishScript(projectSynthPath,arguments);
@@ -206,6 +211,8 @@ void TaskManager::taskController(const int mode) {
             }
         } else {
             // 如果网表不存在
+            this->setSynthSuccessMsgStatus(true);
+            this->setNextImplementProcessStatus(false);
             // 直接执行
             QString arguments = buildSynthScript();
             publishScript(projectSynthPath,arguments);
@@ -253,6 +260,8 @@ void TaskManager::taskController(const int mode) {
                             QMessageBox::Cancel
                     )){
                         // 重新implement
+                        this->setSynthSuccessMsgStatus(false);
+                        this->setNextImplementProcessStatus(true);
                         QString implScript = buildImpScript();
                         publishScript(projectImplPath,implScript);
                         fileChanged = false;
@@ -294,6 +303,8 @@ void TaskManager::taskController(const int mode) {
                 } else {
                     // 设计文件没有改动
                     // 直接执行implement
+                    this->setSynthSuccessMsgStatus(false);
+                    this->setNextImplementProcessStatus(true);
                     QString implScript = buildImpScript();
                     publishScript(projectImplPath,implScript);
                     fileChanged = false;
@@ -409,21 +420,9 @@ QString TaskManager::buildImpScript() {
     return QString("impl_design");
 }
 
-// 生成bit流 阶段
-// mode 1 ： 仅生成top.fasm
-// mode 2 ： 生成top.fasm 与 top.bit
-//void TaskManager::buildBit(int mode) {
-//    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-//    if (mode == 1) {
-//        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName,topName);
-//        ProcessManager::instance().checkCall("Fasm Generation", projectImplPath, QString::fromStdString(script),displayPartName);
-//    }
-//    if (mode == 2) {
-//        std::string script = CommandBuilder::instance().generateFasmCommands(projectSynthPath,archName,topName);
-//        script += " && " + CommandBuilder::instance().generateBitCommands(projectImplPath,"%PYTHON3%",topName);
-//        ProcessManager::instance().checkCall("Bitstream Generation", projectImplPath, QString::fromStdString(script),displayPartName);
-//    }
-//}
+QString TaskManager::buildBitScript() {
+    return QString("write_bitstream");
+}
 
 void TaskManager::onFileChanged() {
     fileChanged = true;
@@ -484,7 +483,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
     // 如果当前执行完毕
     // exitCode 为0表示正常执行并成功退出
     if (msg.exitCode == 0) {
-        if (msg.phase == "synthesizer"){
+        if (msg.phase == "Synthesis"){
             // 综合结束后，读取资源统计信息
             qDebug() << "============= =========== ==================";
             qDebug() << msg.workPath;
@@ -506,7 +505,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
                 // 如果需要做
                 this->publishScript(this->_nextWorkPath, this->_nextTclCommand);
             }
-        } else if (msg.phase == "implementation"){
+        } else if (msg.phase == "Implementation"){
             InfoWidget::instance()->updateImplItem(
                     msg.workPath,
                     msg.phase + " Complete!",

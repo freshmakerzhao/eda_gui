@@ -116,6 +116,7 @@ private:
     void setImplementSuccessMsgStatus(bool status);
     void setNextImplementProcessStatus(bool status);
     void initMessageStatus();
+
     // 下一阶段使用的命令
     QString _nextPhase = nullptr;
     QString _nextWorkPath = nullptr;
@@ -128,6 +129,7 @@ public:
     void readBackMemory(const QString &rbdFilePath);
     void readBackRegister(const QString &registerAddress);
 
+    QString buildBitScript();
 };
 
 #endif // TASKMANAGER_H
