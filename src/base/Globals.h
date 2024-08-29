@@ -12,6 +12,9 @@
 #include <string>
 #include <map>
 #include <QString>
+#include <QFileInfo>
+#include <QCoreApplication>
+#include <QDebug>
 
 static int GLOBAL_TILE_BLOCK_WIDTH  = 210;
 static int GLOBAL_TILE_BLOCK_HEIGHT = 100;
@@ -29,8 +32,11 @@ static std::map<std::string,std::string> GLOBAL_PART_TO_ARCH = {
 };
 
 // 全局资源路径
-static QString GLOBAL_RESOURCE_PATH = "C:/HybrdLink/resource_win";
-// static QString GLOBAL_RESOURCE_PATH = "E:/workspace/HybrdLink_test/resource_win";
+namespace GlobalConfig {
+    extern QString GLOBAL_RESOURCE_PATH;
+
+    void initGlobalResourcePath();
+}
 
 //// 架构映射文件路径
 //extern std::string GLOBAL_TILE_INFO_MAP_PATH;

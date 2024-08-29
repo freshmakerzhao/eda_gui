@@ -64,8 +64,8 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 9) {
         qDebug() << "[TaskManager] arch " << this->arch;
-        std::string tileGridPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
-        std::string tileColorPath = GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+        std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
+        std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
         qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
         qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
         if (gridView) {
