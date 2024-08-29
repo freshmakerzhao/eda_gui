@@ -7,6 +7,7 @@
 #include <QSplashScreen>
 #include <utils/FontsUtilities.h>
 #include "utils/LicenseUtilities.h"
+#include "utils/ProcessManager.h"
 
 int main(int argc, char *argv[])
 {
@@ -39,6 +40,7 @@ int main(int argc, char *argv[])
 #endif
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();
+    ProcessManager::instance().initEnvironment();
 
     // 启动画面
     QPixmap pix(":/resource/start.jpg");

@@ -64,6 +64,7 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "place_design", TclPlaceCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "route_design", TclRouteCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "write_bitstream", TclBitstreamCmd, nullptr, nullptr);
 
     // 读取标准输出并将其写入到 Tcl 标准输出通道
     connect(process, &QProcess::readyReadStandardOutput, [&]() {
@@ -212,12 +213,12 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     script << workDir + "/runs/synth/" + topName + ".json";
     script << "--write";
     script << workDir + "/runs/impl/route.json";
-    script << "--debug";
+    script << "--fasm";
+    script << workDir + "/runs/impl/" + topName + ".fasm";
 
     QString info = "Starting Implementation Task\n";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    ProcessManager::instance().initEnvironment();
     QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
@@ -334,7 +335,6 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
                            "Top: %2").arg(deviceModel, topName);
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    ProcessManager::instance().initEnvironment();
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
@@ -374,12 +374,10 @@ int TclConsole::TclPackCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     script << "--write";
     script << workDir + "/runs/impl/pack.json";
     script << "--pack-only";
-    script << "--debug";
 
     QString info = "Starting Pack Task\n";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    ProcessManager::instance().initEnvironment();
     QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
@@ -421,12 +419,10 @@ int TclConsole::TclPlaceCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     script << workDir + "/runs/impl/place.json";
     script << "--no-pack";
     script << "--no-route";
-    script << "--debug";
 
     QString info = "Starting Place Task\n";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    ProcessManager::instance().initEnvironment();
     QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
@@ -465,14 +461,14 @@ int TclConsole::TclRouteCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     script << workDir + "/runs/impl/place.json";
     script << "--write";
     script << workDir + "/runs/impl/route.json";
+    script << "--fasm";
+    script << workDir + "/runs/impl/" + topName + ".fasm";
     script << "--no-pack";
     script << "--no-place";
-    script << "--debug";
 
     QString info = "Starting Route Task\n";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    ProcessManager::instance().initEnvironment();
     QString phase = "Implementation";
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
@@ -500,5 +496,53 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
         return TCL_ERROR;
     }
 
+    return TCL_OK;
+}
+
+int TclConsole::TclBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char **argv) {
+
+
+    QStringList script;
+    QString part_name = "xc7a100tfgg484-2";
+
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+    const QString topName = QString(topVar);
+
+    QDir dir(workDir);
+    QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
+    QString framesPath = dir.filePath("runs/impl/" + topName + ".frames");
+    QString bitstreamPath = dir.filePath("runs/impl/" + topName + ".bit");
+
+    script << "%FASM2FRAMES%";
+    script << "--part";
+    script << part_name;
+    script << "--db-root";
+    script << GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\hybrdlink_db\MC7F)";
+    script << "--fn_out";
+    script << framesPath;
+    script << "--fn_in";
+    script << fasmPath;
+    script << "&&";
+    script << "%FRAMES2BIT%";
+    script << "--part_file";
+    script << GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + part_name + "/part.yaml";
+    script << "--part_name";
+    script << part_name;
+    script << "--frm_file";
+    script << framesPath;
+    script << "--output_file";
+    script << bitstreamPath;
+
+    QString info = "Starting Gen Bit Task\n";
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
+    QString phase = "GeneratorBitstream";
+    ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }

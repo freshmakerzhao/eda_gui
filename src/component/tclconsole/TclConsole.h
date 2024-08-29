@@ -65,6 +65,7 @@ private:
     static int TclPlaceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclRouteCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+    static int TclBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 };

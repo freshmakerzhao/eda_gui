@@ -156,7 +156,7 @@ ProcessManager::~ProcessManager()
 }
 
 void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
-    initEnvironment(); // 初始化环境变量
+    process->setProcessEnvironment(env);
     this->curPhase = phase; // 当前执行阶段
 
     process->terminate(); // 执行前中断process
@@ -166,7 +166,8 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
         script << "/c" << projectProperty["synthesizer_path"] << command;
     } else if (phase == "Implementation"){
         script << "/c" << projectProperty["implementation_path"] << command;
-
+    } else if (phase == "GeneratorBitstream"){
+        script << "/c" << command;
     }
     qDebug() << " =================================== ";
     qDebug() << script;
@@ -181,9 +182,19 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
 
 void ProcessManager::initEnvironment() {
     env = QProcessEnvironment::systemEnvironment();
-    QString YosysLibPath = QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));
-    env.insert("PATH", YosysLibPath);
-    projectProperty["synthesizer_path"] = GLOBAL_RESOURCE_PATH + R"(\yosys\bin\yosys.exe)";
+
+//    QString origin_path = env.value("PATH");
+//    origin_path += ";" + QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));
+//    qgetenv("WINDIR")
+
+    QString system32_path =  QString("%1\\System32").arg(QString::fromLocal8Bit(qgetenv("WINDIR")));
+    QString yosys_lib_path =  QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));;
+    QString path = system32_path + ";" + yosys_lib_path;
+    env.insert("PATH", path);
+    env.insert("PYTHON3", GLOBAL_RESOURCE_PATH + R"(\common\python\python.exe)");
+    env.insert("FASM2FRAMES", GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\fasm2frames.exe)");
+    env.insert("FRAMES2BIT", GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\xc7frames2bit.exe)");
+    projectProperty["synthesizer_path"] = GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
     projectProperty["implementation_path"] = GLOBAL_RESOURCE_PATH + R"(\nextpnr\bin\nextpnr-xilinx.exe)";
 }
 

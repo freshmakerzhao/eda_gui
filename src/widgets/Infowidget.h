@@ -59,6 +59,11 @@ private:
 
     std::unordered_map<std::string, int*> keyMapSynth = {
         {"$lut", &lutNumSynth},
+        {"INV", &lutNumSynth},
+        {"LUT2", &lutNumSynth},
+        {"LUT3", &lutNumSynth},
+        {"LUT4", &lutNumSynth},
+        {"LUT5", &lutNumSynth},
         {"MUXF6", &muxf6NumSynth},
         {"FDRE", &ffNumSynth},
         {"FDSE", &ffNumSynth},
