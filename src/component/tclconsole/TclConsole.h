@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QTextEdit>
 #include <QColor>
-#include <QProcess>
+// #include <QProcess>
 #include <QDebug>
 #include <tcl.h>
 #include "LineEditor.h"
@@ -35,7 +35,7 @@ private:
     QTextEdit *output;
     LineEditor *input;
 
-    static QProcess *process;
+    // static QProcess *process;
 
     // 自定义输出函数
     static int QtTclOutput(ClientData clientData, const char *buf, int toWrite, int *errorCodePtr);
@@ -49,7 +49,13 @@ private:
     // 自定义 getHandleProc 函数
     static int QtTclGetHandle(ClientData clientData, int direction, ClientData *handlePtr);
 
+    // 自定义 seekProc 函数
+    static int QtTclSeekProc(ClientData instanceData, long offset, int seekMode, int *errorCode);
 
+    // 自定义 wideSeekProc 函数
+    static Tcl_WideInt QtTclWideSeekProc(ClientData instanceData, Tcl_WideInt offset, int seekMode, int *errorCode);
+
+    // ---------------------------- TCL Command ------------------------------
     static int TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
@@ -65,7 +71,8 @@ private:
     static int TclPlaceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclRouteCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
-    static int TclBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 };
