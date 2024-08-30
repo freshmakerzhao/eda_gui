@@ -92,6 +92,12 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     proBitViewItem->setIcon(0, QIcon(":/icons/resource/icons/28-icon_grid_view.png"));
     proDownloadBitItem = new QTreeWidgetItem(proItem, QStringList() << "Download Bit");
     proDownloadBitItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
+    // downFlashItem = new QTreeWidgetItem(proItem, QStringList() << "Download Flash");
+    // downFlashItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
+    // readBackRegItem = new QTreeWidgetItem(proItem, QStringList() << "Read Back Reg");
+    // readBackRegItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
+    // readBackMemoryItem =  new QTreeWidgetItem(proItem, QStringList() << "Read Back Memory");
+    // readBackMemoryItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
     expandAll();
 
     QObject::connect(this, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
@@ -119,7 +125,13 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(13);
         } else if (item == prjSummaryItem) {
             TaskManager::instance().handleTreeItemActivation(14);
-        }
+        }/* else if (item == downFlashItem) {
+            TaskManager::instance().handleTreeItemActivation(15);
+        } else if (item == readBackRegItem) {
+            TaskManager::instance().handleTreeItemActivation(16);
+        } else if (item == readBackMemoryItem) {
+            TaskManager::instance().handleTreeItemActivation(17);
+        }*/
         clearSelection(); // 清除选中状态
     });
 

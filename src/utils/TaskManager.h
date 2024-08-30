@@ -107,9 +107,11 @@ private:
 
 public:
     void downloadBit(const QString &projectImplPath1, const QString &topName1);
-    void downloadFlash();
+    void downloadFlash(const QString &projectImplPath1, const QString &topName1);
     QWidget* gridView = nullptr;
 
+    void readBackMemory(const QString &rbdFilePath);
+    void readBackRegister(const QString &registerAddress);
 };
 
 #endif // TASKMANAGER_H

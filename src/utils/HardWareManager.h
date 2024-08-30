@@ -10,7 +10,7 @@ class HardWareManager :public QObject
 public:
     static HardWareManager& instance();
 
-    void openProgramDevice();
+    void openProgramDevice(const int &mode = 0);
 
     QString path;
 private:

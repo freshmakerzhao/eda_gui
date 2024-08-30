@@ -10,6 +10,7 @@
 #include "mainwindow.h"
 #include "FileHelper.h"
 #include "HardWareManager.h"
+#include "dialog/AdvancedFileDialog.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -79,7 +80,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // frameView->show();
     } else if (mode == 10) {
         // downloadBit();
-        HardWareManager::instance().openProgramDevice();
+        HardWareManager::instance().openProgramDevice(0);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 11) {
@@ -97,6 +98,59 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // settingDialog->show();
     } else if (mode == 14) {
         MainWindow::instance()->showPrjSummary();
+    } else if (mode == 15) {
+        HardWareManager::instance().openProgramDevice(1);
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (mode == 16) {
+        // HardWareManager::instance().openProgramDevice(2);
+        QDialog dialog;
+        QFormLayout *formLayout = new QFormLayout(&dialog);
+        QLineEdit lineEdit;
+        formLayout->addRow("Register Address: ", &lineEdit);
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+        formLayout->addWidget(buttonBox);
+        connect(buttonBox, &QDialogButtonBox::accepted, [&lineEdit, &dialog, this](){
+            QString regAddress = lineEdit.text();
+            qDebug() << "Reg Address:" << regAddress;
+            readBackRegister(regAddress);
+            dialog.accept();
+        });
+        connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+        dialog.exec();
+        InfoWidget::instance()->setCurrentPage(2);
+    } else if (mode == 17) {
+        QDialog dialog;
+        dialog.setFixedWidth(600);
+        QLabel label("Rbd file path: ");
+        QVBoxLayout *mainLayout = new QVBoxLayout(&dialog);
+        QHBoxLayout *hboxLayout = new QHBoxLayout();
+        hboxLayout->addWidget(&label);
+        QLineEdit *lineEdit = new QLineEdit();
+        hboxLayout->addWidget(lineEdit);
+        QPushButton *browseButton = new QPushButton("Browse...");
+        hboxLayout->addWidget(browseButton);
+        mainLayout->addLayout(hboxLayout);
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+        mainLayout->addWidget(buttonBox);
+        QObject::connect(browseButton, &QPushButton::clicked, [lineEdit]() {
+            QString filePath = AdvancedFileDialog::getSaveFileName(nullptr, "Save Rbd File", "", "*.rbd;;All Files (*)");
+            if (!filePath.isEmpty()) {
+                if (QFileInfo(filePath).suffix().isEmpty()) {
+                    filePath += ".rbd";
+                }
+                lineEdit->setText(filePath);
+            }
+        });
+        QObject::connect(buttonBox, &QDialogButtonBox::accepted, [&lineEdit, &dialog, this]() {
+            QString rbdFilePath = lineEdit->text();
+            qDebug() << "RbdFilePath:" << rbdFilePath;
+            readBackMemory(rbdFilePath);
+            dialog.accept();
+        });
+        QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+        dialog.exec();
+        InfoWidget::instance()->setCurrentPage(2);
     }
 }
 /**
@@ -484,10 +538,33 @@ void TaskManager::downloadBit(const QString &projectImplPath1, const QString &to
     }
 }
 
-void TaskManager::downloadFlash() {
+void TaskManager::readBackRegister(const QString &registerAddress) {
     ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath, partName, topName);
-    ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),displayPartName);
+
+    std::string script = CommandBuilder::instance().generateReadBackRegisterCommands(partName, registerAddress);
+    ProcessManager::instance().checkCall("ReadBack Register", projectImplPath, QString::fromStdString(script),displayPartName);
+
+}
+
+void TaskManager::readBackMemory(const QString &rbdFilePath) {
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+
+    std::string script = CommandBuilder::instance().generateReadMemoryCommands(partName, rbdFilePath);
+    ProcessManager::instance().checkCall("ReadBack Memory", projectImplPath, QString::fromStdString(script),displayPartName);
+
+}
+
+void TaskManager::downloadFlash(const QString &projectImplPath1, const QString &topName1) {
+
+
+    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+    if (projectImplPath1.isEmpty() && topName1.isEmpty()) {
+        std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath, partName, topName);
+        ProcessManager::instance().checkCall("Config Flash", projectImplPath, QString::fromStdString(script),displayPartName);
+    } else {
+        std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath1, partName, topName1);
+        ProcessManager::instance().checkCall("Config Flash", projectImplPath1, QString::fromStdString(script),displayPartName);
+    }
 }
 
 // 两个选项的弹窗，true 左侧，false 右侧

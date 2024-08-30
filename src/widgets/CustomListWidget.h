@@ -26,6 +26,9 @@ public:
     QString projectPath;
 
 protected:
+protected:
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
     bool eventFilter(QObject *obj, QEvent *event) override;
 //    void leaveEvent(QEvent *event) override;
 //    void enterEvent(QEvent *event) override;
