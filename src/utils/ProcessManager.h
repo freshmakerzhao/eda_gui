@@ -74,7 +74,7 @@ private:
 
 private slots:
     void handleFinished(int exitCode,QProcess::ExitStatus exitStatus);
-    void handleReadyReadStandardOutput();
+    void handleChannelReadyReadOutput();
 
 signals:
 

@@ -32,7 +32,7 @@ void ProcessManager::configWorkPath(const QString &path) {
 }
 
 // 实时回显数据
-void ProcessManager::handleReadyReadStandardOutput()
+void ProcessManager::handleChannelReadyReadOutput()
 {
     // 获取标准输出
     QByteArray normalOutput = process->readAllStandardOutput();
@@ -145,7 +145,7 @@ ProcessManager::ProcessManager()
     process = new QProcess();
     // readyReadStandardOutput 信号，有输出则显示在message中
     // connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(handleReadyReadStandardOutput()));
-    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleReadyReadStandardOutput);
+    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
     // finished 信号，process执行完毕后触发
     connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
 }
