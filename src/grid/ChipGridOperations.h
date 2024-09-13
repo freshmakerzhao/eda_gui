@@ -12,6 +12,7 @@
 #include "blocks/Blocks.h"
 #include <QCoreApplication>
 #include <fstream>
+#include <unordered_set>
 
 static std::map<std::string, std::map<std::string,int>> TYPE_TO_SIZE_FACTORS;
 
@@ -26,6 +27,9 @@ public:
     std::vector<std::vector<NormalTile>> gridTypeMatrix; // 存储tile_grid
     std::vector<std::vector<Blocks*>> gridMatrix; // 存储绘图对象 graphicItem
     std::vector<SubItem> usageGrid;
+
+    // std::vector<std::string> used_site;
+    std::unordered_set<std::string> used_site;
 
     ChipGridOperations();
     void buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal);

@@ -113,7 +113,8 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     // 资源占用
     connect(rightTopUsage, &QPushButton::clicked, [this,rightTopSites,rightTopBlockName,projectImplPath]() {
         // ==================== 默认使用runs/impl目录下的end_placement.json文件可视化资源使用情况 =========================
-        usageJsonPath = projectImplPath + "/end_placement.json";
+        // usageJsonPath = projectImplPath + "/end_placement.json";
+        usageJsonPath = projectImplPath + "/place.json";
         if (projectImplPath != "") {
             viewer.setAllTileWhite(scene);
             viewer.updateSitesVisibleStatus(true);

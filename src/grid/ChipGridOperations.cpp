@@ -297,33 +297,65 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     TotalSize usageSize;
     size_t num_elements = j.size();
 
-    // 匹配 "cluster_x" 后面的数字,表示第几列
-    std::regex rule ("cluster_x(\\d+)");
+    usageSize.width = 210;
+    usageSize.height = 456;
 
-    if (num_elements > 1) {
-        usageSize.width = j["size"]["width"];
-        usageSize.height = j["size"]["height"];
-        qDebug() << usageSize.width;
-        qDebug() << usageSize.height;
-    } else {
-        std::exit(1);
+    used_site.reserve(128); // 预先分配内存
+
+    // const nlohmann::json& modules = j["modules"];
+    // for (auto module = modules.begin(); module != modules.end(); ++module) {
+    //     const nlohmann::json& cells = module.value()["cells"];
+    //     for (auto cell = cells.begin(); cell != cells.end(); ++cell) {
+    //         const nlohmann::json& bells = cell.value()["attributes"]["NEXTPNR_BEL"];
+    //         for (auto bell = bells.begin(); bell != bells.end(); ++bell) {
+    //             const std::string& value = bell.value().get_ref<const std::string&>();
+    //             size_t pos = value.find('/');
+    //             if (pos != std::string::npos) {
+    //                 used_site.push_back(value.substr(0, pos));
+    //             } else {
+    //                 used_site.push_back(value);
+    //             }
+    //         }
+    //     }
+    // }
+
+    /*
+     * 根据 JSON 结构，可以通过提前获取多层嵌套的 JSON 引用来减少嵌套深度。
+     * 提前处理可能的错误条件（如 key 不存在）也有助于减少查找开销。
+    **/
+    const auto& modules = j["modules"];
+    for (const auto& module : modules) {
+        if (!module.contains("cells")) continue;  // 提前检查 key 是否存在
+        const auto& cells = module["cells"];
+        for (const auto& cell : cells) {
+            if (!cell.contains("attributes") || !cell["attributes"].contains("NEXTPNR_BEL")) continue;
+            const auto& bells = cell["attributes"]["NEXTPNR_BEL"];
+            for (const auto& bell : bells) {
+                const std::string& value = bell.get_ref<const std::string&>();
+                size_t pos = value.find('/');
+                if (pos != std::string::npos) {
+                    // used_site.push_back(value.substr(0, pos));
+                    used_site.insert(value.substr(0, pos));
+                } else {
+                    // used_site.push_back(value);
+                    used_site.insert(value);
+                }
+            }
+        }
     }
-    for (const auto& col  : j.items()) {
-        if (col.key()  == "size") continue; // 如果键是 "size"，就跳过当前迭代
-        std::smatch match;
-        if (std::regex_search(col.key(), match, rule) && match.size() > 1) {
-            int colIndex = std::stoi(match.str(1));
-            if(colIndex > usageSize.width ){
+
+    // qDebug() << "set: " << used_site.size();
+    for (int i = 0; i < gridTypeMatrix.size(); ++i) {
+        for (int j = 0; j < gridTypeMatrix[i].size(); ++j) {
+            if (gridTypeMatrix[i][j].types == "SKIP") {
                 continue;
             }
-            for (const auto& cluster : col.value().items()) {
-                Cluster item(cluster.value());
-                auto sub_size = item.sub.size();
-                for (int i = 0; i < sub_size; ++i ) {
-                     if (item.sub[i].color != "white"){
-                         // 不是white就占用了
-                         usageGrid.push_back(item.sub[i]);
-                     }
+            for (auto site : gridTypeMatrix[i][j].cur_sites) {
+                // if (std::find(used_site.begin(), used_site.end(), site.name) != used_site.end()) {
+                if (used_site.find(site.name) != used_site.end()) {
+                    for (auto item : gridMatrix[i][j]->child_items) {
+                        item->setColor("SteelBlue");
+                    }
                 }
             }
         }
@@ -347,6 +379,7 @@ bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
                 continue;
             }
             gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->setColor(QString::fromStdString(usageGrid[i].color));
+            // gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->setColor(QString("gray"));
         }
         qDebug() << 456;
         usageGrid.clear();
