@@ -2,12 +2,14 @@
 #include "utils/ProjectManager.h"
 #include "widgets/Form.h"
 #include "base/InitialConfig.h"
+#include "base/Globals.h"
 #include <QApplication>
 #include <QFontDatabase>
 #include <QSplashScreen>
 #include <utils/FontsUtilities.h>
 #include "utils/LicenseUtilities.h"
 #include "utils/ProcessManager.h"
+#include "widgets/FrameView.h"
 
 int main(int argc, char *argv[])
 {
@@ -44,11 +46,19 @@ int main(int argc, char *argv[])
 
     // 启动画面
     QPixmap pix(":/resource/start.jpg");
-
     QSplashScreen splash(pix.scaled(640, 640, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     splash.show();
     splash.showMessage("Loading...");
     a.processEvents();
+
+#if ONLY_COMPILE_GRIDVIEW
+    std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_100t.json";
+    std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+    FrameView gridView(tileGridPath,tileColorPath);
+    gridView.resize(1600, 1000);
+    splash.finish(&gridView);
+    gridView.show();
+#else
     splash.finish(MainWindow::instance()); // 启动画面结束
     MainWindow::instance()->setCentralWidget(Form::instance());
     MainWindow::instance()->show();
@@ -57,6 +67,6 @@ int main(int argc, char *argv[])
     QStringList args = a.arguments();
     // 如果有传递文件作为命令行参数
     ProjectManager::instance().openProjectFromArgs(args);
-
+#endif
     return a.exec();
 }

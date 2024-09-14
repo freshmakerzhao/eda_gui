@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
 # 是否需要检查 软件有效期
 option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" ON)
+# 仅编译GridView
+option(ONLY_COMPILE_GRIDVIEW "Only compile the GridView" OFF)
 
 if (ENABLE_MAC_CHECK)
     message(STATUS "ENABLE_MAC_CHECK ON.")
@@ -23,6 +25,13 @@ if (ENABLE_EXPIRATION_CHECK)
     add_definitions(-DENABLE_EXPIRATION_CHECK)
 else ()
     message(STATUS "ENABLE_EXPIRATION_CHECK OFF.")
+endif()
+
+if (ONLY_COMPILE_GRIDVIEW)
+    message(STATUS "ONLY_COMPILE_GRIDVIEW ON.")
+    add_definitions(-DONLY_COMPILE_GRIDVIEW)
+else ()
+    message(STATUS "ONLY_COMPILE_GRIDVIEW OFF.")
 endif()
 
 # 检测操作系统
