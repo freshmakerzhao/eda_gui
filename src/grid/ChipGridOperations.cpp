@@ -301,24 +301,6 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     usageSize.height = 456;
 
     used_site.reserve(128); // 预先分配内存
-
-    // const nlohmann::json& modules = j["modules"];
-    // for (auto module = modules.begin(); module != modules.end(); ++module) {
-    //     const nlohmann::json& cells = module.value()["cells"];
-    //     for (auto cell = cells.begin(); cell != cells.end(); ++cell) {
-    //         const nlohmann::json& bells = cell.value()["attributes"]["NEXTPNR_BEL"];
-    //         for (auto bell = bells.begin(); bell != bells.end(); ++bell) {
-    //             const std::string& value = bell.value().get_ref<const std::string&>();
-    //             size_t pos = value.find('/');
-    //             if (pos != std::string::npos) {
-    //                 used_site.push_back(value.substr(0, pos));
-    //             } else {
-    //                 used_site.push_back(value);
-    //             }
-    //         }
-    //     }
-    // }
-
     /*
      * 根据 JSON 结构，可以通过提前获取多层嵌套的 JSON 引用来减少嵌套深度。
      * 提前处理可能的错误条件（如 key 不存在）也有助于减少查找开销。
@@ -334,10 +316,8 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
                 const std::string& value = bell.get_ref<const std::string&>();
                 size_t pos = value.find('/');
                 if (pos != std::string::npos) {
-                    // used_site.push_back(value.substr(0, pos));
                     used_site.insert(value.substr(0, pos));
                 } else {
-                    // used_site.push_back(value);
                     used_site.insert(value);
                 }
             }
@@ -351,10 +331,11 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
                 continue;
             }
             for (auto site : gridTypeMatrix[i][j].cur_sites) {
-                // if (std::find(used_site.begin(), used_site.end(), site.name) != used_site.end()) {
                 if (used_site.find(site.name) != used_site.end()) {
                     for (auto item : gridMatrix[i][j]->child_items) {
-                        item->setColor("SteelBlue");
+                        // item->setColor("SteelBlue");
+                        QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
+                        item->setColor(color);
                     }
                 }
             }
