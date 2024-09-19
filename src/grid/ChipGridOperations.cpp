@@ -238,6 +238,42 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
             }
         }
     }
+
+    // --------------------- Clock Region ----------------------------
+    // nlohmann::json tgj = tile_json_data;
+    // // Iterate over JSON object
+    // for (auto& [tile, tiledata] : tgj.items()) {
+    //     int x = tiledata["grid_x"];
+    //     int y = tiledata["grid_y"];
+
+    //     // Read tile clock region info
+    //     std::string clock_region = tiledata.contains("clock_region") && !tiledata["clock_region"].get<std::string>().empty()
+    //                                    ? tiledata["clock_region"].get<std::string>()
+    //                                    : "NULL";
+
+    //     // Update clock region bounding box
+    //     if (clock_region != "NULL") {
+    //         if (clock_region_bounding_boxes.find(clock_region) == clock_region_bounding_boxes.end()) {
+    //             // Initialize new clock region bounding box
+    //             clock_region_bounding_boxes[clock_region] = BoundingBox();
+    //         }
+
+    //         // Update bounding box with min/max values
+    //         clock_region_bounding_boxes[clock_region].x0 = std::min(clock_region_bounding_boxes[clock_region].x0, static_cast<double>(x));
+    //         clock_region_bounding_boxes[clock_region].y0 = std::min(clock_region_bounding_boxes[clock_region].y0, static_cast<double>(y));
+    //         clock_region_bounding_boxes[clock_region].x1 = std::max(clock_region_bounding_boxes[clock_region].x1, static_cast<double>(x));
+    //         clock_region_bounding_boxes[clock_region].y1 = std::max(clock_region_bounding_boxes[clock_region].y1, static_cast<double>(y));
+    //     }
+    // }
+
+    // // Print the clock region bounding boxes
+    // for (const auto& region : clock_region_bounding_boxes) {
+    //     std::cout << "Clock region: " << region.first
+    //               << " BoundingBox(x0: " << region.second.x0
+    //               << ", y0: " << region.second.y0
+    //               << ", x1: " << region.second.x1
+    //               << ", y1: " << region.second.y1 << ")" << std::endl;
+    // }
 }
 
 
@@ -259,6 +295,26 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
     }catch (...) {
         return false;  // 如果在执行过程中抛出任何异常，则返回 false
     }
+
+    QPen pen;
+    pen.setWidth(7);
+    pen.setColor(Qt::darkGreen);
+    scene->addRect(QRect(0, 1*100, 78*210 + 100, 51*100), pen);
+    pen.setColor(Qt::darkYellow);
+    scene->addRect(QRect(0, 53*100, 78*210 + 100, 103*100 - 52*100), pen);
+    pen.setColor(Qt::darkBlue);
+    scene->addRect(QRect(0, 105*100, 78*210 + 100, 155*100 - 104*100), pen);
+    pen.setColor(Qt::darkRed);
+    scene->addRect(QRect(0, 157*100, 78*210 + 100, 207*100 - 156*100), pen);
+
+    pen.setColor(Qt::darkBlue);
+    scene->addRect(QRect(78*210 + 110, 1*100, 130*210 + 210 - 78*210 - 105, 51*100), pen);
+    pen.setColor(Qt::darkRed);
+    scene->addRect(QRect(78*210 + 110, 53*100, 147*210 + 210 - 78*210 - 105, 103*100 - 52*100), pen);
+    pen.setColor(Qt::darkGreen);
+    scene->addRect(QRect(78*210 + 110, 105*100, 147*210 + 210 - 78*210 - 105, 155*100 - 104*100), pen);
+    pen.setColor(Qt::darkYellow);
+    scene->addRect(QRect(78*210 + 110, 157*100, 130*210 + 210 - 78*210 - 105, 207*100 - 156*100), pen);
 
     return true;  // 如果成功执行了所有操作，则返回 true
 }
@@ -341,6 +397,8 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
             }
         }
     }
+
+    used_site.clear();
 }
 
 bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
