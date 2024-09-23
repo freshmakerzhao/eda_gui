@@ -112,9 +112,15 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 
     // 资源占用
     connect(rightTopUsage, &QPushButton::clicked, [this,rightTopSites,rightTopBlockName,projectImplPath]() {
-        // ==================== 默认使用runs/impl目录下的end_placement.json文件可视化资源使用情况 =========================
-        usageJsonPath = projectImplPath + "/end_placement.json";
-        if (projectImplPath != "") {
+#if ONLY_COMPILE_GRIDVIEW
+        // -------------------- 手动选择资源占用文件，方便测试 -----------------------------------
+        usageJsonPath = FileHelper::addJsonFile();
+#else          
+    // ----------- 默认使用runs/impl目录下的place.json文件可视化资源使用情况 -----------
+    QDir dir(projectImplPath);
+    usageJsonPath = dir.filePath("place.json");
+#endif
+        if (QFile(usageJsonPath).exists()) {
             viewer.setAllTileWhite(scene);
             viewer.updateSitesVisibleStatus(true);
             viewer.updateTilesNameVisibleStatus(false);
@@ -126,22 +132,10 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
             if (viewer.showPlaceUsageGrid(scene)){
             } else {
             }
+        } else {
+            qDebug() << usageJsonPath <<  "is not exists";
         }
-        // ==================== 手动选择资源占用文件，方便测试 =========================
-//        usageJsonPath = FileHelper::addJsonFile();
-//        if (!usageJsonPath.isEmpty()) {
-//            viewer.setAllTileWhite(scene);
-//            viewer.updateSitesVisibleStatus(true);
-//            viewer.updateTilesNameVisibleStatus(false);
-//            showTilesName = false;
-//            showSites = true;
-//            rightTopSites->setText("Hide Module Details");
-//            rightTopBlockName->setText("Tile Name On");
-//            viewer.buildPlaceUsageGrid(usageJsonPath.toStdString());
-//            if (viewer.showPlaceUsageGrid(scene)){
-//            } else {
-//            }
-//        }
+
     });
 
     // ========================= 下部分的标签 ===========================
