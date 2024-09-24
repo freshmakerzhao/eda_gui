@@ -111,6 +111,7 @@ file(GLOB PROJECT_SOURCES
     ipmanager/BlockMemoryGenerator/*.cpp
     component/tclconsole/TclConsole.cpp
     component/tclconsole/LineEditor.cpp
+    component/tclconsole/OutputEditor.cpp
     settings/*.cpp
     include/tinyxml2/*.cpp
     entity/*.cpp
@@ -132,6 +133,7 @@ file(GLOB PROJECT_HEADERS
     ipmanager/BlockMemoryGenerator/*.h
     component/tclconsole/TclConsole.h
     component/tclconsole/LineEditor.h
+    component/tclconsole/OutputEditor.h
     settings/*.h
     include/Qsci/*.h
     include/yaml-cpp/*.h

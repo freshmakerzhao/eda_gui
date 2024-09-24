@@ -20,8 +20,7 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setMargin(0);
 
-    output = new QTextEdit(this);
-    output->setReadOnly(true);
+    output = new OutputEditor(this);
     layout->addWidget(output);
 
     input = new LineEditor(this);
@@ -83,7 +82,7 @@ void TclConsole::onCommandEnter(QString text) {
 }
 
 int TclConsole::QtTclOutput(ClientData clientData, const char *buf, int toWrite, int *errorCodePtr) {
-    QTextEdit *output = reinterpret_cast<QTextEdit*>(clientData);
+    OutputEditor *output = reinterpret_cast<OutputEditor*>(clientData);
     if (output) {
         output->moveCursor(QTextCursor::End);
         output->insertPlainText(QString::fromUtf8(buf, toWrite));
@@ -94,7 +93,7 @@ int TclConsole::QtTclOutput(ClientData clientData, const char *buf, int toWrite,
 
 int TclConsole::QtTclClose(ClientData clientData, Tcl_Interp *interp) {
     // 处理通道关闭时的清理工作
-    QTextEdit *output = reinterpret_cast<QTextEdit*>(clientData);
+    OutputEditor *output = reinterpret_cast<OutputEditor*>(clientData);
     if (output) {
         // 清理操作，如必要时释放资源
     }

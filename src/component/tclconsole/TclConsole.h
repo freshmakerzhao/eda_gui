@@ -3,12 +3,12 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
-#include <QTextEdit>
 #include <QColor>
 // #include <QProcess>
 #include <QDebug>
 #include <tcl.h>
 #include "LineEditor.h"
+#include "OutputEditor.h"
 
 class TclConsole : public QWidget
 {
@@ -32,7 +32,7 @@ private:
 
     Tcl_Interp *interp;
     Tcl_ChannelType *channelType;
-    QTextEdit *output;
+    OutputEditor *output;
     LineEditor *input;
 
     // static QProcess *process;
