@@ -162,47 +162,56 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     }
 
     QDir dir(workDir);
-    QString synthJsonPath = dir.filePath("runs/synth/" + topName + ".json");
-    QString packJsonPath = dir.filePath("runs/impl/pack.json");
-    QString placeJsonPath = dir.filePath("runs/impl/place.json");
-    QString routeJsonPath = dir.filePath("runs/impl/route.json");
-    QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
+    const QString implPath = dir.filePath("runs/impl");
+    const QString synthJsonPath = dir.filePath("runs/synth/" + topName + ".json");
+    const QString packJsonPath = dir.filePath("runs/impl/pack.json");
+    const QString placeJsonPath = dir.filePath("runs/impl/place.json");
+    const QString routeJsonPath = dir.filePath("runs/impl/route.json");
+    const QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
     QStringList script;
-    script << "--chipdb";
-    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/common/archs/" + "xc7a100t.bin";
-    script << "--xdc" << resultList;
 
     QString info;
-    if (QString(argv[0]) == "impl_design") {
-        script << "--json" << synthJsonPath;
-        script << "--write" << routeJsonPath;
-        script << "--fasm" << fasmPath;
+
+    // 公共部分提取为函数，避免重复代码
+    auto addCommonArgs = [&script, &resultList](const QString &jsonPath,
+                                                const QString &writePath,
+                                                const QStringList &extraArgs = {}) {
+        script << "%IMPL_PATH%";
+        script << "--chipdb";
+        script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/common/archs/xc7a100t.bin";
+        script << "--xdc" << resultList;
+        script << "--json" << jsonPath;
+        script << "--write" << writePath;
+        script << extraArgs;
+    };
+
+    const QString task = QString(argv[0]);
+
+    if (task == "impl_design") {
+        addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only"});
+        script << "&&";
+        addCommonArgs(packJsonPath, placeJsonPath, {"--no-pack", "--no-route"});
+        script << "&&";
+        addCommonArgs(placeJsonPath, routeJsonPath, {"--fasm", fasmPath, "--no-pack", "--no-place"});
         info = "Starting Implementation Task";
-    } else if (QString(argv[0]) == "pack_design") {
-        script << "--json" << synthJsonPath;
-        script << "--write" << packJsonPath;
-        script << "--pack-only";
+    } else if (task == "pack_design") {
+        addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only"});
         info = "Starting Pack Task";
-    } else if (QString(argv[0]) == "place_design") {
-        script << "--json" << packJsonPath;
-        script << "--write" << placeJsonPath;
-        script << "--no-pack";
-        script << "--no-route";
+    } else if (task == "place_design") {
+        addCommonArgs(packJsonPath, placeJsonPath, {"--no-pack", "--no-route"});
         info = "Starting Place Task";
-    } else if (QString(argv[0]) == "route_design") {
-        script << "--json" << placeJsonPath;
-        script << "--write" << routeJsonPath;
-        script << "--fasm" << fasmPath;
-        script << "--no-pack";
-        script << "--no-place";
+    } else if (task == "route_design") {
+        addCommonArgs(placeJsonPath, routeJsonPath, {"--fasm", fasmPath, "--no-pack", "--no-place"});
         info = "Starting Route Task";
-    } else  {
+    } else {
         info = "Unknown implement command";
     }
+
 
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     QString phase = "Implementation";
+    ProcessManager::instance().configWorkPath(implPath);
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
@@ -302,8 +311,9 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     const QString workDir = QString(workDirVar);
 
     QDir dir(workDir);
-    QString jsonPath = dir.filePath("runs/synth/" + topName + ".json");
-    QString edifPath = dir.filePath("runs/synth/" + topName + ".edn");
+    const QString jsonPath = dir.filePath("runs/synth/" + topName + ".json");
+    const QString edifPath = dir.filePath("runs/synth/" + topName + ".edn");
+    const QString synthPath = dir.filePath("runs/synth");
 
     QStringList script;
     script << "-p";
@@ -319,6 +329,7 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
                            "Top: %2").arg(deviceModel, topName);
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
+    ProcessManager::instance().configWorkPath(synthPath);
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
@@ -366,9 +377,10 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     const QString topName = QString(topVar);
 
     QDir dir(workDir);
-    QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
-    QString framesPath = dir.filePath("runs/impl/" + topName + ".frames");
-    QString bitstreamPath = dir.filePath("runs/impl/" + topName + ".bit");
+    const QString implPath = dir.filePath("runs/impl");
+    const QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
+    const QString framesPath = dir.filePath("runs/impl/" + topName + ".frames");
+    const QString bitstreamPath = dir.filePath("runs/impl/" + topName + ".bit");
 
     script << "%FASM2FRAMES%";
     script << "--part";
@@ -394,6 +406,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     QString phase = "Generate Bitstream";
+    ProcessManager::instance().configWorkPath(implPath);
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }

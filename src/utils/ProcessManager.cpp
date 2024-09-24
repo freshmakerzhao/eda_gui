@@ -165,7 +165,8 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
     if (phase == "Synthesis"){
         script << "/c" << projectProperty["synthesizer_path"] << command;
     } else if (phase == "Implementation"){
-        script << "/c" << projectProperty["implementation_path"] << command;
+        // script << "/c" << projectProperty["implementation_path"] << command;
+        script << "/c" << command;
     } else if (phase == "Generate Bitstream"){
         script << "/c" << command;
     }
@@ -194,8 +195,9 @@ void ProcessManager::initEnvironment() {
     env.insert("PYTHON3", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\common\python\python.exe)");
     env.insert("FASM2FRAMES", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\fasm2frames.exe)");
     env.insert("FRAMES2BIT", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\xc7frames2bit.exe)");
+    env.insert("IMPL_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)");
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
-    projectProperty["implementation_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
+    // projectProperty["implementation_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
 }
 
 void ProcessManager::configDisplay(const QString &partname) {
