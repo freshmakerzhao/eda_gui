@@ -26,6 +26,9 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
     QLabel *pathLabel = new QLabel("Project path:");
     pathLineEdit = new QLineEdit(QDir::homePath(), this);
     pathLineEdit->setClearButtonEnabled(true);
+
+    nameLineEdit->setText(autoSetName(pathLineEdit->text()));
+
     QPushButton *browseButton = new QPushButton("Browse");
     connect(browseButton, &QPushButton::clicked, [=]() {
         QString path = AdvancedFileDialog::getExistingDirectory(this, "Select Directory", QDir::homePath(), QFileDialog::DontUseNativeDialog);
@@ -63,9 +66,8 @@ bool ProjectNamePage::isComplete() const
     }
 
     // 检查路径下是否存在相同的名称
-    QDir projectDir(projectPath);
-    QStringList entryList = projectDir.entryList();
-    if (entryList.contains(projectName, Qt::CaseSensitive)) {
+    QDir dir(projectPath);
+    if (dir.exists(projectName)) {
         warningLabel->setText("Same name folder already exists in the selected path!");
         return false;
     }
@@ -80,6 +82,17 @@ bool ProjectNamePage::isComplete() const
     // 通过检查
     warningLabel->setText("");
     return true;
-
-
 }
+
+QString ProjectNamePage::autoSetName(const QString &projectDir)
+{
+    QDir dir(projectDir);
+    unsigned long long int number = 1;
+    QString result;
+    do {
+        result = QString("project_%1").arg(number);
+        number++;
+    } while (dir.exists(result));
+    return result;
+}
+

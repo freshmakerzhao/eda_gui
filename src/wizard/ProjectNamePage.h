@@ -23,6 +23,8 @@ protected:
     bool isComplete() const override;
 
 private:
+    QString autoSetName(const QString &projectDir);
+
     QLineEdit *nameLineEdit;
     QLineEdit *pathLineEdit;
     QLabel *warningLabel;
