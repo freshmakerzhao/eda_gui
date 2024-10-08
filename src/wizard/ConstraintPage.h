@@ -24,10 +24,11 @@ private:
 
     QStandardItemModel *model;
 
-    QTableView *tableView;
+    WizTableView *tableView;
 
     const QMap<QString, QString> Map = {
-        {"xdc", "xdc"}
+        {"xdc", "xdc"},
+        {"hdc", "hdc"}
     };
 
 private slots:

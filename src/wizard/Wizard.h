@@ -31,6 +31,7 @@
 #include <QComboBox>
 #include <QFormLayout>
 #include <QDebug>
+#include "WizCommon.h"
 
 class Wizard : public QWizard
 {

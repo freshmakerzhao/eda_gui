@@ -22,7 +22,7 @@ public:
 private:
     QStandardItemModel *model;
 
-    QTableView *tableView;
+    WizTableView *tableView;
 
     int _mode;
 

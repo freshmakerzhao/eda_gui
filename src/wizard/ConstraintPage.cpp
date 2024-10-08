@@ -24,7 +24,8 @@ ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
     model->setHeaderData(2, Qt::Horizontal, QObject::tr("File Type"));
     model->setHeaderData(3, Qt::Horizontal, QObject::tr("Location"));
 
-    tableView = new QTableView(this);
+    tableView = new WizTableView(this);
+    tableView->setDisplayText("Use Add Flles, Add Dlrectories or Create File buttons below");
     tableView->setModel(model);
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
@@ -38,10 +39,10 @@ ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
     QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &ConstraintPage::onAddFiles);
 
-    QPushButton *createFileButton = new QPushButton("Create Files");createFileButton->setFixedSize(160, 45);
+    QPushButton *createFileButton = new QPushButton("Create File");createFileButton->setFixedSize(160, 45);
     connect(createFileButton, &QPushButton::clicked, this, &ConstraintPage::onCreateFile);
 
-    QPushButton *removeButton = new QPushButton("Remove Files");removeButton->setFixedSize(160, 45);
+    QPushButton *removeButton = new QPushButton("Remove File");removeButton->setFixedSize(160, 45);
     connect(removeButton, &QPushButton::clicked, this, &ConstraintPage::onRemoveFiles);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -57,7 +58,10 @@ ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
 void ConstraintPage::onAddFiles()
 {
     int currentIndex = model->rowCount() + 1; // 用于记录当前索引
-    QStringList fileNames = AdvancedFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.xdc)");
+    QStringList fileNames = AdvancedFileDialog::getOpenFileNames(this,
+                                                                 "Add Constraint Files",
+                                                                 "",
+                                                                 "Design Constraint Files (*.xdc *.hdc);;All Files(*)");
     for (const QString &fileName : fileNames) {
         QFileInfo fileInfo(fileName);
         QList<QStandardItem *> items;
@@ -88,6 +92,7 @@ void ConstraintPage::onCreateFile()
     dialog.setWindowTitle("Create Constraint File");
     QComboBox *comboBox = new QComboBox(&dialog);
     comboBox->addItem("XDC");
+    comboBox->addItem("HDC");
 
     QFormLayout *formLayout = new QFormLayout(&dialog);
     formLayout->addRow("File type:", comboBox);
@@ -107,7 +112,9 @@ void ConstraintPage::onCreateFile()
         QString extension;
         if (fileType == "XDC") {
             extension = ".xdc";
-        }else {
+        } else if (fileType == "HDC") {
+            extension = ".hdc";
+        } else {
             // Handle other file types if needed
         }
 
@@ -116,19 +123,21 @@ void ConstraintPage::onCreateFile()
             directory.mkpath(".");
         }
 
-        QString newFilePath = "Cache/" + fileName + extension;
-        QFile file(newFilePath);
+        fileName = "Cache/" + fileName;
+        if (!fileName.endsWith(extension)) {
+            fileName += extension;
+        }
+        QFile file(fileName);
         if (file.open(QFile::WriteOnly | QFile::Truncate)) {
             // File created successfully, do any additional processing here if needed
             // QTextStream stream(&file);
             file.close();
-        }
-        else {
+        } else {
             // Failed to create file, handle error appropriately
         }
 
         int currentIndex = model->rowCount() + 1;
-        QFileInfo fileInfo(newFilePath);
+        QFileInfo fileInfo(fileName);
         QList<QStandardItem *> items;
         items << new QStandardItem(QString::number(currentIndex++)); // 设置索引
         items << new QStandardItem(fileInfo.fileName());
@@ -141,7 +150,7 @@ void ConstraintPage::onCreateFile()
         items << new QStandardItem("<Local to Project>");
         model->appendRow(items);
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->constraintFilesList.append(newFilePath); // 添加文件路径到列表中
+        wizard->constraintFilesList.append(fileName); // 添加文件路径到列表中
 
         qDebug() << "-----------------------------------------------------";
         for(auto it : wizard->constraintFilesList){

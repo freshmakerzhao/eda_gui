@@ -16,7 +16,8 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
     _mode = mode;
 
     setTitle("Add Sources");
-    setSubTitle("Specify HDL, netlist, Block Design, and iP files to add to your project.");
+    setSubTitle("Specify HDL files to add to your project. "
+                "Create a new source file on disk and add it to your project.");
 
     model = new QStandardItemModel(this);
     model->setColumnCount(4); // 增加列数，用于显示索引
@@ -25,7 +26,8 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
     model->setHeaderData(2, Qt::Horizontal, QObject::tr("File Type"));
     model->setHeaderData(3, Qt::Horizontal, QObject::tr("Location"));
 
-    tableView = new QTableView(this);
+    tableView = new WizTableView(this);
+    tableView->setDisplayText("Use Add Flles, Add Dlrectories or Create File buttons below");
     tableView->setModel(model);
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
@@ -39,10 +41,10 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
     QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
     connect(addFilesButton, &QPushButton::clicked, this, &SourcesPage::onAddFiles);
 
-    QPushButton *createFileButton = new QPushButton("Create Files");createFileButton->setFixedSize(160, 45);
+    QPushButton *createFileButton = new QPushButton("Create File");createFileButton->setFixedSize(160, 45);
     connect(createFileButton, &QPushButton::clicked, this, &SourcesPage::onCreateFile);
 
-    QPushButton *removeButton = new QPushButton("Remove Files");removeButton->setFixedSize(160, 45);
+    QPushButton *removeButton = new QPushButton("Remove File");removeButton->setFixedSize(160, 45);
     connect(removeButton, &QPushButton::clicked, this, &SourcesPage::onRemoveFiles);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -58,7 +60,10 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
 void SourcesPage::onAddFiles()
 {
     int currentIndex = model->rowCount() + 1; // 用于记录当前索引
-    QStringList fileNames = AdvancedFileDialog::getOpenFileNames(this, "Select Files", "", "Verilog Source Files (*.v)");
+    QStringList fileNames = AdvancedFileDialog::getOpenFileNames(this,
+                                                                 "Add Source Files",
+                                                                 "",
+                                                                 "Design Source Files (*.v);;All Files(*)");
     for (const QString &fileName : fileNames) {
         QFileInfo fileInfo(fileName);
         QList<QStandardItem *> items;
@@ -108,7 +113,7 @@ void SourcesPage::onCreateFile()
         QString extension;
         if (fileType == "Verilog") {
             extension = ".v";
-        }else {
+        } else {
             // Handle other file types if needed
         }
 
@@ -117,19 +122,20 @@ void SourcesPage::onCreateFile()
             directory.mkpath(".");
         }
         // TODO:文件名不能为空
-        QString newFilePath = "Cache/" + fileName + extension;
-        QFile file(newFilePath);
+        fileName = "Cache/" + fileName;
+        if (!fileName.endsWith(extension)) {
+            fileName += extension;
+        }
+        QFile file(fileName);
         if (file.open(QFile::WriteOnly | QFile::Truncate)) {
             // File created successfully, do any additional processing here if needed
-            // QTextStream stream(&file);
             file.close();
-        }
-        else {
+        } else {
             // Failed to create file, handle error appropriately
         }
 
         int currentIndex = model->rowCount() + 1;
-        QFileInfo fileInfo(newFilePath);
+        QFileInfo fileInfo(fileName);
         QList<QStandardItem *> items;
         items << new QStandardItem(QString::number(currentIndex++)); // 设置索引
         items << new QStandardItem(fileInfo.fileName());
@@ -142,7 +148,7 @@ void SourcesPage::onCreateFile()
         items << new QStandardItem("<Local to Project>");
         model->appendRow(items);
         Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->sourcesFilesList.append(newFilePath); // 添加文件路径到列表中
+        wizard->sourcesFilesList.append(fileName); // 添加文件路径到列表中
 
         qDebug() << "-----------------------------------------------------";
         for(auto it : wizard->sourcesFilesList){
