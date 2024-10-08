@@ -105,6 +105,13 @@ void ConstraintPage::onCreateFile()
     formLayout->addRow(buttonBox);
     formLayout->setVerticalSpacing(25); // 设置垂直间距
 
+    QPushButton *acceptButton = buttonBox->button(QDialogButtonBox::Ok);
+    acceptButton->setEnabled(false);
+
+    connect(lineEdit, &QLineEdit::textChanged, [acceptButton](const QString &text) {
+        acceptButton->setEnabled(!text.isEmpty());
+    });
+
     connect(buttonBox, &QDialogButtonBox::accepted, [comboBox, lineEdit, &dialog, this](){
         QString fileType = comboBox->currentText();
         QString fileName = lineEdit->text();
