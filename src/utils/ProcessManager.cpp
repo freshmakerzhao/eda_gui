@@ -163,23 +163,29 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
 
     QStringList script;
     if (phase == "Synthesis"){
-        script << "/c" << projectProperty["synthesizer_path"] << command;
+        // script << "/c" << projectProperty["synthesizer_path"] << command;
     } else if (phase == "Implementation"){
         // script << "/c" << projectProperty["implementation_path"] << command;
         script << "/c" << command;
     } else if (phase == "Generate Bitstream"){
         script << "/c" << command;
     }
-    qDebug() << " =================================== ";
+    qDebug() << "------------------------------------------------- ";
     qDebug() << script;
-    qDebug() << " =================================== ";
+    qDebug() << "------------------------------------------------- ";
 
     // 记录开始执行的时间
     this->startTime = TimeUtilities::getCurTimeAndFormat(); // 展示
     this->startTimeForCal = TimeUtilities::getCurTime(); // 计算
 
-    process->start("cmd.exe", script);
+    if (phase == "Synthesis") {
+        qDebug() << command;
+        process->start(projectProperty["synthesizer_path"], command);
+    } else {
+        process->start("cmd.exe", script);
+    }
 }
+
 
 void ProcessManager::initEnvironment() {
     env = QProcessEnvironment::systemEnvironment();
