@@ -27,7 +27,7 @@ SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
     model->setHeaderData(3, Qt::Horizontal, QObject::tr("Location"));
 
     tableView = new WizTableView(this);
-    tableView->setDisplayText("Use Add Flles, Add Dlrectories or Create File buttons below");
+    tableView->setDisplayText("Use Add Flles or Create File buttons below");
     tableView->setModel(model);
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位

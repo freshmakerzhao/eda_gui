@@ -1,6 +1,3 @@
-#ifndef FONTSUTILITIES_H
-#define FONTSUTILITIES_H
-
 /**
   ******************************************************************************
   * @file           : FontsUtilities.h
@@ -10,6 +7,9 @@
   * @date           : 2024/6/24
   ******************************************************************************
   */
+#ifndef FONTSUTILITIES_H
+#define FONTSUTILITIES_H
+
 #include <QCoreApplication>
 #include <QApplication>
 #include <QFont>
