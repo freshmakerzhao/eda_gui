@@ -429,15 +429,9 @@ void TaskManager::onFileChanged() {
     qDebug("\033[43m[FileWatcher]\033[0m File Changed");
 }
 
-void TaskManager::downloadBit(const QString &projectImplPath1, const QString &topName1) {
-//    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-//    if (projectImplPath1.isEmpty() && topName1.isEmpty()) {
-//        std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath, partName, topName);
-//        ProcessManager::instance().checkCall("Bitstream Download", projectImplPath, QString::fromStdString(script),displayPartName);
-//    } else {
-//        std::string script = CommandBuilder::instance().generateDownloadBitCommands(projectImplPath1, partName, topName1);
-//        ProcessManager::instance().checkCall("Bitstream Download", projectImplPath1, QString::fromStdString(script),displayPartName);
-//    }
+void TaskManager::downloadBit(const QString &bitstream) {
+    std::string script = CommandBuilder::instance().generateDownloadBitCommands(bitstream);
+    ProcessManager::instance().excuteBitStreamScript(QString::fromStdString(script));
 }
 
 void TaskManager::readBackRegister(const QString &registerAddress) {

@@ -54,6 +54,8 @@ public:
 
     void excuteCommand(QString &phase, const QStringList& command);
 
+    void excuteBitStreamScript(const QString &script);
+
     /**
      * 初始化环境变量
      */

@@ -122,7 +122,7 @@ private:
     QString _nextWorkPath = nullptr;
     QString _nextTclCommand = nullptr;
 public:
-    void downloadBit(const QString &projectImplPath1, const QString &topName1);
+    void downloadBit(const QString &bitstream);
     void downloadFlash(const QString &projectImplPath1, const QString &topName1);
     QWidget* gridView = nullptr;
 

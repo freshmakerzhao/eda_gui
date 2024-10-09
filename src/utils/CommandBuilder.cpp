@@ -25,46 +25,11 @@ CommandBuilder::~CommandBuilder()
 {
 }
 
-std::string CommandBuilder::generateBitCommands(const QString& projectImplPath,const std::string& pythonPath,const QString& topName){
-    std::map<std::string,std::string> parameters;
-
-//    parameters["db-root"] = StringUtilities::concatPath({ProcessManager::instance().getProperty("prjxray_db_path"), "artix7"});
-//    parameters["part"] = ProcessManager::instance().getProperty("part_name");
-//    parameters["part_file"] = StringUtilities::concatPath({ProcessManager::instance().getProperty("prjxray_db_path"), "artix7", ProcessManager::instance().getProperty("part_name"), "part.yaml"});
-//    parameters["sparse"] = "";
-//    parameters["frm2bit"] = ProcessManager::instance().getProperty("fasm2bit_path");
-//    parameters["emit_pudc_b_pullup"] = "";
-//    parameters["fn_in"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".fasm"});
-//    parameters["bit_out"] = StringUtilities::concatPath({projectImplPath.toStdString(), topName.toStdString() + ".bit"});
-//
+std::string CommandBuilder::generateDownloadBitCommands(const QString& bitstream){
     std::stringstream cmd;
-//    std::string xcfasmPath = ProcessManager::instance().getProperty("generate_bit_path");
-//    // pythonPath + executePath + 后面的参数
-//
-//    cmd << pythonPath << " " << xcfasmPath;
-//
-//    for(const auto& pair : parameters) {
-//        cmd << " --" << pair.first << " " << pair.second;
-//    }
-//
-    return cmd.str();
-}
-
-std::string CommandBuilder::generateDownloadBitCommands(
-        const QString& projectImplPath,
-        const QString& partName,
-        const QString& topName){
-    std::stringstream cmd;
-//    cmd << ProcessManager::instance().getProperty("openFPGALoader_path");
-//
-//    if (partName.contains("a100t")){
-//        //  100t 黑金
-//        cmd << " -c digilent_hs3";
-//    } else if (partName.contains("a35t")){
-//        //  35t 野火
-//        cmd << " -c ft2232";
-//    };
-//    cmd << " " << (projectImplPath + "/" + topName).toStdString();
+    cmd << "%BITSTREAMTOOL_PATH%";
+    cmd << " -c digilent_hs3";
+    cmd << " " << (bitstream).toStdString();
     return cmd.str();
 }
 

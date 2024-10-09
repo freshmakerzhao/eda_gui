@@ -186,6 +186,21 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
     }
 }
 
+void ProcessManager::excuteBitStreamScript(const QString &script)
+{
+    process->setProcessEnvironment(env);
+    this->curPhase = "Download Bitstream"; // 当前执行阶段
+    process->terminate();
+
+    this->startTime = TimeUtilities::getCurTimeAndFormat(); // 展示
+    this->startTimeForCal = TimeUtilities::getCurTime(); // 计算
+
+    QStringList arguments;
+    arguments << "/c" << script;
+    qDebug() << arguments;
+    process->start("cmd.exe", arguments);
+}
+
 
 void ProcessManager::initEnvironment() {
     env = QProcessEnvironment::systemEnvironment();
@@ -202,6 +217,7 @@ void ProcessManager::initEnvironment() {
     env.insert("FASM2FRAMES", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\fasm2frames.exe)");
     env.insert("FRAMES2BIT", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\xc7frames2bit.exe)");
     env.insert("IMPL_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)");
+    env.insert("BITSTREAMTOOL_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\bin\bitstreamTools.exe)");
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
     // projectProperty["implementation_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
 }

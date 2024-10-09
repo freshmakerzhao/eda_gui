@@ -16,14 +16,6 @@ class CommandBuilder {
 public:
 
     static CommandBuilder& instance();
-    std::string generateImpPackCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName,const QString& topName = "top");
-    std::string generateImpIOPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath,const QString& topName = "top");
-    std::string generateImpConstrainsCommands(const QString& projectSynthPath,const QString& projectImplPath,const std::string& pythonPath,const QString& topName = "top");
-    std::string generateImpPlaceCommands(const QString& projectSynthPath,const QString& projectImplPath,const QString& archName,const QString& topName = "top");
-    std::string generateImpRouteCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
-    std::string generateImpementationCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
-    std::string generateFasmCommands(const QString& projectSynthPath,const QString& archName,const QString& topName = "top");
-    std::string generateBitCommands(const QString& projectImplPath,const std::string& pythonPath,const QString& topName = "top");
     /**
      * 下载码流
      * @param projectImplPath 项目路径\runs\impl
@@ -31,7 +23,7 @@ public:
      * @param partName
      * @return
      */
-    std::string generateDownloadBitCommands(const QString& projectImplPath, const QString& partName, const QString& topName = "top");
+    std::string generateDownloadBitCommands(const QString& bitstream);
     std::string generateDownloadFlashCommands(const QString& projectImplPath, const QString& partName, const QString& topName = "top");
 
     std::string generateReadBackRegisterCommands(const QString &partName, const QString &registerAddress);
@@ -39,17 +31,6 @@ public:
 private:
     CommandBuilder();
     ~CommandBuilder();
-    std::map<std::string,std::string> device2graphMap = {
-            {"xc7a35t","xc7a50t_test"},
-            {"xc7a50t","xc7a50t_test"},
-            {"xc7a100t","xc7a100t_test"}
-    };
-
-    std::map<std::string,std::string> deviceMap = {
-            {"xc7a35t","xc7a50t-test"},
-            {"xc7a50t","xc7a50t-test"},
-            {"xc7a100t","xc7a100t-test"}
-    };
 };
 
 
