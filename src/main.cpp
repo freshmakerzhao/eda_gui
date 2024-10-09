@@ -23,17 +23,7 @@ int main(int argc, char *argv[])
     qss.close();
 
     //! ----- Fonts -----
-    QString appDirPath = QCoreApplication::applicationDirPath();
-    // 加载字体并获取字体名
-    QString fontName = FontsUtilities::instance().loadFont(appDirPath);
-    if (fontName.isEmpty()) {
-        qCritical() << "Failed to load any font. Exiting.";
-        fontName = a.font().family();
-    }
-    QFont font(fontName, 9);
-    font.setHintingPreference(QFont::PreferNoHinting); // 修复中文笔画粘连
-    a.setFont(font);
-    QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
+    FontsUtilities::loadFont();
 
 #if defined(ENABLE_MAC_CHECK) || defined(ENABLE_EXPIRATION_CHECK)
     if (!LicenseUtilities::instance()->checkLicense()) {
