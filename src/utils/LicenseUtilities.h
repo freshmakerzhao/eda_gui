@@ -14,23 +14,21 @@
 #include <QString>
 #include <QDateTime>
 #include <QRegularExpression>
-#include "dialog/LicenseDialog.h"
-
 
 class LicenseUtilities {
 public:
-    static LicenseUtilities *instance();
+    static bool checkLicense();
 
-    bool checkLicense();
+    static QString getLicensePath();
 
 private:
-    int loadLicense();
+    static int loadLicense();
 
-    bool checkMacAddress(const QString& expectedMacAddress);
+    static bool checkMacAddress(const QString& expectedMacAddress);
 
-    int isWithinValidPeriod(const QString& compileDateTimeStr);
+    static int isWithinValidPeriod(const QString& compileDateTimeStr);
 
-    QString getMacAddress();
+    static QString getMacAddress();
 };
 
 

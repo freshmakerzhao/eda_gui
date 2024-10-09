@@ -1,4 +1,5 @@
 #include "LicenseDialog.h"
+#include "utils/LicenseUtilities.h"
 
 LicenseDialog::LicenseDialog(QWidget *parent, const int &mode)
     : QDialog(parent)
@@ -38,7 +39,7 @@ LicenseDialog::LicenseDialog(QWidget *parent, const int &mode)
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, this);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &LicenseDialog::reject);
     QPushButton *loadLicenseButton = new QPushButton("Load License");
-    connect(loadLicenseButton, &QPushButton::clicked, this, &LicenseDialog::loadLicense);
+    connect(loadLicenseButton, &QPushButton::clicked, this, &LicenseDialog::copyLicense);
     buttonBox->addButton(loadLicenseButton, QDialogButtonBox::ActionRole);
     QLabel *label = new QLabel(title, this);
     label->setWordWrap(true);
@@ -47,14 +48,14 @@ LicenseDialog::LicenseDialog(QWidget *parent, const int &mode)
 
 }
 
-void LicenseDialog::loadLicense()
+void LicenseDialog::copyLicense()
 {
     const QString licenseFile = QFileDialog::getOpenFileName(nullptr, "Select License", QDir::homePath(), "License File (*.lic)");
     if (licenseFile.isEmpty()) {
         this->accept();
     }
-    const QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    const QString licensePath = QFileInfo(appDataPath).path() + "/HybrdChip/Common/license.lic";
+
+    QString licensePath = LicenseUtilities::getLicensePath();
     QFile file(licensePath);
     if (file.exists()) {
         // 如果目标文件已经存在，先删除它

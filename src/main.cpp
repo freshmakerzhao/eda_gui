@@ -25,13 +25,16 @@ int main(int argc, char *argv[])
     //! ----- Fonts -----
     FontsUtilities::loadFont();
 
+    //! ----- Config ----
+    InitialConfig::instance().initializeApplicationConfig();
+    InitialConfig::instance().initializeRoamingPath();
+
 #if defined(ENABLE_MAC_CHECK) || defined(ENABLE_EXPIRATION_CHECK)
-    if (!LicenseUtilities::instance()->checkLicense()) {
+    if (!LicenseUtilities::checkLicense()) {
         return -1;  // License check failed or user rejected dialog
     }
 #endif
-    InitialConfig::instance().initializeApplicationConfig();
-    InitialConfig::instance().initializeRoamingPath();
+
     ProcessManager::instance().initEnvironment();
 
     // 启动画面

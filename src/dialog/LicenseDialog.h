@@ -21,7 +21,7 @@ public:
     QString selectLicense() const;
 
 private slots:
-    void loadLicense();
+    void copyLicense();
 
 };
 

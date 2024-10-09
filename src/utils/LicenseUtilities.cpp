@@ -9,22 +9,14 @@
   */
 #include "LicenseUtilities.h"
 #include "AESUtilities.h"
+#include "dialog/LicenseDialog.h"
 #include <QCoreApplication>
 #include <QNetworkInterface>
 #include <QDate>
 
-LicenseUtilities *LicenseUtilities::instance()
-{
-    static LicenseUtilities *_instance = nullptr;
-    if (!_instance) {
-        _instance = new LicenseUtilities;
-    }
-    return _instance;
-}
-
 bool LicenseUtilities::checkLicense() {
     while (true) {
-        const int result = LicenseUtilities::instance()->loadLicense();
+        const int result = loadLicense();
         if (result == 0) {
             return true;  // License check passed
         }
@@ -36,10 +28,19 @@ bool LicenseUtilities::checkLicense() {
     }
 }
 
-int LicenseUtilities::loadLicense()
+QString LicenseUtilities::getLicensePath()
 {
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QString licensePath = QFileInfo(appDataPath).path() + "/HybrdChip/Common/license.lic";
+    QDir dir(appDataPath);
+    if (dir.cdUp()) {
+        dir.absolutePath();  // 返回父目录的绝对路径
+    }
+    return dir.filePath("Common/license.lic");
+}
+
+int LicenseUtilities::loadLicense()
+{
+    QString licensePath = getLicensePath();
     if (!QFileInfo(licensePath).isFile()) {
         // 证书不存在
         return -1;
@@ -62,7 +63,7 @@ int LicenseUtilities::loadLicense()
     QString macAddress;
     if (macMatch.hasMatch()) macAddress = macMatch.captured(1);
 
-    if (!LicenseUtilities::checkMacAddress(macAddress)) {
+    if (!checkMacAddress(macAddress)) {
         // MAC_ADDRESS检查失败
         return -3;
     }
@@ -71,7 +72,7 @@ int LicenseUtilities::loadLicense()
 #endif
 
 #ifdef ENABLE_EXPIRATION_CHECK
-    int remainingDays = LicenseUtilities::isWithinValidPeriod(decryptText);
+    int remainingDays = isWithinValidPeriod(decryptText);
     if (remainingDays == -1) {
         // 证书过期
         return -4;
