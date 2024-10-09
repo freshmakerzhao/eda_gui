@@ -12,6 +12,7 @@
   */
 
 #include <QWidget>
+#include <QListWidget>
 #include <QVBoxLayout>
 #include <QButtonGroup>
 #include <QPushButton>
@@ -27,6 +28,8 @@ class Form : public QWidget
 public:
     static Form *instance();
 
+    void clearRecent();
+
 protected:
     void paintEvent(QPaintEvent *event) override;
 
@@ -34,6 +37,8 @@ private:
     Form(QWidget *parent = nullptr);
     ~Form();
     std::string extractProjectName(const std::string& path);
+
+    QListWidget *listWidget1; // Recent Project
 };
 
 #endif // FORM_H

@@ -8,7 +8,6 @@
   ******************************************************************************
   */
 
-#include <QListWidget>
 #include "Form.h"
 #include "mainwindow.h"
 #include "CustomListWidget.h"
@@ -24,6 +23,19 @@ Form *Form::instance()
         _instance = new Form(nullptr);
     }
     return _instance;
+}
+
+void Form::clearRecent()
+{
+    for (int i = 0; i < listWidget1->count(); ++i) {
+        QListWidgetItem *item = listWidget1->item(i);
+        QWidget *widget = listWidget1->itemWidget(item);
+        if (widget != nullptr) {
+            disconnect(widget, nullptr, nullptr, nullptr);
+        }
+    }
+
+    listWidget1->clear();
 }
 
 void Form::paintEvent(QPaintEvent *event)
@@ -212,7 +224,7 @@ Form::Form(QWidget *parent)
     QVBoxLayout *rightGroupLayoutOne = new QVBoxLayout(rightGroupBoxOne);
     rightGroupBoxOne->setFixedHeight(500);  // 设置右侧区域的固定宽度
     rightGroupBoxOne->setFixedWidth(700);  // 设置右侧区域的固定宽度
-    QListWidget *listWidget1 = new QListWidget;
+    listWidget1 = new QListWidget;
     std::vector<XmlRecent> recentLists = XmlUtilities::instance().getRecentListFromFatherElementName(
             InitialConfig::instance().xmlPath.toStdString().c_str(),
             "RECENT_PROJECTS");
