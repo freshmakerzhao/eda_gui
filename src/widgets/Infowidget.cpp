@@ -171,6 +171,11 @@ void InfoWidget::initDesignRunsView(const QString &prjPath)
         QString jsonData = synthInFile.readAll();
         synthInFile.close();
         nlohmann::json j = nlohmann::json::parse(jsonData.toStdString());
+        lut6NumSynth =j.value("LUT6", 0);
+        ffNumSynth = j.value("ff", 0);
+        bramNumSynth =j.value("BRAM", 0);
+        dspNumSynth = j.value("dsp", 0);
+        carry4NumSynth = j.value("carry4", 0);
         runsModel->item(0, 1)->setText(QString::fromStdString(j.value("status", ""))); // Status
         runsModel->item(0, 2)->setText(QString::number(j.value("LUT6", 0))); // LUT6
         runsModel->item(0, 3)->setText(QString::number(j.value("ff", 0))); // ff
