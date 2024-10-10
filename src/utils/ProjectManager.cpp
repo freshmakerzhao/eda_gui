@@ -306,7 +306,7 @@ void ProjectManager::setTopModule(const QString &topModule)
 void ProjectManager::setDevicePart(const QStringList &deviceInfo)
 {
     if (_project) {
-        _project->setDevicePart(deviceInfo);
+        _project->setDevicePart(deviceInfo.at(3));
         loadFiles(_project);
     }
 }

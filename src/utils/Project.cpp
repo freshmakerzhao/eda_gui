@@ -8,6 +8,7 @@
   ******************************************************************************
   */
 #include "Project.h"
+#include "utils/DeviceInfoUtils.h"
 
 Project::Project()
 {
@@ -271,13 +272,15 @@ void Project::setTopModule(const QString &topName)
     writeProject();
 }
 
-void Project::setDevicePart(const QStringList &deviceInfo)
+void Project::setDevicePart(const QString &displayPart)
 {
-    parameters[Project::Part] = deviceInfo.at(0);
-    parameters[Project::Arch] = deviceInfo.at(1);
-    parameters[Project::ArchName]= deviceInfo.at(2);
-    parameters[Project::DisplayPart] = deviceInfo.at(3);
-    parameters[Project::FamilyName] = deviceInfo.at(4);
+    DeviceInfoUtils util;
+    DeviceInfo info = util.getDeviceInfo(displayPart);
+    parameters[Project::Part] = info.part;
+    parameters[Project::Arch] = info.arch;
+    parameters[Project::ArchName]= info.archName;
+    parameters[Project::DisplayPart] = displayPart;
+    parameters[Project::FamilyName] = info.family_name;
     writeProject();
 }
 

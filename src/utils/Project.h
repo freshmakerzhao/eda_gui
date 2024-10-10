@@ -80,7 +80,7 @@ public:
 
     void setTopModule(const QString &topName);
 
-    void setDevicePart(const QStringList &deviceInfo);
+    void setDevicePart(const QString &displayPart);
 
     QStringList sourceList;     // Sources(绝对路径)
     QStringList constraintList; // Constraints(绝对路径)
