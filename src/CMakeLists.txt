@@ -71,11 +71,15 @@ include_directories(${QSCINTILLA_INCLUDE_DIR})
 link_directories(${QSCINTILLA_LIBRARY_DIR})
 
 # Include the YAML library
-set(YAML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/yaml-cpp")
-set(YAML_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
-
-include_directories(${YAML_INCLUDE_DIR})
-link_directories(${YAML_LIBRARY_DIR})
+add_subdirectory(external/yaml-cpp)
+set(YAML_CPP_BUILD_TESTS OFF CACHE INTERNAL "")
+set(YAML_CPP_INSTALL OFF CACHE INTERNAL "")
+# Disable yaml-cpp warnings
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(yaml-cpp PRIVATE -w)  # Use -w with GCC or Clang to disable all warnings
+# elseif(MSVC)
+#     target_compile_options(yaml-cpp PRIVATE /W0) # Use /W0 with MSVC to disable all warnings
+endif()
 
 # Include the QADVANCEDDOCK library
 set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/ads")
@@ -136,7 +140,6 @@ file(GLOB PROJECT_HEADERS
     component/tclconsole/OutputEditor.h
     settings/*.h
     include/Qsci/*.h
-    include/yaml-cpp/*.h
     include/tinyxml2/*.h
     *.h
 )
@@ -164,7 +167,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Network
     # HybrdLinkPlugin # qscintilla2_qt5
     qscintilla2_qt5
-    libyaml-cpp.a
+    yaml-cpp
     qtadvanceddocking
     libcrypto-1_1-x64
     libssl-1_1-x64
