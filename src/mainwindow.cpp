@@ -180,7 +180,18 @@ void MainWindow::resizeUi()
 void MainWindow::setRunState(const QString &phase, const bool &flag)
 {
     phaseLabel->setText(phase);
-    flag ? movie->start() : movie->stop();
+    if (flag) {
+        movie->start();
+    } else {
+        movie->stop();
+        if (phase.contains("Complete!")) {
+            movieLabel->setPixmap(QPixmap::fromImage(*completeImage).scaled(movieLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            movieLabel->setScaledContents(true);
+        } else {
+            movieLabel->setPixmap(QPixmap::fromImage(*errorImage).scaled(movieLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            movieLabel->setScaledContents(true);
+        }
+    }
 }
 
 void MainWindow::onNewTriggered()
@@ -461,6 +472,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::initMenuStateBar()
 {
+    completeImage = new QImage(":/icons/resource/icons/25-icon_processing_completed.png");
+    errorImage = new QImage(":/icons/resource/icons/16-1icon_error_status.png");
+
     QWidget *cornerWidget = new QWidget;
     QHBoxLayout *layout = new QHBoxLayout(cornerWidget);
     layout->setMargin(0);
@@ -470,8 +484,9 @@ void MainWindow::initMenuStateBar()
     phaseLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     movie = new QMovie(":/resource/gif/spinner.gif");
-    movie->setScaledSize(QSize(menuBar->height() - 8, menuBar->height() - 8));
+    movie->setScaledSize(QSize(menuBar->height() - 6, menuBar->height() - 6));
     movieLabel = new QLabel();
+    movieLabel->setMargin(3);
     movieLabel->setFixedSize(menuBar->height(), menuBar->height());
     movieLabel->setMovie(movie);
 
@@ -483,6 +498,8 @@ void MainWindow::initMenuStateBar()
     QObject::connect(movie, &QMovie::stateChanged, [this](QMovie::MovieState state) {
         (state == QMovie::NotRunning) ? movieLabel->clear() : movieLabel->setMovie(movie);
     });
+
+    movieLabel->setScaledContents(true);
 }
 
 void MainWindow::onClearTriggered() {

@@ -122,6 +122,8 @@ private:
     QLabel *phaseLabel;
     QMovie *movie;
     QLabel *movieLabel;
+    QImage *completeImage;
+    QImage *errorImage;
 };
 
 #endif // MAINWINDOW_H
