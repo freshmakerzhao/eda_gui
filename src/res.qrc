@@ -19,6 +19,7 @@
         <file>resource/home.png</file>
         <file>resource/icons/CollapseAll.png</file>
         <file>resource/icons/ExpandAll.png</file>
+        <file>resource/gif/spinner.gif</file>
     </qresource>
     <qresource prefix="/gridview">
         <file>resource/gridview/22-1icon_zoom_in.png</file>

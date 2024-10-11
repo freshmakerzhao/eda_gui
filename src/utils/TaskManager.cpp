@@ -431,7 +431,7 @@ void TaskManager::onFileChanged() {
 
 void TaskManager::downloadBit(const QString &bitstream) {
     std::string script = CommandBuilder::instance().generateDownloadBitCommands(bitstream);
-    ProcessManager::instance().excuteBitStreamScript(QString::fromStdString(script));
+    ProcessManager::instance().excuteCommand("Download Bitstream", QStringList() << QString::fromStdString(script));
 }
 
 void TaskManager::readBackRegister(const QString &registerAddress) {
@@ -477,6 +477,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
     // 如果当前执行完毕
     // exitCode 为0表示正常执行并成功退出
     if (msg.exitCode == 0) {
+        MainWindow::instance()->setRunState(msg.phase + " Complete!", false);
         if (msg.phase == "Synthesis"){
             // 综合结束后，读取资源统计信息
             qDebug() << "============= =========== ==================";
@@ -518,6 +519,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
             CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
     } else {
+        MainWindow::instance()->setRunState(msg.phase + " failed.", false);
         CustomMessageBox::showError(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
     }
 }

@@ -72,8 +72,9 @@ link_directories(${QSCINTILLA_LIBRARY_DIR})
 
 # Include the YAML library
 add_subdirectory(external/yaml-cpp)
-set(YAML_CPP_BUILD_TESTS OFF CACHE INTERNAL "")
 set(YAML_CPP_INSTALL OFF CACHE INTERNAL "")
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "Disable yaml-cpp tests")
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable yaml-cpp tools (parse.exe, read.exe, etc.)")
 # Disable yaml-cpp warnings
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(yaml-cpp PRIVATE -w)  # Use -w with GCC or Clang to disable all warnings

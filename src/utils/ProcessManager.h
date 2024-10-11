@@ -52,9 +52,7 @@ public:
     QStringList nextscript = QStringList();
     QString nextpName = nullptr;
 
-    void excuteCommand(QString &phase, const QStringList& command);
-
-    void excuteBitStreamScript(const QString &script);
+    void excuteCommand(const QString &phase, const QStringList& command);
 
     /**
      * 初始化环境变量

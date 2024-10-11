@@ -16,6 +16,8 @@
 #include <QTextCodec>
 #include <QCoreApplication>
 #include <QToolButton>
+#include <QMovie>
+#include <QLabel>
 // #include "grid/ChipPlanner.h"
 #include "ads/DockManager.h"
 #include "ads/DockWidget.h"
@@ -42,6 +44,8 @@ public:
 
     void resizeUi();
 
+    void setRunState(const QString &phase, const bool &flag);
+
 public slots:
     void onNewTriggered();
     void onOpenFileTriggered();
@@ -65,6 +69,8 @@ protected:
 private:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    void initMenuStateBar();
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
@@ -112,6 +118,10 @@ private:
     ads::CDockWidget *PropertiesWidget;
     ads::CDockWidget *IPManagerWidget;
     ads::CDockWidget *PrjSummaryWidget;
+
+    QLabel *phaseLabel;
+    QMovie *movie;
+    QLabel *movieLabel;
 };
 
 #endif // MAINWINDOW_H

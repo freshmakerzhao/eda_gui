@@ -1,15 +1,12 @@
 #include "ProcessManager.h"
+#include <QTimer>
 #include "utils/StringUtilities.h"
 #include "widgets/LogWidget.h"
-#include "widgets/InfoWidget.h"
-#include "mainwindow.h"
 #include <QTextCodec>
-#include <iomanip>
 #include <chrono>
-#include <ctime>
 #include "utils/TimeUtilities.h"
-#include "dialog/CustomMessageBox.h"
 #include "base/Globals.h"
+#include "mainwindow.h"
 
 ProcessManager& ProcessManager::instance()
 {
@@ -43,40 +40,11 @@ void ProcessManager::handleChannelReadyReadOutput()
     QString outputStr = tc->toUnicode(normalOutput);
     QString errorOutputStr = tc->toUnicode(errorOutput);
 
-    // 没有错误发生，输出 output
-
-    // 判断是否报错
-    // if (process->error() == QProcess::UnknownError) {
-    //     // 没有错误发生，输出 output
-    //     LogWidget::instance()->appendLog(outputStr);
-    // } else {
-    //     // 发生错误，输出 errorOutput
-    //     LogWidget::instance()->appendLog(errorOutputStr);
-    // }
-
     if (!outputStr.isEmpty()){
-        // if (outputStr.startsWith("Info:")) {
-        //     LogWidget::instance()->appendInfoLog(outputStr);  // 假设你有一个处理Info日志的函数
-        // } else if (outputStr.startsWith("Warning:")) {
-        //     LogWidget::instance()->appendWarningLog(outputStr);  // 假设你有一个处理Warning日志的函数
-        // } else if (outputStr.startsWith("ERROR:")) {
-        //     LogWidget::instance()->appendErrorLog(outputStr);  // 假设你有一个处理Error日志的函数
-        // } else {
-        //     LogWidget::instance()->appendLog(outputStr);  // 默认处理
-        // }
         LogWidget::instance()->appendLog(outputStr);
     }
 
     if (!errorOutputStr.isEmpty()){
-        // if (errorOutputStr.startsWith("Info:")) {
-        //     LogWidget::instance()->appendInfoLog(errorOutputStr);  // 假设你有一个处理Info日志的函数
-        // } else if (errorOutputStr.startsWith("Warning:")) {
-        //     LogWidget::instance()->appendWarningLog(errorOutputStr);  // 假设你有一个处理Warning日志的函数
-        // } else if (errorOutputStr.startsWith("ERROR:")) {
-        //     LogWidget::instance()->appendErrorLog(errorOutputStr);  // 假设你有一个处理Error日志的函数
-        // } else {
-        //     LogWidget::instance()->appendLog(errorOutputStr);  // 默认处理
-        // }
         LogWidget::instance()->appendLog(errorOutputStr);
     }
 
@@ -85,6 +53,12 @@ void ProcessManager::handleChannelReadyReadOutput()
 // process执行结束后触发
 void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus)
 {
+    if (curPhase == "Implementation") {
+        // 延迟 5000 毫秒，但保持 UI 响应
+        QEventLoop loop;
+        QTimer::singleShot(5000, &loop, &QEventLoop::quit);
+        loop.exec();
+    }
     QTextCodec *tc = QTextCodec::codecForName("GBK");
 
     // 读取可能剩余的标准输出
@@ -93,15 +67,6 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     QString outputStr = tc->toUnicode(remainingOutput);
     if (!remainingOutput.isEmpty()) {
         LogWidget::instance()->appendLog(outputStr);
-        // if (outputStr.startsWith("Info:")) {
-        //     LogWidget::instance()->appendInfoLog(outputStr);  // 假设你有一个处理Info日志的函数
-        // } else if (outputStr.startsWith("Warning:")) {
-        //     LogWidget::instance()->appendWarningLog(outputStr);  // 假设你有一个处理Warning日志的函数
-        // } else if (outputStr.startsWith("ERROR:")) {
-        //     LogWidget::instance()->appendErrorLog(outputStr);  // 假设你有一个处理Error日志的函数
-        // } else {
-        //     LogWidget::instance()->appendLog(outputStr);  // 默认处理
-        // }
     }
 
     // 读取可能剩余的标准错误
@@ -110,15 +75,6 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     outputStr = tc->toUnicode(remainingError);
     if (!remainingError.isEmpty()) {
         LogWidget::instance()->appendLog(outputStr);
-        // if (outputStr.startsWith("Info:")) {
-        //     LogWidget::instance()->appendInfoLog(outputStr);  // 假设你有一个处理Info日志的函数
-        // } else if (outputStr.startsWith("Warning:")) {
-        //     LogWidget::instance()->appendWarningLog(outputStr);  // 假设你有一个处理Warning日志的函数
-        // } else if (outputStr.startsWith("ERROR:")) {
-        //     LogWidget::instance()->appendErrorLog(outputStr);  // 假设你有一个处理Error日志的函数
-        // } else {
-        //     LogWidget::instance()->appendLog(outputStr);  // 默认处理
-        // }
     }
 
     // 结束时间
@@ -138,6 +94,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 
     // 回传给taskmanager
     emit finishMessage(msg);
+
 }
 
 ProcessManager::ProcessManager()
@@ -155,9 +112,11 @@ ProcessManager::~ProcessManager()
     delete process;
 }
 
-void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
-    process->setProcessEnvironment(env);
+void ProcessManager::excuteCommand(const QString &phase, const QStringList& command) {
     this->curPhase = phase; // 当前执行阶段
+    MainWindow::instance()->setRunState(QString("Run %1...").arg(curPhase), true);
+    process->setProcessEnvironment(env);
+
 
     process->terminate(); // 执行前中断process
 
@@ -168,6 +127,8 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
         // script << "/c" << projectProperty["implementation_path"] << command;
         script << "/c" << command;
     } else if (phase == "Generate Bitstream"){
+        script << "/c" << command;
+    } else if (phase == "Download Bitstream") {
         script << "/c" << command;
     }
     qDebug() << "------------------------------------------------- ";
@@ -185,22 +146,6 @@ void ProcessManager::excuteCommand(QString &phase, const QStringList& command) {
         process->start("cmd.exe", script);
     }
 }
-
-void ProcessManager::excuteBitStreamScript(const QString &script)
-{
-    process->setProcessEnvironment(env);
-    this->curPhase = "Download Bitstream"; // 当前执行阶段
-    process->terminate();
-
-    this->startTime = TimeUtilities::getCurTimeAndFormat(); // 展示
-    this->startTimeForCal = TimeUtilities::getCurTime(); // 计算
-
-    QStringList arguments;
-    arguments << "/c" << script;
-    qDebug() << arguments;
-    process->start("cmd.exe", arguments);
-}
-
 
 void ProcessManager::initEnvironment() {
     env = QProcessEnvironment::systemEnvironment();

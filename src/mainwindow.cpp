@@ -177,6 +177,12 @@ void MainWindow::resizeUi()
     resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
 }
 
+void MainWindow::setRunState(const QString &phase, const bool &flag)
+{
+    phaseLabel->setText(phase);
+    flag ? movie->start() : movie->stop();
+}
+
 void MainWindow::onNewTriggered()
 {
     Wizard wizard(this);
@@ -444,11 +450,39 @@ MainWindow::MainWindow(QWidget *parent)
 
     PrjSummaryWidget->setMinimumSize(770, 10);
     SourcesWidget->setMinimumSize(40, 10);
+
+    initMenuStateBar();
 }
 
 MainWindow::~MainWindow()
 {
     qDebug() << "[MainWindow] Distructing...";
+}
+
+void MainWindow::initMenuStateBar()
+{
+    QWidget *cornerWidget = new QWidget;
+    QHBoxLayout *layout = new QHBoxLayout(cornerWidget);
+    layout->setMargin(0);
+    phaseLabel = new QLabel();
+    phaseLabel->setAlignment(Qt::AlignRight);
+    phaseLabel->setMinimumWidth(300);
+    phaseLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    movie = new QMovie(":/resource/gif/spinner.gif");
+    movie->setScaledSize(QSize(menuBar->height() - 8, menuBar->height() - 8));
+    movieLabel = new QLabel();
+    movieLabel->setFixedSize(menuBar->height(), menuBar->height());
+    movieLabel->setMovie(movie);
+
+    layout->addWidget(phaseLabel, 0, Qt::AlignRight);
+    layout->addWidget(movieLabel, 0, Qt::AlignRight);
+    layout->addStretch();
+
+    menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
+    QObject::connect(movie, &QMovie::stateChanged, [this](QMovie::MovieState state) {
+        (state == QMovie::NotRunning) ? movieLabel->clear() : movieLabel->setMovie(movie);
+    });
 }
 
 void MainWindow::onClearTriggered() {
