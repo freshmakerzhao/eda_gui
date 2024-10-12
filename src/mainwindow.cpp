@@ -493,6 +493,7 @@ void MainWindow::initMenuStateBar()
     layout->addWidget(phaseLabel, 0, Qt::AlignRight);
     layout->addWidget(movieLabel, 0, Qt::AlignRight);
     layout->addStretch();
+    layout->addSpacing(8);
 
     menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
     QObject::connect(movie, &QMovie::stateChanged, [this](QMovie::MovieState state) {
