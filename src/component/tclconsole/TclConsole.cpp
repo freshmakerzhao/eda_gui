@@ -1,4 +1,5 @@
 #include "TclConsole.h"
+#include "utils/DeviceInfoUtils.h"
 #include "utils/ProcessManager.h"
 #include "utils/ProjectManager.h"
 #include "base/Globals.h"
@@ -170,14 +171,14 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     QStringList script;
 
     QString info;
-
     // 公共部分提取为函数，避免重复代码
     auto addCommonArgs = [&script, &resultList](const QString &jsonPath,
                                                 const QString &writePath,
                                                 const QStringList &extraArgs = {}) {
+        const QString archName = ProjectManager::instance().getParameter(Project::ArchName);
         script << "%IMPL_PATH%";
         script << "--chipdb";
-        script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/common/archs/xc7a100t.bin";
+        script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/common/archs/" + archName + ".bin";
         script << "--xdc" << resultList;
         script << "--json" << jsonPath;
         script << "--write" << writePath;
@@ -209,7 +210,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
 
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    QString phase = "Implementation";
+    const QString phase = "Implementation";
     ProcessManager::instance().configWorkPath(implPath);
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
@@ -221,9 +222,10 @@ int TclConsole::TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int a
         Tcl_SetResult(interp, const_cast<char*>("Usage: set_device <part>"), TCL_STATIC);
         return TCL_ERROR;
     }
-    const char* varName = "device_model";
+    // const char* varName = "device_model";
     const char* part = argv[1];
-    const char* result = Tcl_SetVar(interp, varName, part, TCL_GLOBAL_ONLY);
+    // const char* result = Tcl_SetVar(interp, varName, part, TCL_GLOBAL_ONLY);
+    ProjectManager::instance().setDevicePart(part);
     Tcl_SetResult(interp, const_cast<char*>(part), TCL_VOLATILE);
     return TCL_OK;
 }
@@ -257,7 +259,7 @@ int TclConsole::TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, in
 
 int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
-    QString phase = "Synthesis";
+    const QString phase = "Synthesis";
     std::map<std::string, std::string> args;
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -275,12 +277,12 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
         }
     }
 
-    const char* deviceModel = Tcl_GetVar(interp, "device_model", TCL_GLOBAL_ONLY);
-    if (deviceModel == nullptr) {
-        Tcl_SetResult(interp, const_cast<char*>("Device model not set"), TCL_STATIC);
-        return TCL_ERROR;
-    }
-
+    QString deviceModel = ProjectManager::instance().getParameter(Project::DisplayPart);
+    // const char* deviceModel = Tcl_GetVar(interp, "device_model", TCL_GLOBAL_ONLY);
+    // if (deviceModel == nullptr) {
+    //     Tcl_SetResult(interp, const_cast<char*>("Device model not set"), TCL_STATIC);
+    //     return TCL_ERROR;
+    // }
 
     const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
     if (args.find("-top") != args.end()) {
@@ -364,7 +366,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
 
 
     QStringList script;
-    QString part_name = "xc7a100tfgg484-2";
+    QString part_name = ProjectManager::instance().getParameter(Project::Part);
 
     const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
     const QString workDir = QString(workDirVar);
@@ -404,7 +406,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     QString info = "Starting Generate Bitstream Task\n";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
-    QString phase = "Generate Bitstream";
+    const QString phase = "Generate Bitstream";
     ProcessManager::instance().configWorkPath(implPath);
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;

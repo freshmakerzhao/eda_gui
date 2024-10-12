@@ -95,7 +95,7 @@ public:
 
     void setTopModule(const QString &topModule);
 
-    void setDevicePart(const QStringList &deviceInfo);
+    void setDevicePart(const QString &deviceInfo);
 
     QString getParameter(const Project::ParamKey key) const;
 

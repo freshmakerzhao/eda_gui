@@ -186,8 +186,8 @@ void ProjectManager::loadFiles(Project *project)
 
     qDebug() << "[ProjectManager] loadFiles...";
 
-    QString setDeviceCmd = QString("set_device %1").arg(_project->getParameter(Project::DisplayPart));
-    TclConsole::instance()->executeTclCommand(setDeviceCmd);
+    // QString setDeviceCmd = QString("set_device %1").arg(_project->getParameter(Project::DisplayPart));
+    // TclConsole::instance()->executeTclCommand(setDeviceCmd);
 
     QString setSetWorkDirCmd = QString("set_work_dir %1").arg(_project->getParameter(Project::Path));
     TclConsole::instance()->executeTclCommand(setSetWorkDirCmd);
@@ -303,10 +303,10 @@ void ProjectManager::setTopModule(const QString &topModule)
     }
 }
 
-void ProjectManager::setDevicePart(const QStringList &deviceInfo)
+void ProjectManager::setDevicePart(const QString &deviceInfo)
 {
     if (_project) {
-        _project->setDevicePart(deviceInfo.at(3));
+        _project->setDevicePart(deviceInfo);
         loadFiles(_project);
     }
 }

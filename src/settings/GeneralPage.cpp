@@ -59,7 +59,7 @@ void GeneralPage::setDevicePart()
 {
     if (deviceInfo.isEmpty()) return;
     if (deviceInfo.first().isEmpty()) return;
-    ProjectManager::instance().setDevicePart(deviceInfo);
+    ProjectManager::instance().setDevicePart(deviceInfo.at(3));
 }
 
 void GeneralPage::startWizard()
