@@ -25,17 +25,33 @@ Form *Form::instance()
     return _instance;
 }
 
-void Form::clearRecent()
+void Form::updateRecent()
 {
-    for (int i = 0; i < listWidget1->count(); ++i) {
-        QListWidgetItem *item = listWidget1->item(i);
-        QWidget *widget = listWidget1->itemWidget(item);
+    for (int i = 0; i < recentListWidget->count(); ++i) {
+        QListWidgetItem *item = recentListWidget->item(i);
+        QWidget *widget = recentListWidget->itemWidget(item);
         if (widget != nullptr) {
             disconnect(widget, nullptr, nullptr, nullptr);
         }
     }
 
-    listWidget1->clear();
+    recentListWidget->clear();
+
+    std::vector<XmlRecent> recentLists = XmlUtilities::instance().getRecentListFromFatherElementName(
+        InitialConfig::instance().xmlPath.toStdString().c_str(),
+        "RECENT_PROJECTS");
+    for (int i = 0; i < recentLists.size(); ++i) {
+        QListWidgetItem *listWidgetItem = new QListWidgetItem;
+        // listWidgetItem->setSizeHint(QSize(0, 50));  // 设置 item 的大小
+        recentListWidget->addItem(listWidgetItem);  // 将 item 添加到 listWidget 中
+        // 创建 custom list item
+        CustomListWidget *customListItem = new CustomListWidget(QString::fromStdString(extractProjectName(recentLists.at(i).getPath())), QString::fromStdString(recentLists.at(i).getPath()), recentListWidget);
+        recentListWidget->setItemWidget(listWidgetItem, customListItem);
+        listWidgetItem->setSizeHint(customListItem->size());
+        connect(customListItem, &CustomListWidget::getProjectPath, this, [](const QString &projectPath){
+            ProjectManager::instance().openProject(projectPath);
+        });
+    }
 }
 
 void Form::paintEvent(QPaintEvent *event)
@@ -224,22 +240,8 @@ Form::Form(QWidget *parent)
     QVBoxLayout *rightGroupLayoutOne = new QVBoxLayout(rightGroupBoxOne);
     rightGroupBoxOne->setFixedHeight(500);  // 设置右侧区域的固定宽度
     rightGroupBoxOne->setFixedWidth(700);  // 设置右侧区域的固定宽度
-    listWidget1 = new QListWidget;
-    std::vector<XmlRecent> recentLists = XmlUtilities::instance().getRecentListFromFatherElementName(
-            InitialConfig::instance().xmlPath.toStdString().c_str(),
-            "RECENT_PROJECTS");
-    for (int i = 0; i < recentLists.size(); ++i) {
-        QListWidgetItem *listWidgetItem = new QListWidgetItem;
-        // listWidgetItem->setSizeHint(QSize(0, 50));  // 设置 item 的大小
-        listWidget1->addItem(listWidgetItem);  // 将 item 添加到 listWidget 中
-        // 创建 custom list item
-        CustomListWidget *customListItem = new CustomListWidget(QString::fromStdString(extractProjectName(recentLists.at(i).getPath())), QString::fromStdString(recentLists.at(i).getPath()), listWidget1);
-        listWidget1->setItemWidget(listWidgetItem, customListItem);
-        listWidgetItem->setSizeHint(customListItem->size());
-        connect(customListItem, &CustomListWidget::getProjectPath, this, [](const QString &projectPath){
-            ProjectManager::instance().openProject(projectPath);
-        });
-    }
+    recentListWidget = new QListWidget;
+    updateRecent();
     // 设置 QListWidget 的样式表
     rightGroupBoxOne->setStyleSheet(
             "QListWidget { border: none; }"
@@ -248,7 +250,7 @@ Form::Form(QWidget *parent)
             "}"
             "QGroupBox { font-size: 28px; }"
     );
-    rightGroupLayoutOne->addWidget(listWidget1);
+    rightGroupLayoutOne->addWidget(recentListWidget);
     // ========================== Recent IP ============================
     QGroupBox *rightGroupBoxTwo = new QGroupBox("Recent IP Locations");
     QVBoxLayout *rightGroupLayoutTwo = new QVBoxLayout(rightGroupBoxTwo);

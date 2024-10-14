@@ -27,8 +27,8 @@ class Form : public QWidget
 
 public:
     static Form *instance();
-
-    void clearRecent();
+    
+    void updateRecent();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -37,8 +37,8 @@ private:
     Form(QWidget *parent = nullptr);
     ~Form();
     std::string extractProjectName(const std::string& path);
-
-    QListWidget *listWidget1; // Recent Project
+    
+    QListWidget *recentListWidget; // Recent Project
 };
 
 #endif // FORM_H

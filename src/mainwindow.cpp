@@ -511,7 +511,7 @@ void MainWindow::onClearTriggered() {
     // Open Recent 置灰
     recentFilesMenu->clear();
     recentFilesMenu->setDisabled(true);
-    Form::instance()->clearRecent();
+    Form::instance()->updateRecent();
 }
 
 void MainWindow::onOpenRecentTriggered(std::string path) {

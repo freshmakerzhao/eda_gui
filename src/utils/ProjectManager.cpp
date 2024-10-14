@@ -18,6 +18,7 @@
 #include "widgets/PrjSummary.h"
 #include "TaskManager.h"
 #include "widgets/InfoWidget.h"
+#include "widgets/Form.h"
 
 ProjectManager &ProjectManager::instance()
 {
@@ -363,6 +364,8 @@ void ProjectManager::closeProject()
     MainWindow::instance()->setForm(1);
     // 重新初始化DesignRuns表
     InfoWidget::instance()->initDesignRunsView();
+    // 更新最近使用工程列表
+    Form::instance()->updateRecent();
 }
 
 ProjectManager::ProjectManager()
