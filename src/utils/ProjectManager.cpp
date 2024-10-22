@@ -15,7 +15,7 @@
 #include "dialog/CustomMessageBox.h"
 #include "XmlUtilities.h"
 #include "base/InitialConfig.h"
-#include "widgets/PrjSummary.h"
+#include "widgets/ProjectSummary.h"
 #include "TaskManager.h"
 #include "widgets/InfoWidget.h"
 #include "widgets/Form.h"
@@ -207,7 +207,7 @@ void ProjectManager::loadFiles(Project *project)
     // 设置工程参数
     TaskManager::instance().setParams(_project->getAllParameters());
     // 设置工程参数
-    PrjSummary::instance()->setParams(_project->getAllParameters());
+    ProjectSummary::instance()->setParams(_project->getAllParameters());
     // 加载文件树
     FileManager::instance()->updateDesignSources(_project->sourceList);
     FileManager::instance()->updateConstraints(_project->constraintList);

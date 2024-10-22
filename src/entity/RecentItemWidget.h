@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file           : CustomListItem.h
-  * @author         : zs
+  * @file           : RecentItemWidget.h
+  * @author         : ksy
   * @description    : None
   * @attention      : None
-  * @date           : 2024/5/8
+  * @date           : 2024/10/21
   ******************************************************************************
   */
-#ifndef HYBRDLINK_CUSTOMLISTWIDGET_H
-#define HYBRDLINK_CUSTOMLISTWIDGET_H
+#ifndef RECENTITEMWIDGET_H
+#define RECENTITEMWIDGET_H
 
 
 #include <QWidget>
@@ -18,10 +18,10 @@
 #include <QApplication>
 #include <QLabel>
 
-class CustomListWidget : public QWidget {
+class RecentItemWidget : public QWidget {
 Q_OBJECT
 public:
-    CustomListWidget(const QString &projectName, const QString &projectPath, QWidget *parent = nullptr);
+    RecentItemWidget(const QString &projectName, const QString &projectPath, QWidget *parent = nullptr);
     QString projectName;
     QString projectPath;
 
@@ -42,4 +42,4 @@ private:
     QLabel *pathLabel;
 };
 
-#endif //HYBRDLINK_CUSTOMLISTWIDGET_H
+#endif // RECENTITEMWIDGET_H

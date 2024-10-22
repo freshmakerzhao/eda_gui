@@ -16,7 +16,7 @@
 #include <QProcess>
 #include <QCoreApplication>
 #include <QDebug>
-#include "Project.h"
+#include "entity/Project.h"
 
 class ProjectManager :  public QObject
 {

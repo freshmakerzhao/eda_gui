@@ -1,27 +1,27 @@
 /**
   ******************************************************************************
-  * @file           : PrjSummary.h
+  * @file           : ProjectSummary.h
   * @author         : zs
   * @description    : None
   * @attention      : None
-  * @date           : 19/6/2024
+  * @date           : 2024/6/19
   ******************************************************************************
   */
-#ifndef HYBRDLINK_PRJSUMMARY_H
-#define HYBRDLINK_PRJSUMMARY_H
+#ifndef PROJECTSUMMARY_H
+#define PROJECTSUMMARY_H
 
 
 #include <QDebug>
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
-#include "utils/Project.h"
+#include "entity/Project.h"
 
-class PrjSummary : public QWidget
+class ProjectSummary : public QWidget
 {
     Q_OBJECT
 public:
-    static PrjSummary *instance();
+    static ProjectSummary *instance();
 
     /**
      * 设置工程参数
@@ -29,7 +29,7 @@ public:
     void setParams(const QMap<Project::ParamKey, QString> &params);
 public slots:
 private:
-    PrjSummary(QWidget* parent = nullptr);
+    ProjectSummary(QWidget* parent = nullptr);
 
     void init();
 

@@ -10,7 +10,7 @@
 
 #include "Form.h"
 #include "mainwindow.h"
-#include "CustomListWidget.h"
+#include "entity/RecentItemWidget.h"
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "utils/ProjectManager.h"
@@ -42,13 +42,11 @@ void Form::updateRecent()
         "RECENT_PROJECTS");
     for (int i = 0; i < recentLists.size(); ++i) {
         QListWidgetItem *listWidgetItem = new QListWidgetItem;
-        // listWidgetItem->setSizeHint(QSize(0, 50));  // 设置 item 的大小
         recentListWidget->addItem(listWidgetItem);  // 将 item 添加到 listWidget 中
-        // 创建 custom list item
-        CustomListWidget *customListItem = new CustomListWidget(QString::fromStdString(extractProjectName(recentLists.at(i).getPath())), QString::fromStdString(recentLists.at(i).getPath()), recentListWidget);
-        recentListWidget->setItemWidget(listWidgetItem, customListItem);
-        listWidgetItem->setSizeHint(customListItem->size());
-        connect(customListItem, &CustomListWidget::getProjectPath, this, [](const QString &projectPath){
+        RecentItemWidget *recentItemWidget = new RecentItemWidget(QString::fromStdString(extractProjectName(recentLists.at(i).getPath())), QString::fromStdString(recentLists.at(i).getPath()), recentListWidget);
+        recentListWidget->setItemWidget(listWidgetItem, recentItemWidget);
+        listWidgetItem->setSizeHint(recentItemWidget->size());
+        connect(recentItemWidget, &RecentItemWidget::getProjectPath, this, [](const QString &projectPath){
             ProjectManager::instance().openProject(projectPath);
         });
     }
@@ -262,7 +260,7 @@ Form::Form(QWidget *parent)
         // listWidgetItem->setSizeHint(QSize(0, 50));  // 设置 item 的大小
         listWidget2->addItem(listWidgetItem);  // 将 item 添加到 listWidget 中
         // 创建 custom list item
-        CustomListWidget *customListItem = new CustomListWidget(titles[i], paths[i], listWidget2);
+        RecentItemWidget *customListItem = new RecentItemWidget(titles[i], paths[i], listWidget2);
         listWidget2->setItemWidget(listWidgetItem, customListItem);
         listWidgetItem->setSizeHint(customListItem->size());
 

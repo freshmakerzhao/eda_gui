@@ -22,7 +22,7 @@
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "ipmanager/IPManager.h"
-#include "widgets/PrjSummary.h"
+#include "widgets/ProjectSummary.h"
 #include "dialog/AdvancedFileDialog.h"
 #include "base/TreeViewBase.h"
 
@@ -457,7 +457,7 @@ MainWindow::MainWindow(QWidget *parent)
     PrjSummaryWidget = new ads::CDockWidget("Project Summary", DockManager);
     // PrjSummaryWidget->hide();
     DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
-    PrjSummaryWidget->setWidget(PrjSummary::instance());
+    PrjSummaryWidget->setWidget(ProjectSummary::instance());
 
     PrjSummaryWidget->setMinimumSize(770, 10);
     SourcesWidget->setMinimumSize(40, 10);

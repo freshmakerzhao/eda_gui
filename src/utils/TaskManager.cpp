@@ -6,7 +6,6 @@
 #include "ProjectManager.h"
 #include "widgets/InfoWidget.h"
 #include "widgets/FrameView.h"
-// #include "widgets/EditorManager.h"
 #include "mainwindow.h"
 #include "FileHelper.h"
 #include "HardWareManager.h"

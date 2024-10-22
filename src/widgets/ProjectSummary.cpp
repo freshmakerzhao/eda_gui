@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file           : PrjSummary.cpp
+  * @file           : ProjectSummary.cpp
   * @author         : zs
   * @description    : None
   * @attention      : None
-  * @date           : 19/6/2024
+  * @date           : 2024/6/19
   ******************************************************************************
   */
 #include <QVBoxLayout>
@@ -13,19 +13,19 @@
 #include <QPushButton>
 #include <QFormLayout>
 #include <QTableWidget>
-#include "PrjSummary.h"
+#include "ProjectSummary.h"
 #include <QHeaderView>
 
-PrjSummary *PrjSummary::instance()
+ProjectSummary *ProjectSummary::instance()
 {
-    static PrjSummary *_instance = nullptr;
+    static ProjectSummary *_instance = nullptr;
     if (!_instance) {
-        _instance = new PrjSummary(nullptr);
+        _instance = new ProjectSummary(nullptr);
     }
     return _instance;
 }
 
-PrjSummary::PrjSummary(QWidget* parent)
+ProjectSummary::ProjectSummary(QWidget* parent)
         : QWidget(parent)
 {
     resize(800, 500);
@@ -33,7 +33,7 @@ PrjSummary::PrjSummary(QWidget* parent)
 }
 
 
-void PrjSummary::init()
+void ProjectSummary::init()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     // ==================================  顶部的 Widget 开始 ==================================
@@ -347,7 +347,7 @@ void PrjSummary::init()
     setStyleSheet("background-color: rgb(247, 247, 247);");
 }
 
-void PrjSummary::setParams(const QMap<Project::ParamKey, QString> &params) {
+void ProjectSummary::setParams(const QMap<Project::ParamKey, QString> &params) {
 
     settingsPrjName->setText(params[Project::Name]);
     settingsPrjLocation->setText(params[Project::Path]);
@@ -361,10 +361,9 @@ void PrjSummary::setParams(const QMap<Project::ParamKey, QString> &params) {
 //    QString implementationStatus = "Complete";
 //    QString implementationPart = "xc7a35tfgg484-2";
 
-    qDebug() << "[PrjSummary] settingsPrjName: " << params[Project::Name];
-    qDebug() << "[PrjSummary] settingsPrjLocation: " << params[Project::Path];
-    qDebug() << "[PrjSummary] settingsPrjFamily: " << params[Project::FamilyName];
-    qDebug() << "[PrjSummary] settingsPrjPart: " << params[Project::DisplayPart];
-    qDebug() << "[PrjSummary] settingsPrjTopModuleName: " << params[Project::TopModule];
+    qDebug() << "[ProjectSummary] ProjectName: " << params[Project::Name];
+    qDebug() << "[ProjectSummary] ProjectLocation: " << params[Project::Path];
+    qDebug() << "[ProjectSummary] ProjectFamily: " << params[Project::FamilyName];
+    qDebug() << "[ProjectSummary] ProjectPart: " << params[Project::DisplayPart];
+    qDebug() << "[ProjectSummary] ProjectTopModuleName: " << params[Project::TopModule];
 }
-

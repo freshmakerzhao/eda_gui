@@ -1,15 +1,15 @@
 /**
   ******************************************************************************
-  * @file           : CustomListItem.cpp
-  * @author         : zs
+  * @file           : RecentItemWidget.cpp
+  * @author         : ksy
   * @description    : None
   * @attention      : None
-  * @date           : 2024/5/8
+  * @date           : 2024/10/21
   ******************************************************************************
   */
-#include <iostream>
-#include "CustomListWidget.h"
-CustomListWidget::CustomListWidget(const QString &projectName, const QString &projectPath, QWidget *parent) : QWidget(parent) {
+#include "RecentItemWidget.h"
+
+RecentItemWidget::RecentItemWidget(const QString &projectName, const QString &projectPath, QWidget *parent) : QWidget(parent) {
     layout = new QVBoxLayout(this);
     this->projectName = projectName;
     this->projectPath = projectPath;
@@ -39,19 +39,19 @@ CustomListWidget::CustomListWidget(const QString &projectName, const QString &pr
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
-QSize CustomListWidget::sizeHint() const
+QSize RecentItemWidget::sizeHint() const
 {
     int width = titleLabel->sizeHint().width() > pathLabel->sizeHint().width() ? titleLabel->sizeHint().width() : pathLabel->sizeHint().width();
     int height = titleLabel->sizeHint().height() + pathLabel->sizeHint().height();
     return QSize(width + layout->contentsMargins().left() + layout->contentsMargins().right(), height + layout->contentsMargins().top() + layout->contentsMargins().bottom());
 }
 
-QSize CustomListWidget::minimumSizeHint() const
+QSize RecentItemWidget::minimumSizeHint() const
 {
     return sizeHint();
 }
 
-bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {
+bool RecentItemWidget::eventFilter(QObject *obj, QEvent *event) {
     if (event->type() == QEvent::MouseButtonPress) {
         emit getProjectPath(this->projectPath);
         return true;
@@ -59,7 +59,7 @@ bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {
     return QWidget::eventFilter(obj, event);
 }
 
-//bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {
+//bool RecentItemWidget::eventFilter(QObject *obj, QEvent *event) {
 //    std::cout << 123;
 //    if (obj == this) {
 //        if (event->type() == QEvent::HoverEnter) {
@@ -71,7 +71,7 @@ bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {
 //    return QWidget::eventFilter(obj, event);
 //}
 
-//void CustomListWidget::enterEvent(QEvent *event) {
+//void RecentItemWidget::enterEvent(QEvent *event) {
 //    std::cout << 123;
 //    Q_UNUSED(event);
 //    QPalette pal = palette();
@@ -79,7 +79,7 @@ bool CustomListWidget::eventFilter(QObject *obj, QEvent *event) {
 //    setPalette(pal);
 //}
 //
-//void CustomListWidget::leaveEvent(QEvent *event) {
+//void RecentItemWidget::leaveEvent(QEvent *event) {
 //    std::cout << 456;
 //    Q_UNUSED(event);
 //    QPalette pal = palette();
