@@ -39,6 +39,8 @@ if(WIN32)
     message(STATUS "Configuring on/for Windows")
     # 特定于Windows的编译选项
     add_definitions(-DWINDOWS_PLATFORM)
+    # Copy qt.conf
+    configure_file(${CMAKE_SOURCE_DIR}/qt.conf ${CMAKE_BINARY_DIR}/qt.conf COPYONLY)
 elseif(UNIX AND NOT APPLE)
     message(STATUS "Configuring on/for Linux")
     # 特定于Linux的编译选项

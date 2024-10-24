@@ -33,7 +33,7 @@ ProgramDeviceDialog::ProgramDeviceDialog(QWidget *parent, const int &mode)
     bitStreamFilePathLineEdit->setClearButtonEnabled(true);
     layout1->addWidget(bitStreamFilePathLineEdit);
     bitStreamFilePathBrowseButton = new QPushButton("...", this);
-    bitStreamFilePathBrowseButton->setFixedSize(25, 25);
+    bitStreamFilePathBrowseButton->setFixedSize(bitStreamFilePathLineEdit->height(), bitStreamFilePathLineEdit->height());
     bitStreamFilePathBrowseButton->setObjectName("squareButton");
     connect(bitStreamFilePathBrowseButton, &QPushButton::clicked, this, &ProgramDeviceDialog::onbitStreamFilePathBrowseButtonClicked);
     layout1->addWidget(bitStreamFilePathBrowseButton);

@@ -63,7 +63,8 @@ namespace FontsUtilities {
             fontName = QApplication::font().family();  // 使用 QApplication::instance()->font()
         }
 
-        QFont font(fontName, 9);
+        QFont font(fontName);
+        font.setPointSizeF(QApplication::font().pointSizeF());
         font.setHintingPreference(QFont::PreferNoHinting); // 修复中文笔画粘连
         QApplication::setFont(font);  // 设置应用程序字体
     }

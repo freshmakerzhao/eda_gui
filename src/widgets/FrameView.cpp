@@ -52,7 +52,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 //    right_top_five->setEnabled(false); // 默认禁止
 
     // 设置按钮大小不变
-    QSize buttonSize = QSize(200, rightTopBlockName->sizeHint().height());
+    QSize buttonSize = QSize(rightTopUsage->sizeHint().width(), rightTopUsage->sizeHint().height());
     // right_top_load_arch->setFixedSize(buttonSize);
     rightTopBlockName->setFixedSize(buttonSize);
     rightTopSites->setFixedSize(buttonSize);
@@ -153,12 +153,24 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     siteNameValue = new QLabel;
     siteTypeValue = new QLabel;
     // 设置每个 QLabel 的最小宽度
-    const int labelMinimumWidth = 150;
-    tileTypeLabel->setMinimumWidth(labelMinimumWidth);
-    rowNumLabel->setMinimumWidth(labelMinimumWidth);
-    colNumLabel->setMinimumWidth(labelMinimumWidth);
-    siteNameLabel->setMinimumWidth(labelMinimumWidth);
-    siteTypeLabel->setMinimumWidth(labelMinimumWidth);
+    // const int labelMinimumWidth = 150;
+    // tileTypeLabel->setMinimumWidth(labelMinimumWidth);
+    // rowNumLabel->setMinimumWidth(labelMinimumWidth);
+    // colNumLabel->setMinimumWidth(labelMinimumWidth);
+    // siteNameLabel->setMinimumWidth(labelMinimumWidth);
+    // siteTypeLabel->setMinimumWidth(labelMinimumWidth);
+
+    tileTypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    rowNumLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    colNumLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    siteNameLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    siteTypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    tileTypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    rowNumValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    colNumValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    siteNameValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    siteTypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     formLayout->addRow(tileTypeLabel, tileTypeValue);
     formLayout->addRow(rowNumLabel, rowNumValue);
