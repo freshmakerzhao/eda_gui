@@ -7,16 +7,16 @@
   * @date           : 2024/4/7
   ******************************************************************************
   */
-
-#include "ProjectManager.h"
-#include "widgets/FileManager.h"
-#include "wizard/Wizard.h"
-#include "mainwindow.h"
-#include "dialog/CustomMessageBox.h"
-#include "XmlUtilities.h"
 #include "base/InitialConfig.h"
-#include "widgets/ProjectSummary.h"
+#include "mainwindow.h"
+#include "ProjectManager.h"
 #include "TaskManager.h"
+#include "XmlUtilities.h"
+#include "wizard/Wizard.h"
+#include "dialog/CustomMessageBox.h"
+#include "dialog/ProgressHelper.h"
+#include "widgets/FileManager.h"
+#include "widgets/ProjectSummary.h"
 #include "widgets/InfoWidget.h"
 #include "widgets/Form.h"
 
@@ -107,19 +107,10 @@ bool ProjectManager::startProcess(const QString &hprPath)
  */
 bool ProjectManager::openProject(const QString &hprPath)
 {
-    // // QProgressDialog *progressDialog = new QProgressDialog;
-    // progressDialog->setFixedSize(600, 60);
-    // progressDialog->setLabelText("Processing...");
-    // progressDialog->setCancelButton(nullptr); // 没有取消按钮
-    // progressDialog->setMinimum(0);
-    // progressDialog->setMaximum(0); // 无明确终点
-    // // progressDialog->setWindowModality(Qt::WindowModal); // 设置窗口模态
-    // progressDialog->setWindowModality(Qt::ApplicationModal); // 设置为应用模态
-    // progressDialog->show();
-    // // QTimer::singleShot(3000, progressDialog, &QProgressDialog::close); // 3秒后关闭对话框
-    // QTimer::singleShot(3000, progressDialog, &QProgressDialog::accept);
-    // progressDialog->exec();
-
+    bool isCanceled = ProgressHelper::showProgressDialog(MainWindow::instance());
+    if (isCanceled) {
+        return false;
+    }
 
     std::vector<XmlRecent> recentLists = {
         {0, hprPath.toStdString()}
@@ -378,6 +369,4 @@ ProjectManager::~ProjectManager()
     if (_project) {
         delete _project;
     }
-
-    // progressDialog->deleteLater();
 }
