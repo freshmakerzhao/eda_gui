@@ -188,20 +188,20 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const QString task = QString(argv[0]);
 
     if (task == "impl_design") {
-        addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only"});
+        addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
         script << "&&";
-        addCommonArgs(packJsonPath, placeJsonPath, {"--no-pack", "--no-route"});
+        addCommonArgs(packJsonPath, placeJsonPath, {"--no-pack", "--no-route", "-l", "log_place.log"});
         script << "&&";
-        addCommonArgs(placeJsonPath, routeJsonPath, {"--fasm", fasmPath, "--no-pack", "--no-place"});
+        addCommonArgs(placeJsonPath, routeJsonPath, {"--fasm", fasmPath, "--no-pack", "--no-place", "-l", "log_route.log"});
         info = "Starting Implementation Task";
     } else if (task == "pack_design") {
-        addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only"});
+        addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
         info = "Starting Pack Task";
     } else if (task == "place_design") {
-        addCommonArgs(packJsonPath, placeJsonPath, {"--no-pack", "--no-route"});
+        addCommonArgs(packJsonPath, placeJsonPath, {"--no-pack", "--no-route", "-l", "log_place.log"});
         info = "Starting Place Task";
     } else if (task == "route_design") {
-        addCommonArgs(placeJsonPath, routeJsonPath, {"--fasm", fasmPath, "--no-pack", "--no-place"});
+        addCommonArgs(placeJsonPath, routeJsonPath, {"--fasm", fasmPath, "--no-pack", "--no-place", "-l", "log_route.log"});
         info = "Starting Route Task";
     } else {
         info = "Unknown implement command";
@@ -322,6 +322,11 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
                   .arg(topName, jsonPath, edifPath);
     // Design Sources
     for (const QString &item : resultList) {
+        script << item;
+    }
+
+    // IP Core
+    for (const QString &item : ProjectManager::instance().ipList) {
         script << item;
     }
 

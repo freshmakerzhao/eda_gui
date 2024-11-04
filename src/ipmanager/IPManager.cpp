@@ -1,5 +1,7 @@
 #include "IPManager.h"
-#include "BlockMemoryGenerator/BlockMemoryGenerator.h"
+#include "clk_wiz/ClockingWizard.h"
+#include "utils/ProjectManager.h"
+#include "widgets/FileManager.h"
 
 IPManager *IPManager::instance()
 {
@@ -21,8 +23,8 @@ void IPManager::init()
 {
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setIconSize(QSize(28, 28));
-    QAction *expandAllAction = new QAction(QIcon(":/resource/icons/ExpandAll.png"),"ExpandAll", this);
-    QAction *collapseAllAction = new QAction(QIcon(":/resource/icons/CollapseAll.png"),"CollapseAll", this);
+    QAction *expandAllAction = new QAction("ExpandAll", this);
+    QAction *collapseAllAction = new QAction("CollapseAll", this);
     toolBar->addAction(expandAllAction);
     toolBar->addSeparator();
     toolBar->addAction(collapseAllAction);
@@ -36,7 +38,8 @@ void IPManager::init()
     QStringList headers = {"Name",
                            "AXI4",
                            "Status",
-                           "License"
+                           "License",
+                           "VLNV"
     };
     model->setHorizontalHeaderLabels(headers);
     treeView->setModel(model);
@@ -55,39 +58,82 @@ void IPManager::init()
     vlayout->addWidget(treeView);
     vlayout->setMargin(0);
 
-    QWidget *detailWidget = new QWidget(this);
+    // QWidget *detailWidget = new QWidget(this);
+    detailLabel = new QLabel("Select an lP to see details");
 
     QSplitter *splitter = new QSplitter(Qt::Vertical);
     QWidget *baseWidget = new QWidget(this);
     baseWidget->setLayout(vlayout);
     splitter->addWidget(baseWidget);
-    splitter->addWidget(detailWidget);
+    splitter->addWidget(detailLabel);
 
     QHBoxLayout *vlayout2 = new QHBoxLayout(this);
     vlayout2->setMargin(0);
     vlayout2->addWidget(splitter);
 
-    QStandardItem *rootItem = new QStandardItem(QString("Vivado Repository"));
+    QStandardItem *rootItem = new QStandardItem(QString("HybrdChip Repository"));
     model->setItem(0, 0, rootItem);
-    QStandardItem *basicelsmentsitem = new QStandardItem(QString("Basic Elements"));
-    rootItem->appendRow(basicelsmentsitem);
-    QStandardItem *memoryelementsitem = new QStandardItem(QString("Memory Elements"));
-    basicelsmentsitem->appendRow(memoryelementsitem);
-    blockmemorygeneratoritem = new QStandardItem(QString("Block Memory Generator"));
+    // QStandardItem *basicelsmentsitem = new QStandardItem(QString("Basic Elements"));
+    // rootItem->appendRow(basicelsmentsitem);
+    // QStandardItem *memoryelementsitem = new QStandardItem(QString("Memory Elements"));
+    // basicelsmentsitem->appendRow(memoryelementsitem);
+    // blockmemorygeneratoritem = new QStandardItem(QString("Block Memory Generator"));
+    // QList<QStandardItem *> rowItems;
+    // rowItems.append(blockmemorygeneratoritem);
+    // rowItems.append(new QStandardItem(QString("AXI4")));
+    // rowItems.append(new QStandardItem(QString("Production")));
+    // rowItems.append(new QStandardItem(QString("Included")));
+    // // rowItems.append(new QStandardItem(QString("xilinx.com:ip:blk_mem_gen:8.4")));
+    // memoryelementsitem->appendRow(blockmemorygeneratoritem);
+    // memoryelementsitem->appendRow(rowItems);
+    // blockmemorygeneratoritem->setData("blockmemorygenerator", Qt::UserRole);
+
+    QStandardItem *fpgaFeaturesAndDesignItem = new QStandardItem(QString("FPGA Features and Design"));
+    rootItem->appendRow(fpgaFeaturesAndDesignItem);
+    QStandardItem *clockingItem = new QStandardItem(QString("Clocking"));
+    fpgaFeaturesAndDesignItem->appendRow(clockingItem);
+    // QStandardItem *clockingWizardItem = new QStandardItem(QString("Clocking Wizard"));
+    // clockingItem->appendRow(clockingItem);
+    QStandardItem *clk_wiz = new QStandardItem(QString("Clocking Wizard"));
     QList<QStandardItem *> rowItems;
-    rowItems.append(blockmemorygeneratoritem);
+    rowItems.append(clk_wiz);
     rowItems.append(new QStandardItem(QString("AXI4")));
     rowItems.append(new QStandardItem(QString("Production")));
     rowItems.append(new QStandardItem(QString("Included")));
-    // rowItems.append(new QStandardItem(QString("xilinx.com:ip:blk_mem_gen:8.4")));
-    // memoryelementsitem->appendRow(blockmemorygeneratoritem);
-    memoryelementsitem->appendRow(rowItems);
-    blockmemorygeneratoritem->setData("blockmemorygenerator", Qt::UserRole);
+    rowItems.append(new QStandardItem(QString("hybrdchip.com:ip:clk_wiz:6.0")));
+    clk_wiz->setData("clk_wiz", Qt::UserRole);
+    clockingItem->appendRow(rowItems);
 
+    connect(treeView, &QTreeView::doubleClicked, this, &IPManager::doubleClickedIP);
 
-    connect(treeView, &QTreeView::doubleClicked, this, &IPManager::clickedIP);
+    connect(treeView, &QTreeView::clicked, this, &IPManager::clickedIP);
 
     treeView->expandAll();
+}
+
+void IPManager::doubleClickedIP(const QModelIndex &index)
+{
+    //取选中的这行的第一个元素的index
+    const QModelIndex &idx = index.sibling(index.row(),0);
+    if (!idx.isValid()) {
+        return;
+    }
+    const QString ipName = idx.data(Qt::UserRole).toString();
+    // qDebug() << idx;
+    if (ipName == "blockmemorygenerator") {
+        // BlockMemoryGenerator blockMemoryGenerator(this);
+        // blockMemoryGenerator.exec();
+    } else if (ipName == "clk_wiz"){
+        ClockingWizard clk_wiz;
+        if (clk_wiz.exec() == QDialog::Accepted) {
+            // QString targetDir = QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("ip");
+            // qDebug() << targetDir;
+
+            FileManager::instance()->updateIPList();
+
+        }
+    }
+
 }
 
 void IPManager::clickedIP(const QModelIndex &index)
@@ -100,8 +146,13 @@ void IPManager::clickedIP(const QModelIndex &index)
     const QString ipName = idx.data(Qt::UserRole).toString();
     // qDebug() << idx;
     if (ipName == "blockmemorygenerator") {
-        BlockMemoryGenerator blockMemoryGenerator(this);
-        blockMemoryGenerator.exec();
+        // BlockMemoryGenerator blockMemoryGenerator(this);
+        // blockMemoryGenerator.exec();
+    } else if (ipName == "clk_wiz"){
+        detailLabel->setText("Name:         Clocking Wizard\n"
+                             "Version:      6.0 (Rev. 3)\n"
+                             "Interfaces:   AXI4\n"
+                             "Status:       Production\n"
+                             "License:      included");
     }
-
 }

@@ -1,5 +1,5 @@
-#ifndef SUMMARYWIDGET_H
-#define SUMMARYWIDGET_H
+#ifndef OUTPUTCLOCKSWIDGET_H
+#define OUTPUTCLOCKSWIDGET_H
 
 #include <QDebug>
 #include <QVBoxLayout>
@@ -8,27 +8,30 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QRadioButton>
 #include <QLineEdit>
-#include <QPushButton>
+#include <QScrollBar>
+#include <QScrollArea>
+#include "ipmanager/common/AdvancedTableView.h"
 
-class SummaryWidget : public QWidget
+class OutputClocksWidget : public QWidget
 {
-    Q_OBJECT
 public:
-    SummaryWidget(QWidget *parent = nullptr);
-
-    void setMemoryTypeInformation(const QString &option);
+    OutputClocksWidget(AdvancedTableView *outputClockInforTableView,
+                       QStandardItemModel *outputClockInforModel,
+                       QWidget *parent = nullptr);
 
 private:
+    AdvancedTableView *tableView;
+
+    QStandardItemModel *model;
+
     const QString titleLabelQss = "QLabel{"
                                   "font-size: 20px;"
                                   "font-weight: bold;"
                                   "border-bottom: 2px solid #DCDCDC;"
                                   "border-radius: 0px;" // 不能删除，我也不知道为什么
                                   "}";
-
-    QLabel *memoryTypeLabel;
-    QLabel *AddressWidthALabel;
 };
 
-#endif // SUMMARYWIDGET_H
+#endif // OUTPUTCLOCKSWIDGET_H

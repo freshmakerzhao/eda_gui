@@ -13,6 +13,7 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QSplitter>
+#include <QLabel>
 
 class IPManager : public QWidget
 {
@@ -26,13 +27,17 @@ private:
     void init();
 
 public slots:
+    void doubleClickedIP(const QModelIndex& index);
+
     void clickedIP(const QModelIndex& index);
- private:
+private:
+    QLabel *detailLabel;
+
     QTreeView *treeView;
 
     QStandardItemModel *model;
 
-    QStandardItem *blockmemorygeneratoritem;
+    // QStandardItem *blockmemorygeneratoritem;
 };
 
 #endif // IPMANAGER_H

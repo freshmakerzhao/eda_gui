@@ -12,6 +12,8 @@ option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
 option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" ON)
 # 仅编译GridView
 option(ONLY_COMPILE_GRIDVIEW "Only compile the GridView" OFF)
+# 打包部署
+option(PACK_DEPLOYED "Pack and deployed" OFF)
 
 if (ENABLE_MAC_CHECK)
     message(STATUS "ENABLE_MAC_CHECK ON.")
@@ -32,6 +34,13 @@ if (ONLY_COMPILE_GRIDVIEW)
     add_definitions(-DONLY_COMPILE_GRIDVIEW)
 else ()
     message(STATUS "ONLY_COMPILE_GRIDVIEW OFF.")
+endif()
+
+if (PACK_DEPLOYED)
+    message(STATUS "PACK_DEPLOYED ON.")
+    add_definitions(-DPACK_DEPLOYED)
+else ()
+    message(STATUS "PACK_DEPLOYED OFF.")
 endif()
 
 # 检测操作系统
@@ -115,10 +124,9 @@ file(GLOB PROJECT_SOURCES
     base/*.cpp
     dialog/*.cpp
     ipmanager/*.cpp
-    ipmanager/BlockMemoryGenerator/*.cpp
-    component/tclconsole/TclConsole.cpp
-    component/tclconsole/LineEditor.cpp
-    component/tclconsole/OutputEditor.cpp
+    ipmanager/common/*.cpp
+    ipmanager/clk_wiz/*.cpp
+    component/tclconsole/*.cpp
     settings/*.cpp
     include/tinyxml2/*.cpp
     entity/*.cpp
@@ -137,10 +145,9 @@ file(GLOB PROJECT_HEADERS
     entity/*.h
     dialog/*.h
     ipmanager/*.h
-    ipmanager/BlockMemoryGenerator/*.h
-    component/tclconsole/TclConsole.h
-    component/tclconsole/LineEditor.h
-    component/tclconsole/OutputEditor.h
+    ipmanager/common/*.h
+    ipmanager/clk_wiz/*.h
+    component/tclconsole/*.h
     settings/*.h
     include/Qsci/*.h
     include/tinyxml2/*.h
