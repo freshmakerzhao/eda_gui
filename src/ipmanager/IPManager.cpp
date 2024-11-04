@@ -58,14 +58,30 @@ void IPManager::init()
     vlayout->addWidget(treeView);
     vlayout->setMargin(0);
 
-    // QWidget *detailWidget = new QWidget(this);
-    detailLabel = new QLabel("Select an lP to see details");
+    detailLabel = new QLabel;
+    detailLabel->setMargin(15);
+    detailLabel->setStyleSheet("background-color: rgb(255, 255, 255);");
+    setDetails();
+
+    QWidget *detailWidget = new QWidget;
+    QVBoxLayout *vboxLayout = new QVBoxLayout(detailWidget);
+    vboxLayout->setMargin(0);
+    QLabel *titleLabel = new QLabel("Details");
+    titleLabel->setContentsMargins(9, 0, 0, 0);
+    titleLabel->setStyleSheet("font-weight: bold;");
+    QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setFrameStyle(QFrame::NoFrame);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setWidget(detailLabel);
+    vboxLayout->addWidget(titleLabel);
+    vboxLayout->addWidget(scrollArea);
 
     QSplitter *splitter = new QSplitter(Qt::Vertical);
     QWidget *baseWidget = new QWidget(this);
     baseWidget->setLayout(vlayout);
     splitter->addWidget(baseWidget);
-    splitter->addWidget(detailLabel);
+    splitter->addWidget(detailWidget);
+    splitter->setSizes(QList<int>() << 400 << 200);
 
     QHBoxLayout *vlayout2 = new QHBoxLayout(this);
     vlayout2->setMargin(0);
@@ -149,10 +165,31 @@ void IPManager::clickedIP(const QModelIndex &index)
         // BlockMemoryGenerator blockMemoryGenerator(this);
         // blockMemoryGenerator.exec();
     } else if (ipName == "clk_wiz"){
-        detailLabel->setText("Name:         Clocking Wizard\n"
-                             "Version:      6.0 (Rev. 3)\n"
-                             "Interfaces:   AXI4\n"
-                             "Status:       Production\n"
-                             "License:      included");
+        setDetails("Name:         Clocking Wizard\n"
+                   "Version:      6.0 (Rev. 3)\n"
+                   "Interfaces:   AXI4\n"
+                   "Description:  The Clocking Wizard creates an HDL file that contains "
+                   "a clocking circuit customized to the user's clocking requirements\n"
+                   "Status:       Production\n"
+                   "License:      included");
+    } else {
+        setDetails();
     }
+}
+
+void IPManager::setDetails(const QString &details)
+{
+    QPalette palette;
+    if (details.isEmpty()) {
+        palette.setColor(QPalette::WindowText, QColor(128, 128, 128));
+        detailLabel->setAlignment(Qt::AlignCenter);
+        detailLabel->setPalette(palette);
+        detailLabel->setText("Select an lP to see details");
+        return;
+    }
+
+    palette.setColor(QPalette::WindowText, Qt::black);
+    detailLabel->setAlignment(Qt::AlignLeft);
+    detailLabel->setPalette(palette);
+    detailLabel->setText(details);
 }

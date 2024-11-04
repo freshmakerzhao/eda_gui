@@ -31,6 +31,8 @@ public slots:
 
     void clickedIP(const QModelIndex& index);
 private:
+    void setDetails(const QString &details = QString());
+
     QLabel *detailLabel;
 
     QTreeView *treeView;
