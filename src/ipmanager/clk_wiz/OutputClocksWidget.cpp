@@ -4,17 +4,8 @@
 OutputClocksWidget::OutputClocksWidget(AdvancedTableView *outputClockInforTableView,
                                        QStandardItemModel *outputClockInforModel,
                                        QWidget *parent) :
-    QWidget(parent)
+    BasePage(parent)
 {
-    QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
-    vBoxLayout->setMargin(0);
-    QScrollArea *scrollArea = new QScrollArea;
-    vBoxLayout->addWidget(scrollArea);
-    scrollArea->setWidgetResizable(true);
-    QWidget *mainWidget = new QWidget;
-    scrollArea->setWidget(mainWidget);
-    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
-    mainLayout->setAlignment(Qt::AlignTop);
     // -----------------------------------------------------------
     QLabel *label = new QLabel("The phase is calculated relative to the active input clock.", this);
     mainLayout->addWidget(label);
@@ -30,7 +21,8 @@ OutputClocksWidget::OutputClocksWidget(AdvancedTableView *outputClockInforTableV
     model = outputClockInforModel;
     tableView->setModel(model);
 
-    auto pHeader = new MultiLevelHeaderView(Qt::Horizontal, 2, col, tableView);
+    const int headerRow = 2;
+    auto pHeader = new MultiLevelHeaderView(Qt::Horizontal, headerRow, col, tableView);
     tableView->setHorizontalHeader(pHeader);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     pHeader->setCellSpan(0, 0, 2, 1);
@@ -150,52 +142,7 @@ OutputClocksWidget::OutputClocksWidget(AdvancedTableView *outputClockInforTableV
 
     tableView->horizontalScrollBar()->setVisible(false);
     tableView->verticalScrollBar()->setVisible(false);
-    // -------------------------------------- Resize ------------------------------------------
-    // Auto resize columns to fit content initially
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
-    // Store the widths of the columns
-    QVector<int> columnWidths;
-    for (int col = 0; col < model->columnCount(); ++col) {
-        columnWidths.append(tableView->columnWidth(col));
-    }
-
-    // Set the mode to Interactive to allow manual resizing after automatic adjustment
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-
-    // Set the widths back to the original sizes
-    for (int col = 0; col < model->columnCount(); ++col) {
-        tableView->setColumnWidth(col, columnWidths.at(col));
-    }
-
-    tableView->resizeColumnsToContents();
-    tableView->resizeRowsToContents();
-
-    int width = tableView->verticalHeader()->width();
-    for (int i = 0; i < tableView->model()->columnCount(); ++i) {
-        width += tableView->columnWidth(i);
-    }
-    // qDebug() << "tableView->horizontalHeader()->model()->rowCount() : " << tableView->horizontalHeader()->model()->rowCount();
-    int height = tableView->horizontalHeader()->height() * 2;
-    qDebug() << "horizontalHeader()->height() : " << height;
-    for (int i = 0; i < tableView->model()->rowCount(); ++i) {
-        height += tableView->rowHeight(i);
-    }
-
-    // Add space for scrollbar if necessary
-    if (tableView->verticalScrollBar()->isVisible()) {
-        width += tableView->verticalScrollBar()->width();
-    }
-    if (tableView->horizontalScrollBar()->isVisible()) {
-        height += tableView->horizontalScrollBar()->height();
-    }
-
-    tableView->setMinimumSize(width + 2, height + 2);
-    tableView->setMaximumSize(width + 2, height + 2);
-
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    tableView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
+    tableView->resizeTableView(headerRow);
     mainLayout->addStretch();
 }
 

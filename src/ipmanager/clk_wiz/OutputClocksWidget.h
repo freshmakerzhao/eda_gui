@@ -12,9 +12,10 @@
 #include <QLineEdit>
 #include <QScrollBar>
 #include <QScrollArea>
+#include "ipmanager/common/BasePage.h"
 #include "ipmanager/common/AdvancedTableView.h"
 
-class OutputClocksWidget : public QWidget
+class OutputClocksWidget : public BasePage
 {
 public:
     OutputClocksWidget(AdvancedTableView *outputClockInforTableView,

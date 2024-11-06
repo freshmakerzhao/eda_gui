@@ -14,14 +14,16 @@ class AdvancedTableView : public QTableView {
 
 public:
     AdvancedTableView(QWidget *parent = nullptr) : QTableView(parent) {
-        // 设置列的调整模式为 Interactive
         horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-
-        // 监听列宽变化的信号
         connect(horizontalHeader(), &QHeaderView::sectionResized, this, &AdvancedTableView::updateEmbeddedWidgets);
     }
 
-    void resizeTableView() {
+    /**
+     * 调整TableView大小
+     * @param headerRow 表头行数
+     * @return
+     */
+    void resizeTableView(const int &headerRow = 1) {
         if (!this->model()) {
             return;
         }
@@ -51,7 +53,7 @@ public:
             width += this->columnWidth(i);
         }
 
-        int height = this->horizontalHeader()->height();
+        int height = this->horizontalHeader()->height() * headerRow;
         for (int i = 0; i < this->model()->rowCount(); ++i) {
             height += this->rowHeight(i);
         }

@@ -1,27 +1,26 @@
-#ifndef PORTRENAMINGWIDGET_H
-#define PORTRENAMINGWIDGET_H
+#ifndef BLKMEMGENSUMMARY_H
+#define BLKMEMGENSUMMARY_H
 
 #include "ipmanager/common/BasePage.h"
-#include "ipmanager/common/AdvancedTableView.h"
 
-class PortRenamingWidget : public BasePage
+class BlkMemGenSummary : public BasePage
 {
+    Q_OBJECT
 public:
-    PortRenamingWidget(QWidget *parent = nullptr);
+    BlkMemGenSummary(QWidget *parent = nullptr);
+
+    void setMemoryTypeInformation(const QString &option);
 
 private:
-    QLabel *vcoFrequencyValLabel;
-
-    AdvancedTableView *tableView;
-
-    QStandardItemModel *model;
-
     const QString titleLabelQss = "QLabel{"
                                   "font-size: 20px;"
                                   "font-weight: bold;"
                                   "border-bottom: 2px solid #DCDCDC;"
                                   "border-radius: 0px;" // 不能删除，我也不知道为什么
                                   "}";
+
+    QLabel *memoryTypeLabel;
+    QLabel *AddressWidthALabel;
 };
 
-#endif // PORTRENAMINGWIDGET_H
+#endif // BLKMEMGENSUMMARY_H

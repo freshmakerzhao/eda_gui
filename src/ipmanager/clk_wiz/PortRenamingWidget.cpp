@@ -1,18 +1,8 @@
 #include "PortRenamingWidget.h"
 
 PortRenamingWidget::PortRenamingWidget(QWidget *parent) :
-    QWidget(parent)
+    BasePage(parent)
 {
-    QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
-    vBoxLayout->setMargin(0);
-    QScrollArea *scrollArea = new QScrollArea;
-    vBoxLayout->addWidget(scrollArea);
-    scrollArea->setWidgetResizable(true);
-    QWidget *mainWidget = new QWidget;
-    scrollArea->setWidget(mainWidget);
-    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
-    mainLayout->setAlignment(Qt::AlignTop);
-    mainLayout->addSpacing(10);
     // ----------------------- VCO Frequency ---------------------------
     QLabel *vcoFrequencyLabel = new QLabel("VCO Frequency", this);
     vcoFrequencyLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -27,7 +17,7 @@ PortRenamingWidget::PortRenamingWidget(QWidget *parent) :
     optionalPortNamesLabel->setStyleSheet(titleLabelQss);
     mainLayout->addWidget(optionalPortNamesLabel);
 
-    tableView = new QTableView(this);
+    tableView = new AdvancedTableView(this);
     // tableView->setFixedSize(255, 70);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -46,23 +36,6 @@ PortRenamingWidget::PortRenamingWidget(QWidget *parent) :
     portNameEdit->setText("locked");
     tableView->setIndexWidget(model->index(0, 1), portNameEdit);
 
-    // Auto resize columns to fit content initially
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
-    int width = 0;
-    for (int i = 0; i < tableView->model()->columnCount(); ++i) {
-        width += tableView->columnWidth(i);
-    }
-
-    int height = tableView->horizontalHeader()->height();
-    for (int i = 0; i < tableView->model()->rowCount(); ++i) {
-        height += tableView->rowHeight(i);
-    }
-
-    tableView->setMinimumSize(width + 2, height + 2);
-    tableView->setMaximumSize(width + 2, height + 2);
-
-        tableView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
+    tableView->resizeTableView();
     mainLayout->addStretch(); // 添加一个弹簧以将控件聚集到顶部
 }

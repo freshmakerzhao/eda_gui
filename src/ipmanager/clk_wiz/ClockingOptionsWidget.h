@@ -1,27 +1,13 @@
 #ifndef CLOCKINGOPTIONSWIDGET_H
 #define CLOCKINGOPTIONSWIDGET_H
 
-#include <QDebug>
-#include <QJsonObject>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QLabel>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QButtonGroup>
-#include <QLineEdit>
-#include <QtWidgets>
+#include "ipmanager/common/BasePage.h"
 #include "ipmanager/common/AdvancedTableView.h"
 
-
-class ClockingOptionsWidget : public QWidget
+class ClockingOptionsWidget : public BasePage
 {
 public:
     ClockingOptionsWidget(AdvancedTableView *inputClockInformationTableView, QStandardItemModel *inputClockInformationModel, QWidget *parent = nullptr);
-
-    // QString getInputClockInfor();
 
 private:
     // ----------------------- Clock Monitor ---------------------------

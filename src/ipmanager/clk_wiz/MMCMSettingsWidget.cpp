@@ -1,18 +1,8 @@
 #include "MMCMSettingsWidget.h"
 
 MMCMSettingsWidget::MMCMSettingsWidget(QWidget *parent) :
-    QWidget(parent)
+    BasePage(parent)
 {
-    QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
-    vBoxLayout->setMargin(0);
-    QScrollArea *scrollArea = new QScrollArea;
-    vBoxLayout->addWidget(scrollArea);
-    scrollArea->setWidgetResizable(true);
-    QWidget *mainWidget = new QWidget;
-    scrollArea->setWidget(mainWidget);
-    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
-    mainLayout->setAlignment(Qt::AlignTop);
-
     QLabel *label = new QLabel("These are the settings based on inputs from previous pages. Any update on this page \n"
                                "will override the optimal settings calculated by the wizard", this);
     mainLayout->addWidget(label);

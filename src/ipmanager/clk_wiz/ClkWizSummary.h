@@ -1,28 +1,20 @@
-#ifndef SUMMARYWIDGET_H
-#define SUMMARYWIDGET_H
+#ifndef CLKWIZSUMMARY_H
+#define CLKWIZSUMMARY_H
 
-#include <QDebug>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QLabel>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QScrollArea>
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QHeaderView>
+#include "ipmanager/common/BasePage.h"
+#include "ipmanager/common/AdvancedTableView.h"
 
-class SummaryWidget : public QWidget
+class ClkWizSummary : public BasePage
 {
     Q_OBJECT
 public:
-    SummaryWidget(QWidget *parent = nullptr);
+    ClkWizSummary(QWidget *parent = nullptr);
 
 private:
-    QTableView *primaryInputClockAttributesTableView;
+    AdvancedTableView *primaryInputClockAttributesTableView;
 
     QStandardItemModel *primaryInputClockAttributesModel;
 
@@ -43,4 +35,4 @@ private:
 
 };
 
-#endif // SUMMARYWIDGET_H
+#endif // CLKWIZSUMMARY_H

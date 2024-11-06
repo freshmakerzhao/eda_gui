@@ -1,18 +1,8 @@
 #include "ClockingOptionsWidget.h"
 
 ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInformationTableView, QStandardItemModel *inputClockInformationModel, QWidget *parent) :
-    QWidget(parent)
+    BasePage(parent)
 {
-    QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
-    vBoxLayout->setMargin(0);
-    QScrollArea *scrollArea = new QScrollArea;
-    vBoxLayout->addWidget(scrollArea);
-    scrollArea->setWidgetResizable(true);
-    QWidget *mainWidget = new QWidget;
-    scrollArea->setWidget(mainWidget);
-    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
-    mainLayout->setAlignment(Qt::AlignTop);
-    mainLayout->addSpacing(10);
     // ----------------------- Clock Monitor ---------------------------
     QLabel *clockMonitorLabel = new QLabel("Clock Monitor", this);
     clockMonitorLabel->setStyleSheet(titleLabelQss);
@@ -109,6 +99,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
     mainLayout->addWidget(inputClockInformationLabel);
     // model = new QStandardItemModel;
     model = inputClockInformationModel;
+    // model = qobject_cast<QStandardItemModel *>(tableView->model());
     QStringList headers;
     headers << "" << "Input Clock" << "Port Name" << "Input Frequency (MHz)" << ""
             << "Jitter Options" << "Input Jitter" << "Source";
@@ -122,6 +113,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
     inputClockInformationLayout->addWidget(tableView);
     mainLayout->addLayout(inputClockInformationLayout);
     tableView->setModel(model);
+    // model = qobject_cast<QStandardItemModel *>(tableView->model());
 
     model->insertRows(0, 2);
     // ----------------------- Primary --------------------------

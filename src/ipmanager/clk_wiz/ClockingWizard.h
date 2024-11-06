@@ -17,15 +17,18 @@
 #include <QScrollArea>
 #include <QDialogButtonBox>
 #include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QMessageBox>
+#include "ipmanager/common/BaseDialog.h"
 #include "ipmanager/clk_wiz/ClockingOptionsWidget.h"
 #include "ipmanager/clk_wiz/OutputClocksWidget.h"
 #include "ipmanager/clk_wiz/PortRenamingWidget.h"
 #include "ipmanager/clk_wiz/MMCMSettingsWidget.h"
-#include "ipmanager/clk_wiz/SummaryWidget.h"
+#include "ipmanager/clk_wiz/ClkWizSummary.h"
 #include "base/Globals.h"
 
-
-class ClockingWizard : public QDialog
+class ClockingWizard : public BaseDialog
 {
     Q_OBJECT
 public:
@@ -33,7 +36,7 @@ public:
 protected:
     void accept() override;
 private:
-    QTabWidget *tabWidget;
+    // QTabWidget *tabWidget;
 
     ClockingOptionsWidget *clockingOptionsWidget;
 
@@ -43,15 +46,7 @@ private:
 
     MMCMSettingsWidget *mmcmSettingsWidget;
 
-    SummaryWidget *summaryWidget;
-
-    // QGraphicsView *viewModule;
-
-    QAction *docAction;
-    QAction *ipLocAction;
-    QAction *switchToDefaultAction;
-    
-    QLineEdit *componentNameLineEdit;
+    ClkWizSummary *summaryWidget;
 
     // int out_clk_nums = 0;
 

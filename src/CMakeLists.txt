@@ -73,6 +73,7 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS PrintSupport)
 find_package(Qt5 COMPONENTS OpenGL)
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Xml REQUIRED)
 
 # Include the QScintilla library
 set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/Qsci")
@@ -126,6 +127,7 @@ file(GLOB PROJECT_SOURCES
     ipmanager/*.cpp
     ipmanager/common/*.cpp
     ipmanager/clk_wiz/*.cpp
+    ipmanager/blk_mem_gen/*.cpp
     component/tclconsole/*.cpp
     settings/*.cpp
     include/tinyxml2/*.cpp
@@ -147,6 +149,7 @@ file(GLOB PROJECT_HEADERS
     ipmanager/*.h
     ipmanager/common/*.h
     ipmanager/clk_wiz/*.h
+    ipmanager/blk_mem_gen/*.h
     component/tclconsole/*.h
     settings/*.h
     include/Qsci/*.h
@@ -175,6 +178,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     Qt5::Core
     Qt5::Network
+    Qt5::Xml
     # HybrdLinkPlugin # qscintilla2_qt5
     qscintilla2_qt5
     yaml-cpp
