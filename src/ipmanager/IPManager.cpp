@@ -1,6 +1,7 @@
 #include "IPManager.h"
 #include "clk_wiz/ClockingWizard.h"
 #include "blk_mem_gen/BlockMemoryGenerator.h"
+#include "fifo_generator/FIFOGenerator.h"
 #include "widgets/FileManager.h"
 #include "base/TreeViewBase.h"
 
@@ -85,6 +86,11 @@ void IPManager::doubleClickedIP(const QModelIndex &index)
         if (clk_wiz.exec() == QDialog::Accepted) {
             FileManager::instance()->updateIPList();
         }
+    } else if(ipName == "FIFO Generator") {
+        FIFOGenerator fifo_gen;
+        if (fifo_gen.exec() == QDialog::Accepted) {
+            FileManager::instance()->updateIPList();
+        }
     }
 
 }
@@ -120,6 +126,8 @@ void IPManager::clickedIP(const QModelIndex &index)
                    "a clocking circuit customized to the user's clocking requirements\n"
                    "Status:       Production\n"
                    "License:      included");
+    } else if(ipName == "FIFO Generator") {
+
     } else {
         setDetails();
     }

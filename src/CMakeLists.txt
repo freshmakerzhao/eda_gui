@@ -128,6 +128,7 @@ file(GLOB PROJECT_SOURCES
     ipmanager/common/*.cpp
     ipmanager/clk_wiz/*.cpp
     ipmanager/blk_mem_gen/*.cpp
+    ipmanager/fifo_generator/*.cpp
     component/tclconsole/*.cpp
     settings/*.cpp
     include/tinyxml2/*.cpp
@@ -150,6 +151,7 @@ file(GLOB PROJECT_HEADERS
     ipmanager/common/*.h
     ipmanager/clk_wiz/*.h
     ipmanager/blk_mem_gen/*.h
+    ipmanager/fifo_generator/*.h
     component/tclconsole/*.h
     settings/*.h
     include/Qsci/*.h
