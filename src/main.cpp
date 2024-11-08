@@ -22,12 +22,12 @@ int main(int argc, char *argv[])
     }
     qss.close();
 
-    //! ----- Fonts -----
-    FontsUtilities::loadFont();
-
     //! ----- Config ----
     InitialConfig::instance().initializeApplicationConfig();
     InitialConfig::instance().initializeRoamingPath();
+
+    //! ----- Fonts -----
+    FontsUtilities::loadFont();
 
 #if defined(ENABLE_MAC_CHECK) || defined(ENABLE_EXPIRATION_CHECK)
     if (!LicenseUtilities::checkLicense()) {

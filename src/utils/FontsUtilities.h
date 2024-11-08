@@ -17,6 +17,7 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <QDebug>
+#include "base/Globals.h"
 
 namespace FontsUtilities {
 
@@ -25,8 +26,7 @@ namespace FontsUtilities {
         QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
 
         // Application
-        QString appDirPath = QCoreApplication::applicationDirPath();
-        QString fontDirPath = appDirPath + "/Fonts";
+        QString fontDirPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("../Fonts");
         QDir fontDir(fontDirPath);
         if (!fontDir.exists()) {
             qWarning() << "Font directory does not exist:" << fontDirPath;
