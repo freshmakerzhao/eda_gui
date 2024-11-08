@@ -1,5 +1,5 @@
-#ifndef PORTAOPTIONSWIDGET_H
-#define PORTAOPTIONSWIDGET_H
+#ifndef BASEPAGE_H
+#define BASEPAGE_H
 
 #include <QDebug>
 #include <QVBoxLayout>
@@ -8,26 +8,21 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QRadioButton>
+#include <QButtonGroup>
 #include <QLineEdit>
-#include <QPushButton>
+#include <QScrollBar>
+#include <QScrollArea>
 
-class PortAOptionsWidget : public QWidget
+class BasePage : public QWidget
 {
-    Q_OBJECT
 public:
-    PortAOptionsWidget(QWidget *parent = nullptr);
+    BasePage(QWidget *parent = nullptr);
 
-    QLineEdit *portAWidthLineEdit;
+protected:
+    QVBoxLayout *mainLayout;
 
-    QLineEdit *portADepthLineEdit;
-
-    QLabel *portADepthRangeLabel;
-
-    //! Port A Depth Range动态更新接口
-    void updatePortADepthRange();
-
-private:
-    const QString titleLabelQss = "QLabel{"
+    const QString TITLE_LABEL_STYLESHEET = "QLabel{"
                                   "font-size: 20px;"
                                   "font-weight: bold;"
                                   "border-bottom: 2px solid #DCDCDC;"
@@ -35,4 +30,4 @@ private:
                                   "}";
 };
 
-#endif // PORTAOPTIONSWIDGET_H
+#endif // BASEPAGE_H

@@ -27,25 +27,24 @@
 #include "PortAOptionsWidget.h"
 #include "PortBOptionsWidget.h"
 #include "OtherOptionsWidget.h"
-#include "SummaryWidget.h"
-#include "IPlocationDialog.h"
+#include "ipmanager/blk_mem_gen/BlkMemGenSummary.h"
+// #include "IPlocationDialog.h"
+#include "ipmanager/common/BaseDialog.h"
 
-class BlockMemoryGenerator : public QDialog
+class BlockMemoryGenerator : public BaseDialog
 {
     Q_OBJECT
 public:
     BlockMemoryGenerator(QWidget *parent = nullptr);
-
-    int exec() override;
 
     //! 响应MemoryType选择
     //! 更新Summary页面
     //! 更新Tab
     void updateMemoryType(const QString &option);
 private:
-    QTabWidget *tabWidget;
+    // QTabWidget *tabWidget;
 
-    QLineEdit *cmptNameLineEdit;
+    // QLineEdit *cmptNameLineEdit;
 
     BasicWidget *basicWidget;
 
@@ -55,13 +54,13 @@ private:
 
     OtherOptionsWidget *otherOptionsWidget;
 
-    SummaryWidget *summaryWidget;
+    BlkMemGenSummary *summaryWidget;
 
-    QGraphicsView *viewModule;
+    // QGraphicsView *viewModule;
 
-    QAction *docAction;
-    QAction *ipLocAction;
-    QAction *swToDftAction;
+    // QAction *docAction;
+    // QAction *ipLocAction;
+    // QAction *swToDftAction;
 
 private slots:
     void onipLocActionTrigger();

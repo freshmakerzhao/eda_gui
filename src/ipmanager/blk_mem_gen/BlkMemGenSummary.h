@@ -1,21 +1,13 @@
-#ifndef SUMMARYWIDGET_H
-#define SUMMARYWIDGET_H
+#ifndef BLKMEMGENSUMMARY_H
+#define BLKMEMGENSUMMARY_H
 
-#include <QDebug>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QLabel>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QPushButton>
+#include "ipmanager/common/BasePage.h"
 
-class SummaryWidget : public QWidget
+class BlkMemGenSummary : public BasePage
 {
     Q_OBJECT
 public:
-    SummaryWidget(QWidget *parent = nullptr);
+    BlkMemGenSummary(QWidget *parent = nullptr);
 
     void setMemoryTypeInformation(const QString &option);
 
@@ -31,4 +23,4 @@ private:
     QLabel *AddressWidthALabel;
 };
 
-#endif // SUMMARYWIDGET_H
+#endif // BLKMEMGENSUMMARY_H

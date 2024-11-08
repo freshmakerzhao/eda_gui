@@ -23,12 +23,13 @@
 QString GlobalConfig::GLOBAL_RESOURCE_PATH = "";
 
 void GlobalConfig::initGlobalResourcePath() {
-    // 测试用
-    QString TEST_PATH1 = "E:/workspace/HybrdLink_test/resource_win";
-    QString TEST_PATH2 = "C:/HybrdLink/resource_win";
-    QString TEST_PATH3 = "C:/Users/INTEL/Desktop/Work/VMwareFileWorkspace/HybrdLink/resource_win";
     // 打包用
-    QString PACK_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
+    const QString PACK_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
+
+    // 测试用
+    const QString TEST_PATH1 = "E:/workspace/HybrdLink_test/resource_win";
+    const QString TEST_PATH2 = "C:/HybrdLink/resource_win";
+    const QString TEST_PATH3 = "C:/Users/INTEL/Desktop/Work/VMwareFileWorkspace/HybrdLink/resource_win";
 
     QFileInfo fileInfo1(TEST_PATH1);
     QFileInfo fileInfo2(TEST_PATH2);
@@ -44,6 +45,10 @@ void GlobalConfig::initGlobalResourcePath() {
     } else if (fileInfo4.exists()) {
         GLOBAL_RESOURCE_PATH = PACK_PATH;
     }
+
+#ifdef PACK_DEPLOYED
+    GLOBAL_RESOURCE_PATH = PACK_PATH;
+#endif
 
     qDebug() << GLOBAL_RESOURCE_PATH;
 }

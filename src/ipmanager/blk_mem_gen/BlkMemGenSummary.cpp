@@ -1,11 +1,8 @@
-#include "SummaryWidget.h"
+#include "BlkMemGenSummary.h"
 
-SummaryWidget::SummaryWidget(QWidget *parent) :
-    QWidget(parent)
+BlkMemGenSummary::BlkMemGenSummary(QWidget *parent) :
+    BasePage(parent)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setAlignment(Qt::AlignTop);
-
     // --------------- Information ------------------
     QLabel *infoLabel = new QLabel("Information", this);
     infoLabel->setStyleSheet(titleLabelQss);
@@ -18,7 +15,7 @@ SummaryWidget::SummaryWidget(QWidget *parent) :
     AddressWidthALabel = new QLabel(this);
 }
 
-void SummaryWidget::setMemoryTypeInformation(const QString &option)
+void BlkMemGenSummary::setMemoryTypeInformation(const QString &option)
 {
     memoryTypeLabel->setText(option);
 }

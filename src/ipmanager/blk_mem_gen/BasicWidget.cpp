@@ -1,18 +1,15 @@
 #include "BasicWidget.h"
 
 BasicWidget::BasicWidget(QWidget *parent) :
-    QWidget(parent)
+    BasePage(parent)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setAlignment(Qt::AlignTop);
-    // -----------------------------------------------------------------
     QFormLayout *fLayout = new QFormLayout;
     mainLayout->addLayout(fLayout);
     interfaceTypeComboBox = new QComboBox(this);
     interfaceTypeComboBox->addItem("Native");
     interfaceTypeComboBox->addItem("AXI4");
     interfaceTypeComboBox->setCurrentIndex(1);
-    connect(interfaceTypeComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+    connect(interfaceTypeComboBox, static_cast<void (QComboBox::*)(const int)>(&QComboBox::currentIndexChanged),
             this, &::BasicWidget::onInterfaceTypeComboBoxIndexChanged);
 
     interfaceTypeComboBox->setFixedWidth(220);
@@ -44,7 +41,7 @@ BasicWidget::BasicWidget(QWidget *parent) :
     mainLayout->addSpacing(20);
     // ------------------------- ECC Options -------------------------
     QLabel *eccOptLabel = new QLabel("ECC Options", this);
-    eccOptLabel->setStyleSheet(titleLabelQss);
+    eccOptLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(eccOptLabel);
     QFormLayout *eccOptionfLayout = new QFormLayout;
     eccOptionfLayout->setContentsMargins(25, 0, 0, 0);
@@ -64,19 +61,19 @@ BasicWidget::BasicWidget(QWidget *parent) :
     mainLayout->addSpacing(20);
     // ------------------------ Write Enable -------------------------
     QLabel *writeEnableLabel = new QLabel("Write Enable", this);
-    writeEnableLabel->setStyleSheet(titleLabelQss);
+    writeEnableLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(writeEnableLabel);
     mainLayout->addSpacing(20);
     // ----------------------- Algorithm Options ---------------------
     QLabel *algorithmOptionsLabel = new QLabel("Algorithm Options", this);
-    algorithmOptionsLabel->setStyleSheet(titleLabelQss);
+    algorithmOptionsLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(algorithmOptionsLabel);
 
 }
 
-void BasicWidget::onInterfaceTypeComboBoxIndexChanged(const QString &option)
+void BasicWidget::onInterfaceTypeComboBoxIndexChanged(const int &index)
 {
-    qDebug() << "Interface Type : " << option;
+    qDebug() << "Interface Type : " << interfaceTypeComboBox->itemText(index);
 }
 
 void BasicWidget::onInterfaceTypeCheckBoxStateChanged(const int &state)

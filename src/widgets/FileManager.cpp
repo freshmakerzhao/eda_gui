@@ -67,6 +67,9 @@ void FileManager::updateDesignSources(const QStringList &list)
         node->setData(QFileInfo(file).filePath(), Qt::UserRole); // 设置Qt::UserRole数据
         designsources->appendRow(node);
     }
+
+    fileWatcher->addPath(QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("ip"));
+    updateIPList();
 }
 
 /**
@@ -144,6 +147,34 @@ void FileManager::cleanFileItems()
 {
     designsources->removeRows(0, designsources->rowCount());
     constraints->removeRows(0, constraints->rowCount());
+    ipLists->removeRows(0, ipLists->rowCount());
+}
+
+void FileManager::updateIPList()
+{
+    ipLists->removeRows(0, ipLists->rowCount());
+    QDir target = QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("ip");
+    // qDebug() << "target: " << target;
+    QStringList list;
+    target.setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
+    QFileInfoList subDirectories = target.entryInfoList();
+    for (const QFileInfo &subDir : subDirectories) {
+        QStandardItem *dirItem = new QStandardItem(QIcon(":/icons/resource/icons/5-icon_ip_catalog.png"), subDir.fileName());
+        dirItem->setData(subDir.filePath(), Qt::UserRole);
+        ipLists->appendRow(dirItem);
+        list.append(subDir.filePath());
+        // QDir compDir(subDir.absoluteFilePath());
+        // compDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
+        // QFileInfoList comps = compDir.entryInfoList();
+        // for(const QFileInfo &comp : comps) {
+        //     QStandardItem *compItem = new QStandardItem(QIcon(":/icons/resource/icons/5-icon_ip_catalog.png"), comp.fileName());
+        //     dirItem->appendRow(compItem);
+        //     compItem->setData(comp.filePath(), Qt::UserRole);
+        //     list.append(comp.filePath());
+        // }
+    }
+
+    ProjectManager::instance().ipList = list;
 }
 
 // void FileManager::keyPressEvent(QKeyEvent *event)
@@ -194,8 +225,15 @@ FileManager::FileManager(QWidget *parent) : QTreeView(parent)
     setModel(model);
     designsources = new QStandardItem("Design Sources");
     constraints = new QStandardItem("Constraints");
+    ipLists = new QStandardItem("IP Sources");
     model->setItem(0, 0, designsources);
     model->setItem(1, 0, constraints);
+    model->setItem(2, 0, ipLists);
+
+    fileWatcher = new QFileSystemWatcher(this);
+    QObject::connect(fileWatcher, &QFileSystemWatcher::directoryChanged, [&](const QString &changedPath) {
+        updateIPList();
+    });
 }
 
 FileManager::~FileManager()

@@ -24,7 +24,9 @@ class TreeViewBase : public QWidget
 {
     Q_OBJECT
 public:
-    TreeViewBase(QTreeView *treeView, QWidget *parent = nullptr);
+    TreeViewBase(QTreeView *treeView,
+                 const bool &enableSearch = true,
+                 QWidget *parent = nullptr);
 
 private:
     QWidget *baseWidget;

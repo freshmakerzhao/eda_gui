@@ -2,14 +2,11 @@
 #include "CoeFileEditor.h"
 
 OtherOptionsWidget::OtherOptionsWidget(QWidget *parent) :
-    QWidget(parent)
+    BasePage(parent)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setAlignment(Qt::AlignTop);
-
     // ----------------- Memory Initialization ----------------------
     QLabel *memoryInitializationLabel = new QLabel("Memory Initialization", this);
-    memoryInitializationLabel->setStyleSheet(titleLabelQss);
+    memoryInitializationLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(memoryInitializationLabel);
 
     QHBoxLayout *checkBoxLayout = new QHBoxLayout;

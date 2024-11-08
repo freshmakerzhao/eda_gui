@@ -11,6 +11,7 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
+#include "qfilesystemwatcher.h"
 #include <QTreeView>
 #include <QMenu>
 #include <QAction>
@@ -65,6 +66,8 @@ public slots:
 
     // void renameSelectedItem();
 
+    void updateIPList();
+
 private:
     FileManager(QWidget* parent = nullptr);
 
@@ -75,6 +78,10 @@ private:
     QStandardItem *designsources;
 
     QStandardItem *constraints;
+
+    QStandardItem *ipLists;
+
+    QFileSystemWatcher *fileWatcher;
 
 };
 

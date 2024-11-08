@@ -9,7 +9,9 @@
   */
 #include "TreeViewBase.h"
 
-TreeViewBase::TreeViewBase(QTreeView *treeView, QWidget *parent)
+TreeViewBase::TreeViewBase(QTreeView *treeView,
+                           const bool &enableSearch,
+                           QWidget *parent)
     : QWidget(parent),
     toolBar(new QToolBar(this))
 {
@@ -48,6 +50,11 @@ TreeViewBase::TreeViewBase(QTreeView *treeView, QWidget *parent)
     lineEdit->setClearButtonEnabled(true);
 
     matchesLabel = new QLabel("", baseWidget);
+
+    if (!enableSearch) {
+        searchAction->setVisible(false);
+        matchesLabel->hide();
+    }
 
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->setMargin(0);
@@ -95,10 +102,31 @@ TreeViewBase::TreeViewBase(QTreeView *treeView, QWidget *parent)
             secondLevelCount += proxyModel->rowCount(childIndex);
         }
 
+        // // 初始化计数
+        // QModelIndex rootIndex = QModelIndex();
+        // int userRoleCount = 0;
+
+        // // 遍历第一层节点
+        // int rowCount = proxyModel->rowCount(rootIndex);
+        // for (int row = 0; row < rowCount; ++row) {
+        //     QModelIndex childIndex = proxyModel->index(row, 0, rootIndex);
+
+        //     // 遍历每个子节点，检查是否有 UserRole 数据
+        //     int childCount = proxyModel->rowCount(childIndex);
+        //     for (int childRow = 0; childRow < childCount; ++childRow) {
+        //         QModelIndex subChildIndex = proxyModel->index(childRow, 0, childIndex);
+        //         QVariant userRoleData = proxyModel->data(subChildIndex, Qt::UserRole);
+        //         if (!userRoleData.isNull()) {
+        //             ++userRoleCount;
+        //         }
+        //     }
+        // }
+
         if (lineEdit->text().isEmpty()) {
             matchesLabel->setText("");
         } else {
             matchesLabel->setText(QString("Matches: %1").arg(secondLevelCount));
+            // matchesLabel->setText(QString("Matches: %1").arg(userRoleCount));
         }
         // qDebug() << "Second level node count:" << secondLevelCount;
 

@@ -1,14 +1,11 @@
 #include "PortAOptionsWidget.h"
 
 PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
-    QWidget(parent)
+    BasePage(parent)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setAlignment(Qt::AlignTop);
-
     // ------------------- Memory Size ----------------------
     QLabel *memorySizeLabel = new QLabel("Memory Size", this);
-    memorySizeLabel->setStyleSheet(titleLabelQss);
+    memorySizeLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(memorySizeLabel);
 
     QFormLayout *fLayout = new QFormLayout;
@@ -38,18 +35,18 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
 
     // ------------------ Port A Optional Output Registers --------------------
     QLabel *portAOptionalOutputRegistersLabel = new QLabel("Port A Optional Output Registers", this);
-    portAOptionalOutputRegistersLabel->setStyleSheet(titleLabelQss);
+    portAOptionalOutputRegistersLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(portAOptionalOutputRegistersLabel);
     mainLayout->addSpacing(20);
     // --------------------- Port A Output Reset Options ----------------------
     QLabel *portAOutputResetOptionsLabel = new QLabel("Port A Output Reset Options", this);
-    portAOutputResetOptionsLabel->setStyleSheet(titleLabelQss);
+    portAOutputResetOptionsLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(portAOutputResetOptionsLabel);
     mainLayout->addSpacing(20);
 
     // --------------------- READ Address Change A ----------------------
     QLabel *readAddressChangeALabel = new QLabel("READ Address Change A", this);
-    readAddressChangeALabel->setStyleSheet(titleLabelQss);
+    readAddressChangeALabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(readAddressChangeALabel);
 }
 

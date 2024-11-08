@@ -10,9 +10,9 @@
 #include <QAction>
 #include <QPushButton>
 #include <QDebug>
-#include <QTreeView>
-#include <QStandardItemModel>
 #include <QSplitter>
+#include <QLabel>
+#include "RepositoryTreeView.h"
 
 class IPManager : public QWidget
 {
@@ -26,13 +26,15 @@ private:
     void init();
 
 public slots:
+    void doubleClickedIP(const QModelIndex& index);
+
     void clickedIP(const QModelIndex& index);
- private:
-    QTreeView *treeView;
+private:
+    void setDetails(const QString &details = QString());
 
-    QStandardItemModel *model;
+    QLabel *detailLabel;
 
-    QStandardItem *blockmemorygeneratoritem;
+    RepositoryTreeView *repositoryTreeView;
 };
 
 #endif // IPMANAGER_H
