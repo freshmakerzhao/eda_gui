@@ -4,7 +4,7 @@ Basic::Basic(QWidget *parent) :
     BasePage(parent)
 {
     QLabel *interfaceTypeLabel = new QLabel("Interface Type");
-    interfaceTypeLabel->setStyleSheet(TITLE_LABEL_STYLESHEET);
+    interfaceTypeLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
 
     mainLayout->addWidget(interfaceTypeLabel);
 

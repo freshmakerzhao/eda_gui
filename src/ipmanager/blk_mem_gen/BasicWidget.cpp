@@ -41,7 +41,7 @@ BasicWidget::BasicWidget(QWidget *parent) :
     mainLayout->addSpacing(20);
     // ------------------------- ECC Options -------------------------
     QLabel *eccOptLabel = new QLabel("ECC Options", this);
-    eccOptLabel->setStyleSheet(titleLabelQss);
+    eccOptLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(eccOptLabel);
     QFormLayout *eccOptionfLayout = new QFormLayout;
     eccOptionfLayout->setContentsMargins(25, 0, 0, 0);
@@ -61,12 +61,12 @@ BasicWidget::BasicWidget(QWidget *parent) :
     mainLayout->addSpacing(20);
     // ------------------------ Write Enable -------------------------
     QLabel *writeEnableLabel = new QLabel("Write Enable", this);
-    writeEnableLabel->setStyleSheet(titleLabelQss);
+    writeEnableLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(writeEnableLabel);
     mainLayout->addSpacing(20);
     // ----------------------- Algorithm Options ---------------------
     QLabel *algorithmOptionsLabel = new QLabel("Algorithm Options", this);
-    algorithmOptionsLabel->setStyleSheet(titleLabelQss);
+    algorithmOptionsLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(algorithmOptionsLabel);
 
 }

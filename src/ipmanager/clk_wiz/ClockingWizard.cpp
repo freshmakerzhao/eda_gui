@@ -1,9 +1,14 @@
 #include "ClockingWizard.h"
 #include "utils/ProjectManager.h"
+#include "ipmanager/common/SetNameUtils.h"
 
 ClockingWizard::ClockingWizard(QWidget *parent) :
     BaseDialog(parent)
 {
+    displayNameLabel->setText("Clocking Wizard(6.0)");
+    QString componentName = QString("clk_wiz_%1").arg(SetNameUtils::getComponentNameIndex());
+    componentNameLineEdit->setText(componentName);
+
     clockingOptionsWidget = new ClockingOptionsWidget(inputClockInformationTableView, inputClockInformationModel, this);
     outputClocksWidget = new OutputClocksWidget(outputClockInforTableView, outputClockInforModel, this);
     portRenamingWidget = new PortRenamingWidget(this);

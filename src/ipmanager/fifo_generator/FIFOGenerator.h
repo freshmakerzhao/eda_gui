@@ -3,6 +3,7 @@
 
 #include "ipmanager/common/BaseDialog.h"
 #include "ipmanager/fifo_generator/Basic.h"
+#include "ipmanager/fifo_generator/NativePorts.h"
 
 class FIFOGenerator : public BaseDialog
 {
@@ -12,6 +13,8 @@ public:
 
 private:
     Basic *basic;
+
+    NativePorts *nativePorts;
 };
 
 #endif // FIFOGENERATOR_H

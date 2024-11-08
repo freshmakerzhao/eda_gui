@@ -5,7 +5,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
 {
     // ----------------------- Clock Monitor ---------------------------
     QLabel *clockMonitorLabel = new QLabel("Clock Monitor", this);
-    clockMonitorLabel->setStyleSheet(titleLabelQss);
+    clockMonitorLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(clockMonitorLabel);
     enableClockMonitoringCheckBox = new QCheckBox("Enable Clock Monitoring", this);
     QHBoxLayout *hBoxLayout1 = new QHBoxLayout;
@@ -15,7 +15,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
     mainLayout->addSpacing(20);
     // ------------------------- Primitive -----------------------------
     QLabel *primitiveLabel = new QLabel("Primitive", this);
-    primitiveLabel->setStyleSheet(titleLabelQss);
+    primitiveLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(primitiveLabel);
     mmcmRadioButton = new QRadioButton("MMCM", this), mmcmRadioButton->setObjectName("MMCM_Radio_Button");
     pllRadioButton = new QRadioButton("PLL", this), pllRadioButton->setObjectName("PLL_Radio_Button");
@@ -42,7 +42,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
     gridLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Fixed), 1, 3);
     // --------------------- Clocking Features -------------------------
     QLabel *clockingFeaturesLabel = new QLabel("Clocking Features", this);
-    clockingFeaturesLabel->setStyleSheet(titleLabelQss);
+    clockingFeaturesLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     frequencySynthesisCheckBox = new QCheckBox("Frequency Synthesis", this);
     minimizePowerCheckBox = new QCheckBox("Minimize Power", this);
     phaseAlignmentCheckBox = new QCheckBox("Phase Alignment", this), phaseAlignmentCheckBox->setObjectName("Phase_Alignment");
@@ -60,7 +60,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
     gridLayout->addWidget(safeClockStartupCheckBox, 4, 1);
     // --------------------- Jitter Optimization -----------------------
     QLabel *jitterOptimizationLabel = new QLabel("Jitter Optimization", this);
-    jitterOptimizationLabel->setStyleSheet(titleLabelQss);
+    jitterOptimizationLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     balancedRadioButton = new QRadioButton("Balanced", this);
     minimizeOutputJitterRadioButton = new QRadioButton("Minimize Output Jitter", this);
     maximizeInputJitterfilteringRadioButton = new QRadioButton("Maximize Input Jitter filtering", this);
@@ -75,7 +75,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
     balancedRadioButton->setChecked(true);
     // ------------- Dynamic Reconfig Interface Options ----------------
     QLabel *dynamicReconfigInterfaceOptionsLabel = new QLabel("Dynamic Reconfig Interface Options", this);
-    dynamicReconfigInterfaceOptionsLabel->setStyleSheet(titleLabelQss);
+    dynamicReconfigInterfaceOptionsLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(dynamicReconfigInterfaceOptionsLabel);
     QHBoxLayout *hBoxLayout4 = new QHBoxLayout;
     hBoxLayout4->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -95,7 +95,7 @@ ClockingOptionsWidget::ClockingOptionsWidget(AdvancedTableView *inputClockInform
     mainLayout->addSpacing(20);
     // ------------------- Input Clock Information --------------------
     QLabel *inputClockInformationLabel = new QLabel("Input Clock Information", this);
-    inputClockInformationLabel->setStyleSheet(titleLabelQss);
+    inputClockInformationLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(inputClockInformationLabel);
     // model = new QStandardItemModel;
     model = inputClockInformationModel;

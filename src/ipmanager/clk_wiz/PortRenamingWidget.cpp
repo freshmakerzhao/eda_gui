@@ -6,7 +6,7 @@ PortRenamingWidget::PortRenamingWidget(QWidget *parent) :
     // ----------------------- VCO Frequency ---------------------------
     QLabel *vcoFrequencyLabel = new QLabel("VCO Frequency", this);
     vcoFrequencyLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    vcoFrequencyLabel->setStyleSheet(titleLabelQss);
+    vcoFrequencyLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(vcoFrequencyLabel);
     mainLayout->addSpacing(10);
     vcoFrequencyValLabel = new QLabel("VCO Freg = 1000.00000 MHZ", this);
@@ -14,7 +14,7 @@ PortRenamingWidget::PortRenamingWidget(QWidget *parent) :
     mainLayout->addSpacing(20);
     // -------------------- Optional Port Names ------------------------
     QLabel *optionalPortNamesLabel = new QLabel("Optional Port Names", this);
-    optionalPortNamesLabel->setStyleSheet(titleLabelQss);
+    optionalPortNamesLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(optionalPortNamesLabel);
 
     tableView = new AdvancedTableView(this);

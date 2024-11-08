@@ -8,10 +8,15 @@
   ******************************************************************************
   */
 #include "BlockMemoryGenerator.h"
+#include "ipmanager/common/SetNameUtils.h"
 
 BlockMemoryGenerator::BlockMemoryGenerator(QWidget *parent) :
     BaseDialog(parent)
 {
+    displayNameLabel->setText("Block Memory Generator(8.4)");
+    QString componentName = QString("blk_mem_gen_%1").arg(SetNameUtils::getComponentNameIndex());
+    componentNameLineEdit->setText(componentName);
+
     basicWidget = new BasicWidget(this);
     connect(basicWidget, &BasicWidget::memoryTypeComboBoxChangeSignal, this, &BlockMemoryGenerator::updateMemoryType);
     portAOptionsWidget = new PortAOptionsWidget(this);

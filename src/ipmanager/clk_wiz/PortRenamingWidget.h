@@ -15,13 +15,6 @@ private:
     AdvancedTableView *tableView;
 
     QStandardItemModel *model;
-
-    const QString titleLabelQss = "QLabel{"
-                                  "font-size: 20px;"
-                                  "font-weight: bold;"
-                                  "border-bottom: 2px solid #DCDCDC;"
-                                  "border-radius: 0px;" // 不能删除，我也不知道为什么
-                                  "}";
 };
 
 #endif // PORTRENAMINGWIDGET_H

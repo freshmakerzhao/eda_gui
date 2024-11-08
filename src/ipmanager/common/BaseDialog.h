@@ -31,6 +31,8 @@ protected:
     QAction *switchToDefaultAction;
 
     QLineEdit *componentNameLineEdit;
+
+    QLabel *displayNameLabel;
 };
 
 #endif // BASEDIALOG_H

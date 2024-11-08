@@ -6,7 +6,7 @@ OtherOptionsWidget::OtherOptionsWidget(QWidget *parent) :
 {
     // ----------------- Memory Initialization ----------------------
     QLabel *memoryInitializationLabel = new QLabel("Memory Initialization", this);
-    memoryInitializationLabel->setStyleSheet(titleLabelQss);
+    memoryInitializationLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(memoryInitializationLabel);
 
     QHBoxLayout *checkBoxLayout = new QHBoxLayout;

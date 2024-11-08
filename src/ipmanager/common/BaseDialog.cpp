@@ -12,15 +12,14 @@ BaseDialog::BaseDialog(QWidget *parent)
 
     // ! ---------------------- C区 ----------------------------
     // C区基控件
-    QWidget *Cwidget = new QWidget(this);
+    QWidget *Cwidget = new QWidget;
     // C区布局
     QVBoxLayout *CvLayout = new QVBoxLayout(Cwidget);
     CvLayout->setMargin(0);
     QFormLayout *cmptNameLayout = new QFormLayout;
-    componentNameLineEdit = new QLineEdit(this);
-    componentNameLineEdit->setText("clk_wiz_0");
+    componentNameLineEdit = new QLineEdit;
     cmptNameLayout->addRow("Component Name", componentNameLineEdit);
-    tabWidget = new QTabWidget(this);
+    tabWidget = new QTabWidget;
     CvLayout->addLayout(cmptNameLayout);
     CvLayout->addWidget(tabWidget);
 
@@ -31,24 +30,24 @@ BaseDialog::BaseDialog(QWidget *parent)
     QVBoxLayout *AvLayout = new QVBoxLayout;
     QHBoxLayout *titleLayout = new QHBoxLayout;
     // titleLayout->setAlignment(Qt::AlignLeading);
-    QLabel *ipNameLabel = new QLabel("Clocking Wizard(6.0)", this);
-    ipNameLabel->setStyleSheet("font-size: 20px;"
+    displayNameLabel = new QLabel;
+    displayNameLabel->setStyleSheet("font-size: 20px;"
                                "font-weight: bold;");
-    QLabel *logoLabel = new QLabel(this);
+    QLabel *logoLabel = new QLabel;
     logoLabel->setAlignment(Qt::AlignRight);
     QPixmap image(":/resource/icon.png");
-    titleLayout->addWidget(ipNameLabel);
+    titleLayout->addWidget(displayNameLabel);
     titleLayout->addWidget(logoLabel);
     logoLabel->setPixmap(image.scaled(48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     AvLayout->addLayout(titleLayout);
     AvLayout->setAlignment(Qt::AlignTop);
-    QToolBar *toolBar = new QToolBar(this);
+    QToolBar *toolBar = new QToolBar;
     AvLayout->addWidget(toolBar);
-    docAction = new QAction("Documentation", this);
+    docAction = new QAction("Documentation");
     toolBar->addAction(docAction);
-    ipLocAction = new QAction("IP Location", this);
+    ipLocAction = new QAction("IP Location");
     toolBar->addAction(ipLocAction);
-    switchToDefaultAction = new QAction("Switch to Defaults", this);
+    switchToDefaultAction = new QAction("Switch to Defaults");
     toolBar->addAction(switchToDefaultAction);
     // ! --------------------- 总布局 ---------------------------
     QSplitter *splitter = new QSplitter(Qt::Horizontal);

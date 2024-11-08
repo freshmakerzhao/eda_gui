@@ -23,13 +23,6 @@ private:
     QPushButton *browseButton;
 
     QPushButton *editButton;
-
-    const QString titleLabelQss = "QLabel{"
-                                          "font-size: 20px;"
-                                          "font-weight: bold;"
-                                          "border-bottom: 2px solid #DCDCDC;"
-                                          "border-radius: 0px;"
-                                          "}";
 };
 
 #endif // OTHEROPTIONSWIDGET_H
