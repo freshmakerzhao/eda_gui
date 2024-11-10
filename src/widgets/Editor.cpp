@@ -1,13 +1,3 @@
-/**
-  ******************************************************************************
-  * @file           : Editor.cpp
-  * @author         : ksy
-  * @description    : None
-  * @attention      : None
-  * @date           : 2024/2/7
-  ******************************************************************************
-  */
-
 #include "Editor.h"
 #include "EditorManager.h"
 #include "mainwindow.h"
@@ -15,7 +5,7 @@
 #include <QFontDatabase>
 
 Editor::Editor(QWidget *parent)
-    : QsciScintilla(parent)
+    : XsciScintilla(parent)
 {
     qDebug() << "[Editor] Constructing...";
 
@@ -28,9 +18,9 @@ Editor::Editor(QWidget *parent)
     // );
 
     // updateActionState
-    connect(this, &QsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
+    connect(this, &XsciScintilla::textChanged, MainWindow::instance(), &MainWindow::updateActionState);
     // updateLineWidth
-    connect(this, &QsciScintilla::linesChanged, this, &Editor::resizeLineWidth);
+    connect(this, &XsciScintilla::linesChanged, this, &Editor::resizeLineWidth);
     // 光标宽度
     setCaretWidth(10);
     // 创建字体
@@ -48,26 +38,26 @@ Editor::Editor(QWidget *parent)
     // 设置显示行号
     setMarginLineNumbers(0, true);
     // 设置折叠选项
-    setFolding(QsciScintilla::BoxedTreeFoldStyle);
+    setFolding(XsciScintilla::BoxedTreeFoldStyle);
     setMarginWidth(2, 20);
     // 创建词法分析器
-    verilogLexer = new QsciLexerVerilog(this);
+    verilogLexer = new XsciLexerVerilog(this);
     verilogLexer->setFont(font);
     verilogLexer->setFoldComments(true); // 开启注释可折叠
     verilogLexer->setFoldAtModule(true); // 开启模块(Module)可折叠
-    tclLexer = new QsciLexerTCL(this);
+    tclLexer = new XsciLexerTCL(this);
     tclLexer->setFont(font);
     // tclLexer->setColor(QColor(128, 0, 0), QsciLexerTCL::Identifier);
     //设置自动完成所有项
-    setAutoCompletionSource(QsciScintilla::AcsAll);
+    setAutoCompletionSource(XsciScintilla::AcsAll);
     //设置大小写敏感
     setAutoCompletionCaseSensitivity(true);
     //每输入2个字符就出现自动完成的提示
     setAutoCompletionThreshold(2);
     // 括号匹配
-    setBraceMatching(QsciScintilla::SloppyBraceMatch);
+    setBraceMatching(XsciScintilla::SloppyBraceMatch);
     // EnCoding UTF-8
-    SendScintilla(QsciScintilla::SCI_SETCODEPAGE,QsciScintilla::SC_CP_UTF8);
+    SendScintilla(XsciScintilla::SCI_SETCODEPAGE, XsciScintilla::SC_CP_UTF8);
     // 缩进宽度
     setTabWidth(4);
     // 缩进级别可见
@@ -96,7 +86,7 @@ bool Editor::openFile(const QString &path)
         return false;
     }
     if (fileInfo.suffix() == "v") {
-        apis = new QsciAPIs(verilogLexer);
+        apis = new XsciAPIs(verilogLexer);
         QStringList keywords;
         QFile file(":/resource/keywords.txt");
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -116,7 +106,7 @@ bool Editor::openFile(const QString &path)
         apis->prepare();
         setLexer(verilogLexer); // 设置词法分析器
     } else if (fileInfo.suffix() == "xdc") {
-        apis = new QsciAPIs(tclLexer);
+        apis = new XsciAPIs(tclLexer);
         apis->prepare();
         setLexer(tclLexer);
     }
@@ -126,8 +116,8 @@ bool Editor::openFile(const QString &path)
     file.close();
     this->setModified(false);
     // 绑定Tab标签
-    connect(this, &QsciScintillaBase::SCN_SAVEPOINTLEFT, EditorManager::instance(), &EditorManager::setSavePointFlag);
-    connect(this, &QsciScintillaBase::SCN_SAVEPOINTREACHED, EditorManager::instance(), &EditorManager::resetSavePointFlag);
+    connect(this, &XsciScintillaBase::SCN_SAVEPOINTLEFT, EditorManager::instance(), &EditorManager::setSavePointFlag);
+    connect(this, &XsciScintillaBase::SCN_SAVEPOINTREACHED, EditorManager::instance(), &EditorManager::resetSavePointFlag);
     return true;
 }
 
@@ -220,14 +210,14 @@ void Editor::keyPressEvent(QKeyEvent *event)
 
     auto it = autoCompletionMap.find(event->key());
     if (it != autoCompletionMap.end()) {
-        QsciScintilla::keyPressEvent(event);
-        int pos = SendScintilla(QsciScintilla::SCI_GETCURRENTPOS);
+        XsciScintilla::keyPressEvent(event);
+        int pos = SendScintilla(XsciScintilla::SCI_GETCURRENTPOS);
         insert(it->second);
-        SendScintilla(QsciScintilla::SCI_SETCURRENTPOS, pos);
+        SendScintilla(XsciScintilla::SCI_SETCURRENTPOS, pos);
         return;
     }
 
-    QsciScintilla::keyPressEvent(event);
+    XsciScintilla::keyPressEvent(event);
 }
 
 void Editor::resizeLineWidth()

@@ -75,12 +75,9 @@ find_package(Qt5 COMPONENTS OpenGL)
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
 find_package(Qt5 COMPONENTS Core Xml REQUIRED)
 
-# Include the QScintilla library
-set(QSCINTILLA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/Qsci")
-set(QSCINTILLA_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
-
-include_directories(${QSCINTILLA_INCLUDE_DIR})
-link_directories(${QSCINTILLA_LIBRARY_DIR})
+# Include the PowerEditor library
+add_subdirectory(external/XScintilla EXCLUDE_FROM_ALL)
+include_directories(${CMAKE_SOURCE_DIR}/external/XScintilla/src)
 
 # Include the YAML library
 add_subdirectory(external/yaml-cpp)
@@ -178,8 +175,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     Qt5::Network
     Qt5::Xml
-    # HybrdLinkPlugin # qscintilla2_qt5
-    qscintilla2_qt5
+    PowerEditor
     yaml-cpp
     qtadvanceddocking
     libcrypto-1_1-x64

@@ -1,13 +1,3 @@
-/**
-  ******************************************************************************
-  * @file           : Editor.h
-  * @author         : ksy
-  * @description    : None
-  * @attention      : None
-  * @date           : 2024/2/7
-  ******************************************************************************
-  */
-
 #ifndef EDITOR_H
 #define EDITOR_H
 
@@ -19,15 +9,15 @@
 #include <QAction>
 #include <QKeyEvent>
 
-#include "Qsci/qsciscintilla.h" // QsciScintilla本体
-#include "Qsci/qsciapis.h"      // 自动补全的apis
-#include <qscilexerverilog.h>   // Verilog词法分析器
-// #include <qscilexervhdl.h>      // VHDL词法分析器(未启用)
-#include <qscilexertcl.h>
+#include "Xsci/xsciscintilla.h" // QsciScintilla本体
+#include "Xsci/xsciapis.h"      // 自动补全的apis
+#include <Xsci/xscilexerverilog.h>   // Verilog词法分析器
+// #include <Xsci/xscilexervhdl.h>      // VHDL词法分析器(未启用)
+#include <Xsci/xscilexertcl.h>
 
 #include "dialog/AdvancedFileDialog.h"
 
-class Editor : public QsciScintilla
+class Editor : public XsciScintilla
 {
     Q_OBJECT
 public:
@@ -49,9 +39,9 @@ private slots:
 
 private:
     int _width = 16; // 字符宽度
-    QsciLexerVerilog *verilogLexer;
-    QsciLexerTCL *tclLexer;
-    QsciAPIs *apis = nullptr;
+    XsciLexerVerilog *verilogLexer;
+    XsciLexerTCL *tclLexer;
+    XsciAPIs *apis = nullptr;
     QString _path;
 };
 
