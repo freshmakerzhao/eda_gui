@@ -54,6 +54,7 @@ elseif(UNIX AND NOT APPLE)
     message(STATUS "Configuring on/for Linux")
     # 特定于Linux的编译选项
     add_definitions(-DLINUX_PLATFORM)
+    set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 elseif(APPLE)
     message(STATUS "Configuring on/for macOS")
     # 特定于macOS的编译选项
@@ -89,11 +90,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
 endif()
 
 # Include the QADVANCEDDOCK library
-set(QADVANCEDDOCK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/ads")
-set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
-
-include_directories(${QADVANCEDDOCK_INCLUDE_DIR})
-link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
+add_subdirectory(external/QtADS)
+set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_BINARY_DIR}")
+link_directories(${QADVANCEDDOCK_LIBRARY_DIR}/external/QtADS)
+include_directories(${CMAKE_SOURCE_DIR}/external/QtADS)
 
 # Include the OpenSSL library
 set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/openssl")
@@ -177,7 +177,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Xml
     PowerEditor
     yaml-cpp
-    qtadvanceddocking
+    libqt5advanceddocking${CMAKE_SHARED_LIBRARY_SUFFIX}
     libcrypto-1_1-x64
     libssl-1_1-x64
     tcl86
