@@ -24,12 +24,14 @@ void RepositoryTreeView::initRepository()
     QFile file(vv_index);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Error", "Failed to open " + vv_index);
+        return;
     }
     // 解析 XML 文件
     QDomDocument doc;
     if (!doc.setContent(&file)) {
         file.close();
         QMessageBox::critical(this, "Error", "Failed to parse XML");
+        return;
     }
     file.close();
 
@@ -41,6 +43,7 @@ void RepositoryTreeView::initRepository()
     QDomNodeList ipNodes = root.elementsByTagName("IP");
     if (ipNodes.isEmpty()) {
         QMessageBox::warning(this, "Warning", "IP Repository is Empty");
+        return;
     }
     for (int i = 0; i < ipNodes.count(); ++i) {
         QDomElement ipElement = ipNodes.at(i).toElement();
