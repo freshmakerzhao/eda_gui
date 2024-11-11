@@ -64,6 +64,11 @@ Editor::Editor(QWidget *parent)
     setIndentationGuides(true);
     // 自动缩进
     setAutoIndent(true);
+
+    // 行号字体颜色
+    setMarginsForegroundColor(QColor(85, 156, 179));
+    // 行号背景颜色
+    setMarginsBackgroundColor(QColor(240, 240, 240));
 }
 
 Editor::~Editor()
