@@ -85,8 +85,8 @@ add_subdirectory(external/yaml-cpp)
 
 # Include the QADVANCEDDOCK library
 add_subdirectory(external/QtADS)
-set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_BINARY_DIR}")
-link_directories(${QADVANCEDDOCK_LIBRARY_DIR}/external/QtADS)
+set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_BINARY_DIR}/external/QtADS")
+link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/external/QtADS)
 
 # Include the OpenSSL library
@@ -184,7 +184,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Xml
     PowerEditor
     yaml-cpp
-    libqt5advanceddocking${CMAKE_SHARED_LIBRARY_SUFFIX}
+    qt5advanceddocking${CMAKE_SHARED_LIBRARY_SUFFIX}
     libcrypto-1_1-x64
     libssl-1_1-x64
     tcl86
@@ -202,7 +202,6 @@ if (Qt5OpenGL_FOUND)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    # 如果是Release模式，添加-mwindows标志
     set(CMAKE_CXX_FLAGS "-mwindows")
 endif()
 
