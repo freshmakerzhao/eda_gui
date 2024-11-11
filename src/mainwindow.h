@@ -18,6 +18,7 @@
 #include <QToolButton>
 #include <QMovie>
 #include <QLabel>
+#include <QDesktopServices>
 // #include "grid/ChipPlanner.h"
 #include "ads/DockManager.h"
 #include "ads/DockWidget.h"

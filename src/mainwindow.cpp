@@ -25,6 +25,7 @@
 #include "widgets/ProjectSummary.h"
 #include "dialog/AdvancedFileDialog.h"
 #include "base/TreeViewBase.h"
+#include "base/Globals.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -260,7 +261,9 @@ void MainWindow::onChipPlannerTriggered()
 
 void MainWindow::onDocumentationTriggered()
 {
-    // TODO:load documentation
+    QString documentDir = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("../documents");
+    QString url = QUrl::fromLocalFile(documentDir).toString();
+    QDesktopServices::openUrl(QUrl(url));
 }
 
 void MainWindow::onAboutTriggered()
@@ -347,7 +350,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(redoAction, &QAction::triggered, this, &MainWindow::onEditTriggered);
     // ===================== HELP ======================
     documentation = new QAction("Documentation", this);
-    documentation->setDisabled(true);
     aboutAction = new QAction("About", this);
     helpMenu->addActions({documentation, aboutAction});
     connect(documentation, &QAction::triggered, this, &MainWindow::onDocumentationTriggered);
