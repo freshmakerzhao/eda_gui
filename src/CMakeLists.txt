@@ -82,12 +82,6 @@ include_directories(${CMAKE_SOURCE_DIR}/external/XScintilla/src)
 
 # Include the YAML library
 add_subdirectory(external/yaml-cpp)
-# Disable yaml-cpp warnings
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_options(yaml-cpp PRIVATE -w)  # Use -w with GCC or Clang to disable all warnings
-# elseif(MSVC)
-#     target_compile_options(yaml-cpp PRIVATE /W0) # Use /W0 with MSVC to disable all warnings
-endif()
 
 # Include the QADVANCEDDOCK library
 add_subdirectory(external/QtADS)
@@ -108,6 +102,19 @@ set(TCL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/tcl/bin")
 
 include_directories(${TCL_INCLUDE_DIR})
 link_directories(${TCL_LIBRARY_DIR})
+
+# Disable external-library warnings
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # Use -w with GCC or Clang to disable all warnings
+    target_compile_options(PowerEditor PRIVATE -w)
+    target_compile_options(yaml-cpp PRIVATE -w)
+    target_compile_options(qt5advanceddocking PRIVATE -w)
+# elseif(MSVC)
+    # Use /W0 with MSVC to disable all warnings
+#     target_compile_options(PowerEditor PRIVATE /W0)
+#     target_compile_options(yaml-cpp PRIVATE /W0)
+#     target_compile_options(qt5advanceddocking PRIVATE /W0)
+endif()
 
 # Add source files
 file(GLOB PROJECT_SOURCES
