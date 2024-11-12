@@ -42,6 +42,17 @@ OtherOptionsWidget::OtherOptionsWidget(QWidget *parent) :
         editButton->setEnabled(loadInitFileCheckbox->isChecked());
     });
 
+    mainLayout->addSpacing(20);
+    QCheckBox *fillRemainingMemoryLocationsCheckBox = new QCheckBox("Fill Remaining Memory Locations");
+    QLineEdit *remainingMemoryLocationsLineEdit = new QLineEdit;
+    remainingMemoryLocationsLineEdit->setFixedWidth(250);
+    remainingMemoryLocationsLineEdit->setClearButtonEnabled(true);
+    QFormLayout *fLayout = new QFormLayout;
+    fLayout->setContentsMargins(25, 0, 0, 0);
+    mainLayout->addLayout(fLayout);
+    fLayout->addRow(fillRemainingMemoryLocationsCheckBox);
+    fLayout->addRow("Remaining Memory Locations (Hex)", remainingMemoryLocationsLineEdit);
+    mainLayout->addSpacing(20);
 }
 
 void OtherOptionsWidget::onBrowseButtonClicked()

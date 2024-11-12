@@ -19,7 +19,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     portAWidthLayout->addWidget(new QLabel("Range: 1 to 4608 (bits)"));
     fLayout->addRow("Port A Width", portAWidthLayout);
 
-    mainLayout->addSpacing(20);
+    mainLayout->addSpacing(10);
 
     portADepthLineEdit = new QLineEdit(this);
     portADepthLineEdit->setClearButtonEnabled(true);
@@ -33,10 +33,35 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
 
     connect(portAWidthLineEdit, &QLineEdit::textChanged, this, &PortAOptionsWidget::updatePortADepthRange);
 
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    hLayout->setAlignment(Qt::AlignLeft);
+    hLayout->addWidget(new QLabel("Operating Mode"));
+    QComboBox *operatingModeComboBox = new QComboBox;
+    operatingModeComboBox->addItems(QStringList() << "Write First" << "Read First" << "No Change");
+    hLayout->addWidget(operatingModeComboBox);
+    hLayout->addItem(new QSpacerItem(15, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hLayout->addWidget(new QLabel("Enable Port Type"));
+    QComboBox *enablePortTypeComboBox = new QComboBox;
+    enablePortTypeComboBox->addItems(QStringList() << "Always Enabled" << "Use ENA Pin");
+    hLayout->addWidget(enablePortTypeComboBox);
+    mainLayout->addLayout(hLayout);
+    mainLayout->addSpacing(10);
     // ------------------ Port A Optional Output Registers --------------------
     QLabel *portAOptionalOutputRegistersLabel = new QLabel("Port A Optional Output Registers", this);
     portAOptionalOutputRegistersLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(portAOptionalOutputRegistersLabel);
+    QGridLayout *gLayout = new QGridLayout;
+    gLayout->setContentsMargins(25, 0, 0, 0);
+    gLayout->setAlignment(Qt::AlignLeft);
+    QCheckBox *primitivesOutputRegisterCheckBox = new QCheckBox("Primitives Output Register");
+    gLayout->addWidget(primitivesOutputRegisterCheckBox, 0, 0);
+    QCheckBox *coreOutputRegisterCheckBox = new QCheckBox("Core Output Register");
+    gLayout->addWidget(coreOutputRegisterCheckBox, 0, 1);
+    QCheckBox *softECCInputRegisterCheckBox = new QCheckBox("SoftECC Input Register");
+    gLayout->addWidget(softECCInputRegisterCheckBox, 1, 0);
+    QCheckBox *regceaPinCheckBox = new QCheckBox("REGCEA Pin");
+    gLayout->addWidget(regceaPinCheckBox, 1, 1);
+    mainLayout->addLayout(gLayout);
     mainLayout->addSpacing(20);
     // --------------------- Port A Output Reset Options ----------------------
     QLabel *portAOutputResetOptionsLabel = new QLabel("Port A Output Reset Options", this);

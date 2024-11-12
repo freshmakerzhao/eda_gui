@@ -5,7 +5,7 @@ BlkMemGenSummary::BlkMemGenSummary(QWidget *parent) :
 {
     // --------------- Information ------------------
     QLabel *infoLabel = new QLabel("Information", this);
-    infoLabel->setStyleSheet(titleLabelQss);
+    infoLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(infoLabel);
     QFormLayout *fLayout = new QFormLayout;
     fLayout->setContentsMargins(25, 0, 0, 0);

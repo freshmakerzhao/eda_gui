@@ -49,6 +49,8 @@ BasicWidget::BasicWidget(QWidget *parent) :
     eccTypeComboBox = new QComboBox(this); eccTypeComboBox->setEnabled(false);
     eccTypeComboBox->setFixedWidth(220);
     eccTypeComboBox->addItem("No ECC");
+    eccTypeComboBox->addItem("Soft ECC");
+    eccTypeComboBox->addItem("Builtin ECC");
     eccOptionfLayout->addRow("ECC Type", eccTypeComboBox);
     errorInjectionPinsCheckBox = new QCheckBox("Error Injection Pins", this); errorInjectionPinsCheckBox->setEnabled(false);
     QHBoxLayout *eccOptionvLayout = new QHBoxLayout;
@@ -63,12 +65,32 @@ BasicWidget::BasicWidget(QWidget *parent) :
     QLabel *writeEnableLabel = new QLabel("Write Enable", this);
     writeEnableLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(writeEnableLabel);
+    QCheckBox *byteWriteEnableCheckBox = new QCheckBox("Byte Write Enable");
+    QComboBox *byteSizeComboBox = new QComboBox;
+    byteSizeComboBox->addItems(QStringList() << "8" << "9");
+    byteSizeComboBox->setFixedWidth(200);
+    QFormLayout *fLayout1 = new QFormLayout;
+    fLayout1->setContentsMargins(25, 0, 0, 0);
+    fLayout1->addRow(byteWriteEnableCheckBox);
+    fLayout1->addRow("Byte Size (bits)", byteSizeComboBox);
+    mainLayout->addLayout(fLayout1);
     mainLayout->addSpacing(20);
     // ----------------------- Algorithm Options ---------------------
     QLabel *algorithmOptionsLabel = new QLabel("Algorithm Options", this);
     algorithmOptionsLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
     mainLayout->addWidget(algorithmOptionsLabel);
-
+    QFormLayout *fLayout2 = new QFormLayout;
+    fLayout2->setContentsMargins(25, 0, 0, 0);
+    fLayout2->addRow(new QLabel("Defines the algorithm used to concatenate the block RAM primitives.\nRefer datasheet for more information."));
+    QComboBox *algorithmComboBox = new QComboBox;
+    algorithmComboBox->addItems(QStringList() << "Minimum Area" << "Low Power" << "Fixed Primitives");
+    algorithmComboBox->setFixedWidth(220);
+    fLayout2->addRow("Algorithm", algorithmComboBox);
+    QComboBox *primitiveComboBox = new QComboBox;
+    primitiveComboBox->addItems(QStringList() << "2kx9" << "1kx18" << "512x36" << "256x72");
+    primitiveComboBox->setFixedWidth(220);
+    fLayout2->addRow("Primitive", primitiveComboBox);
+    mainLayout->addLayout(fLayout2);
 }
 
 void BasicWidget::onInterfaceTypeComboBoxIndexChanged(const int &index)
