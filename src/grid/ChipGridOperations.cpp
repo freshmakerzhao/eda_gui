@@ -2,8 +2,8 @@
 #include "ChipGridOperations.h"
 #include "view.h"
 #include "blocks/Tiles.h"
-#include "mainwindow.h"
 #include "base/Globals.h"
+#include <iostream>
 #include <regex>
 #include <utility>
 // 处理tile颜色、width、height
@@ -222,7 +222,8 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 // 非跨行的tile增加site
                 for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
                     NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
-                    SitesBlock* site_block = new SitesSliceL(
+                    if (site.type == "SLICEL") {
+                        SitesBlock* site_block = new SitesSliceL(
                             Qt::white,
                             GLOBAL_SITE_BLOCK_WIDTH,
                             GLOBAL_SITE_BLOCK_HEIGHT,
@@ -231,13 +232,98 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.type,
                             site.name,
                             site.index
-                    );
-                    gridMatrix[i][j]->addSubBlock(site_block);
-                    site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                    } else if (site.type == "SLICEM") {
+                        SitesBlock* site_block = new SitesSliceM(
+                            Qt::white,
+                            GLOBAL_SITE_BLOCK_WIDTH,
+                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                    } else if (site.type == "IOB33") {
+                        SitesBlock* site_block = new SitesIOB33(
+                            Qt::white,
+                            GLOBAL_SITE_BLOCK_WIDTH,
+                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                    } else {
+                        SitesBlock* site_block = new Sites(
+                            Qt::white,
+                            GLOBAL_SITE_BLOCK_WIDTH,
+                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                    }
+
+                    // ------------------------------
+                    site_type_set.insert(site.type);
+                    // ------------------------------
                 }
             }
         }
     }
+
+    // ----------------------------------------------
+    // for (auto item : site_type_set) {
+    //     qDebug() << QString::fromStdString(item);
+    // }
+    // ----------------------------------------------
+
+    // --------------------- Clock Region ----------------------------
+    // Iterate over JSON object
+    for (auto& [tile, tiledata] : tile_json_data.items()) {
+        int x = tiledata["grid_x"];
+        int y = tiledata["grid_y"];
+
+        // Read tile clock region info
+        std::string clock_region = tiledata.contains("clock_region") && !tiledata["clock_region"].get<std::string>().empty()
+                                       ? tiledata["clock_region"].get<std::string>()
+                                       : "NULL";
+
+        // Update clock region bounding box
+        if (clock_region != "NULL") {
+            if (clock_region_bounding_boxes.find(clock_region) == clock_region_bounding_boxes.end()) {
+                // Initialize new clock region bounding box
+                clock_region_bounding_boxes[clock_region] = BoundingBox();
+            }
+
+            // Update bounding box with min/max values
+            clock_region_bounding_boxes[clock_region].x0 = std::min(clock_region_bounding_boxes[clock_region].x0, static_cast<double>(x));
+            clock_region_bounding_boxes[clock_region].y0 = std::min(clock_region_bounding_boxes[clock_region].y0, static_cast<double>(y));
+            clock_region_bounding_boxes[clock_region].x1 = std::max(clock_region_bounding_boxes[clock_region].x1, static_cast<double>(x));
+            clock_region_bounding_boxes[clock_region].y1 = std::max(clock_region_bounding_boxes[clock_region].y1, static_cast<double>(y));
+        }
+    }
+
+    // Print the clock region bounding boxes
+    // for (const auto& region : clock_region_bounding_boxes) {
+    //     std::cout << "Clock region: " << region.first
+    //               << " BoundingBox(x0: " << region.second.x0
+    //               << ", y0: " << region.second.y0
+    //               << ", x1: " << region.second.x1
+    //               << ", y1: " << region.second.y1 << ")" << std::endl;
+    // }
 }
 
 
@@ -260,7 +346,41 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
         return false;  // 如果在执行过程中抛出任何异常，则返回 false
     }
 
-    return true;  // 如果成功执行了所有操作，则返回 true
+    // --------------------- Clock Region -----------------------
+    const std::vector<QColor> colors = {
+        QColor(Qt::blue),
+        QColor(Qt::green),
+        QColor(Qt::red),
+        QColor(Qt::yellow),
+        QColor(Qt::magenta),
+        QColor(Qt::red),
+        QColor(Qt::magenta),
+        QColor(Qt::blue),
+        QColor(Qt::green),
+        QColor(Qt::yellow),
+    };
+    int colorIndex = 0;
+
+    QPen pen;
+    pen.setWidth(7);
+
+    for (const auto& region : clock_region_bounding_boxes) {
+        int x0 = region.second.x0 * 210;
+        int y0 = region.second.y0 * 100;
+        int x1 = region.second.x1 * 210;
+        int y1 = region.second.y1 * 100;
+
+        QRect rect(x0, y0, x1 - x0 + 210, y1 - y0 + 100);
+
+        QColor currentColor = colors[colorIndex];
+        pen.setColor(currentColor);
+        colorIndex = (colorIndex + 1) % colors.size();
+
+        scene->addRect(rect, pen);
+    }
+
+    // --------------------- Clock Region -----------------------
+    return true;
 }
 
 ChipGridOperations::ChipGridOperations(){

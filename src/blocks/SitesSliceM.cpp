@@ -1,40 +1,40 @@
-#include "SitesSliceL.h"
+#include "SitesSliceM.h"
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-SitesSliceL::SitesSliceL(const QColor &color, int cur_width, int cur_height, int tile_index_x,int tile_index_y,std::string &cur_type, std::string &cur_name, int site_index)
+SitesSliceM::SitesSliceM(const QColor &color, int cur_width, int cur_height, int tile_index_x,int tile_index_y,std::string &cur_type, std::string &cur_name, int site_index)
     : site_width(cur_width), site_height(cur_height), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_type(cur_type), site_name(cur_name), site_index(site_index){
     this->site_color = color;
     setFlags(ItemIsSelectable);
     // 开启悬浮操作
     setAcceptHoverEvents(true);
-//    setVisible(false); // 默认隐藏
+    //    setVisible(false); // 默认隐藏
     // 创建多个子项
-//    QGraphicsItem* childItem1 = new QGraphicsEllipseItem(0, 0, 50, 50, this);
-//    QGraphicsItem* childItem2 = new QGraphicsRectItem(60, 0, 50, 50, this);
+    //    QGraphicsItem* childItem1 = new QGraphicsEllipseItem(0, 0, 50, 50, this);
+    //    QGraphicsItem* childItem2 = new QGraphicsRectItem(60, 0, 50, 50, this);
 
     // 为子项设置可交互性
-//    childItem1->setFlag(QGraphicsItem::ItemIsSelectable);
-//    childItem1->setFlag(QGraphicsItem::ItemIsMovable);
-//    childItem2->setFlag(QGraphicsItem::ItemIsSelectable);
-//    childItem2->setFlag(QGraphicsItem::ItemIsMovable);
+    //    childItem1->setFlag(QGraphicsItem::ItemIsSelectable);
+    //    childItem1->setFlag(QGraphicsItem::ItemIsMovable);
+    //    childItem2->setFlag(QGraphicsItem::ItemIsSelectable);
+    //    childItem2->setFlag(QGraphicsItem::ItemIsMovable);
 }
 
-QRectF SitesSliceL::boundingRect() const
+QRectF SitesSliceM::boundingRect() const
 {
     return QRectF(0, 0, site_width, site_height);
 }
 
-QPainterPath SitesSliceL::shape() const
+QPainterPath SitesSliceM::shape() const
 {
     QPainterPath path;
     path.addRect(0, 0, site_width, site_height);
     return path;
 }
 
-void SitesSliceL::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SitesSliceM::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
 
@@ -100,18 +100,18 @@ void SitesSliceL::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     }
 }
 
-void SitesSliceL::setColor(const QColor &color){
+void SitesSliceM::setColor(const QColor &color){
     site_color = color;
 }
 
-void SitesSliceL::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void SitesSliceM::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit SiteClicked(tile_index_x,tile_index_y,sites_visible_status,site_index);
     QGraphicsItem::mousePressEvent(event);
     update();
 }
 
-void SitesSliceL::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void SitesSliceM::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->modifiers() & Qt::ShiftModifier) {
         update();
@@ -120,15 +120,13 @@ void SitesSliceL::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void SitesSliceL::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void SitesSliceM::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }
 
-void SitesSliceL::updateSitesVisibleStatus(bool status) {
+void SitesSliceM::updateSitesVisibleStatus(bool status) {
     sites_visible_status = status;
     update();
 }
-
-

@@ -1,40 +1,40 @@
-#include "SitesSliceL.h"
+#include "SitesIOB33.h"
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-SitesSliceL::SitesSliceL(const QColor &color, int cur_width, int cur_height, int tile_index_x,int tile_index_y,std::string &cur_type, std::string &cur_name, int site_index)
+SitesIOB33::SitesIOB33(const QColor &color, int cur_width, int cur_height, int tile_index_x,int tile_index_y,std::string &cur_type, std::string &cur_name, int site_index)
     : site_width(cur_width), site_height(cur_height), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_type(cur_type), site_name(cur_name), site_index(site_index){
     this->site_color = color;
     setFlags(ItemIsSelectable);
     // 开启悬浮操作
     setAcceptHoverEvents(true);
-//    setVisible(false); // 默认隐藏
+    //    setVisible(false); // 默认隐藏
     // 创建多个子项
-//    QGraphicsItem* childItem1 = new QGraphicsEllipseItem(0, 0, 50, 50, this);
-//    QGraphicsItem* childItem2 = new QGraphicsRectItem(60, 0, 50, 50, this);
+    //    QGraphicsItem* childItem1 = new QGraphicsEllipseItem(0, 0, 50, 50, this);
+    //    QGraphicsItem* childItem2 = new QGraphicsRectItem(60, 0, 50, 50, this);
 
     // 为子项设置可交互性
-//    childItem1->setFlag(QGraphicsItem::ItemIsSelectable);
-//    childItem1->setFlag(QGraphicsItem::ItemIsMovable);
-//    childItem2->setFlag(QGraphicsItem::ItemIsSelectable);
-//    childItem2->setFlag(QGraphicsItem::ItemIsMovable);
+    //    childItem1->setFlag(QGraphicsItem::ItemIsSelectable);
+    //    childItem1->setFlag(QGraphicsItem::ItemIsMovable);
+    //    childItem2->setFlag(QGraphicsItem::ItemIsSelectable);
+    //    childItem2->setFlag(QGraphicsItem::ItemIsMovable);
 }
 
-QRectF SitesSliceL::boundingRect() const
+QRectF SitesIOB33::boundingRect() const
 {
     return QRectF(0, 0, site_width, site_height);
 }
 
-QPainterPath SitesSliceL::shape() const
+QPainterPath SitesIOB33::shape() const
 {
     QPainterPath path;
     path.addRect(0, 0, site_width, site_height);
     return path;
 }
 
-void SitesSliceL::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SitesIOB33::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
 
@@ -67,24 +67,9 @@ void SitesSliceL::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     // 显示位置及大小
     painter->drawRect(QRect(0, 0,  site_width, site_height));
     // ------------------------------------------------------------
-    painter->drawRect(QRect(5, 4, 10, 12));
-    painter->drawRect(QRect(5, 20, 10, 12));
-    painter->drawRect(QRect(5, 36, 10, 12));
-    painter->drawRect(QRect(5, 52, 10, 12));
-
-    painter->drawRect(QRect(25, 8, 5, 50));
-
-    painter->drawRect(QRect(40, 4, 25, 62));
-
-    painter->drawRect(QRect(80, 2, 6, 6));
-    painter->drawRect(QRect(80, 10, 6, 6));
-    painter->drawRect(QRect(80, 18, 6, 6));
-    painter->drawRect(QRect(80, 26, 6, 6));
-
-    painter->drawRect(QRect(80, 36, 6, 6));
-    painter->drawRect(QRect(80, 44, 6, 6));
-    painter->drawRect(QRect(80, 52, 6, 6));
-    painter->drawRect(QRect(80, 60, 6, 6));
+    painter->drawRect(QRect(30, 5, 30, 30));
+    painter->drawRect(QRect(12, 40, 30, 30));
+    painter->drawRect(QRect(48, 40, 30, 30));
     // ------------------------------------------------------------
     painter->setBrush(b);
 
@@ -100,18 +85,18 @@ void SitesSliceL::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     }
 }
 
-void SitesSliceL::setColor(const QColor &color){
+void SitesIOB33::setColor(const QColor &color){
     site_color = color;
 }
 
-void SitesSliceL::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void SitesIOB33::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit SiteClicked(tile_index_x,tile_index_y,sites_visible_status,site_index);
     QGraphicsItem::mousePressEvent(event);
     update();
 }
 
-void SitesSliceL::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void SitesIOB33::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->modifiers() & Qt::ShiftModifier) {
         update();
@@ -120,15 +105,14 @@ void SitesSliceL::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void SitesSliceL::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void SitesIOB33::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }
 
-void SitesSliceL::updateSitesVisibleStatus(bool status) {
+void SitesIOB33::updateSitesVisibleStatus(bool status) {
     sites_visible_status = status;
     update();
 }
-
 

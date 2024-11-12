@@ -14,6 +14,13 @@
 #include <fstream>
 #include <unordered_set>
 
+struct BoundingBox {
+    double x0 = std::numeric_limits<double>::infinity(); // Minimum x
+    double y0 = std::numeric_limits<double>::infinity(); // Minimum y
+    double x1 = -std::numeric_limits<double>::infinity(); // Maximum x
+    double y1 = -std::numeric_limits<double>::infinity(); // Maximum y
+};
+
 static std::map<std::string, std::map<std::string,int>> TYPE_TO_SIZE_FACTORS;
 
 class ChipGridOperations : public QMainWindow{
@@ -30,6 +37,10 @@ public:
 
     // std::vector<std::string> used_site;
     std::unordered_set<std::string> used_site;
+
+    std::unordered_set<std::string> site_type_set;
+    // Initialize clock region bounding box map
+    std::map<std::string, BoundingBox> clock_region_bounding_boxes;
 
     ChipGridOperations();
     void buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal);

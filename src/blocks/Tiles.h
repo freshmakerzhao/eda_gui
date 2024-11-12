@@ -6,6 +6,8 @@
 #include <QGraphicsItem>
 #include "Sites.h"
 #include "SitesSliceL.h"
+#include "SitesSliceM.h"
+#include "SitesIOB33.h"
 
 class Tiles : public Blocks
 {
