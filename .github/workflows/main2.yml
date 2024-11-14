@@ -43,8 +43,8 @@ jobs:
       - name: Compress app directory # 压缩应用
         working-directory: D:\a\eda_gui\eda_gui
         run: |
-          dir
-          Compress-Archive -Path .\app -DestinationPath .\app.zip
+          $projectPath = "D:\a\eda_gui\eda_gui"
+          Compress-Archive -Path "$projectPath\app" -DestinationPath "$projectPath\app.zip"
           dir
           
       - name: Upload Artifact # 上传 Artifact 供下载
