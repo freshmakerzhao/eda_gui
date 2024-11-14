@@ -35,6 +35,8 @@ jobs:
             Write-Host "Directory 'app' exists. Deleting it now..."
             Remove-Item -Recurse -Force $appPath
             dir
+          } else {
+            Write-Host "Directory 'app' is not exists."
           }
           New-Item -ItemType Directory -Path $appPath
 
