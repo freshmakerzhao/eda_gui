@@ -40,3 +40,14 @@ jobs:
           }
           New-Item -ItemType Directory -Path $appPath
 
+      - name: Compress app directory # 压缩应用
+        run: |
+          dir
+          Compress-Archive -Path app -DestinationPath app.zip
+          dir
+          
+      - name: Upload Artifact # 上传 Artifact 供下载
+        uses: actions/upload-artifact@v3
+        with:
+          name: HybrdLink
+          path: app.zip
