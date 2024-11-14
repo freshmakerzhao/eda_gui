@@ -5,7 +5,7 @@ jobs:
     runs-on: ${{ matrix.os }}#运行平台
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [windows-latest]
       fail-fast: false
     name: ${{ matrix.os }}
     steps:
