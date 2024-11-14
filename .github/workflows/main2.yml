@@ -26,12 +26,15 @@ jobs:
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         run: echo "C:\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
 
-      - name: Print directory structure before configuration # 打印目录结构
+      - name: Manage app directory
+        shell: pwsh
         run: |
           dir
-          if (Test-Path -Path "app") {
-            Remove-Item -Recurse -Force "app"
+          $appPath = "D:\a\eda_gui\eda_gui\app"
+          if (Test-Path -Path $appPath) {
             Write-Host "Directory 'app' exists. Deleting it now..."
+            Remove-Item -Recurse -Force $appPath
+            dir
           }
-          New-Item -ItemType Directory -Path "app"
-          dir
+          New-Item -ItemType Directory -Path $appPath
+
