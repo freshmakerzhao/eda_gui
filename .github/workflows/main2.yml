@@ -24,11 +24,6 @@ jobs:
       - name: Set PATH for Qt tools
         run: echo "C:\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
 
-      - name: Set up MinGW
-        uses: egor-tensin/setup-mingw@v2 # 安装 MinGW
-        with:
-          platform: x64
-
       - name: Compile using MinGW
         shell: cmd
         run: |
