@@ -41,11 +41,13 @@ jobs:
           New-Item -ItemType Directory -Path $appPath
 
       - name: Compress app directory # 压缩应用
-        working-directory: D:\a\eda_gui\eda_gui
+        shell: pwsh
         run: |
           $projectPath = "D:\a\eda_gui\eda_gui"
+          dir $projectPath
           Compress-Archive -Path "$projectPath\app" -DestinationPath "$projectPath\app.zip"
-          dir
+          dir $projectPath
+
           
       - name: Upload Artifact # 上传 Artifact 供下载
         uses: actions/upload-artifact@v3
