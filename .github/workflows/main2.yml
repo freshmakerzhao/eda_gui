@@ -15,8 +15,11 @@ jobs:
       - name: Install Qt for Windows # 安装 Qt
         uses: jurplel/install-qt-action@v3
         with:
+          aqtversion: '==3.1.*'
           version: '5.15.2'
-          arch: 'win64_mingw'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw81'
           
       - name: Set PATH for Qt tools
         run: echo "C:\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
