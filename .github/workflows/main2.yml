@@ -1,36 +1,36 @@
-name: CI Build
-
+name: QT
 on: [push]
-
 jobs:
   build:
-    runs-on: windows-latest
-
-    env:
-      Qt5_DIR: C:\Qt\5.15.2\mingw81_64  # 根据你的 Qt 安装路径进行调整
-
+    runs-on: ${{ matrix.os }}#运行平台
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+      fail-fast: false
+    name: ${{ matrix.os }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Set up MinGW
-      uses: egor-tensin/setup-mingw@v1
-      with:
-        architecture: x86_64
-
-    - name: Set up Qt
-      uses: jurplel/install-qt-action@v2
+    - name: Git checkout
+      uses: actions/checkout@v3#拉取代码
+    - name: Install Qt windows #安装Qt
+      if: matrix.os == 'windows-latest'
+      uses: jurplel/install-qt-action@v3
       with:
         version: '5.15.2'
-        host: 'windows'
-        target: 'mingw81_64'
-        dir: 'C:\\Qt'
-
-    - name: Set up CMake
-      uses: jwlawson/actions-setup-cmake@v1
-
-    - name: Configure with CMake
-      run: cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\5.15.2\mingw81_64"
-
-    - name: Build with CMake
-      run: cmake --build build --target HybrdLink -j 14
+        arch: 'win64_mingw'
+    - name: Set up MinGW
+      if: matrix.os == 'windows-latest'
+      uses: egor-tensin/setup-mingw@v2#安装windows的MinGW
+      with:
+          platform: x64
+    - name: compile make win
+      if: matrix.os == 'windows-latest'
+      shell: cmd
+      run: |
+        mingw32-make
+    - name: pack win exe #复制
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir app
+        cp release/class-manager.exe app
+        cd app
+        windeployqt class-manager.exe
