@@ -56,12 +56,21 @@ jobs:
 
       - name: Compile using CMake # 编译项目
         run: |
-          cmake --build build --target HybrdLink
+          cmake --build build --target HybrdLink -- -j 14
 
       - name: Pack Windows executable # 打包应用
         run: |
-          dir
+          rm -rf app
           mkdir app
-          dir
           cp build/HybrdLink.exe app/
           windeployqt app/HybrdLink.exe
+
+      - name: Compress app directory # 压缩应用
+        run: |
+          Compress-Archive -Path app -DestinationPath app.zip
+
+      - name: Upload Artifact # 上传 Artifact 供下载
+        uses: actions/upload-artifact@v3
+        with:
+          name: HybrdLink
+          path: app.zip
