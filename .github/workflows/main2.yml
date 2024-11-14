@@ -39,6 +39,7 @@ jobs:
             Write-Host "Directory 'app' is not exists."
           }
           New-Item -ItemType Directory -Path $appPath
+          New-Item -Path "D:\a\eda_gui\eda_gui\app\placeholder.txt" -ItemType File
 
       - name: Compress app directory # 压缩应用
         shell: pwsh
@@ -47,7 +48,6 @@ jobs:
           dir $projectPath
           Compress-Archive -Path "$projectPath\app" -DestinationPath "$projectPath\app.zip"
           dir $projectPath
-
           
       - name: Upload Artifact # 上传 Artifact 供下载
         uses: actions/upload-artifact@v3
