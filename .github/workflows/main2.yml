@@ -41,6 +41,7 @@ jobs:
           New-Item -ItemType Directory -Path $appPath
 
       - name: Compress app directory # 压缩应用
+        working-directory: D:\a\eda_gui\eda_gui
         run: |
           dir
           Compress-Archive -Path .\app -DestinationPath .\app.zip
