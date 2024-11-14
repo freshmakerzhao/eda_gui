@@ -261,6 +261,32 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
                         site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                    } else if (site.type == "BUFR") {
+                        SitesBlock* site_block = new SitesBUFR(
+                            Qt::white,
+                            GLOBAL_SITE_BLOCK_WIDTH,
+                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                    }  else if (site.type == "BUFIO") {
+                        SitesBlock* site_block = new SitesBUFIO(
+                            Qt::white,
+                            GLOBAL_SITE_BLOCK_WIDTH,
+                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
                     } else {
                         SitesBlock* site_block = new Sites(
                             Qt::white,
@@ -285,9 +311,9 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     }
 
     // ----------------------------------------------
-    // for (auto item : site_type_set) {
-    //     qDebug() << QString::fromStdString(item);
-    // }
+    for (auto item : site_type_set) {
+        qDebug() << QString::fromStdString(item);
+    }
     // ----------------------------------------------
 
     // --------------------- Clock Region ----------------------------

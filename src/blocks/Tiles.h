@@ -8,6 +8,8 @@
 #include "SitesSliceL.h"
 #include "SitesSliceM.h"
 #include "SitesIOB33.h"
+#include "SitesBUFR.h"
+#include "SitesBUFIO.h"
 
 class Tiles : public Blocks
 {
