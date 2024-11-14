@@ -53,7 +53,7 @@ jobs:
 
       - name: Pack Windows executable # 打包应用
         run: |
-          if exist app (rmdir /s /q app)
-                    mkdir app
+          Remove-Item -Recurse -Force app
+                    New-Item -ItemType Directory -Path app
           cp build/HybrdLink.exe app/
           windeployqt app/HybrdLink.exe
