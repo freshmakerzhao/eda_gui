@@ -32,6 +32,7 @@ void IPManager::init()
     vlayout->setMargin(0);
 
     detailLabel = new QLabel;
+    detailLabel->setWordWrap(true);
     detailLabel->setMargin(15);
     detailLabel->setStyleSheet("background-color: rgb(255, 255, 255);");
     setDetails();
@@ -103,31 +104,12 @@ void IPManager::clickedIP(const QModelIndex &index)
         return;
     }
     const QString ipName = idx.data(Qt::UserRole).toString();
-    // qDebug() << idx;
     if (ipName == "Block Memory Generator") {
-        // BlockMemoryGenerator blockMemoryGenerator(this);
-        // blockMemoryGenerator.exec();
-        setDetails("Name:         Block Memory Generator\n"
-                   "Version:      8.4 (Rev. 3)\n"
-                   "Interfaces:   AXI4\n"
-                   "Description:  The HybrdChip LogiCORE IP Block Memory Generator replaces the Dual Port Block Memory "
-                   "and Single Port Block Memory LogiCOREs, but is not a direct drop-in replacement. "
-                   "It should be used in all new Xilinx designs. The core supports RAM and ROM functions over a wide range of widths and depths. "
-                   "Use this core to generate block memories with symmetric or asymmetric read and write port widths, as well as cores which can perform simultaneous write "
-                   "operations to separate locations, and simultaneous read operations from the same location. For more information on differences in interface and feature"
-                   " support between this core and the Dual Port Block Memory and Single Port Block Memory LogiCOREs, please consult the data sheet.\n"
-                   "Status:       Production\n"
-                   "License:      included");
+        setDetails(idx.data(Qt::UserRole+1).toString());
     } else if (ipName == "Clocking Wizard"){
-        setDetails("Name:         Clocking Wizard\n"
-                   "Version:      6.0 (Rev. 3)\n"
-                   "Interfaces:   AXI4\n"
-                   "Description:  The Clocking Wizard creates an HDL file that contains "
-                   "a clocking circuit customized to the user's clocking requirements\n"
-                   "Status:       Production\n"
-                   "License:      included");
+        setDetails(idx.data(Qt::UserRole+1).toString());
     } else if(ipName == "FIFO Generator") {
-
+        setDetails(idx.data(Qt::UserRole+1).toString());
     } else {
         setDetails();
     }

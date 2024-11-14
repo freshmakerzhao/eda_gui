@@ -8,6 +8,13 @@
 #include <QtXml/QDomDocument>
 #include <QtXml/QDomElement>
 
+struct IPInfo {
+    QString displayName;
+    QString vlnv;
+    QString interfaces;
+    QString description;
+};
+
 class RepositoryTreeView : public QTreeView
 {
     Q_OBJECT
@@ -18,9 +25,7 @@ public:
 private:
     void createTreePath(const QString &path,
                         QStandardItem *rootItem,
-                        const QString &displayName,
-                        const QString &vlnv,
-                        const QString &interfaces);
+                        const IPInfo &ipInfo);
 
     void parseIPNode(const QDomElement &ipElement, QStandardItem *rootItem);
 

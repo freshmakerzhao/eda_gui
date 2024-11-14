@@ -53,9 +53,7 @@ void RepositoryTreeView::initRepository()
 
 void RepositoryTreeView::createTreePath(const QString &path,
                                         QStandardItem *rootItem,
-                                        const QString &displayName,
-                                        const QString &vlnv,
-                                        const QString &interfaces)
+                                        const IPInfo &ipInfo)
 {
     QStringList pathParts = path.split("/", Qt::SkipEmptyParts);
     QStandardItem *currentItem = rootItem;
@@ -82,34 +80,40 @@ void RepositoryTreeView::createTreePath(const QString &path,
     }
 
     // 在路径末尾添加 DisplayName 作为叶子节点
-    QStandardItem *displayNameItem = new QStandardItem(displayName);
+    QStandardItem *displayNameItem = new QStandardItem(ipInfo.displayName);
     QList<QStandardItem *> rowItems;
     rowItems.append(displayNameItem);
-    rowItems.append(new QStandardItem(interfaces));
+    rowItems.append(new QStandardItem(ipInfo.interfaces));
     rowItems.append(new QStandardItem(QString("Production")));
     rowItems.append(new QStandardItem(QString("Included")));
-    rowItems.append(new QStandardItem(vlnv));
+    rowItems.append(new QStandardItem(ipInfo.vlnv));
     currentItem->appendRow(rowItems);
-    displayNameItem->setData(displayName, Qt::UserRole);
+    displayNameItem->setData(ipInfo.displayName, Qt::UserRole);
+    displayNameItem->setData(ipInfo.description, Qt::UserRole+1);
 }
 
 void RepositoryTreeView::parseIPNode(const QDomElement &ipElement, QStandardItem *rootItem)
 {
+    IPInfo ipInfo;
+
     // 获取 DisplayName 属性
     QDomElement displayNameElement = ipElement.firstChildElement("DisplayName");
-    QString displayName = displayNameElement.attribute("value");
+    ipInfo.displayName = displayNameElement.attribute("value");
 
     // 获取 VLNV 属性
     QDomElement vlnvElement = ipElement.firstChildElement("VLNV");
-    QString vlnv = vlnvElement.attribute("value");
+    ipInfo.vlnv = vlnvElement.attribute("value");
+
+    // 获取 Description 属性
+    QDomElement descriptionElement = ipElement.firstChildElement("Description");
+    ipInfo.description = descriptionElement.attribute("value");
 
     // 获取 Interfaces 属性
     QDomElement interfacesElement = ipElement.firstChildElement("Interfaces");
-    QString interfaces;
     if (!interfacesElement.isNull()) {
         QDomElement interfaceElement = interfacesElement.firstChildElement("Interface");
         if (!interfaceElement.isNull()) {
-            interfaces = interfaceElement.attribute("value");
+            ipInfo.interfaces = interfaceElement.attribute("value");
         }
     }
 
@@ -118,6 +122,6 @@ void RepositoryTreeView::parseIPNode(const QDomElement &ipElement, QStandardItem
     QDomElement taxonomyElement = taxonomiesElement.firstChildElement("Taxonomy");
     if (!taxonomyElement.isNull()) {
         QString taxonomyPath = taxonomyElement.attribute("value");
-        createTreePath(taxonomyPath, rootItem, displayName, vlnv, interfaces);
+        createTreePath(taxonomyPath, rootItem, ipInfo);
     }
 }
