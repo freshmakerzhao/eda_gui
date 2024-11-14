@@ -7,6 +7,8 @@ jobs:
     runs-on: windows-latest # 仅在 Windows 上运行
     strategy:
       fail-fast: false
+      matrix:
+        cmake_flags: ["-DENABLE_MAC_CHECK=OFF -DENABLE_EXPIRATION_CHECK=OFF -DPACK_DEPLOYED=ON"]
     name: Windows Build
     steps:
       - name: Git checkout
@@ -29,14 +31,15 @@ jobs:
 
       - name: Configure project with CMake # 配置项目
         run: |
-          cmake -S src -B build -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\5.15.2\mingw81_64"
+          cmake -S src -B build -G "MinGW Makefiles" ${{ matrix.cmake_flags }} -DCMAKE_PREFIX_PATH="C:\Qt\5.15.2\mingw81_64"
 
       - name: Compile using CMake # 编译项目
         run: |
-          cmake --build build --target HybrdLink -- -j 14
+          cmake --build build --target HybrdLink -- -j %NUMBER_OF_PROCESSORS%
 
       - name: Pack Windows executable # 打包应用
         run: |
-          mkdir app
-          cp build/class-manager.exe app/
-          windeployqt app/class-manager.exe
+          if exist app (rmdir /s /q app)
+                    mkdir app
+          cp build/HybrdLink.exe app/
+          windeployqt app/HybrdLink.exe
