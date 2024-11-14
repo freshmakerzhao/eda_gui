@@ -43,7 +43,7 @@ jobs:
       - name: Compress app directory # 压缩应用
         run: |
           dir
-          Compress-Archive -Path app -DestinationPath app.zip
+          Compress-Archive -Path .\app -DestinationPath .\app.zip
           dir
           
       - name: Upload Artifact # 上传 Artifact 供下载
