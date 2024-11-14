@@ -31,6 +31,7 @@ jobs:
           dir
           if (Test-Path -Path "app") {
             Remove-Item -Recurse -Force "app"
+            Write-Host "Directory 'app' exists. Deleting it now..."
           }
           New-Item -ItemType Directory -Path "app"
           dir
