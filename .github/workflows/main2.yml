@@ -9,18 +9,25 @@ jobs:
       fail-fast: false
       matrix:
         cmake_flags: ["-DENABLE_MAC_CHECK=OFF -DENABLE_EXPIRATION_CHECK=OFF -DPACK_DEPLOYED=ON"]
+        qt_ver: [5.15.2]
     name: Windows Build
     steps:
       - name: Git checkout
         uses: actions/checkout@v3 # 拉取代码
 
-      - name: Cache Qt installation
+      - name: Cache Qt installation # 缓存 Qt 环境
+        id: WindowsCacheQt
         uses: actions/cache@v3
         with:
-          path: C:\Qt\5.15.2
-          key: ${{ runner.os }}-qt-5.15.2
+          path: C:\Qt\5.15.2\mingw81_64
+          key: ${{ runner.os }}-Qt-5.15.2-mingw81
 
-      - name: Install Qt for Windows # 安装 Qt
+      - name: Setup Qt from cache # 设置缓存的 Qt 环境
+        if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
+        run: echo "C:\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
+
+      - name: Install Qt for Windows # 安装 Qt（如果没有缓存）
+        if: steps.WindowsCacheQt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v3
         with:
           aqtversion: '==3.1.*'
@@ -53,7 +60,8 @@ jobs:
 
       - name: Pack Windows executable # 打包应用
         run: |
-          Remove-Item -Recurse -Force app
-                    New-Item -ItemType Directory -Path app
+          dir
+          mkdir app
+          dir
           cp build/HybrdLink.exe app/
           windeployqt app/HybrdLink.exe
