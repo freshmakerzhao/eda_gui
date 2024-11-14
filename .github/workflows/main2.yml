@@ -15,13 +15,13 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v3 # 拉取代码
 
-      - name: Cache Qt installation # 缓存 Qt 环境
+      - name: cache Qt
         id: WindowsCacheQt
-        uses: actions/cache@v3
+        uses: actions/cache@v1
         with:
           path: C:\Qt\5.15.2\mingw81_64
-          key: ${{ runner.os }}-Qt-5.15.2-mingw81
-
+          key: ${{ runner.os }}-Qt/5.15.2/mingw81_64
+          
       - name: Setup Qt from cache # 设置缓存的 Qt 环境
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         run: echo "C:\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
@@ -46,9 +46,6 @@ jobs:
           key: ${{ runner.os }}-cmake-build-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-cmake-build-
-
-      - name: Print directory structure before configuration # 打印目录结构
-        run: dir
 
       - name: Configure project with CMake # 配置项目
         run: |
