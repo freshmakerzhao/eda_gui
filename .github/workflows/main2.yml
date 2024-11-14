@@ -24,13 +24,19 @@ jobs:
       - name: Set PATH for Qt tools
         run: echo "C:\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
 
-      - name: Compile using MinGW
-        shell: cmd
+      - name: Print directory structure before configuration # 打印目录结构
+        run: dir
+
+      - name: Configure project with CMake # 配置项目
         run: |
-          mingw32-make
+          cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\5.15.2\mingw81_64"
+
+      - name: Compile using CMake # 编译项目
+        run: |
+          cmake --build build --target HybrdLink -- -j 14
 
       - name: Pack Windows executable # 打包应用
         run: |
           mkdir app
-          cp release/class-manager.exe app/
+          cp build/class-manager.exe app/
           windeployqt app/class-manager.exe
