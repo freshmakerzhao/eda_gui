@@ -29,7 +29,7 @@ jobs:
 
       - name: Configure project with CMake # 配置项目
         run: |
-          cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\5.15.2\mingw81_64"
+          cmake -S src -B build -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\5.15.2\mingw81_64"
 
       - name: Compile using CMake # 编译项目
         run: |
