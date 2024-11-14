@@ -1,7 +1,5 @@
 name: Windows Build
-
 on: [push]
-
 jobs:
   build:
     runs-on: windows-latest # 仅在 Windows 上运行
