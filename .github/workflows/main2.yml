@@ -49,7 +49,7 @@ jobs:
       - name: Compile using CMake # 编译项目
         run: |
           cmake --build build --target HybrdLink -- -j 14
-
+ 
       - name: Pack Windows executable # 打包应用
         run: |
           $appPath = "D:\a\eda_gui\eda_gui\app"
