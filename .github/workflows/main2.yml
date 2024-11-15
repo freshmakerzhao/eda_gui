@@ -18,7 +18,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: D:\a\eda_gui\Qt\5.15.2\mingw81_64
-          key: ${{ runner.os }}-Qt/5.15.2/mingw81_64
+          key: Windows-Qt/5.15.2/mingw81_64
           
       - name: Setup Qt from cache # 设置缓存的 Qt 环境
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
@@ -41,9 +41,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: build
-          key: ${{ runner.os }}-cmake-build-${{ github.sha }}
+          key: Windows-cmake-build-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-cmake-build-
+            Windows-cmake-build-
 
       - name: Configure project with CMake # 配置项目
         run: |
