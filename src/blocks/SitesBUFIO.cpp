@@ -75,7 +75,7 @@ void SitesBUFIO::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
         painter->setFont(font);
         painter->save();
         // painter->drawText(QRect(0, 0, site_width, 25), Qt::AlignCenter, QString(QString::fromStdString(site_type)));
-        painter->drawText(QRect(2, 0, site_width, 80), Qt::AlignLeft | Qt::AlignBottom, QString(QString::fromStdString(site_type)));
+        // painter->drawText(QRect(2, 0, site_width, 80), Qt::AlignLeft | Qt::AlignBottom, QString(QString::fromStdString(site_type)));
         painter->restore();
     }
 }

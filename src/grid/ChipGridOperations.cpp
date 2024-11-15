@@ -264,8 +264,8 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                     } else if (site.type == "BUFR") {
                         SitesBlock* site_block = new SitesBUFR(
                             Qt::white,
-                            GLOBAL_SITE_BLOCK_WIDTH,
-                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            GLOBAL_SITE_BLOCK_WIDTH-40,
+                            GLOBAL_SITE_BLOCK_HEIGHT-65,
                             i,
                             j,
                             site.type,
@@ -273,12 +273,14 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
-                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
-                    }  else if (site.type == "BUFIO") {
+                        // site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                        // site_block->setPos(QPointF(10*(index+1) + 10*index, 10));
+                        site_block->setPos(QPointF(80, 10*(index-4+1) + 10*(index-4)));
+                    } else if (site.type == "BUFIO") {
                         SitesBlock* site_block = new SitesBUFIO(
                             Qt::white,
-                            GLOBAL_SITE_BLOCK_WIDTH,
-                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            GLOBAL_SITE_BLOCK_WIDTH-40,
+                            GLOBAL_SITE_BLOCK_HEIGHT-65,
                             i,
                             j,
                             site.type,
@@ -286,7 +288,25 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
-                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                        // site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                        // site_block->setPos(QPointF(10*(index+1) + 10*index, 10));
+                        site_block->setPos(QPointF(10, 10*(index+1) + 10*index));
+                    } else if (site.type == "IDELAYCTRL") {
+                        SitesBlock* site_block = new SitesIDELAYCTRL(
+                            Qt::white,
+                            GLOBAL_SITE_BLOCK_WIDTH-40,
+                            GLOBAL_SITE_BLOCK_HEIGHT-45,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        // site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                        // site_block->setPos(QPointF(10*(index+1) + 10*index, 10));
+                        // site_block->setPos(QPointF(10, 10*(index+1) + 10*index));
+                        site_block->setPos(QPointF(150, 10*(index-8+1) + 10*(index-8)));
                     } else {
                         SitesBlock* site_block = new Sites(
                             Qt::white,

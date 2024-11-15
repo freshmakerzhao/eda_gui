@@ -1,10 +1,10 @@
-#include "SitesBUFR.h"
+#include "SitesIDELAYCTRL.h"
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-SitesBUFR::SitesBUFR(const QColor &color, int cur_width, int cur_height, int tile_index_x,int tile_index_y,std::string &cur_type, std::string &cur_name, int site_index)
+SitesIDELAYCTRL::SitesIDELAYCTRL(const QColor &color, int cur_width, int cur_height, int tile_index_x,int tile_index_y,std::string &cur_type, std::string &cur_name, int site_index)
     : site_width(cur_width), site_height(cur_height), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_type(cur_type), site_name(cur_name), site_index(site_index){
     this->site_color = color;
     setFlags(ItemIsSelectable);
@@ -22,19 +22,19 @@ SitesBUFR::SitesBUFR(const QColor &color, int cur_width, int cur_height, int til
     //    childItem2->setFlag(QGraphicsItem::ItemIsMovable);
 }
 
-QRectF SitesBUFR::boundingRect() const
+QRectF SitesIDELAYCTRL::boundingRect() const
 {
     return QRectF(0, 0, site_width, site_height);
 }
 
-QPainterPath SitesBUFR::shape() const
+QPainterPath SitesIDELAYCTRL::shape() const
 {
     QPainterPath path;
     path.addRect(0, 0, site_width, site_height);
     return path;
 }
 
-void SitesBUFR::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SitesIDELAYCTRL::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
 
@@ -80,18 +80,18 @@ void SitesBUFR::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     }
 }
 
-void SitesBUFR::setColor(const QColor &color){
+void SitesIDELAYCTRL::setColor(const QColor &color){
     site_color = color;
 }
 
-void SitesBUFR::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void SitesIDELAYCTRL::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit SiteClicked(tile_index_x,tile_index_y,sites_visible_status,site_index);
     QGraphicsItem::mousePressEvent(event);
     update();
 }
 
-void SitesBUFR::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void SitesIDELAYCTRL::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->modifiers() & Qt::ShiftModifier) {
         update();
@@ -100,15 +100,13 @@ void SitesBUFR::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void SitesBUFR::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void SitesIDELAYCTRL::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }
 
-void SitesBUFR::updateSitesVisibleStatus(bool status) {
+void SitesIDELAYCTRL::updateSitesVisibleStatus(bool status) {
     sites_visible_status = status;
     update();
 }
-
-

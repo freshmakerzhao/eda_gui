@@ -10,6 +10,7 @@
 #include "SitesIOB33.h"
 #include "SitesBUFR.h"
 #include "SitesBUFIO.h"
+#include "SitesIDELAYCTRL.h"
 
 class Tiles : public Blocks
 {
