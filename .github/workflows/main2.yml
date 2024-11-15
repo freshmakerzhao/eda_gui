@@ -15,7 +15,7 @@ jobs:
 
       - name: cache Qt
         id: WindowsCacheQt
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: D:\a\eda_gui\Qt\5.15.2\mingw81_64
           key: Windows-Qt/5.15.2/mingw81_64
