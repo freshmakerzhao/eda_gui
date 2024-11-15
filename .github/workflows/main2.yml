@@ -33,10 +33,7 @@ jobs:
           host: 'windows'
           target: 'desktop'
           arch: 'win64_mingw81'
-          
-      - name: Set PATH for Qt tools
-        run: echo "D:\a\eda_gui\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
-
+      
       - name: Cache CMake build files
         uses: actions/cache@v3
         with:
@@ -61,7 +58,7 @@ jobs:
           }
           New-Item -ItemType Directory -Path $appPath
           cp build/HybrdLink.exe app/
-          windeployqt app/HybrdLink.exe
+          D:\a\eda_gui\Qt\5.15.2\mingw81_64\bin\windeployqt app/HybrdLink.exe
 
       - name: Upload Artifact # 上传 Artifact 供下载
         uses: actions/upload-artifact@v3
