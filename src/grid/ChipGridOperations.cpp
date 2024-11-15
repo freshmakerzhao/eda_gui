@@ -422,7 +422,9 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
         pen.setColor(currentColor);
         colorIndex = (colorIndex + 1) % colors.size();
 
-        scene->addRect(rect, pen);
+        QGraphicsRectItem *rectItem = scene->addRect(rect, pen);
+        rectItem->setVisible(false);
+        clock_region_rects.insert(rectItem);
     }
 
     // --------------------- Clock Region -----------------------
@@ -570,6 +572,13 @@ void ChipGridOperations::updateTilesNameVisibleStatus(bool status) {
             }
             gridMatrix[i][j]->updateTilesNameVisibleStatus(status);
         }
+    }
+}
+
+void ChipGridOperations::updateClockRegionVisibleStatus(const bool &clockRegionVisibleStatus)
+{
+    for (QGraphicsRectItem *it : clock_region_rects) {
+        it->setVisible(clockRegionVisibleStatus);
     }
 }
 

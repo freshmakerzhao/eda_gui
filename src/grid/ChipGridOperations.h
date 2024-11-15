@@ -38,6 +38,8 @@ public:
     // std::vector<std::string> used_site;
     std::unordered_set<std::string> used_site;
 
+    std::unordered_set<QGraphicsRectItem *> clock_region_rects;
+
     std::unordered_set<std::string> site_type_set;
     // Initialize clock region bounding box map
     std::map<std::string, BoundingBox> clock_region_bounding_boxes;
@@ -53,6 +55,7 @@ public:
     bool showPlaceUsageGrid(QGraphicsScene *scene);
     void updateSitesVisibleStatus(bool sitesVisibleStatus);
     void updateTilesNameVisibleStatus(bool status);
+    void updateClockRegionVisibleStatus(const bool &clockRegionVisibleStatus);
     NormalTile getTileInfo(int col,int row);
 private:
     std::map<std::string, std::map<std::string, std::map<std::string, int>>> buildTileInfoMap(const nlohmann::basic_json<>& colorJson);

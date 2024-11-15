@@ -45,6 +45,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     // QPushButton* right_top_load_arch = new QPushButton("加载架构信息");
     QPushButton* rightTopBlockName = new QPushButton("Tile Name Off");
     QPushButton* rightTopSites = new QPushButton("Show Module Details");
+    QPushButton* rightTopClockRegion = new QPushButton("Show Clock Region");
     QPushButton* rightTopUsage = new QPushButton("Resource Usage(no arch)");
 //    QPushButton* right_top_four = new QPushButton("清空视图");
 //    right_top_four->setEnabled(false); // 默认禁止
@@ -56,6 +57,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     // right_top_load_arch->setFixedSize(buttonSize);
     rightTopBlockName->setFixedSize(buttonSize);
     rightTopSites->setFixedSize(buttonSize);
+    rightTopClockRegion->setFixedSize(buttonSize);
     rightTopUsage->setFixedSize(buttonSize);
 
     // 默认禁止
@@ -66,6 +68,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     // right_top_layout->addWidget(right_top_load_arch, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopBlockName, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopSites, 0, Qt::AlignHCenter);
+    rightTopLayout->addWidget(rightTopClockRegion, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopUsage, 0, Qt::AlignHCenter);
     // right_top_layout->addWidget(right_top_four, 0, Qt::AlignHCenter);
 
@@ -108,6 +111,17 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
         }
         showTilesName = false;
         showSites = !showSites;
+    });
+
+    // 显示、隐藏 Clock Region
+    connect(rightTopClockRegion, &QPushButton::clicked, [this,rightTopClockRegion]() {
+        viewer.updateClockRegionVisibleStatus(!showClockRegion);
+        if(showClockRegion){
+            rightTopClockRegion->setText("Show Clock Region");
+        }else{
+            rightTopClockRegion->setText("Hide Clock Region");
+        }
+        showClockRegion = !showClockRegion;
     });
 
     // 资源占用
