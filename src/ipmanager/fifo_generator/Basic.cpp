@@ -37,4 +37,5 @@ Basic::Basic(QWidget *parent) :
                   << "Independent Clocks Builtin FIFO";
     fifoImplComboBox->addItems(fifoImplItems);
     fLayout->addRow("Fifo Implementation", fifoImplComboBox);
+    mainLayout->addSpacing(20);
 }

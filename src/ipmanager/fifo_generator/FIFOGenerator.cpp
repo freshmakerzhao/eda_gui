@@ -10,7 +10,9 @@ FIFOGenerator::FIFOGenerator(QWidget *parent) :
 
     basic = new Basic;
     nativePorts = new NativePorts;
+    dataCounts = new DataCounts;
 
     tabWidget->addTab(basic, "Basic");
     tabWidget->addTab(nativePorts, "Native Ports");
+    tabWidget->addTab(dataCounts, "Data Counts");
 }

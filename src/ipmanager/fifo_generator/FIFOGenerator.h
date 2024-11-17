@@ -4,6 +4,7 @@
 #include "ipmanager/common/BaseDialog.h"
 #include "ipmanager/fifo_generator/Basic.h"
 #include "ipmanager/fifo_generator/NativePorts.h"
+#include "ipmanager/fifo_generator/DataCounts.h"
 
 class FIFOGenerator : public BaseDialog
 {
@@ -15,6 +16,8 @@ private:
     Basic *basic;
 
     NativePorts *nativePorts;
+
+    DataCounts *dataCounts;
 };
 
 #endif // FIFOGENERATOR_H
