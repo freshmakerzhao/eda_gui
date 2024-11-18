@@ -1,0 +1,67 @@
+name: Windows Build
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest # 仅在 Windows 上运行
+    strategy:
+      fail-fast: false
+      matrix:
+        cmake_flags: ["-DENABLE_MAC_CHECK=OFF -DENABLE_EXPIRATION_CHECK=OFF -DPACK_DEPLOYED=ON"]
+        qt_ver: [5.15.2]
+    name: Windows Build
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3 # 拉取代码
+
+      - name: cache Qt
+        id: WindowsCacheQt
+        uses: actions/cache@v3
+        with:
+          path: D:\a\eda_gui\Qt\5.15.2\mingw81_64
+          key: Windows-Qt/5.15.2/mingw81_64
+          
+      - name: Setup Qt from cache # 设置缓存的 Qt 环境
+        if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
+        run: echo "D:\a\eda_gui\Qt\5.15.2\mingw81_64\bin" >> $GITHUB_PATH
+
+      - name: Install Qt for Windows # 安装 Qt（如果没有缓存）
+        if: steps.WindowsCacheQt.outputs.cache-hit != 'true'
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '5.15.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw81'
+      
+      - name: Cache CMake build files
+        uses: actions/cache@v3
+        with:
+          path: build
+          key: Windows-cmake-build-${{ github.sha }}
+          restore-keys: |
+            Windows-cmake-build-
+
+      - name: Configure project with CMake # 配置项目
+        run: |
+          cmake -S src -B build -G "MinGW Makefiles" ${{ matrix.cmake_flags }} -DCMAKE_PREFIX_PATH="C:\Qt\5.15.2\mingw81_64"
+
+      - name: Compile using CMake # 编译项目
+        run: |
+          cmake --build build --target HybrdLink -- -j 14
+ 
+      - name: Pack Windows executable # 打包应用
+        run: |
+          $appPath = "D:\a\eda_gui\eda_gui\app"
+          if (Test-Path -Path $appPath) {
+            Remove-Item -Recurse -Force $appPath
+          }
+          New-Item -ItemType Directory -Path $appPath
+          cp build/HybrdLink.exe app/
+          D:\a\eda_gui\Qt\5.15.2\mingw81_64\bin\windeployqt app/HybrdLink.exe
+
+      - name: Upload Artifact # 上传 Artifact 供下载
+        uses: actions/upload-artifact@v3
+        with:
+          name: HybrdLink
+          path: app
