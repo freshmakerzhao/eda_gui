@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef GRID_VIEW_FILEHELPER_H
-#define GRID_VIEW_FILEHELPER_H
+#ifndef FILEHELPER_H
+#define FILEHELPER_H
 
 #include <QString>
 #include <QWidget>
@@ -80,8 +80,20 @@ public:
             }
         }
     }
+
+    static QString convertToStandardPath(const QString &filePath) {
+        // QFileInfo 确保路径合法
+        QFileInfo fileInfo(filePath);
+        if (!fileInfo.exists()) {
+            return QString();
+        }
+
+        // 使用 QDir 的 toNativeSeparators 和 QDir::cleanPath
+        QString standardizedPath = QDir::cleanPath(fileInfo.absoluteFilePath());
+        return standardizedPath;
+    }
 };
-#endif //GRID_VIEW_FILEHELPER_H
+#endif // FILEHELPER_H
 
 
 

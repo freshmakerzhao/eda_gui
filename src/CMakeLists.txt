@@ -132,6 +132,7 @@ file(GLOB PROJECT_SOURCES
     ipmanager/fifo_generator/*.cpp
     component/tclconsole/*.cpp
     settings/*.cpp
+    service/*.cpp
     include/tinyxml2/*.cpp
     entity/*.cpp
     *.cpp
@@ -155,6 +156,7 @@ file(GLOB PROJECT_HEADERS
     ipmanager/fifo_generator/*.h
     component/tclconsole/*.h
     settings/*.h
+    service/*.h
     include/Qsci/*.h
     include/tinyxml2/*.h
     *.h
