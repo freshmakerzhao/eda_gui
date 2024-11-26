@@ -47,24 +47,28 @@ void Tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 
     // 计算缩放等级，画面越小,细节越少，lod越接近于0; 画面越大，细节越多，lod越趋近于1
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    if (lod < 0.125) {
+    // if (lod < 0.125) {
         // 当缩小到非常小时，不需要内部细节，直接用颜色覆盖即可
-        painter->fillRect(QRectF(0, 0, tile_width, tile_height), fillColor);
-        return;
-    }
+        painter->fillRect(QRectF(0, 0, tile_width, tile_height).toAlignedRect(), fillColor);
+        // return;
+    // }
 
     QPen oldPen = painter->pen();
     QPen pen = oldPen;
-    int width = 0;
-    if (option->state & QStyle::State_Selected)
-        width += 2;
+    // int width = 0;
+    // if (option->state & QStyle::State_Selected)
+    //     width += 2;
 
-    pen.setWidth(width);
+    // pen.setWidth(width);
+
+    pen.setWidthF(1.0 / lod);
+    painter->setPen(pen);
+
     QBrush b = painter->brush();
     painter->setBrush(QBrush(fillColor.darker(option->state & QStyle::State_Sunken ? 120 : 100)));
 
     // 显示位置及大小
-    painter->drawRect(QRect(0, 0, tile_width, tile_height));
+    painter->drawRect(QRectF(0, 0, tile_width, tile_height));
     painter->setBrush(b);
 
 //    painter->setPen(QPen(Qt::black, 0));
@@ -75,8 +79,8 @@ void Tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
         font.setStyleStrategy(QFont::ForceOutline); // 强制字体以轮廓方式渲染
         painter->setFont(font);
         painter->save();
-        painter->drawText(QRect(0, 0, tile_width, 35),Qt::AlignCenter, QString(QString::fromStdString(tile_type)));
-        painter->drawText(QRect(0, 0, tile_width, 80),Qt::AlignCenter, QString("X%1Y%2").arg(loc_x).arg(loc_y));
+        painter->drawText(QRectF(0, 0, tile_width, 35),Qt::AlignCenter, QString(QString::fromStdString(tile_type)));
+        painter->drawText(QRectF(0, 0, tile_width, 80),Qt::AlignCenter, QString("X%1Y%2").arg(loc_x).arg(loc_y));
         painter->restore();
     }
 }

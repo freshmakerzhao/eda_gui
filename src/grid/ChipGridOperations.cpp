@@ -408,7 +408,8 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
     int colorIndex = 0;
 
     QPen pen;
-    pen.setWidth(7);
+    pen.setWidthF(1.0f);
+    pen.setCosmetic(true); // 线宽保持固定
 
     for (const auto& region : clock_region_bounding_boxes) {
         int x0 = region.second.x0 * 210;
@@ -416,13 +417,13 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
         int x1 = region.second.x1 * 210;
         int y1 = region.second.y1 * 100;
 
-        QRect rect(x0, y0, x1 - x0 + 210, y1 - y0 + 100);
+        QRectF rect(x0, y0, x1 - x0 + 210, y1 - y0 + 100);
 
         QColor currentColor = colors[colorIndex];
         pen.setColor(currentColor);
         colorIndex = (colorIndex + 1) % colors.size();
 
-        QGraphicsRectItem *rectItem = scene->addRect(rect, pen);
+        QGraphicsRectItem *rectItem = scene->addRect(rect.toAlignedRect(), pen);
         rectItem->setVisible(false);
         clock_region_rects.insert(rectItem);
     }
