@@ -62,21 +62,6 @@ public:
     std::vector<XmlRecent> getRecentListFromFatherElementName(
             const char *xmlPath,
             const char *fatherElementName);
-
-private:
-    /**
-     * 比较两个路径是否指向同一个位置
-     * @param path1
-     * @param path2
-     * @return
-     */
-    bool isSamePath(std::string path1, std::string path2);
-    /**
-     * 将路径中的右斜替换成左斜，统一分隔符。
-     * @param path
-     * @return
-     */
-    std::string normalizePathSeparators(std::string path);
 };
 
 

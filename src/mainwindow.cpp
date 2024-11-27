@@ -26,6 +26,7 @@
 #include "dialog/AdvancedFileDialog.h"
 #include "base/TreeViewBase.h"
 #include "base/Globals.h"
+#include "service/RecentService.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -105,34 +106,25 @@ void MainWindow::setForm(const int &mode)
 
 
 void MainWindow::setRecentMenu() {
-    // 不让 Open Recent 操作影响主进程
-    try {
-        // 获取 RECENT_PROJECTS 的 recentList
-        std::vector<XmlRecent> recentList = XmlUtilities::instance().getRecentListFromFatherElementName(
-                InitialConfig::instance().xmlPath.toStdString().c_str(),
-                "RECENT_PROJECTS"
-        );
-        if (recentList.empty()){
-            // 当 recentList 空时
-            // Open Recent 不允许点击
-            recentFilesMenu->setDisabled(true);
-        } else {
-            recentFilesMenu->setDisabled(false);
-            for (const XmlRecent& recent : recentList) {
-                QAction *recentFileAction = recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
-                connect(recentFileAction, &QAction::triggered, [this, recent]() {
-                    this->onOpenRecentTriggered(recent.getPath());
-                });
-            }
-            // 分割线
-            recentFilesMenu->addSeparator();
-            clearAction = new QAction("Clear List", recentFilesMenu);
-            recentFilesMenu->addAction(clearAction);
-            connect(clearAction, &QAction::triggered, this, &MainWindow::onClearTriggered);
+    recentFilesMenu->clear();
+    std::vector<XmlRecent> recentList = RecentService::readRecentProject();
+    if (recentList.empty()){
+        // 当 recentList 空时
+        // Open Recent 不允许点击
+        recentFilesMenu->setDisabled(true);
+    } else {
+        recentFilesMenu->setDisabled(false);
+        for (const XmlRecent& recent : recentList) {
+            QAction *recentFileAction = recentFilesMenu->addAction(QString::fromStdString(recent.getPath()));
+            connect(recentFileAction, &QAction::triggered, [this, recent]() {
+                this->onOpenRecentTriggered(recent.getPath());
+            });
         }
-    } catch (const std::exception& e) {
-        // 异常
-        qDebug() << "[MainWindow] An error occurred from MainWindow recentList: " << e.what();
+        // 分割线
+        recentFilesMenu->addSeparator();
+        clearAction = new QAction("Clear List", recentFilesMenu);
+        recentFilesMenu->addAction(clearAction);
+        connect(clearAction, &QAction::triggered, this, &MainWindow::onClearTriggered);
     }
 }
 
@@ -507,9 +499,7 @@ void MainWindow::initMenuStateBar()
 
 void MainWindow::onClearTriggered() {
     // 清空 RECENT_PROJECTS 下的 recent
-    XmlUtilities::instance().clearNodesFromFatherElementName(
-            InitialConfig::instance().xmlPath.toStdString().c_str(),
-            "RECENT_PROJECTS");
+    RecentService::clearRecentProject();
     // Open Recent 置灰
     recentFilesMenu->clear();
     recentFilesMenu->setDisabled(true);

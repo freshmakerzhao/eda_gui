@@ -200,9 +200,9 @@ bool XmlUtilities::insertHybrdLinkXmlRecent(
     }
 
     // 路径标准化
-    for (auto & recent : recentList) {
-        recent.setPath(normalizePathSeparators(recent.getPath()));
-    }
+    // for (auto & recent : recentList) {
+    //     recent.setPath(normalizePathSeparators(recent.getPath()));
+    // }
 
     // 合并前去重
     // 使用迭代器进行循环，安全删除元素
@@ -318,37 +318,4 @@ std::vector<XmlRecent> XmlUtilities::getRecentListFromFatherElementName(
     }
     std::reverse(recentAllList.begin(),recentAllList.end());
     return recentAllList;
-}
-
-/**
- * 比较两个路径是否指向同一个位置
- * @param path1
- * @param path2
- * @return
- */
-bool XmlUtilities::isSamePath(std::string path1, std::string path2){
-    // 将路径中的 '\\' 转为 '/'，统一分隔符后进行比较
-    std::transform(path1.begin(), path1.end(), path1.begin(),
-                   [](char c) { return (c == '\\') ? '/' : c; });
-    std::transform(path2.begin(), path2.end(), path2.begin(),
-                   [](char c) { return (c == '\\') ? '/' : c; });
-
-    // 转小写，忽略大小写
-    std::transform(path1.begin(), path1.end(), path1.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-    std::transform(path2.begin(), path2.end(), path2.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-    return path1 == path2;
-}
-
-/**
- * 将路径中的右斜替换成左斜，统一分隔符。
- * @param path
- * @return
- */
-std::string XmlUtilities::normalizePathSeparators(std::string path){
-    // 将路径中的 '\\' 转为 '/'，统一分隔符后进行比较
-    std::transform(path.begin(), path.end(), path.begin(),
-                   [](char c) { return (c == '\\') ? '/' : c; });
-    return path;
 }

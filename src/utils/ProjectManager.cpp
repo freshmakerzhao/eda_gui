@@ -11,7 +11,6 @@
 #include "mainwindow.h"
 #include "ProjectManager.h"
 #include "TaskManager.h"
-#include "XmlUtilities.h"
 #include "wizard/Wizard.h"
 #include "dialog/CustomMessageBox.h"
 #include "dialog/ProgressHelper.h"
@@ -19,6 +18,8 @@
 #include "widgets/ProjectSummary.h"
 #include "widgets/InfoWidget.h"
 #include "widgets/Form.h"
+#include "service/RecentService.h"
+#include "FileHelper.h"
 
 ProjectManager &ProjectManager::instance()
 {
@@ -112,23 +113,11 @@ bool ProjectManager::openProject(const QString &hprPath)
         return false;
     }
 
-    std::vector<XmlRecent> recentLists = {
-        {0, hprPath.toStdString()}
-    };
-    try {
-        XmlUtilities::instance().insertHybrdLinkXmlRecent(
-            InitialConfig::instance().xmlPath.toStdString().c_str(),
-            "RECENT_PROJECTS",
-            recentLists
-            );
-    } catch (const std::exception& e) {
-        // 异常
-        // 不让IO操作影响主进程
-        qDebug() << "[ProjectManager] An error occurred from openProject: " << e.what();
-    }
+    // 必须转换为完整路径
+    const QString standardHprPath = FileHelper::convertToStandardPath(hprPath);
 
     Project *newOpenProject = new Project;
-    if (!newOpenProject->parseProject(hprPath)) {
+    if (!newOpenProject->parseProject(standardHprPath)) {
         CustomMessageBox::showError(MainWindow::instance(), "Error",
                                     "Failed to open project, File parsing error.");
         delete newOpenProject;
@@ -137,6 +126,11 @@ bool ProjectManager::openProject(const QString &hprPath)
     ProjectManager::instance().loadFiles(newOpenProject);
     InfoWidget::instance()->initDesignRunsView(newOpenProject->getParameter(Project::Path));
     TaskManager::instance().setWatchFiles();
+
+    // 更新 Recent Projects 列表
+    RecentService::writeRecentProject(standardHprPath);
+    MainWindow::instance()->setRecentMenu();
+
     return true;
 }
 
