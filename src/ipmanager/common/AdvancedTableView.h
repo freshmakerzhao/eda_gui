@@ -19,6 +19,29 @@ public:
     }
 
     /**
+     * 修改指定行列的单元格内容
+     * @param row 行号
+     * @param col 列号
+     * @param newValue 要设置的新值
+     * @return 是否成功
+     */
+    bool modifyCell(int row, int col, const QVariant &newValue) {
+        QAbstractItemModel *model = this->model();
+        if (!model) {
+            qWarning() << "Model is null. Cannot modify cell.";
+            return false;
+        }
+
+        QModelIndex index = model->index(row, col);
+        if (!index.isValid()) {
+            qWarning() << "Invalid index: row=" << row << ", col=" << col;
+            return false;
+        }
+
+        return model->setData(index, newValue);
+    }
+
+    /**
      * 调整TableView大小
      * @param headerRow 表头行数
      * @return
