@@ -49,7 +49,7 @@ void SitesSliceM::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
     // 计算缩放等级，画面越小,细节越少，lod越接近于0; 画面越大，细节越多，lod越趋近于1
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    if (lod < 0.125) {
+    if (lod < SITE_LEVEL1) {
         painter->fillRect(QRectF(0, 0, site_width, site_height), fillColor);
         return;
     }
@@ -65,31 +65,11 @@ void SitesSliceM::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     // 设置点击控件后使其变暗
     painter->setBrush(QBrush(fillColor.darker(option->state & QStyle::State_Sunken ? 120 : 100)));
     // 显示位置及大小
-    painter->drawRect(QRect(0, 0,  site_width, site_height));
-    // ------------------------------------------------------------
-    painter->drawRect(QRect(5, 4, 10, 12));
-    painter->drawRect(QRect(5, 20, 10, 12));
-    painter->drawRect(QRect(5, 36, 10, 12));
-    painter->drawRect(QRect(5, 52, 10, 12));
-
-    painter->drawRect(QRect(25, 8, 5, 50));
-
-    painter->drawRect(QRect(40, 4, 25, 62));
-
-    painter->drawRect(QRect(80, 2, 6, 6));
-    painter->drawRect(QRect(80, 10, 6, 6));
-    painter->drawRect(QRect(80, 18, 6, 6));
-    painter->drawRect(QRect(80, 26, 6, 6));
-
-    painter->drawRect(QRect(80, 36, 6, 6));
-    painter->drawRect(QRect(80, 44, 6, 6));
-    painter->drawRect(QRect(80, 52, 6, 6));
-    painter->drawRect(QRect(80, 60, 6, 6));
-    // ------------------------------------------------------------
+    painter->drawRect(QRectF(0, 0,  site_width, site_height));
     painter->setBrush(b);
 
 
-    if (lod >= 0.5 && sites_visible_status) {
+    if (lod >= SITE_LEVEL2 && sites_visible_status) {
         QFont font("Times", 5);
         font.setStyleStrategy(QFont::ForceOutline);
         painter->setFont(font);
@@ -97,6 +77,29 @@ void SitesSliceM::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
         // painter->drawText(QRect(0, 0, site_width, 25), Qt::AlignCenter, QString(QString::fromStdString(site_type)));
         painter->drawText(QRect(2, 0, site_width, 80), Qt::AlignLeft | Qt::AlignBottom, QString(QString::fromStdString(site_type)));
         painter->restore();
+    }
+
+    if (lod >= SITE_LEVEL3 && sites_visible_status) {
+        // ------------------------------------------------------------
+        painter->drawRect(QRect(5, 4, 10, 12));
+        painter->drawRect(QRect(5, 20, 10, 12));
+        painter->drawRect(QRect(5, 36, 10, 12));
+        painter->drawRect(QRect(5, 52, 10, 12));
+
+        painter->drawRect(QRect(25, 8, 5, 50));
+
+        painter->drawRect(QRect(40, 4, 25, 62));
+
+        painter->drawRect(QRect(80, 2, 6, 6));
+        painter->drawRect(QRect(80, 10, 6, 6));
+        painter->drawRect(QRect(80, 18, 6, 6));
+        painter->drawRect(QRect(80, 26, 6, 6));
+
+        painter->drawRect(QRect(80, 36, 6, 6));
+        painter->drawRect(QRect(80, 44, 6, 6));
+        painter->drawRect(QRect(80, 52, 6, 6));
+        painter->drawRect(QRect(80, 60, 6, 6));
+        // ------------------------------------------------------------
     }
 }
 

@@ -49,7 +49,7 @@ void SitesBUFR::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     // 计算缩放等级，画面越小,细节越少，lod越接近于0; 画面越大，细节越多，lod越趋近于1
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    if (lod < 0.125) {
+    if (lod < SITE_LEVEL1) {
         painter->fillRect(QRectF(0, 0, site_width, site_height), fillColor);
         return;
     }
@@ -65,15 +65,17 @@ void SitesBUFR::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     // 设置点击控件后使其变暗
     painter->setBrush(QBrush(fillColor.darker(option->state & QStyle::State_Sunken ? 120 : 100)));
     // 显示位置及大小
-    painter->drawRect(QRect(0, 0,  site_width, site_height));
+    // painter->drawRect(QRect(0, 0,  site_width, site_height));
     painter->setBrush(b);
 
 
-    if (lod >= 0.5 && sites_visible_status) {
+    if (lod >= SITE_LEVEL2 && sites_visible_status) {
         QFont font("Times", 5);
         font.setStyleStrategy(QFont::ForceOutline);
         painter->setFont(font);
         painter->save();
+
+        painter->drawRect(QRect(0, 0,  site_width, site_height));
         // painter->drawText(QRect(0, 0, site_width, 25), Qt::AlignCenter, QString(QString::fromStdString(site_type)));
         // painter->drawText(QRect(2, 0, site_width, 80), Qt::AlignLeft | Qt::AlignBottom, QString(QString::fromStdString(site_type)));
         painter->restore();
