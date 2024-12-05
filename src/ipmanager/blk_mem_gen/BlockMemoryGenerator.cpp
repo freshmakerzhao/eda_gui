@@ -56,3 +56,37 @@ void BlockMemoryGenerator::onipLocActionTrigger()
     // dialog.move(globalPos.x() + 200, globalPos.y() + 100);
     // dialog.exec();
 }
+
+void BlockMemoryGenerator::accept()
+{
+    QProcess process;
+    QString pythonPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("ipcore/rom_ip.exe");
+    QStringList arguments;
+    arguments << "--core_generation_info" << core_generation_info;
+
+    process.setWorkingDirectory(QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("ip"));
+    // 启动 Python 脚本
+    process.start(pythonPath, arguments);
+
+    // 等待脚本启动并输出
+    if (!process.waitForStarted()) {
+        QMessageBox::warning(this, "Information" ,"The IP Core generation failed. Failed to start the process");
+    }
+
+    // 等待脚本完成执行
+    process.waitForFinished();
+
+    // 读取输出内容
+    QString output = process.readAllStandardOutput();
+    QString error = process.readAllStandardError();
+
+    if (!output.isEmpty()) {
+        qDebug() << output;
+    }
+
+    if (!error.isEmpty()) {
+        QMessageBox::warning(this, "Information" ,"The IP Core generation failed." + error);
+    }
+
+    QDialog::accept();
+}

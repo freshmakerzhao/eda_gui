@@ -41,6 +41,8 @@ public:
     //! 更新Summary页面
     //! 更新Tab
     void updateMemoryType(const QString &option);
+protected:
+    void accept() override;
 private:
     // QTabWidget *tabWidget;
 
