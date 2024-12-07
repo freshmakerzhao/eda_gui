@@ -18,8 +18,11 @@ Q_OBJECT
 public:
     virtual void updateSitesVisibleStatus(bool status){}
     virtual void setColor(const QColor &color){}
+    virtual std::string getSiteName() const = 0;
 signals:
     void SiteClicked(int tile_index_x, int tile_index_y,bool sites_visible_status,int index);
+
+private:
 };
 
 

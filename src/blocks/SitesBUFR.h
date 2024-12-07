@@ -15,7 +15,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget) override;
     void updateSitesVisibleStatus(bool status) override;
     void setColor(const QColor &color) override;
-
+    std::string getSiteName() const override;
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

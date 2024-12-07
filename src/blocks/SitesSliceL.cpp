@@ -104,6 +104,11 @@ void SitesSliceL::setColor(const QColor &color){
     site_color = color;
 }
 
+std::string SitesSliceL::getSiteName() const
+{
+    return this->site_name;
+}
+
 void SitesSliceL::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit SiteClicked(tile_index_x,tile_index_y,sites_visible_status,site_index);

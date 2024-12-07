@@ -491,24 +491,6 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
             }
         }
     }
-
-    // qDebug() << "set: " << used_site.size();
-    for (int i = 0; i < gridTypeMatrix.size(); ++i) {
-        for (int j = 0; j < gridTypeMatrix[i].size(); ++j) {
-            if (gridTypeMatrix[i][j].types == "SKIP") {
-                continue;
-            }
-            for (auto site : gridTypeMatrix[i][j].cur_sites) {
-                if (used_site.find(site.name) != used_site.end()) {
-                    for (auto item : gridMatrix[i][j]->child_items) {
-                        // item->setColor("SteelBlue");
-                        QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
-                        item->setColor(color);
-                    }
-                }
-            }
-        }
-    }
 }
 
 bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
@@ -516,22 +498,24 @@ bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
         return false;  // 如果 scene 为 nullptr，则返回 false
     }
     try {
-        auto len = usageGrid.size();
-        for (int i = 0; i < len; ++i) {
-            int x = usageGrid[i].father_x_coordinate - 1;
-            int y = usageGrid[i].father_y_coordinate - 1;
-            if (gridTypeMatrix[x][y].types == "SKIP" || gridMatrix[x][y] == nullptr || (x == 0 && y == 0)) {
+        for (int i = 0; i < gridTypeMatrix.size(); ++i) {
+            for (int j = 0; j < gridTypeMatrix[i].size(); ++j) {
+                if (gridTypeMatrix[i][j].types == "SKIP") {
                     continue;
+                }
+                for (auto site : gridTypeMatrix[i][j].cur_sites) {
+                    if (used_site.find(site.name) != used_site.end()) {
+                        for (auto item : gridMatrix[i][j]->child_items) {
+                            if (item->getSiteName() == site.name) {
+                                item->setColor("SteelBlue");
+                                QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
+                                item->setColor(color);
+                            }
+                        }
+                    }
+                }
             }
-
-            if (usageGrid[i].child_loc >= gridMatrix[x][y]->child_items.size()){
-                continue;
-            }
-            gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->setColor(QString::fromStdString(usageGrid[i].color));
-            // gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->setColor(QString("gray"));
         }
-        qDebug() << 456;
-        usageGrid.clear();
     }catch (...) {
         return false;  // 如果在执行过程中抛出任何异常，则返回 false
     }

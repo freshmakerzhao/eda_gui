@@ -74,6 +74,11 @@ void Sites::setColor(const QColor &color){
     site_color = color;
 }
 
+std::string Sites::getSiteName() const
+{
+    return this->site_name;
+}
+
 void Sites::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit SiteClicked(tile_index_x,tile_index_y,sites_visible_status,site_index);
