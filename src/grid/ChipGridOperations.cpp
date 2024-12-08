@@ -507,7 +507,6 @@ bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
                     if (used_site.find(site.name) != used_site.end()) {
                         for (auto item : gridMatrix[i][j]->child_items) {
                             if (item->getSiteName() == site.name) {
-                                item->setColor("SteelBlue");
                                 QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
                                 item->setColor(color);
                             }
@@ -516,6 +515,7 @@ bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
                 }
             }
         }
+        used_site.clear();
     }catch (...) {
         return false;  // 如果在执行过程中抛出任何异常，则返回 false
     }
