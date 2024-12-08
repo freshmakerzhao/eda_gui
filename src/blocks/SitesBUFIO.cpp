@@ -84,6 +84,11 @@ void SitesBUFIO::setColor(const QColor &color){
     site_color = color;
 }
 
+std::string SitesBUFIO::getSiteName() const
+{
+    return this->site_name;
+}
+
 void SitesBUFIO::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit SiteClicked(tile_index_x,tile_index_y,sites_visible_status,site_index);

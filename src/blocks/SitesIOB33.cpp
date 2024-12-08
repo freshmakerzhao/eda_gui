@@ -89,6 +89,11 @@ void SitesIOB33::setColor(const QColor &color){
     site_color = color;
 }
 
+std::string SitesIOB33::getSiteName() const
+{
+    return this->site_name;
+}
+
 void SitesIOB33::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit SiteClicked(tile_index_x,tile_index_y,sites_visible_status,site_index);

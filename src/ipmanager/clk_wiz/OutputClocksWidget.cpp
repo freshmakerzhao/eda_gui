@@ -101,7 +101,7 @@ OutputClocksWidget::OutputClocksWidget(AdvancedTableView *outputClockInforTableV
     }
     // Phase (degrees) Actual
     for (int i = 0; i < model->rowCount(); i++) {
-        model->setData(model->index(i, 5), "N/A");
+        model->setData(model->index(i, 5), "0.000");
         model->item(i, 5)->setFlags(model->item(i, 5)->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
 
@@ -114,7 +114,7 @@ OutputClocksWidget::OutputClocksWidget(AdvancedTableView *outputClockInforTableV
     }
     // Duty Cycle (%) Actual
     for (int i = 0; i < model->rowCount(); i++) {
-        model->setData(model->index(i, 7), "N/A");
+        model->setData(model->index(i, 7), "50.000");
         model->item(i, 7)->setFlags(model->item(i, 7)->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
     // Drives

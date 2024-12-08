@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QFontDatabase>
 #include <QSplashScreen>
+#include <QComboBox>
 #include <utils/FontsUtilities.h>
 #include "utils/LicenseUtilities.h"
 #include "utils/ProcessManager.h"
@@ -45,7 +46,21 @@ int main(int argc, char *argv[])
     a.processEvents();
 
 #if ONLY_COMPILE_GRIDVIEW
-    std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_100t.json";
+    QDialog dialog;
+    dialog.resize(400, 100);
+    splash.finish(&dialog);
+    QVBoxLayout *vLayout = new QVBoxLayout(&dialog);
+    QComboBox *comboBox = new QComboBox;
+    QPushButton *button = new QPushButton("Accept");
+    comboBox->addItems(QStringList() << "100t" << "200t");
+    vLayout->addWidget(comboBox);
+    vLayout->addWidget(button);
+    QObject::connect(button, &QPushButton::clicked, &dialog, &QDialog::accept);
+    if (dialog.exec() == QDialog::Rejected) {
+        return 0;
+    }
+
+    std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/tilegrid_%1.json").arg(comboBox->currentText()).toStdString();
     std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
     FrameView gridView(tileGridPath,tileColorPath);
     gridView.resize(1600, 1000);
