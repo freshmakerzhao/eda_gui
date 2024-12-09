@@ -19,6 +19,7 @@ public:
     void updatePortADepthRange();
 
 private:
+    int portADepthMax = 1024;	// Port A 的最大位宽
 
 };
 

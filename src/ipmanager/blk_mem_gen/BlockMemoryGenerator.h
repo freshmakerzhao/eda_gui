@@ -23,7 +23,17 @@
 #include <QToolBar>
 #include <QSplitter>
 #include <QDialogButtonBox>
-#include "BasicWidget.h"
+#include <QMessageBox>
+#include <QProcess>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include "ipmanager/blk_mem_gen/BasicWidget.h"
+#include "ipmanager/blk_mem_gen/PortAOptionsWidget.h"
+#include "ipmanager/blk_mem_gen/PortBOptionsWidget.h"
+#include "ipmanager/blk_mem_gen/OtherOptionsWidget.h"
+#include "ipmanager/blk_mem_gen/BlkMemGenSummary.h"
+#include "ipmanager/blk_mem_gen/CoeFileEditor.h"
 #include "PortAOptionsWidget.h"
 #include "PortBOptionsWidget.h"
 #include "OtherOptionsWidget.h"
@@ -47,6 +57,8 @@ private:
     // QTabWidget *tabWidget;
 
     // QLineEdit *cmptNameLineEdit;
+    void updateCoreGenerationInfoJson(QTableView *tableView);
+    void setup_core_generation_info(QTableView *tableView);
 
     BasicWidget *basicWidget;
 
@@ -57,6 +69,10 @@ private:
     OtherOptionsWidget *otherOptionsWidget;
 
     BlkMemGenSummary *summaryWidget;
+
+    QJsonObject inputJsonRoot;
+
+    QString	core_generation_info;
 
     // QGraphicsView *viewModule;
 
