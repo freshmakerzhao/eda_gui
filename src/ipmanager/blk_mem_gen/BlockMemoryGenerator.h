@@ -37,6 +37,7 @@
 #include "PortAOptionsWidget.h"
 #include "PortBOptionsWidget.h"
 #include "OtherOptionsWidget.h"
+#include "base/Globals.h"
 #include "ipmanager/blk_mem_gen/BlkMemGenSummary.h"
 // #include "IPlocationDialog.h"
 #include "ipmanager/common/BaseDialog.h"
@@ -57,8 +58,10 @@ private:
     // QTabWidget *tabWidget;
 
     // QLineEdit *cmptNameLineEdit;
-    void updateCoreGenerationInfoJson(QTableView *tableView);
-    void setup_core_generation_info(QTableView *tableView);
+    void updateCoreGenerationInfoJson();
+    void setup_core_generation_info();
+    void updatePortInfoJson();
+    void setup_port_info();
 
     BasicWidget *basicWidget;
 
@@ -74,6 +77,9 @@ private:
 
     QString	core_generation_info;
 
+    QString port_info;
+
+    QJsonObject portJsonRoot;
     // QGraphicsView *viewModule;
 
     // QAction *docAction;

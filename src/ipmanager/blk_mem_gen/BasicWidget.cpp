@@ -35,6 +35,7 @@ BasicWidget::BasicWidget(QWidget *parent) :
 
     memoryTypeCheckBox = new QCheckBox("Common Clock", this);
     memoryTypeCheckBox->setObjectName("Common Clock");
+    memoryTypeCheckBox->setEnabled(false);
     connect(memoryTypeCheckBox, &QCheckBox::stateChanged, this, &BasicWidget::memoryTypeCheckBoxStateChanged);
     QHBoxLayout *memoryTypeLayout = new QHBoxLayout;
     memoryTypeLayout->addWidget(memoryTypeComboBox);
@@ -125,3 +126,4 @@ void BasicWidget::memoryTypeCheckBoxStateChanged(const int &state)
         qDebug() << "Memory Type : [Common Clock] Disabled";
     }
 }
+

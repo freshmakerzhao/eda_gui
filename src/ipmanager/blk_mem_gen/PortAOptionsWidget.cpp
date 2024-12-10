@@ -12,6 +12,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     fLayout->setContentsMargins(25, 0, 0, 0);
     mainLayout->addLayout(fLayout);
     portAWidthLineEdit = new QLineEdit(this);
+    portAWidthLineEdit->setObjectName("Port A Width");
     portAWidthLineEdit->setClearButtonEnabled(true);
     portAWidthLineEdit->setFixedWidth(220);
     QHBoxLayout *portAWidthLayout = new QHBoxLayout;
@@ -22,6 +23,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     mainLayout->addSpacing(10);
 
     portADepthLineEdit = new QLineEdit(this);
+    portADepthLineEdit->setObjectName("Port A Depth");
     portADepthLineEdit->setClearButtonEnabled(true);
     portADepthLineEdit->setFixedWidth(220);
     portADepthLineEdit->setEnabled(false);

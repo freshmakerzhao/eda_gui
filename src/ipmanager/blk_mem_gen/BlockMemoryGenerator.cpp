@@ -30,23 +30,13 @@ BlockMemoryGenerator::BlockMemoryGenerator(QWidget *parent) :
     tabWidget->addTab(otherOptionsWidget, "Other Options");
     tabWidget->addTab(summaryWidget, "Summary");
 
-    setup_core_generation_info(nullptr);
+    setup_core_generation_info();
 
-    updateCoreGenerationInfoJson(nullptr);
+    updateCoreGenerationInfoJson();
 
-    QList<QCheckBox *> checkBoxs = basicWidget->findChildren<QCheckBox *>();
-    for (const QCheckBox *checkBox : checkBoxs) {
-        QObject::connect(checkBox, &QCheckBox::toggled, [=]() {
-            updateCoreGenerationInfoJson(nullptr);
-        });
-    }
+    setup_port_info();
 
-    QList<QComboBox *> comboboxs = basicWidget->findChildren<QComboBox *>();
-    for (const QComboBox *combobx : comboboxs) {
-        QObject::connect(combobx, &QComboBox::currentTextChanged, [=]() {
-            updateCoreGenerationInfoJson(nullptr);
-        });
-    }
+    updatePortInfoJson();
 }
 
 void BlockMemoryGenerator::updateMemoryType(const QString &option)
@@ -54,14 +44,18 @@ void BlockMemoryGenerator::updateMemoryType(const QString &option)
     //! 更新summary
     qDebug() << "Memory Type : " << option;
     summaryWidget->setMemoryTypeInformation(option);
-
+    QCheckBox *memoryTypeCheckBox = basicWidget->findChild<QCheckBox *>("Common Clock");
     //! Simple Dual Port RAM, True Dual Port RAM, Dual Port ROM 显示Port B Options
-    if (option == "Simple Dual Port RAM" ||
-        option == "True Dual Port RAM" ||
-        option == "Dual Port ROM") {
+    if (option == "Single Port RAM" || option == "Single Port ROM") {
+        memoryTypeCheckBox->setChecked(false);
+        memoryTypeCheckBox->setEnabled(false);
+    }
+    else {
         tabWidget->insertTab(2, portBOptionsWidget, "Port B Options");
+        memoryTypeCheckBox->setEnabled(true);
         return;
     }
+
     if (tabWidget->count() == 5) {
         tabWidget->removeTab(2);
     }
@@ -76,7 +70,7 @@ void BlockMemoryGenerator::onipLocActionTrigger()
     // dialog.exec();
 }
 
-void BlockMemoryGenerator::updateCoreGenerationInfoJson(QTableView *tableView)
+void BlockMemoryGenerator::updateCoreGenerationInfoJson()
 {
     QJsonObject jsonObject;
     jsonObject.insert("version", "blk_mem");
@@ -94,19 +88,23 @@ void BlockMemoryGenerator::updateCoreGenerationInfoJson(QTableView *tableView)
     if (memoryTypeComboBox) {
         QString memoryType = memoryTypeComboBox->currentText();
         if (memoryType == "Single Port ROM") {
-            jsonObject.insert("memoryType", "single_port_rom");
+            jsonObject.insert("memory_type", "single_port_rom");
         } else if(memoryType == "Dual Port ROM") {
-            jsonObject.insert("memoryType", "dual_port_rom");
+            jsonObject.insert("memory_type", "dual_port_rom");
         } else if(memoryType == "True Dual Port RAM") {
-            jsonObject.insert("memoryType", "true_dual_port_ram");
+            jsonObject.insert("memory_type", "true_dual_port_ram");
         } else if(memoryType == "Simple Dual Port RAM") {
-            jsonObject.insert("memoryType", "simple_dual_port_ram");
+            jsonObject.insert("memory_type", "simple_dual_port_ram");
         } else if(memoryType == "Single Port RAM") {
-            jsonObject.insert("memoryType", "single_port_ram");
+            jsonObject.insert("memory_type", "single_port_ram");
         }
     } else {
-        jsonObject.insert("memoryType", "single_port_ram");
+        jsonObject.insert("memoryType", "single_port_rom");
     }
+
+    QLineEdit *coeFileLineEdit = otherOptionsWidget->findChild<QLineEdit *>("coeFilePath");
+    if (coeFileLineEdit && !coeFileLineEdit->text().isEmpty())
+        jsonObject.insert("coe_path", coeFileLineEdit->text());
 
     QJsonDocument doc(jsonObject);
     core_generation_info = doc.toJson(QJsonDocument::Indented);
@@ -119,44 +117,103 @@ void BlockMemoryGenerator::updateCoreGenerationInfoJson(QTableView *tableView)
     qDebug() << core_generation_info;
 }
 
-void BlockMemoryGenerator::setup_core_generation_info(QTableView *tableView)
+void BlockMemoryGenerator::setup_core_generation_info()
 {
     QObject::connect(componentNameLineEdit, &QLineEdit::textChanged, [=]() {
-        updateCoreGenerationInfoJson(tableView);
+        updateCoreGenerationInfoJson();
+    });
+
+    QList<QCheckBox *> checkBoxs = basicWidget->findChildren<QCheckBox *>();
+    for (const QCheckBox *checkBox : checkBoxs) {
+        QObject::connect(checkBox, &QCheckBox::toggled, [=]() {
+            updateCoreGenerationInfoJson();
+        });
+    }
+
+    QList<QComboBox *> comboboxs = basicWidget->findChildren<QComboBox *>();
+    for (const QComboBox *combobx : comboboxs) {
+        QObject::connect(combobx, &QComboBox::currentTextChanged, [=]() {
+            updateCoreGenerationInfoJson();
+        });
+    }
+
+    QLineEdit *coeFileLineEdit = otherOptionsWidget->findChild<QLineEdit *>("coeFilePath");
+    QObject::connect(coeFileLineEdit, &QLineEdit::textChanged, [=]() {
+        updateCoreGenerationInfoJson();
     });
 }
+
+void BlockMemoryGenerator::updatePortInfoJson()
+{
+    QJsonObject portA;
+
+    QLineEdit *portAWidthLineEdit = portAOptionsWidget->findChild<QLineEdit *>("Port A Width");
+    if (portAWidthLineEdit && !portAWidthLineEdit->text().isEmpty())
+        portA.insert("data_width", portAWidthLineEdit->text().toInt());
+
+    QLineEdit *portADepthLineEdit = portAOptionsWidget->findChild<QLineEdit *>("Port A Depth");
+    if (portADepthLineEdit && !portADepthLineEdit->text().isEmpty())
+        portA.insert("data_depth", portADepthLineEdit->text().toInt());
+
+    portJsonRoot["porta"] = portA;
+    QJsonDocument doc(portJsonRoot);
+    port_info = doc.toJson(QJsonDocument::Indented);
+
+    QFile file(QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("runs/.works/port_info.json"));
+    if(file.isOpen()) {
+        QTextStream in(&file);
+        in << port_info;
+        file.close();
+    }
+    qDebug() << port_info;
+}
+
+void BlockMemoryGenerator::setup_port_info()
+{
+    QList<QLineEdit *> lineEdits = portAOptionsWidget->findChildren<QLineEdit *>();
+    for(const QLineEdit* lineEdit : lineEdits) {
+        if (lineEdit) {
+            QObject::connect(lineEdit, &QLineEdit::textChanged, [=]() {
+                updatePortInfoJson();
+            });
+        }
+    }
+}
+
 
 void BlockMemoryGenerator::accept()
 {
     qDebug() << "ok";
-//    QProcess process;
-//    QString pythonPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("ipcore/rom_ip.exe");
-//    QStringList arguments;
-//    arguments << "--core_generation_info" << core_generation_info;
-//
-//    process.setWorkingDirectory(QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("ip"));
-//    // 启动 Python 脚本
-//    process.start(pythonPath, arguments);
-//
-//    // 等待脚本启动并输出
-//    if (!process.waitForStarted()) {
-//        QMessageBox::warning(this, "Information" ,"The IP Core generation failed. Failed to start the process");
-//    }
-//
-//    // 等待脚本完成执行
-//    process.waitForFinished();
-//
-//    // 读取输出内容
-//    QString output = process.readAllStandardOutput();
-//    QString error = process.readAllStandardError();
-//
-//    if (!output.isEmpty()) {
-//        qDebug() << output;
-//    }
-//
-//    if (!error.isEmpty()) {
-//        QMessageBox::warning(this, "Information" ,"The IP Core generation failed." + error);
-//    }
-//
-//    QDialog::accept();
+    QProcess process;
+    QString pythonPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("ipcore/rom_ip.exe");
+    QStringList arguments;
+    arguments << "--core_generation_info" << core_generation_info
+              << "--port_info" << port_info
+            ;
+
+    process.setWorkingDirectory(QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("ip"));
+
+    process.start(pythonPath, arguments);
+
+    // 等待脚本启动并输出
+    if (!process.waitForStarted()) {
+        QMessageBox::warning(this, "Information" ,"The IP Core generation failed. Failed to start the process");
+    }
+
+    // 等待脚本完成执行
+    process.waitForFinished();
+
+    // 读取输出内容
+    QString output = process.readAllStandardOutput();
+    QString error = process.readAllStandardError();
+
+    if (!output.isEmpty()) {
+        qDebug() << output;
+    }
+
+    if (!error.isEmpty()) {
+        QMessageBox::warning(this, "Information" ,"The IP Core generation failed." + error);
+    }
+
+    QDialog::accept();
 }
