@@ -21,7 +21,7 @@ BlockMemoryGenerator::BlockMemoryGenerator(QWidget *parent) :
     basicWidget = new BasicWidget(this);
     connect(basicWidget, &BasicWidget::memoryTypeComboBoxChangeSignal, this, &BlockMemoryGenerator::updateMemoryType);
     portAOptionsWidget = new PortAOptionsWidget(this);
-    portBOptionsWidget = new PortBOptionsWidget(this);
+    portBOptionsWidget = new PortBOptionsWidget(this, portAOptionsWidget);
     otherOptionsWidget = new OtherOptionsWidget(this);
     summaryWidget = new BlkMemGenSummary(this);
 
@@ -29,6 +29,22 @@ BlockMemoryGenerator::BlockMemoryGenerator(QWidget *parent) :
     tabWidget->addTab(portAOptionsWidget, "Port A Options");
     tabWidget->addTab(otherOptionsWidget, "Other Options");
     tabWidget->addTab(summaryWidget, "Summary");
+
+    QObject::connect(
+            portAOptionsWidget->portAWidthLineEdit,
+            &QLineEdit::textChanged,
+            this,
+            [this](const QString &text) {
+                portBOptionsWidget->UpdatePortBWidth(portAOptionsWidget);
+            });
+
+    QObject::connect(
+            portAOptionsWidget->portADepthLineEdit,
+            &QLineEdit::textChanged,
+            this,
+            [this](const QString &text) {
+                portBOptionsWidget->UpdatePortBWidth(portAOptionsWidget);
+            });
 
     setup_core_generation_info();
 

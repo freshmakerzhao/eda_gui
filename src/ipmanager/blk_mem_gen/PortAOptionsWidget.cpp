@@ -15,6 +15,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     portAWidthLineEdit->setObjectName("Port A Width");
     portAWidthLineEdit->setClearButtonEnabled(true);
     portAWidthLineEdit->setFixedWidth(220);
+    portAWidthLineEdit->setText("16");
     QHBoxLayout *portAWidthLayout = new QHBoxLayout;
     portAWidthLayout->addWidget(portAWidthLineEdit);
     portAWidthLayout->addWidget(new QLabel("Range: 1 to 4608 (bits)"));
@@ -26,7 +27,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     portADepthLineEdit->setObjectName("Port A Depth");
     portADepthLineEdit->setClearButtonEnabled(true);
     portADepthLineEdit->setFixedWidth(220);
-    portADepthLineEdit->setEnabled(false);
+    portADepthLineEdit->setText("16");
     QHBoxLayout *portADepthLayout = new QHBoxLayout;
     portADepthLayout->addWidget(portADepthLineEdit);
     portADepthRangeLabel = new QLabel("Range: -- to --", this);
@@ -99,9 +100,9 @@ void PortAOptionsWidget::updatePortADepthRange()
     if (portAWidth <= 0) return;
     else if (portAWidth == 1) portADepthMax = 32768;
     else if (portAWidth == 2) portADepthMax = 16385;
-    else if (portAWidth > 2 && portAWidth <= 4) portADepthMax = 8192;
-    else if (portAWidth > 4 && portAWidth <= 9) portADepthMax = 4096;
-    else if (portAWidth > 9 && portAWidth <= 18) portADepthMax = 2048;
+    else if (portAWidth <= 4) portADepthMax = 8192;
+    else if (portAWidth <= 9) portADepthMax = 4096;
+    else if (portAWidth <= 18) portADepthMax = 2048;
     else portADepthMax = 1024;
 
     if(portAWidth > 4608)
