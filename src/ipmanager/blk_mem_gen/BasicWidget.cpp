@@ -24,6 +24,7 @@ BasicWidget::BasicWidget(QWidget *parent) :
     memoryTypeComboBox = new QComboBox(this);
     connect(memoryTypeComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
             this, &BasicWidget::memoryTypeComboBoxChangeSignal);
+    memoryTypeComboBox->setObjectName("memoryType");
     memoryTypeComboBox->setFixedWidth(220);
     memoryTypeComboBox->addItem("Single Port RAM");
     memoryTypeComboBox->addItem("Simple Dual Port RAM");
@@ -33,6 +34,8 @@ BasicWidget::BasicWidget(QWidget *parent) :
     memoryTypeComboBox->setCurrentIndex(3);
 
     memoryTypeCheckBox = new QCheckBox("Common Clock", this);
+    memoryTypeCheckBox->setObjectName("Common Clock");
+    memoryTypeCheckBox->setEnabled(false);
     connect(memoryTypeCheckBox, &QCheckBox::stateChanged, this, &BasicWidget::memoryTypeCheckBoxStateChanged);
     QHBoxLayout *memoryTypeLayout = new QHBoxLayout;
     memoryTypeLayout->addWidget(memoryTypeComboBox);
@@ -123,3 +126,4 @@ void BasicWidget::memoryTypeCheckBoxStateChanged(const int &state)
         qDebug() << "Memory Type : [Common Clock] Disabled";
     }
 }
+

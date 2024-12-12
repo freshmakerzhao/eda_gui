@@ -21,6 +21,7 @@ OtherOptionsWidget::OtherOptionsWidget(QWidget *parent) :
     editLayout->addWidget(new QLabel("Coe File", this));
 
     coeFileLineEdit = new QLineEdit(this);
+    coeFileLineEdit->setObjectName("coeFilePath");
     coeFileLineEdit->setEnabled(loadInitFileCheckbox->isChecked());
     coeFileLineEdit->setStyleSheet("QLineEdit{color: red;}");
     coeFileLineEdit->setText("no_coe_file_loaded");
@@ -60,7 +61,7 @@ void OtherOptionsWidget::onBrowseButtonClicked()
     QFileDialog dialog(this);
     dialog.setWindowTitle("Save Location For COE File");
     dialog.setNameFilter("COE Files(*.coe)");
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
     if (dialog.exec() != QDialog::Accepted) {
         return; // 用户取消了操作
     }

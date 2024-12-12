@@ -12,6 +12,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     fLayout->setContentsMargins(25, 0, 0, 0);
     mainLayout->addLayout(fLayout);
     portAWidthLineEdit = new QLineEdit(this);
+    portAWidthLineEdit->setObjectName("Port A Width");
     portAWidthLineEdit->setClearButtonEnabled(true);
     portAWidthLineEdit->setFixedWidth(220);
     QHBoxLayout *portAWidthLayout = new QHBoxLayout;
@@ -22,8 +23,10 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     mainLayout->addSpacing(10);
 
     portADepthLineEdit = new QLineEdit(this);
+    portADepthLineEdit->setObjectName("Port A Depth");
     portADepthLineEdit->setClearButtonEnabled(true);
     portADepthLineEdit->setFixedWidth(220);
+    portADepthLineEdit->setEnabled(false);
     QHBoxLayout *portADepthLayout = new QHBoxLayout;
     portADepthLayout->addWidget(portADepthLineEdit);
     portADepthRangeLabel = new QLabel("Range: -- to --", this);
@@ -46,6 +49,12 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     hLayout->addWidget(enablePortTypeComboBox);
     mainLayout->addLayout(hLayout);
     mainLayout->addSpacing(10);
+
+    connect(portADepthLineEdit, &QLineEdit::textChanged, this, [this, portADepthLayout](){
+        if(portADepthLineEdit->text().toInt() > portADepthMax)
+            portADepthLineEdit->setText(QString::number(portADepthMax));
+    } );
+
     // ------------------ Port A Optional Output Registers --------------------
     QLabel *portAOptionalOutputRegistersLabel = new QLabel("Port A Optional Output Registers", this);
     portAOptionalOutputRegistersLabel->setStyleSheet(BasePage::TITLE_LABEL_STYLESHEET);
@@ -78,9 +87,29 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
 void PortAOptionsWidget::updatePortADepthRange()
 {
     // 在此处编写计算Port A Depth Range公式
+    if(portAWidthLineEdit->text().isEmpty()) {
+        portADepthLineEdit->clear();
+        portADepthLineEdit->setEnabled(false);
+        return;
+    } else {
+        portADepthLineEdit->setEnabled(true);
+    }
+
     int portAWidth = portAWidthLineEdit->text().toInt();
-    if (portAWidth == 0) return;
-    portAWidth = 65536 / portAWidth;
-    QString val = QString("Range: %1 to %2").arg(QString::number(2), QString::number(portAWidth));
+    if (portAWidth <= 0) return;
+    else if (portAWidth == 1) portADepthMax = 32768;
+    else if (portAWidth == 2) portADepthMax = 16385;
+    else if (portAWidth > 2 && portAWidth <= 4) portADepthMax = 8192;
+    else if (portAWidth > 4 && portAWidth <= 9) portADepthMax = 4096;
+    else if (portAWidth > 9 && portAWidth <= 18) portADepthMax = 2048;
+    else portADepthMax = 1024;
+
+    if(portAWidth > 4608)
+        portAWidthLineEdit->setText("4608");
+
+    QString val = QString("Range: %1 to %2").arg(QString::number(2), QString::number(portADepthMax));
     portADepthRangeLabel->setText(val);
+    if(portADepthLineEdit->text().toInt() > portADepthMax)
+        portADepthLineEdit->setText(QString::number(portADepthMax));
+
 }

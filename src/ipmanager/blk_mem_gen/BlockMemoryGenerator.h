@@ -23,10 +23,21 @@
 #include <QToolBar>
 #include <QSplitter>
 #include <QDialogButtonBox>
-#include "BasicWidget.h"
+#include <QMessageBox>
+#include <QProcess>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include "ipmanager/blk_mem_gen/BasicWidget.h"
+#include "ipmanager/blk_mem_gen/PortAOptionsWidget.h"
+#include "ipmanager/blk_mem_gen/PortBOptionsWidget.h"
+#include "ipmanager/blk_mem_gen/OtherOptionsWidget.h"
+#include "ipmanager/blk_mem_gen/BlkMemGenSummary.h"
+#include "ipmanager/blk_mem_gen/CoeFileEditor.h"
 #include "PortAOptionsWidget.h"
 #include "PortBOptionsWidget.h"
 #include "OtherOptionsWidget.h"
+#include "base/Globals.h"
 #include "ipmanager/blk_mem_gen/BlkMemGenSummary.h"
 // #include "IPlocationDialog.h"
 #include "ipmanager/common/BaseDialog.h"
@@ -41,10 +52,16 @@ public:
     //! 更新Summary页面
     //! 更新Tab
     void updateMemoryType(const QString &option);
+protected:
+    void accept() override;
 private:
     // QTabWidget *tabWidget;
 
     // QLineEdit *cmptNameLineEdit;
+    void updateCoreGenerationInfoJson();
+    void setup_core_generation_info();
+    void updatePortInfoJson();
+    void setup_port_info();
 
     BasicWidget *basicWidget;
 
@@ -56,6 +73,13 @@ private:
 
     BlkMemGenSummary *summaryWidget;
 
+    QJsonObject inputJsonRoot;
+
+    QString	core_generation_info;
+
+    QString port_info;
+
+    QJsonObject portJsonRoot;
     // QGraphicsView *viewModule;
 
     // QAction *docAction;
