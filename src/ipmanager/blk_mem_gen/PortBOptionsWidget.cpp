@@ -1,5 +1,4 @@
 #include "PortBOptionsWidget.h"
-#include <cmath>
 
 PortBOptionsWidget::PortBOptionsWidget(QWidget *parent, PortAOptionsWidget *portA) :
     BasePage(parent)
@@ -10,20 +9,21 @@ PortBOptionsWidget::PortBOptionsWidget(QWidget *parent, PortAOptionsWidget *port
     mainLayout->addWidget(memorySizeLabel);
 
     QFormLayout *fLayout = new QFormLayout;
-    fLayout->setContentsMargins(25, 0, 0, 0);
+    fLayout->setContentsMargins(26, 0, 0, 0);
     mainLayout->addLayout(fLayout);
     portBWidthComboBox = new QComboBox(this);
     portBWidthComboBox->setObjectName("Port B Width");
-    portBWidthComboBox->setFixedWidth(220);
+    portBWidthComboBox->setFixedWidth(221);
     UpdatePortBWidth(portA);
     QHBoxLayout *portBWidthLayout = new QHBoxLayout;
     portBWidthLayout->addWidget(portBWidthComboBox);
     fLayout->addRow("Port B Width", portBWidthLayout);
 
-    mainLayout->addSpacing(10);
+    mainLayout->addSpacing(11);
 
     QHBoxLayout *portBDepthLayout = new QHBoxLayout;
     portBDepthLabel = new QLabel(portA->portADepthLineEdit->text(), this);
+    portBDepthLayout->setObjectName("Port B Depth");
     portBDepthLayout->addWidget(portBDepthLabel);
     fLayout->addRow("Port B Depth :", portBDepthLayout);
     fLayout->addRow(new QLabel("The Width and Depth values are used for Read Operation in Port B", this));
@@ -36,13 +36,13 @@ PortBOptionsWidget::PortBOptionsWidget(QWidget *parent, PortAOptionsWidget *port
     QComboBox *operatingModeComboBox = new QComboBox;
     operatingModeComboBox->addItems(QStringList() << "Write First" << "Read First" << "No Change");
     hLayout->addWidget(operatingModeComboBox);
-    hLayout->addItem(new QSpacerItem(15, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hLayout->addItem(new QSpacerItem(16, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
     hLayout->addWidget(new QLabel("Enable Port Type"));
     QComboBox *enablePortTypeComboBox = new QComboBox;
     enablePortTypeComboBox->addItems(QStringList() << "Always Enabled" << "Use ENA Pin");
     hLayout->addWidget(enablePortTypeComboBox);
     mainLayout->addLayout(hLayout);
-    mainLayout->addSpacing(10);
+    mainLayout->addSpacing(11);
 
     // ------------------ Port B Optional Output Registers --------------------
     QLabel *portAOptionalOutputRegistersLabel = new QLabel("Port B Optional Output Registers", this);
@@ -81,7 +81,6 @@ void PortBOptionsWidget::UpdatePortBWidth(PortAOptionsWidget *portA) {
     int i = 0;
     int portAWidth = portA->portAWidthLineEdit->text().toInt();
     int portADepth = portA->portADepthLineEdit->text().toInt();
-    //portADepth = std::pow(2, std::log(portADepth) / std::log(2));
     capacity = portAWidth * portADepth;
     std::vector<int> widths;
     int width_less = portAWidth;
@@ -111,4 +110,11 @@ void PortBOptionsWidget::UpdatePortDepth(const QString &width) {
         return;
     int portBWidth = width.toInt();
     portBDepthLabel->setText(QString::number(capacity/portBWidth));
+}
+
+int PortBOptionsWidget::getDepth() {
+    if(portBWidthComboBox->currentText().isEmpty())
+        return 0;
+    else
+        return capacity/portBWidthComboBox->currentText().toInt();
 }

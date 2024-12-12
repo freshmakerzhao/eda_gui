@@ -30,22 +30,6 @@ BlockMemoryGenerator::BlockMemoryGenerator(QWidget *parent) :
     tabWidget->addTab(otherOptionsWidget, "Other Options");
     tabWidget->addTab(summaryWidget, "Summary");
 
-    QObject::connect(
-            portAOptionsWidget->portAWidthLineEdit,
-            &QLineEdit::textChanged,
-            this,
-            [this](const QString &text) {
-                portBOptionsWidget->UpdatePortBWidth(portAOptionsWidget);
-            });
-
-    QObject::connect(
-            portAOptionsWidget->portADepthLineEdit,
-            &QLineEdit::textChanged,
-            this,
-            [this](const QString &text) {
-                portBOptionsWidget->UpdatePortBWidth(portAOptionsWidget);
-            });
-
     setup_core_generation_info();
 
     updateCoreGenerationInfoJson();
@@ -53,6 +37,7 @@ BlockMemoryGenerator::BlockMemoryGenerator(QWidget *parent) :
     setup_port_info();
 
     updatePortInfoJson();
+
 }
 
 void BlockMemoryGenerator::updateMemoryType(const QString &option)
@@ -69,6 +54,7 @@ void BlockMemoryGenerator::updateMemoryType(const QString &option)
     else {
         tabWidget->insertTab(2, portBOptionsWidget, "Port B Options");
         memoryTypeCheckBox->setEnabled(true);
+        updatePortInfoJson();
         return;
     }
 
@@ -147,8 +133,8 @@ void BlockMemoryGenerator::setup_core_generation_info()
     }
 
     QList<QComboBox *> comboboxs = basicWidget->findChildren<QComboBox *>();
-    for (const QComboBox *combobx : comboboxs) {
-        QObject::connect(combobx, &QComboBox::currentTextChanged, [=]() {
+    for (const QComboBox *combobox : comboboxs) {
+        QObject::connect(combobox, &QComboBox::currentTextChanged, [=]() {
             updateCoreGenerationInfoJson();
         });
     }
@@ -172,9 +158,19 @@ void BlockMemoryGenerator::updatePortInfoJson()
         portA.insert("data_depth", portADepthLineEdit->text().toInt());
 
     portJsonRoot["porta"] = portA;
+
+    QJsonObject portB;
+
+    QComboBox *portBWidthComboBox = portBOptionsWidget->findChild<QComboBox *>("Port B Width");
+    if(portBWidthComboBox && !portBWidthComboBox->currentText().isEmpty()) {
+        portB.insert("data_width", portBWidthComboBox->currentText().toInt());
+        portB.insert("data_depth", portBOptionsWidget->getDepth());
+    }
+
+    portJsonRoot["portb"] = portB;
+
     QJsonDocument doc(portJsonRoot);
     port_info = doc.toJson(QJsonDocument::Indented);
-
     QFile file(QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("runs/.works/port_info.json"));
     if(file.isOpen()) {
         QTextStream in(&file);
@@ -194,6 +190,30 @@ void BlockMemoryGenerator::setup_port_info()
             });
         }
     }
+
+    QList<QComboBox *> comboboxs = portBOptionsWidget->findChildren<QComboBox *>();
+    for (const QComboBox *combobox : comboboxs) {
+        QObject::connect(combobox, &QComboBox::currentTextChanged, [=]() {
+            updatePortInfoJson();
+        });
+    }
+
+    QObject::connect(
+            portAOptionsWidget->portAWidthLineEdit,
+            &QLineEdit::textChanged,
+            this,
+            [this](const QString &text) {
+                portBOptionsWidget->UpdatePortBWidth(portAOptionsWidget);
+            });
+
+    QObject::connect(
+            portAOptionsWidget->portADepthLineEdit,
+            &QLineEdit::textChanged,
+            this,
+            [this](const QString &text) {
+                portBOptionsWidget->UpdatePortBWidth(portAOptionsWidget);
+            });
+
 }
 
 

@@ -11,6 +11,7 @@ class PortBOptionsWidget : public BasePage
 public:
     PortBOptionsWidget(QWidget *parent = nullptr, PortAOptionsWidget *portA = nullptr);
     void UpdatePortBWidth(PortAOptionsWidget *portA = nullptr);
+    int getDepth();
 
     QComboBox *portBWidthComboBox;
     QLabel *portBDepthLabel;
