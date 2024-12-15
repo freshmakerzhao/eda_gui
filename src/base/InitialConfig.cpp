@@ -31,6 +31,10 @@ void InitialConfig::initializeApplicationConfig() {
     QCoreApplication::setApplicationVersion("v1.0.0-beta");
     QCoreApplication::setOrganizationName("HybrdChip");
     QCoreApplication::setOrganizationDomain("www.hybrdchip.com");
+
+    qint64 pid = QCoreApplication::applicationPid();
+    this->pid_str = QString::number(pid);
+    qDebug() << "Current Process ID (PID):" << this->pid_str;
 }
 
 void InitialConfig::initializeRoamingPath() {

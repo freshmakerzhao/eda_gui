@@ -7,55 +7,62 @@
   * @date           : 2024/12/12
   ******************************************************************************
   */
-
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonParseError>
-#include <QLoggingCategory>
-#include <QCoreApplication>
 #include "PipeServer.h"
 
-// 日志分类
+PipeServer& PipeServer::instance()
+{
+    static PipeServer instance;
+    return instance;
+}
 
-Q_LOGGING_CATEGORY(pipeServerLog, "pipeServer")
-Q_LOGGING_CATEGORY(pipeServerError, "pipeServer.error")
-PipeServer::PipeServer(QObject *parent) : QObject(parent) {}
+PipeServer::PipeServer() {
+    // 构建管道名称
+    this->logPipeName = QString("LogPipe_%1").arg(InitialConfig::instance().pid_str);
+    this->dataPipeName = QString("DataPipe_%1").arg(InitialConfig::instance().pid_str);
+    this->controlPipeName = QString("ControlPipe_%1").arg(InitialConfig::instance().pid_str);
+}
 
 PipeServer::~PipeServer() {
+    // 程序结束时调用stop确保清理
     stop();
 }
 
-bool PipeServer::start(const QString &logPipeName, const QString &dataPipeName, const QString &controlPipeName) {
-    bool logPipeStarted = setupServer(logServer, logPipeName, &PipeServer::logMessageReceived);
-    bool dataPipeStarted = setupServer(dataServer, dataPipeName, &PipeServer::dataMessageReceived);
-    bool controlPipeStarted = setupServer(controlServer, controlPipeName, &PipeServer::controlMessageReceived);
-
-    if (logPipeStarted && dataPipeStarted && controlPipeStarted) {
-        qDebug() << "All pipes started successfully:";
-        qDebug() << "Log pipe:" << logPipeName;
-        qDebug() << "Data pipe:" << dataPipeName;
-        qDebug() << "Control pipe:" << controlPipeName;
+bool PipeServer::startServer(QLocalServer &server, const QString &name) {
+    if (server.isListening()) {
+        // 防止重复对已经处于监听状态的 QLocalServer 进行二次监听操作
         return true;
-    } else {
-        qCritical() << "Failed to start one or more pipes.";
-        stop();  // 停止所有已启动的管道以清理资源
+    }
+
+    // 如果存在同名的server文件残留，先移除
+    QLocalServer::removeServer(name);
+
+    if (!server.listen(name)) {
+        qWarning() << "Failed to start server on pipe:" << name << server.errorString();
+        QLocalServer::removeServer(name);
         return false;
     }
+
+    qDebug() << "Server started listening on pipe:" << name;
+    return true;
 }
 
+void PipeServer::start() {
+    // 启动每个server，如果其中一个失败，可根据逻辑选择是否立即return或者做恢复
+    bool logOk  = startServer(logServer, this->logPipeName);
+    bool dataOk = startServer(dataServer, this->dataPipeName);
+    bool controlOk   = startServer(controlServer, this->controlPipeName);
 
-void PipeServer::clearPipes() {
-    // 停止当前的管道服务
-    stop();
-
-    // 使用当前的管道名称重新启动
-    if (!start(logServer.serverName(), dataServer.serverName(), controlServer.serverName())) {
-        qDebug() << "Failed to restart pipes during clearing.";
-    } else {
-        qDebug() << "Pipes cleared and restarted successfully.";
+    if (!logOk || !dataOk || !controlOk) {
+        qWarning() << "One or more servers failed to start.";
+        // Todo 可以根据需求决定后续逻辑。这里简单return
+        return;
     }
-}
 
+    // 分别连接不同槽函数，处理初次建立连接的事件
+    connect(&logServer, &QLocalServer::newConnection, this, &PipeServer::handleLogConnection);
+    connect(&dataServer, &QLocalServer::newConnection, this, &PipeServer::handleDataConnection);
+    connect(&controlServer, &QLocalServer::newConnection, this, &PipeServer::handleControlConnection);
+}
 
 void PipeServer::stop() {
     // 关闭并移除 logServer
@@ -79,131 +86,151 @@ void PipeServer::stop() {
     qDebug() << "PipeServer stopped and resources released.";
 }
 
+// 日志管道建立连接槽函数
+void PipeServer::handleLogConnection() {
+    QLocalSocket *clientConnection = logServer.nextPendingConnection();
+    if (!clientConnection) return;
 
-template <typename SignalHandler>
-void PipeServer::setupServer(QLocalServer &server, const QString &pipeName, SignalHandler handler) {
-    if (server.listen(pipeName)) {
-        connect(&server, &QLocalServer::newConnection, this, [this, &server, handler]() {
-            QLocalSocket *clientConnection = server.nextPendingConnection();
-            if (!clientConnection) {
-                qCWarning(pipeServerError) << "No pending connection available on pipe:" << server.serverName();
-                return;
-            }
-
-            // 处理数据读取和解析
-            connect(clientConnection, &QLocalSocket::readyRead, this, [this, clientConnection, handler]() {
-                QByteArray data = clientConnection->readAll();
-                if (data.isEmpty()) {
-                    qCWarning(pipeServerError) << "Received empty data on pipe:" << clientConnection->serverName();
-                    return;
-                }
-
-                QJsonObject jsonObj;
-                if (parseJsonData(data, jsonObj)) {
-                    std::invoke(handler, this, jsonObj);  // 调用处理函数
-                }
-            });
-
-            // 连接断开时释放资源
-            connect(clientConnection, &QLocalSocket::disconnected, clientConnection, &QLocalSocket::deleteLater);
-        });
-
-        qCInfo(pipeServerLog) << "Listening on pipe:" << pipeName;
-    } else {
-        qCCritical(pipeServerError) << "Failed to start pipe:" << pipeName << "Error:" << server.errorString();
-        QLocalServer::removeServer(pipeName);
-    }
-}
-
-
-/**
- * @brief 解析 JSON 数据
- * @param data 输入的原始数据
- * @param jsonObj 输出的 JSON 对象
- * @return 解析是否成功
- */
-bool PipeServer::parseJsonData(const QByteArray &data, QJsonObject &jsonObj) {
-    QJsonParseError parseError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
-    if (parseError.error == QJsonParseError::NoError) {
-        if (jsonDoc.isObject()) {
-            jsonObj = jsonDoc.object();
-            return true;
-        } else {
-            qCWarning(pipeServerError) << "Parsed JSON is not an object. Data:" << data;
-            return false;
-        }
-    } else {
-        qCWarning(pipeServerError) << "JSON parsing error:" << parseError.errorString() << "Data:" << data;
-        return false;
-    }
-}
-
-void PipeServer::handleNewConnection(QLocalServer *server, void (PipeServer::*signal)(const QByteArray &)) {
-    QLocalSocket *clientConnection = server->nextPendingConnection();
-    if (!clientConnection) {
-        qDebug() << "No pending connection available.";
-        return;
-    }
-
-    qDebug() << "New connection established on pipe:" << server->serverName();
-
-    // 处理客户端消息
-    connect(clientConnection, &QLocalSocket::readyRead, this, [this, clientConnection, signal]() {
-        QByteArray data;
-        while (clientConnection->bytesAvailable() > 0) {
-            data.append(clientConnection->readAll());
-        }
-
-        if (data.isEmpty()) {
-            qDebug() << "Received empty data from client.";
-            return;
-        }
-
-        // 解析 JSON 数据包
-        QJsonParseError parseError;
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
-        if (parseError.error == QJsonParseError::NoError) {
-            if (jsonDoc.isObject()) {
-                processJsonPacket(jsonDoc.object());
-            } else {
-                qDebug() << "Received JSON is not an object.";
-            }
-        } else {
-            qDebug() << "Failed to parse JSON data:" << parseError.errorString();
-        }
+    connect(clientConnection, &QLocalSocket::readyRead, this, [this, clientConnection]() {
+        QByteArray data = clientConnection->readAll();
+        processLogPipeMessage(logServer.serverName(), data);
     });
 
-    // 处理客户端断开连接，释放资源
     connect(clientConnection, &QLocalSocket::disconnected, clientConnection, &QLocalSocket::deleteLater);
 }
 
-void PipeServer::processJsonPacket(const QJsonObject &jsonObj) {
-    QString type = jsonObj.value("type").toString();
-    if (type == "log") {
-        emit logMessageReceived(jsonObj.value("level").toString(), jsonObj.value("message").toString());
-    } else if (type == "data") {
-        emit dataMessageReceived(jsonObj.value("data"));
-    } else if (type == "control") {
-        emit controlMessageReceived(jsonObj.value("command").toString());
-    } else {
-        qWarning() << "Unknown type in JSON packet:" << type;
-    }
+// 日志管道建立连接槽函数
+void PipeServer::handleDataConnection() {
+    QLocalSocket *clientConnection = dataServer.nextPendingConnection();
+    if (!clientConnection) return;
+
+    connect(clientConnection, &QLocalSocket::readyRead, this, [this, clientConnection]() {
+        QByteArray data = clientConnection->readAll();
+        processDataPipeMessage(dataServer.serverName(), data);
+    });
+
+    connect(clientConnection, &QLocalSocket::disconnected, clientConnection, &QLocalSocket::deleteLater);
 }
 
-bool PipeServer::initialize() {
-    // 根据父进程 ID 生成唯一管道名称
-    qint64 parentPid = QCoreApplication::applicationPid();
-    QString logPipeName = QString("logPipe_%1").arg(parentPid);
-    QString dataPipeName = QString("dataPipe_%1").arg(parentPid);
-    QString controlPipeName = QString("controlPipe_%1").arg(parentPid);
+void PipeServer::handleControlConnection() {
+    QLocalSocket *clientConnection = controlServer.nextPendingConnection();
+    if (!clientConnection) return;
 
-    // 启动管道服务
-    if () {
-        qDebug() << "PipeServer started with pipes:" << logPipeName << dataPipeName << controlPipeName;
-        return true;
+    connect(clientConnection, &QLocalSocket::readyRead, this, [this, clientConnection]() {
+        QByteArray data = clientConnection->readAll();
+        processControlPipeMessage(controlServer.serverName(), data);
+    });
+
+    connect(clientConnection, &QLocalSocket::disconnected, clientConnection, &QLocalSocket::deleteLater);
+}
+
+QJsonObject PipeServer::parseJsonObject(const QByteArray &data) {
+    QJsonParseError parseError;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
+    // 无法处理时，返回空json对象
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "Failed to parse JSON data:" << parseError.errorString();
+        return QJsonObject();
     }
 
-    qCritical() << "Failed to initialize PipeServer.";
-    return false;
+    if (!jsonDoc.isObject()) {
+        qWarning() << "Received JSON is not an object.";
+        return QJsonObject();
+    }
+
+    return jsonDoc.object();
+}
+
+// 解析data信息
+void PipeServer::processDataPipeMessage(const QString &serverName, const QByteArray &data) {
+    qDebug() << "Received data message from client on" << serverName << ":" << data;
+    QJsonObject jsonObj = parseJsonObject(data);
+    if (jsonObj.isEmpty()) {
+        // 解析失败，通知上层处理
+        qWarning() << "Data message parsing failed. Emitting signal with error status.";
+        emit dataArrived(QJsonValue(), -1); // Todo 使用-1表示数据转换错误，后续可以改成枚举
+        return;
+    }
+
+    // 确保 "type" 字段存在且为 "data"
+    QString type = jsonObj.value("type").toString();
+    if (type != "data") {
+        qWarning() << "Invalid message type for data pipe message:" << type;
+        emit dataArrived(QJsonValue(), -2); // 使用status=-2表示类型不匹配
+        return;
+    }
+
+    // 获取 status 字段
+    QJsonValue statusValue = jsonObj.value("status");
+    if (!statusValue.isDouble()) {
+        qWarning() << "Missing or invalid 'status' field in data message.";
+        emit dataArrived(QJsonValue(), -3); // 使用status=-3表示缺少或无效的status字段
+        return;
+    }
+
+    int status = statusValue.toInt();
+    QJsonValue dataValue = jsonObj.value("data");
+
+    // 根据 status 进行处理
+    if (status == 200) {
+        qDebug() << "Data Received successfully. Content:" << dataValue;
+    } else {
+        qWarning() << "Data message returned status:" << status;
+    }
+    // 发射信号将data传给外部使用者,即使是非200状态，也发射信号，让上层决定处理逻辑
+    emit dataArrived(dataValue, status);
+}
+
+// 解析logo信息
+void PipeServer::processLogPipeMessage(const QString &serverName, const QByteArray &data) {
+    qDebug() << "Received log message from client on" << serverName << ":" << data;
+    QJsonObject jsonObj = parseJsonObject(data);
+    if (jsonObj.isEmpty()) return; // 解析失败直接退出
+
+    QString type = jsonObj.value("type").toString();
+    if (type != "logo") {
+        qWarning() << "Invalid message type for log pipe message:" << type;
+        return;
+    }
+
+    // 检查"level"字段
+    QString level = jsonObj.value("level").toString();
+    if (level.isEmpty()) {
+        qWarning() << "Missing or invalid 'level' field in log message.";
+        return;
+    }
+
+    QString message = jsonObj.value("message").toString();
+    if (message.isEmpty()) {
+        qWarning() << "Missing or invalid 'message' field in log message.";
+        return;
+    }
+
+    QString phase = jsonObj.value("phase").toString();
+    if (phase.isEmpty()) {
+        qWarning() << "Missing or invalid 'phase' field in log message.";
+    }
+
+    // 通过信号将日志信息传给外部
+    emit logArrived(level, message, phase);
+}
+
+// 解析control信息
+void PipeServer::processControlPipeMessage(const QString &serverName, const QByteArray &data) {
+    qDebug() << "Received control message from client on" << serverName << ":" << data;
+    QJsonObject jsonObj = parseJsonObject(data);
+    if (jsonObj.isEmpty()) return; // 解析失败
+
+    QString type = jsonObj.value("type").toString();
+    if (type != "control") {
+        qWarning() << "Invalid message type for control pipe message:" << type;
+        return;
+    }
+
+    // control消息的内容应根据实际需求解析
+    emit controlCommandArrived(jsonObj);
+}
+
+PipeServer *PipeServer::getPipeServer() {
+    return nullptr;
 }

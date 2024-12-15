@@ -7,95 +7,63 @@
   * @date           : 2024/12/12
   ******************************************************************************
   */
+#ifndef QTSERVICE_PIPESERVER_H
+#define QTSERVICE_PIPESERVER_H
 
-#ifndef PIPESERVER_H
-#define PIPESERVER_H
-
-#include <QObject>
+#include <QCoreApplication>
 #include <QLocalServer>
 #include <QLocalSocket>
+#include <QProcess>
+#include <QJsonParseError>
 #include <QJsonObject>
-#include <QByteArray>
+#include "base/InitialConfig.h"
 
 class PipeServer : public QObject {
 Q_OBJECT
 public:
-    explicit PipeServer(QObject *parent = nullptr);  // 构造函数
-    ~PipeServer();                                   // 析构函数
+    static PipeServer& instance();
+    PipeServer *getPipeServer();
+    QString logPipeName;
+    QString dataPipeName;
+    QString controlPipeName;
 
-    /**
-     * @brief 启动命名管道服务
-     * @param logPipeName 日志管道名
-     * @param dataPipeName 数据管道名
-     * @param controlPipeName 控制管道名
-     * @return 启动是否成功
-     */
-    bool start(const QString &logPipeName, const QString &dataPipeName, const QString &controlPipeName);
-
-    /**
-     * @brief 初始化并启动管道服务
-     */
-    bool initialize();
+    // 启动管道监听
+    void start();
 
     /**
      * @brief 停止管道监听服务
      */
     void stop();
 
-    /**
-     * @brief 清空管道数据
-     */
-    void clearPipes();
-
 signals:
-    /**
-     * @brief 日志消息信号
-     * @param level 日志级别
-     * @param message 日志内容
-     */
-    void logMessageReceived(const QString &level, const QString &message);
+    // 在解析成功后发射这些信号，将数据传给外部模块
+    void logArrived(const QString &level, const QString &message, const QString &phase);
+    void dataArrived(const QJsonValue &dataValue,const int status);
+    void controlCommandArrived(const QJsonObject &command);
 
-    /**
-     * @brief 数据消息信号
-     * @param data 收到的数据内容
-     */
-    void dataMessageReceived(const QJsonValue &data);
-
-    /**
-     * @brief 控制命令信号
-     * @param command 控制命令内容
-     */
-    void controlMessageReceived(const QString &command);
+private slots:
+    void handleLogConnection();
+    void handleDataConnection();
+    void handleControlConnection();
 
 private:
-    // QLocalServer 实例，用于处理不同类型的管道
-    QLocalServer logServer;       // 日志管道
-    QLocalServer dataServer;      // 数据管道
-    QLocalServer controlServer;   // 控制管道
+    PipeServer();
+    ~PipeServer();
 
-    /**
-     * @brief 设置管道服务器
-     * @param server QLocalServer 对象
-     * @param pipeName 管道名称
-     * @param signal 连接到的信号函数
-     */
-    template <typename SignalHandler>
-    void setupServer(QLocalServer &server, const QString &pipeName, SignalHandler handler);
+    // 启动指定的QLocalServer监听
+    bool startServer(QLocalServer &server, const QString &name);
 
+    // 静态工具函数：解析JSON并返回QJsonObject，不成功则返回空对象
+    static QJsonObject parseJsonObject(const QByteArray &data);
 
-    /**
-     * @brief 处理新连接
-     * @param server QLocalServer 对象
-     * @param signal 连接到的信号函数
-     */
-    void handleNewConnection(QLocalServer *server, void (PipeServer::*signal)(const QByteArray &));
+    // 处理接收到的原始数据
+    void processLogPipeMessage(const QString &serverName, const QByteArray &data);
+    void processDataPipeMessage(const QString &serverName, const QByteArray &data);
+    void processControlPipeMessage(const QString &serverName, const QByteArray &data);
 
-    /**
-     * @brief 处理 JSON 数据包
-     * @param jsonObj 收到的 JSON 对象
-     */
-    void processJsonPacket(const QJsonObject &jsonObj);
-    bool parseJsonData(const QByteArray &data, QJsonObject &jsonObj);
+    QLocalServer logServer;
+    QLocalServer dataServer;
+    QLocalServer controlServer;
 };
 
-#endif // PIPESERVER_H
+#endif //QTSERVICE_PIPESERVER_H
