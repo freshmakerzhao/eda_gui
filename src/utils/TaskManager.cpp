@@ -440,7 +440,7 @@ void TaskManager::onFileChanged() {
 
 void TaskManager::downloadBit(const QString &bitstream) {
     std::string script = CommandBuilder::instance().generateDownloadBitCommands(bitstream);
-    ProcessManager::instance().excuteCommand("Download Bitstream", QStringList() << QString::fromStdString(script));
+    ProcessManager::instance().executeCommand("Download Bitstream", QStringList() << QString::fromStdString(script));
 }
 
 void TaskManager::readBackRegister(const QString &registerAddress) {

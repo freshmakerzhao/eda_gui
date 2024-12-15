@@ -100,6 +100,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 ProcessManager::ProcessManager()
 {
     process = new QProcess();
+    pipeServer = new PipeServer();
     // readyReadStandardOutput 信号，有输出则显示在message中
     // connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(handleReadyReadStandardOutput()));
     connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
@@ -112,38 +113,43 @@ ProcessManager::~ProcessManager()
     delete process;
 }
 
-void ProcessManager::excuteCommand(const QString &phase, const QStringList& command) {
+void ProcessManager::executeCommand(const QString &phase, const QStringList &command) {
     this->curPhase = phase; // 当前执行阶段
     MainWindow::instance()->setRunState(QString("Run %1...").arg(curPhase), true);
+
+    pipeServer->clearPipes(); // 清空管道数据，确保干净环境
+    process->terminate(); // 停止当前正在执行的进程
+
+    // 拼接父进程 ID 用于管道名称
+    qint64 parentPid = QCoreApplication::applicationPid();
+    QString logPipeName = QString("logPipe_%1").arg(parentPid);
+    QString dataPipeName = QString("dataPipe_%1").arg(parentPid);
+    QString controlPipeName = QString("controlPipe_%1").arg(parentPid);
+
+    // 启动管道监听服务
+    startPipeServer();
+
     process->setProcessEnvironment(env);
 
-
-    process->terminate(); // 执行前中断process
-
     QStringList script;
-    if (phase == "Synthesis"){
-        // script << "/c" << projectProperty["synthesizer_path"] << command;
-    } else if (phase == "Implementation"){
-        // script << "/c" << projectProperty["implementation_path"] << command;
+    if (phase == "Synthesis") {
+     } else if (phase == "Implementation") {
         script << "/c" << command;
-    } else if (phase == "Generate Bitstream"){
+    } else if (phase == "Generate Bitstream") {
         script << "/c" << command;
     } else if (phase == "Download Bitstream") {
         script << "/c" << command;
     } else if(phase == "Simulation Run")  {
         script << "/c" << command;
     }
-    qDebug() << "------------------------------------------------- ";
-    qDebug() << script;
-    qDebug() << "------------------------------------------------- ";
 
     // 记录开始执行的时间
-    this->startTime = TimeUtilities::getCurTimeAndFormat(); // 展示
-    this->startTimeForCal = TimeUtilities::getCurTime(); // 计算
+    this->startTime = TimeUtilities::getCurTimeAndFormat();
+    this->startTimeForCal = TimeUtilities::getCurTime();
 
+    // 启动进程
     if (phase == "Synthesis") {
-        qDebug() << command;
-        process->start(projectProperty["synthesizer_path"], command);
+        process->start("synthesizer.exe", script);
     } else {
         process->start("cmd.exe", script);
     }
@@ -173,4 +179,19 @@ void ProcessManager::initEnvironment() {
 
 void ProcessManager::configDisplay(const QString &partname) {
     this->displayPartName = partname;
+}
+
+void ProcessManager::initializePipeServer() {
+    // 获取当前应用的进程 ID，用于拼接管道名称
+    qint64 parentPid = QCoreApplication::applicationPid();
+    QString logPipeName = QString("logPipe_%1").arg(parentPid);
+    QString dataPipeName = QString("dataPipe_%1").arg(parentPid);
+    QString controlPipeName = QString("controlPipe_%1").arg(parentPid);
+
+    // 启动管道服务
+    if (!pipeServer->start(logPipeName, dataPipeName, controlPipeName)) {
+        qCritical() << "Failed to start PipeServer.";
+    } else {
+        qDebug() << "PipeServer started with pipes:" << logPipeName << dataPipeName << controlPipeName;
+    }
 }
