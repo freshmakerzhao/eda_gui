@@ -17,7 +17,7 @@ class InitialConfig {
 
 public:
     InitialConfig();
-    static void initializeApplicationConfig();
+    void initializeApplicationConfig();
     void initializeRoamingPath();
     static InitialConfig& instance();
     // "C:/Users/xxx/AppData/Roaming/HybrdChip/HybrdLink"
@@ -30,6 +30,8 @@ public:
     QString hybrdPath;
     // 版本路径
     QString versionPath;
+    // 进程id
+    QString pid_str;
 };
 
 

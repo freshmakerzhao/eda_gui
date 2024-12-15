@@ -70,7 +70,7 @@ private:
     ProcessManager();
     ~ProcessManager();
     QProcess* process;
-    PipeServer *pipeServer;                 // 管道服务
+    PipeServer &pipeServer; // 成员变量引用
     void initializePipeServer();            // 初始化管道服务
 
 private slots:
