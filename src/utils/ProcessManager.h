@@ -3,6 +3,7 @@
 
 #include <QProcess>
 #include <QDebug>
+#include "PipeServer.h"
 
 struct ProcessMessage {
     QString phase;
@@ -15,8 +16,7 @@ struct ProcessMessage {
     QString showInfoContent;
 };
 
-class ProcessManager
-        : public QObject {
+class ProcessManager : public QObject {
 Q_OBJECT
 public:
     static ProcessManager& instance();
@@ -52,13 +52,12 @@ public:
     QStringList nextscript = QStringList();
     QString nextpName = nullptr;
 
-    void excuteCommand(const QString &phase, const QStringList& command);
+    void executeCommand(const QString &phase, const QStringList& command);
 
     /**
      * 初始化环境变量
      */
     void initEnvironment();
-
 
     /**
      * 获取指定变量值
@@ -71,6 +70,8 @@ private:
     ProcessManager();
     ~ProcessManager();
     QProcess* process;
+    PipeServer *pipeServer;                 // 管道服务
+    void initializePipeServer();            // 初始化管道服务
 
 private slots:
     void handleFinished(int exitCode,QProcess::ExitStatus exitStatus);

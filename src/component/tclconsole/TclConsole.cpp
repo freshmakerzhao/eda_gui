@@ -212,7 +212,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
 
     const QString phase = "Implementation";
     ProcessManager::instance().configWorkPath(implPath);
-    ProcessManager::instance().excuteCommand(phase, script);
+    ProcessManager::instance().executeCommand(phase, script);
     return TCL_OK;
 }
 
@@ -336,7 +336,7 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     ProcessManager::instance().configWorkPath(synthPath);
-    ProcessManager::instance().excuteCommand(phase, script);
+    ProcessManager::instance().executeCommand(phase, script);
     return TCL_OK;
 }
 
@@ -413,6 +413,6 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
 
     const QString phase = "Generate Bitstream";
     ProcessManager::instance().configWorkPath(implPath);
-    ProcessManager::instance().excuteCommand(phase, script);
+    ProcessManager::instance().executeCommand(phase, script);
     return TCL_OK;
 }
