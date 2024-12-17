@@ -188,22 +188,22 @@ void PipeServer::processLogPipeMessage(const QString &serverName, const QByteArr
     if (jsonObj.isEmpty()) return; // 解析失败直接退出
 
     QString type = jsonObj.value("type").toString();
-    if (type != "logo") {
+    if (type != "log") {
         qWarning() << "Invalid message type for log pipe message:" << type;
         return;
     }
 
-    // 检查"level"字段
-    QString level = jsonObj.value("level").toString();
-    if (level.isEmpty()) {
+    // 获取 level 字段
+    QJsonValue levelValue = jsonObj.value("level");
+    if (!levelValue.isDouble()) {
         qWarning() << "Missing or invalid 'level' field in log message.";
         return;
     }
 
+
     QString message = jsonObj.value("message").toString();
     if (message.isEmpty()) {
         qWarning() << "Missing or invalid 'message' field in log message.";
-        return;
     }
 
     QString phase = jsonObj.value("phase").toString();
@@ -212,7 +212,7 @@ void PipeServer::processLogPipeMessage(const QString &serverName, const QByteArr
     }
 
     // 通过信号将日志信息传给外部
-    emit logArrived(level, message, phase);
+    emit logArrived(levelValue.toInt(-1), message, phase);
 }
 
 // 解析control信息

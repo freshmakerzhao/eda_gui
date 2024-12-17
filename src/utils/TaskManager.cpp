@@ -55,10 +55,8 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 8) {
-
         QString arguments = buildBitScript();
         publishScript(projectSynthPath,arguments);
-
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 9) {
@@ -82,7 +80,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // frameView->show();
     } else if (mode == 10) {
         // downloadBit();
-        HardWareManager::instance().openProgramDevice(0);
+        HardWareManager::instance().openProgramDeviceAndDownload(0);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 11) {
@@ -101,7 +99,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     } else if (mode == 14) {
         MainWindow::instance()->showPrjSummary();
     } else if (mode == 15) {
-        HardWareManager::instance().openProgramDevice(1);
+        HardWareManager::instance().openProgramDeviceAndDownload(1);
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 16) {
         // HardWareManager::instance().openProgramDevice(2);
@@ -359,7 +357,6 @@ void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
     displayPartName = params[Project::DisplayPart];
     archName = params[Project::ArchName];
     arch = params[Project::Arch];
-
 }
 
 /**
@@ -438,8 +435,9 @@ void TaskManager::onFileChanged() {
     qDebug("\033[43m[FileWatcher]\033[0m File Changed");
 }
 
-void TaskManager::downloadBit(const QString &bitstream) {
-    std::string script = CommandBuilder::instance().generateDownloadBitCommands(bitstream);
+// 烧写位流
+void TaskManager::downloadBit(const QString &bitstream, const QString &cable_name) {
+    std::string script = CommandBuilder::instance().generateDownloadBitCommands(bitstream, cable_name);
     ProcessManager::instance().executeCommand("Download Bitstream", QStringList() << QString::fromStdString(script));
 }
 

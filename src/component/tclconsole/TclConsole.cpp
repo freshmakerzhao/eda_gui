@@ -61,6 +61,7 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "set_work_dir", TclSetWorkDirCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "set_top_module", TclSetTopModuleCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "synth_design", TclSynthCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "auto_connect", TclHardwareCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "impl_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "pack_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "place_design", TclImplCmd, nullptr, nullptr);
@@ -141,6 +142,54 @@ void TclConsole::executeTclCommand(const QString &command) {
     output->moveCursor(QTextCursor::End);
 }
 
+int TclConsole::TclHardwareCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
+    QStringList script;
+    QString info;
+    const QString task = QString(argv[0]);
+    std::map<std::string, std::string> args;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-cable") {
+            if (i + 1 < argc) { // 校验
+                args[arg] = argv[++i];
+            } else {
+                std::string errorMsg = "Error: Option " + arg + " requires a value.";
+                Tcl_SetResult(interp, (char*)errorMsg.c_str(), TCL_VOLATILE);
+                return TCL_ERROR;
+            }
+        } else {
+            Tcl_SetResult(interp, (char*)"Warning: Unknown option ", TCL_STATIC);
+        }
+    }
+    if (task == "auto_connect") {
+        script << "%BITSTREAMTOOL_PATH%";
+        script << "-c";
+        if (args.find("-cable") != args.end()) {
+            script << QString::fromStdString(args["-cable"]);
+        } else {
+            script << "digilent_hs3";
+        }
+        script << "--read-register-from-address";
+        script << "01100,10110,00111,01001,10001,01101,10000";
+        script << "--father-process-id";
+        script << InitialConfig::instance().pid_str;
+        info = "Starting Auto Connect";
+    } else {
+        info = "Unknown Hardware Command";
+    }
+
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
+    const QString phase = "Auto Connect";
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+    QDir dir(workDir);
+    const QString implPath = dir.filePath("runs/impl");
+    ProcessManager::instance().configWorkPath(implPath);
+    ProcessManager::instance().executeCommand(phase, script);
+    return TCL_OK;
+}
+
 int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
     const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
     if (topVar == nullptr) {
@@ -207,7 +256,6 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     } else {
         info = "Unknown implement command";
     }
-
 
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
@@ -473,9 +521,7 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
     return TCL_OK;
 }
 
-int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char **argv) {
-
-
+int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
     QStringList script;
     QString part_name = ProjectManager::instance().getParameter(Project::Part);
 
