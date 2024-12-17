@@ -65,6 +65,8 @@ private:
     QString projectSynthPath;
     // implement路径
     QString projectImplPath;
+    // simulation路径
+    QString projectSimPath;
     // part name
     QString partName;
     // display Part Name （临时解决）
@@ -100,6 +102,7 @@ private:
     QString buildSynthScript();
     QString buildImpScript();
     void buildBit(int mode);
+    QString buildSimScript();
 
     // SettingsDialog *settingDialog = nullptr;
 

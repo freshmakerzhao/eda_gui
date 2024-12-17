@@ -130,6 +130,10 @@ void ProcessManager::excuteCommand(const QString &phase, const QStringList& comm
         script << "/c" << command;
     } else if (phase == "Download Bitstream") {
         script << "/c" << command;
+    } else if(phase == "Simulation Compile")  {
+         script << "/c" << command;
+    } else if(phase == "Simulation Run")  {
+        script << "/c" << command;
     }
     qDebug() << "------------------------------------------------- ";
     qDebug() << script;
@@ -142,7 +146,11 @@ void ProcessManager::excuteCommand(const QString &phase, const QStringList& comm
     if (phase == "Synthesis") {
         qDebug() << command;
         process->start(projectProperty["synthesizer_path"], command);
-    } else {
+    } else if(phase == "Simulation Compile") {
+        process->start("cmd.exe", script);
+        process->waitForFinished();  // 先编译出文件，再执行此文件。所以需要等此process执行完成才能执行仿真
+    }
+    else {
         process->start("cmd.exe", script);
     }
 }
@@ -165,6 +173,8 @@ void ProcessManager::initEnvironment() {
     env.insert("BITSTREAMTOOL_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\bin\bitstreamTools.exe)");
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
     // projectProperty["implementation_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
+    env.insert("SIMULATION_COMPILER_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\iverilog.exe)" );
+    env.insert("SIMULATION_RUN_PATH",GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\vvp.exe)");
 }
 
 void ProcessManager::configDisplay(const QString &partname) {

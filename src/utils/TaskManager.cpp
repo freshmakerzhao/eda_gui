@@ -153,6 +153,9 @@ void TaskManager::handleTreeItemActivation(const int &mode)
 
         dialog.exec();
         InfoWidget::instance()->setCurrentPage(2);
+    } else if (mode == 18) {
+        // simulation
+        publishScript(projectSimPath,buildSimScript());
     }
 }
 /**
@@ -348,6 +351,7 @@ void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
     QString path = params[Project::Path];
     projectSynthPath = path + "/runs/synth";
     projectImplPath = path + "/runs/impl";
+    projectSimPath = path + "/run/sim";
     projectPath = path;
     topName = params[Project::TopModule];
     // 存储partname
@@ -421,6 +425,10 @@ QString TaskManager::buildImpScript() {
 
 QString TaskManager::buildBitScript() {
     return QString("write_bitstream");
+}
+
+QString TaskManager::buildSimScript() {
+    return QString("sim_design");
 }
 
 void TaskManager::onFileChanged() {
