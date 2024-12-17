@@ -122,7 +122,7 @@ private:
     QString _nextWorkPath = nullptr;
     QString _nextTclCommand = nullptr;
 public:
-    void downloadBit(const QString &bitstream);
+    void downloadBit(const QString &bitstream, const QString &cable_name = "digilent_hs3");
     void downloadFlash(const QString &projectImplPath1, const QString &topName1);
     QWidget* gridView = nullptr;
 

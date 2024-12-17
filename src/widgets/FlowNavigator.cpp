@@ -10,6 +10,7 @@
 
 #include "FlowNavigator.h"
 #include "utils/TaskManager.h"
+#include "utils/HardWareManager.h"
 
 FlowNavigator *FlowNavigator::instance()
 {
@@ -71,7 +72,7 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run Synthesis");
     synthRunItem->setIcon(0, QIcon(":/icons/resource/icons/1-icon_start_process.png"));
     // run synth
-    QTreeWidgetItem *synthReportItem = new QTreeWidgetItem(synthItem, QStringList() << "Report");
+    synthReportItem = new QTreeWidgetItem(synthItem, QStringList() << "Report");
     synthReportItem->setIcon(0, QIcon(":/icons/resource/icons/6-icon_report.png"));
     synthReportItem->setDisabled(true);
     // ================== imp ==================
@@ -90,8 +91,44 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     proBitItem->setIcon(0, QIcon(":/icons/resource/icons/3-icon_generate_bitstream.png"));
     proBitViewItem = new QTreeWidgetItem(proItem, QStringList() << "Generate GridView");
     proBitViewItem->setIcon(0, QIcon(":/icons/resource/icons/28-icon_grid_view.png"));
-    proDownloadBitItem = new QTreeWidgetItem(proItem, QStringList() << "Download Bit");
-    proDownloadBitItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
+
+    // ================================ Hardware Manager 分组 ==============================
+    // 创建 Hardware Manager 分组
+    groupHardwareManager = new QTreeWidgetItem(proItem, QStringList() << "Hardware Manager");
+//    groupHardwareManager->setIcon(0, QIcon(":/icons/resource/icons/right2.png"));
+
+    proAutoConnect = new QTreeWidgetItem(groupHardwareManager, QStringList() << "Auto Connect");
+    proAutoConnect->setIcon(0, QIcon(":/icons/resource/0-icon_transparent.png"));
+    proDownloadBitItem = new QTreeWidgetItem(groupHardwareManager, QStringList() << "Download Bit");
+    proDownloadBitItem->setIcon(0, QIcon(":/icons/resource/0-icon_transparent.png"));
+    // 若需要显示子项指示器（下拉箭头），可显式设置
+    groupHardwareManager->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+//    groupHardwareManager->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
+//    qDebug() << "Children count of groupHardwareManager:" << groupHardwareManager->childCount();
+    // 默认状态为收起
+//    connect(this, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem *item, int column) {
+//        if (item == groupHardwareManager) {
+//            bool isExpanded = item->isExpanded();
+//            // 双击后切换展开状态
+//            item->setExpanded(!isExpanded);
+//
+//            // 根据状态切换图标，例如：
+//            // - 收起状态（!isExpanded为true时，表示原本展开状态现在要收起）
+//            // - 展开状态
+//            if (!isExpanded) {
+//                // 原本是收起状态，双击后展开
+//                // 使用一个展开状态的图标，例如open-folder.png
+//                item->setIcon(0, QIcon(":/icons/resource/icons/down2.png"));
+//            } else {
+//                // 原本是展开状态，双击后收起
+//                // 切换回收起状态图标，比如down2.png
+//                item->setIcon(0, QIcon(":/icons/resource/icons/right2.png"));
+//            }
+//        }
+//    });
+
+    // ================================ Hardware Manager 分组 ==============================
+
     // downFlashItem = new QTreeWidgetItem(proItem, QStringList() << "Download Flash");
     // downFlashItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
     // readBackRegItem = new QTreeWidgetItem(proItem, QStringList() << "Read Back Reg");
@@ -99,6 +136,24 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // readBackMemoryItem =  new QTreeWidgetItem(proItem, QStringList() << "Read Back Memory");
     // readBackMemoryItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
     expandAll();
+    groupHardwareManager->setExpanded(false);
+//
+//    // 连接 itemExpanded 信号
+//    QObject::connect(this, &QTreeWidget::itemExpanded, [&](QTreeWidgetItem* item) {
+//        qDebug() << "Hardware Manager expanded";
+//        if (item == groupHardwareManager) {
+//            qDebug() << "123";
+//        }
+//    });
+//
+//    // 连接 itemCollapsed 信号
+////    QObject::connect(this, &QTreeWidget::itemCollapsed, [&](QTreeWidgetItem* item) {
+////        qDebug() << "Hardware Manager collapsed";
+////        if (item == groupHardwareManager) {
+////            qDebug() << "546";
+////            // 在此处添加你需要执行的操作
+////        }
+////    });
 
     QObject::connect(this, &QTreeWidget::itemDoubleClicked, [=](QTreeWidgetItem *item, int column) {
         if (item == synthRunItem) {
@@ -125,7 +180,12 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(13);
         } else if (item == prjSummaryItem) {
             TaskManager::instance().handleTreeItemActivation(14);
-        }/* else if (item == downFlashItem) {
+        } else if (item == proAutoConnect) {
+            // 自动连接，连接后记录连接状态
+            HardWareManager::instance().autoConnect();
+            qDebug() << "asfasf";
+        }
+        /* else if (item == downFlashItem) {
             TaskManager::instance().handleTreeItemActivation(15);
         } else if (item == readBackRegItem) {
             TaskManager::instance().handleTreeItemActivation(16);

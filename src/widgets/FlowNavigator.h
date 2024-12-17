@@ -63,8 +63,15 @@ private:
     QTreeWidgetItem *proBitItem;
     //! gridview
     QTreeWidgetItem *proBitViewItem;
+    // ========== PROGRAM AND DEBUG HARDWARE MANAGER ============
+    //! HARDWARE MANAGER
+    QTreeWidgetItem *groupHardwareManager;
+    //! auto connect
+    QTreeWidgetItem *proAutoConnect;
     //! download bit
     QTreeWidgetItem *proDownloadBitItem;
+
+    // ========== PROGRAM AND DEBUG HARDWARE MANAGER ============
 
     // QTreeWidgetItem *downFlashItem;
 

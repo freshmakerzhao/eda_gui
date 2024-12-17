@@ -31,23 +31,22 @@ void ProcessManager::configWorkPath(const QString &path) {
 // 实时回显数据
 void ProcessManager::handleChannelReadyReadOutput()
 {
-    // 获取标准输出
-    QByteArray normalOutput = process->readAllStandardOutput();
-    // 获取错误输出
-    QByteArray errorOutput = process->readAllStandardError();
-    QTextCodec *tc = QTextCodec::codecForName("GBK");
-    // 转码
-    QString outputStr = tc->toUnicode(normalOutput);
-    QString errorOutputStr = tc->toUnicode(errorOutput);
-
-    if (!outputStr.isEmpty()){
-        LogWidget::instance()->appendLog(outputStr);
-    }
-
-    if (!errorOutputStr.isEmpty()){
-        LogWidget::instance()->appendLog(errorOutputStr);
-    }
-
+//    // 获取标准输出
+//    QByteArray normalOutput = process->readAllStandardOutput();
+//    // 获取错误输出
+//    QByteArray errorOutput = process->readAllStandardError();
+//    QTextCodec *tc = QTextCodec::codecForName("GBK");
+//    // 转码
+//    QString outputStr = tc->toUnicode(normalOutput);
+//    QString errorOutputStr = tc->toUnicode(errorOutput);
+//
+//    if (!outputStr.isEmpty()){
+//        LogWidget::instance()->appendLog(outputStr);
+//    }
+//
+//    if (!errorOutputStr.isEmpty()){
+//        LogWidget::instance()->appendLog(errorOutputStr);
+//    }
 }
 
 // process执行结束后触发
@@ -59,23 +58,23 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
         QTimer::singleShot(5000, &loop, &QEventLoop::quit);
         loop.exec();
     }
-    QTextCodec *tc = QTextCodec::codecForName("GBK");
-
-    // 读取可能剩余的标准输出
-    QByteArray remainingOutput = process->readAllStandardOutput();
-    // 转码
-    QString outputStr = tc->toUnicode(remainingOutput);
-    if (!remainingOutput.isEmpty()) {
-        LogWidget::instance()->appendLog(outputStr);
-    }
-
-    // 读取可能剩余的标准错误
-    QByteArray remainingError = process->readAllStandardError();
-    // 转码
-    outputStr = tc->toUnicode(remainingError);
-    if (!remainingError.isEmpty()) {
-        LogWidget::instance()->appendLog(outputStr);
-    }
+//    QTextCodec *tc = QTextCodec::codecForName("GBK");
+//
+//    // 读取可能剩余的标准输出
+//    QByteArray remainingOutput = process->readAllStandardOutput();
+//    // 转码
+//    QString outputStr = tc->toUnicode(remainingOutput);
+//    if (!remainingOutput.isEmpty()) {
+////        LogWidget::instance()->appendLog(outputStr);
+//    }
+//
+//    // 读取可能剩余的标准错误
+//    QByteArray remainingError = process->readAllStandardError();
+//    // 转码
+//    outputStr = tc->toUnicode(remainingError);
+//    if (!remainingError.isEmpty()) {
+////        LogWidget::instance()->appendLog(outputStr);
+//    }
 
     // 结束时间
     this->endTimeForCal = TimeUtilities::getCurTime();
@@ -128,7 +127,10 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
         script << "/c" << command;
     } else if (phase == "Download Bitstream") {
         script << "/c" << command;
+    } else if (phase == "Auto Connect") {
+        script << "/c" << command;
     }
+    
     qDebug() << "------------------------------------------------- ";
     qDebug() << script;
     qDebug() << "------------------------------------------------- ";

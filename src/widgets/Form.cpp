@@ -149,7 +149,7 @@ Form::Form(QWidget *parent)
     button5->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     button6->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    connect(button5, &QPushButton::clicked, &HardWareManager::instance(), &HardWareManager::openProgramDevice);
+    connect(button5, &QPushButton::clicked, &HardWareManager::instance(), &HardWareManager::openProgramDeviceAndDownload);
 
     leftGroupLayoutTwo->addWidget(titleLabelTwo);
     leftGroupLayoutTwo->addWidget(button4);

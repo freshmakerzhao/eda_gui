@@ -10,12 +10,16 @@ class HardWareManager :public QObject
 public:
     static HardWareManager& instance();
 
-    void openProgramDevice(const int &mode = 0);
+    void openProgramDeviceAndDownload(const int &mode = 0);
+    void autoConnect();
 
     QString path;
+    QString cable_name = "digilent_hs3";
+
 private:
     HardWareManager();
-
+    QString buildAutoConnectScript(const QString &cable="digilent_hs3");
+    void publishScript(const QString &tclCommand);
 };
 
 #endif // HARDWAREMANAGER_H
