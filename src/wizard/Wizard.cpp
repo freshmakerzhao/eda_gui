@@ -95,7 +95,8 @@ void Wizard::onNewFinish()
             dir.mkdir(".works"); // 记录中间过程，方便后续在此基础上继续执行
             dir.mkdir("impl"); // pack place route
             dir.mkdir("synth"); // synth
-            qDebug() << "Folders Created Successfully including runs/.works、runs/impl and runs/synth";
+            dir.mkdir("sim");
+            qDebug() << "Folders Created Successfully including runs/.works、runs/impl、 runs/synth and runs/sim";
         } else {
             qDebug() << "Failed to create runs folder";
         }

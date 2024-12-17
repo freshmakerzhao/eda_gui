@@ -67,6 +67,7 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "route_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "write_bitstream", TclWriteBitstreamCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "sim_design", TclSimCmd, nullptr, nullptr);
 }
 
 TclConsole::~TclConsole() {
@@ -339,6 +340,103 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     ProcessManager::instance().excuteCommand(phase, script);
     return TCL_OK;
 }
+
+int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    const QString phaseCompile = "Simulation Compile";
+    //  argv ： sim_design     编译源文件
+    //  iverilog  -y  verilog\src\retarget\ -y verilog\src\unisims\ -o tb_run  sourve.v
+
+    //   command
+    QStringList scriptCompile;
+    scriptCompile << "%SIMULATION_COMPILER_PATH%";
+    //  -y lib
+   const QString designElementPath = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulationer\share\)";
+    scriptCompile << QString("-y")<<(designElementPath + R"(retarget\)");
+   scriptCompile << QString("-y")<<(designElementPath +R"(unisims\)");
+    //  -o  compile_file
+    const  QString compileFile = "tb_run";
+    //scriptFirst << QString("-o  %1").arg("tb_run");
+    // scriptFirst << QString("-o  tb_run");
+    scriptCompile << "-o" << compileFile;
+     // Design Sources
+    QStringList sourceFileList;
+    const char *tclVarValue = Tcl_GetVar(interp, "source", 0);
+    if (tclVarValue != nullptr) {
+        // 将 Tcl 列表字符串转换为 QString
+        QString qStringList = QString::fromUtf8(tclVarValue);
+        // 将 QString 转换为 QStringList
+        sourceFileList = qStringList.split(' ', Qt::SkipEmptyParts);
+    }
+    scriptCompile.append(sourceFileList);
+    // 仿真路径
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+    QDir dir(workDir);
+    const QString simPath = dir.filePath("runs/sim");
+    // 生成波形配置文件
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+    const QString topName = QString(topVar);
+    QString configWaveFullFilePath;
+    if(generateSimWaveConfigFilePath(topName, simPath, configWaveFullFilePath )) {
+        Tcl_SetResult(interp, const_cast<char*>("Unable to open the waveform configuration file."), TCL_STATIC);
+        return TCL_ERROR;
+    }
+    //  添加波形配置文件
+    scriptCompile << configWaveFullFilePath;
+
+    // generating command finish.
+    QString info = QString("Starting sim_design\n");
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+    //  设置路径
+    ProcessManager::instance().configWorkPath(simPath);
+    // 执行编译命令
+   ProcessManager::instance().excuteCommand(phaseCompile, scriptCompile);
+
+    //  执行仿真:  vvp  compileFile
+    const QString phaseRunSim = "Simulation Run";
+    QStringList scriptRunSim;
+    scriptRunSim <<"%SIMULATION_RUN_PATH%" << compileFile;
+    ProcessManager::instance().excuteCommand(phaseRunSim, scriptRunSim);
+
+    return TCL_OK;
+}
+
+int TclConsole::generateSimWaveConfigFilePath(const QString topName, const QString simPath, QString& configWaveFullFilePath )
+{
+    int error = 0;
+    // 默认的波形生成，只生成最上层的信号。
+    //  配置信息
+    const QString waveFileName = "hybrdLinkWaveFile.vcd";
+    const QString WaveSignalConfig = "1, " + topName;  // 1:只输出此层的信号，具体使用查询$dumpvars的使用
+    const QString moduleName = "hybrdLinkWaveConfigModule";
+    // 生成文件
+    const QDir simFilePath(simPath);
+    const QString configFileName(moduleName + ".v");
+    configWaveFullFilePath =  simFilePath.filePath(configFileName);
+
+    QFile onfigFile(configWaveFullFilePath);
+    if(onfigFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&onfigFile);
+        out << QString( "module %1 ();").arg(moduleName) <<Qt:: endl;
+        out << "initial begin" << Qt::endl;
+        out << QString( "$dumpfile( \"%1\") ;" ).arg(waveFileName ) <<Qt:: endl;
+        out << QString("$dumpvars( %1 ) ;").arg(WaveSignalConfig) <<Qt:: endl;
+        out << "end" << Qt::endl;
+        out << "endmodule" << Qt::endl;
+        onfigFile.close();
+        qDebug()  << "波形配置文件生成完毕。" <<Qt::endl;
+    } else {
+        qDebug() << "无法打开波形配置文件。"  << Qt::endl;
+        error = 1;
+    }
+    return error;
+}
+
 
 int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
