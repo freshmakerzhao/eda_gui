@@ -1,5 +1,5 @@
 #include "ProgramDeviceDialog.h"
-#include "utils/HardWareManager.h"
+#include "service/HardWareManager.h"
 #include "dialog/AdvancedFileDialog.h"
 
 ProgramDeviceDialog::ProgramDeviceDialog(QWidget *parent, const int &mode)

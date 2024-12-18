@@ -14,7 +14,7 @@
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "utils/ProjectManager.h"
-#include "utils/HardWareManager.h"
+#include "service/HardWareManager.h"
 
 Form *Form::instance()
 {

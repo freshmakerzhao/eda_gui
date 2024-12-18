@@ -3,7 +3,7 @@
 
 #include <QProcess>
 #include <QDebug>
-#include "PipeServer.h"
+#include "service/PipeServer.h"
 
 struct ProcessMessage {
     QString phase;

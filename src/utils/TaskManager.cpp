@@ -8,7 +8,7 @@
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 #include "FileHelper.h"
-#include "HardWareManager.h"
+#include "service/HardWareManager.h"
 #include "dialog/AdvancedFileDialog.h"
 #include "base/Globals.h"
 
