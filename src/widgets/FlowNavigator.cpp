@@ -10,7 +10,7 @@
 
 #include "FlowNavigator.h"
 #include "utils/TaskManager.h"
-#include "utils/HardWareManager.h"
+#include "service/HardWareManager.h"
 
 FlowNavigator *FlowNavigator::instance()
 {

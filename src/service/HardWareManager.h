@@ -2,7 +2,7 @@
 #define HARDWAREMANAGER_H
 
 #include <QObject>
-#include <dialog/ProgramDeviceDialog.h>
+#include "dialog/ProgramDeviceDialog.h"
 
 class HardWareManager :public QObject
 {

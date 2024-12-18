@@ -1,5 +1,5 @@
 #include "LogWidget.h"
-#include "utils/PipeServer.h"
+#include "service/PipeServer.h"
 
 LogWidget *LogWidget::instance(QWidget *parent)
 {
