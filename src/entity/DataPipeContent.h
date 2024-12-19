@@ -17,23 +17,23 @@
 
 class DataPipeContent {
 private:
-    QString m_type;      // 管道信息类型
-    StatusCode m_status = StatusCode::SUCCESS;    // 结束状态
+    QString m_pipe_type;      // 管道信息类型
+    StatusCode m_status_code = StatusCode::SUCCESS;    // 结束状态
     QJsonValue m_data;   // 实际数据
     QString m_phase;     // 阶段信息
-    QString m_subPhase;  // 子阶段信息
+    QString m_sub_phase;  // 子阶段信息
 
 public:
     // 构造函数
     DataPipeContent() = default;
-    DataPipeContent(QString type, int status, QJsonValue data, QString phase, const QString &subPhase);
+    DataPipeContent(QString pipe_type, int status_code, QJsonValue data, QString phase, const QString &sub_phase);
 
     // Getter 和 Setter 方法
-    QString getType() const;
-    void setType(const QString &type);
+    QString getPipeType() const;
+    void setPipeType(const QString &pipe_type);
 
-    StatusCode getStatus() const;
-    void setStatus(StatusCode status_code);
+    StatusCode getStatusCode() const;
+    void setStatusCode(StatusCode status_code);
 
     QJsonValue getData() const;
     void setData(QJsonValue data);
@@ -42,7 +42,7 @@ public:
     void setPhase(const QString &phase);
 
     QString getSubPhase() const;
-    void setSubPhase(const QString &subPhase);
+    void setSubPhase(const QString &sub_phase);
 
     // 转换为 JSON 对象
     QJsonObject toJson() const;

@@ -10,49 +10,53 @@
 #include "LogPipeContent.h"
 
 // 构造函数
-LogPipeContent::LogPipeContent(const QString &type, int level, const QString &message, const QString &phase, const QString &subPhase)
-        : m_type(type), m_message(message), m_phase(phase), m_subPhase(subPhase) {
-    if (level == 1) {
-        m_level = StatusCode::INFO_LOG;
-    } else if (level == 2) {
-        m_level = StatusCode::WARNING_LOG;
-    } else if (level == 3) {
-        m_level = StatusCode::CRITICAL_WARNING_LOG;
-    } else if (level == 4) {
-        m_level = StatusCode::ERROR_LOG;
+LogPipeContent::LogPipeContent(const QString &pipe_type, int level_code, const QString &message_content, const QString &category, const QString &phase, const QString &sub_phase)
+        : m_pipe_type(pipe_type), m_message_content(message_content), m_category(category), m_phase(phase), m_sub_phase(sub_phase) {
+    if (level_code == 1) {
+        m_level_code = LevelCode::INFO_LOG;
+    } else if (level_code == 2) {
+        m_level_code = LevelCode::WARNING_LOG;
+    } else if (level_code == 3) {
+        m_level_code = LevelCode::CRITICAL_WARNING_LOG;
+    } else if (level_code == 4) {
+        m_level_code = LevelCode::ERROR_LOG;
     } else {
-        m_level = StatusCode::INFO_LOG;
+        m_level_code = LevelCode::ALWAYS_LOG;
     }
 }
 
 // Getter 和 Setter 实现
-QString LogPipeContent::getType() const { return m_type; }
-void LogPipeContent::setType(const QString &type) { m_type = type; }
+QString LogPipeContent::getPipeType() const { return m_pipe_type; }
+void LogPipeContent::setPipeType(const QString &pipe_type) { m_pipe_type = pipe_type; }
 
-StatusCode LogPipeContent::getLevel() const { return m_level; }
-void LogPipeContent::setLevel(StatusCode level) { m_level = level; }
+LevelCode LogPipeContent::getLevelCode() const { return m_level_code; }
+void LogPipeContent::setLevelCode(LevelCode level_code) { m_level_code = level_code; }
 
-QString LogPipeContent::getMessage() const { return m_message; }
-void LogPipeContent::setMessage(const QString &message) { m_message = message; }
+QString LogPipeContent::getMessageContent() const { return m_message_content; }
+void LogPipeContent::setMessageContent(const QString &message_content) { m_message_content = message_content; }
+
+QString LogPipeContent::getCategory() const { return m_category; }
+void LogPipeContent::setCategory(const QString &category) { m_category = category; }
 
 QString LogPipeContent::getPhase() const { return m_phase; }
 void LogPipeContent::setPhase(const QString &phase) { m_phase = phase; }
 
-QString LogPipeContent::getSubPhase() const { return m_subPhase; }
-void LogPipeContent::setSubPhase(const QString &subPhase) { m_subPhase = subPhase; }
+QString LogPipeContent::getSubPhase() const { return m_sub_phase; }
+void LogPipeContent::setSubPhase(const QString &sub_phase) { m_sub_phase = sub_phase; }
 
 // 转换为 JSON 对象
 QJsonObject LogPipeContent::toJson() const {
     QJsonObject obj;
-    obj["type"] = m_type;
-    obj["level"] = (m_level == StatusCode::INFO_LOG) ? "info" :
-                   (m_level == StatusCode::WARNING_LOG) ? "warning" :
-                   (m_level == StatusCode::CRITICAL_WARNING_LOG) ? "critical_warning" :
-                   (m_level == StatusCode::ERROR_LOG) ? "error" : "unknown";
-    obj["message"] = m_message;
+    obj["pipe_type"] = m_pipe_type;
+    obj["level_code"] = (m_level_code == LevelCode::INFO_LOG) ? "info" :
+                   (m_level_code == LevelCode::WARNING_LOG) ? "warning" :
+                   (m_level_code == LevelCode::CRITICAL_WARNING_LOG) ? "critical_warning" :
+                   (m_level_code == LevelCode::ERROR_LOG) ? "error" : "always";
+    obj["message_content"] = m_message_content;
+    obj["category"] = m_category;
     // 创建 phase_info 对象
     obj["phase"] = m_phase;
-    obj["sub_phase"] = m_subPhase;
+    obj["sub_phase"] = m_sub_phase;
     return obj;
 }
 
