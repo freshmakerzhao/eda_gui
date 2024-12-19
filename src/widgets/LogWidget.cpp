@@ -1,5 +1,6 @@
 #include "LogWidget.h"
 #include "service/PipeServer.h"
+#include "service/LogManager.h"
 
 LogWidget *LogWidget::instance(QWidget *parent)
 {
@@ -12,14 +13,14 @@ LogWidget *LogWidget::instance(QWidget *parent)
 
 void LogWidget::appendLog(const QString &str)
 {
-    // 获取当前文本光标
-    QTextCursor cursor = logTextEdit->textCursor();
-    // 将光标移动到文本末尾(否则会在用户鼠标点击位置插入信息）
-    cursor.movePosition(QTextCursor::End);
-    logTextEdit->setTextCursor(cursor);
-    // 插入log
-    logTextEdit->insertPlainText(str);
-//    logTextEdit->appendPlainText(str);
+//    // 获取当前文本光标
+//    QTextCursor cursor = logTextEdit->textCursor();
+//    // 将光标移动到文本末尾(否则会在用户鼠标点击位置插入信息）
+//    cursor.movePosition(QTextCursor::End);
+//    logTextEdit->setTextCursor(cursor);
+//    // 插入log
+//    logTextEdit->insertPlainText(str);
+    logTextEdit->appendPlainText(str);
 }
 
 LogWidget::LogWidget(QWidget* parent)
@@ -28,8 +29,6 @@ LogWidget::LogWidget(QWidget* parent)
     init();
     // 获取 PipeServer 的单例实例
     PipeServer &pipeServer = PipeServer::instance();
-    // 连接 PipeServer 的 logArrived 信号到 LogWidget 的 handleLogArrived 槽
-    connect(&pipeServer, &PipeServer::logArrived, this, &LogWidget::handleLogArrived);
 }
 
 void LogWidget::init()
@@ -116,20 +115,4 @@ void LogWidget::init()
     connect(copyAction, &QAction::triggered, [=]() {
         QApplication::clipboard()->setText(logTextEdit->toPlainText());
     });
-}
-
-void LogWidget::handleLogArrived(int level, const QString &message, const QString &phase) {
-    // 获取当前时间
-//    QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    // 格式化日志信息
-//    QString formattedMessage = QString("[%1] [%2] [%3] %4")
-//            .arg(currentTime)
-//            .arg(level)
-//            .arg(phase)
-//            .arg(message);
-    // 使用已有的 appendLog 函数将日志添加到 UI
-    qDebug() << "=================";
-    qDebug() << message;
-    qDebug() << "=================";
-    appendLog(message);
 }

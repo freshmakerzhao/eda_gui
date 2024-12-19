@@ -4,6 +4,7 @@
 #include <QProcess>
 #include <QDebug>
 #include "service/PipeServer.h"
+#include "service/LogManager.h"
 
 struct ProcessMessage {
     QString phase;
@@ -71,6 +72,7 @@ private:
     ~ProcessManager();
     QProcess* process;
     PipeServer &pipeServer; // 成员变量引用
+    LogManager &logManager; // 成员变量引用
     void initializePipeServer();            // 初始化管道服务
 
 private slots:

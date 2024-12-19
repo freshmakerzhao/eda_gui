@@ -533,7 +533,6 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
 
 // 将命令提交给tcl console
 void TaskManager::publishScript(const QString &workPath, const QString &tclCommand) {
-    // ProcessManager::instance().configWorkPath(workPath);
     Q_UNUSED(workPath); // 在TclConsole设置路径
     TclConsole::instance()->executeTclCommand(tclCommand);
 }
