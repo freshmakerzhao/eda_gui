@@ -93,10 +93,9 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 
     // 回传给taskmanager
     emit finishMessage(msg);
-
 }
 
-ProcessManager::ProcessManager(): pipeServer(PipeServer::instance())
+ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(LogManager::instance())
 {
     process = new QProcess();
     pipeServer.start(); // 启动管道监听

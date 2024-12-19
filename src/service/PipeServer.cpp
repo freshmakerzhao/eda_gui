@@ -8,6 +8,7 @@
   ******************************************************************************
   */
 #include "PipeServer.h"
+#include "entity/LogPipeContent.h"
 
 PipeServer& PipeServer::instance()
 {
@@ -143,12 +144,12 @@ QJsonObject PipeServer::parseJsonObject(const QByteArray &data) {
 
 // 解析data信息
 void PipeServer::processDataPipeMessage(const QString &serverName, const QByteArray &data) {
-    qDebug() << "Received data message from client on" << serverName << ":" << data;
+    // qDebug() << "Received data message from client on" << serverName << ":" << data;
     QJsonObject jsonObj = parseJsonObject(data);
     if (jsonObj.isEmpty()) {
         // 解析失败，通知上层处理
         qWarning() << "Data message parsing failed. Emitting signal with error status.";
-        emit dataArrived(QJsonValue(), -1); // Todo 使用-1表示数据转换错误，后续可以改成枚举
+        emit dataArrived(DataPipeContent("data",400,QJsonValue(),"Common","Common"));
         return;
     }
 
@@ -156,7 +157,7 @@ void PipeServer::processDataPipeMessage(const QString &serverName, const QByteAr
     QString type = jsonObj.value("type").toString();
     if (type != "data") {
         qWarning() << "Invalid message type for data pipe message:" << type;
-        emit dataArrived(QJsonValue(), -2); // 使用status=-2表示类型不匹配
+        emit dataArrived(DataPipeContent("data",400,QJsonValue(),"Common","Common"));
         return;
     }
 
@@ -164,7 +165,23 @@ void PipeServer::processDataPipeMessage(const QString &serverName, const QByteAr
     QJsonValue statusValue = jsonObj.value("status");
     if (!statusValue.isDouble()) {
         qWarning() << "Missing or invalid 'status' field in data message.";
-        emit dataArrived(QJsonValue(), -3); // 使用status=-3表示缺少或无效的status字段
+        emit dataArrived(DataPipeContent("data",400,QJsonValue(),"Common","Common"));
+        return;
+    }
+    
+    // 提取 phase 字段
+    QString phase = jsonObj.value("phase").toString();
+    if (phase.isEmpty()) {
+        qWarning() << "Missing or invalid 'phase' field in phase_info.";
+        emit dataArrived(DataPipeContent("data",400,QJsonValue(),"Common","Common"));
+        return;
+    }
+
+    // 提取 sub_phase 字段
+    QString subPhase = jsonObj.value("sub_phase").toString();
+    if (subPhase.isEmpty()) {
+        qWarning() << "Missing or invalid 'sub_phase' field in phase_info.";
+        emit dataArrived(DataPipeContent("data",400,QJsonValue(),"Common","Common"));
         return;
     }
 
@@ -173,46 +190,53 @@ void PipeServer::processDataPipeMessage(const QString &serverName, const QByteAr
 
     // 根据 status 进行处理
     if (status == 200) {
-        qDebug() << "Data Received successfully. Content:" << dataValue;
+        // qDebug() << "Data Received successfully. Content:" << dataValue;
     } else {
         qWarning() << "Data message returned status:" << status;
     }
     // 发射信号将data传给外部使用者,即使是非200状态，也发射信号，让上层决定处理逻辑
-    emit dataArrived(dataValue, status);
+    emit dataArrived(DataPipeContent("data",status,dataValue,phase,subPhase));
 }
 
 // 解析logo信息
 void PipeServer::processLogPipeMessage(const QString &serverName, const QByteArray &data) {
-    qDebug() << "Received log message from client on" << serverName << ":" << data;
+    // qDebug() << "Received log message from client on" << serverName << ":" << data;
     QJsonObject jsonObj = parseJsonObject(data);
     if (jsonObj.isEmpty()) return; // 解析失败直接退出
 
     QString type = jsonObj.value("type").toString();
     if (type != "log") {
         qWarning() << "Invalid message type for log pipe message:" << type;
-        return;
     }
 
     // 获取 level 字段
     QJsonValue levelValue = jsonObj.value("level");
     if (!levelValue.isDouble()) {
         qWarning() << "Missing or invalid 'level' field in log message.";
-        return;
     }
 
+    // 提取 phase 字段
+    QString phase = jsonObj.value("phase").toString();
+    if (phase.isEmpty()) {
+        qWarning() << "Missing or invalid 'phase' field in log message.";
+    }
+
+    // 提取 sub_phase 字段
+    QString subPhase = jsonObj.value("sub_phase").toString();
+    if (subPhase.isEmpty()) {
+        qWarning() << "Missing or invalid 'sub_phase' field in log message.";
+    }
 
     QString message = jsonObj.value("message").toString();
     if (message.isEmpty()) {
         qWarning() << "Missing or invalid 'message' field in log message.";
     }
 
-    QString phase = jsonObj.value("phase").toString();
-    if (phase.isEmpty()) {
-        qWarning() << "Missing or invalid 'phase' field in log message.";
-    }
+    // 创建 LogMessage 实体
+    LogPipeContent one_log(type, levelValue.toInt(0), message, phase, subPhase);
 
     // 通过信号将日志信息传给外部
-    emit logArrived(levelValue.toInt(-1), message, phase);
+    emit logArrived(one_log);
 }
 
 // 解析control信息
@@ -228,7 +252,7 @@ void PipeServer::processControlPipeMessage(const QString &serverName, const QByt
     }
 
     // control消息的内容应根据实际需求解析
-    emit controlCommandArrived(jsonObj);
+    emit controlCommandArrived("",jsonObj);
 }
 
 PipeServer *PipeServer::getPipeServer() {

@@ -33,9 +33,6 @@ private:
     QWidget* baseWidget;
     SearchTextEdit *logTextEdit;
 
-public slots:
-    // 处理日志信号
-    void handleLogArrived(int level, const QString &message, const QString &phase);
 };
 
 

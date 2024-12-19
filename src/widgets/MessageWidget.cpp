@@ -16,74 +16,121 @@ MessageWidget *MessageWidget::instance(QWidget *parent)
 MessageWidget::MessageWidget(QWidget *parent)
         : QWidget(parent)
 {
-    setupUI();
-    addMessage(1, "主模块", "a");
-    addMessage(2, "启动", "b");
-    addMessage(3, "模块", "c");
+    init();
+//    addMessage(1, "主模块", "a");
+//    addMessage(2, "启动", "b");
+//    addMessage(3, "模块", "c");
 }
 
-MessageWidget::~MessageWidget()
-{
-    // 析构函数留空
-}
+MessageWidget::~MessageWidget() {};
 
-void MessageWidget::setupUI()
+void MessageWidget::init()
 {
     // 初始化控件
     treeWidget = new QTreeWidget(this);
-    treeWidget->setHeaderLabels({"时间", "级别", "阶段", "消息"});
-    treeWidget->setUniformRowHeights(true);
+
+    // 隐藏标题栏（无分栏）
+    treeWidget->setHeaderHidden(true);
 
     searchBox = new QLineEdit(this);
-    searchBox->setPlaceholderText("搜索消息...");
+    searchBox->setPlaceholderText("搜索日志...");
 
-    clearButton = new QPushButton(QIcon(":/icons/clear.png"), "", this);
+    clearButton = new QPushButton("清除搜索", this);
     expandButton = new QPushButton("展开全部", this);
     collapseButton = new QPushButton("折叠全部", this);
 
-    // 布局顶部搜索栏和按钮
     QHBoxLayout *topLayout = new QHBoxLayout;
     topLayout->addWidget(searchBox);
     topLayout->addWidget(clearButton);
     topLayout->addWidget(expandButton);
     topLayout->addWidget(collapseButton);
 
-    // 主布局
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(topLayout);
     mainLayout->addWidget(treeWidget);
-
     setLayout(mainLayout);
-
-    // 连接信号和槽
+    // 信号槽绑定
     connect(searchBox, &QLineEdit::textChanged, this, &MessageWidget::onSearchTextChanged);
     connect(clearButton, &QPushButton::clicked, this, &MessageWidget::onClearSearch);
     connect(expandButton, &QPushButton::clicked, this, &MessageWidget::onExpandAll);
     connect(collapseButton, &QPushButton::clicked, this, &MessageWidget::onCollapseAll);
 }
 
-void MessageWidget::addMessage(int level, const QString &message, const QString &phase, QTreeWidgetItem *parent)
+
+//
+//void MessageWidget::init()
+//{
+//    // 初始化控件
+//    treeWidget = new QTreeWidget(this);
+//    treeWidget->setHeaderLabels({"时间", "级别", "阶段", "消息"});
+//    treeWidget->setUniformRowHeights(true);
+//
+//    searchBox = new QLineEdit(this);
+//    searchBox->setPlaceholderText("搜索消息...");
+//
+//    clearButton = new QPushButton(QIcon(":/icons/clear.png"), "", this);
+//    expandButton = new QPushButton("展开全部", this);
+//    collapseButton = new QPushButton("折叠全部", this);
+//
+//    // 布局顶部搜索栏和按钮
+//    QHBoxLayout *topLayout = new QHBoxLayout;
+//    topLayout->addWidget(searchBox);
+//    topLayout->addWidget(clearButton);
+//    topLayout->addWidget(expandButton);
+//    topLayout->addWidget(collapseButton);
+//
+//    // 主布局
+//    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+//    mainLayout->addLayout(topLayout);
+//    mainLayout->addWidget(treeWidget);
+//
+//    setLayout(mainLayout);
+//
+//    // 连接信号和槽
+//    connect(searchBox, &QLineEdit::textChanged, this, &MessageWidget::onSearchTextChanged);
+//    connect(clearButton, &QPushButton::clicked, this, &MessageWidget::onClearSearch);
+//    connect(expandButton, &QPushButton::clicked, this, &MessageWidget::onExpandAll);
+//    connect(collapseButton, &QPushButton::clicked, this, &MessageWidget::onCollapseAll);
+//}
+
+void MessageWidget::populateTreeFromLogStorage(const LogStorage &logStorage)
 {
-    QString levelStr;
-    switch (level) {
-        case 1: levelStr = "INFO"; break;
-        case 2: levelStr = "WARNING"; break;
-        case 3: levelStr = "ERROR"; break;
-        default: levelStr = "UNKNOWN"; break;
-    }
+    treeWidget->clear();
 
-    QString currentTime = TimeUtilities::getCurTimeAndFormat(); // 展示
-    QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget);
-    item->setText(0, currentTime);
-    item->setText(1, levelStr);
-    item->setText(2, phase);
-    item->setText(3, message);
+    for (auto it = logStorage.constBegin(); it != logStorage.constEnd(); ++it) {
+        const QString &phase = it.key();
+        const QMap<QString, QStringList> &subPhaseMap = it.value();
 
-    if (!parent) {
-        treeWidget->expandItem(item);
+        // 创建第一层节点（phase）
+        QTreeWidgetItem *phaseItem = new QTreeWidgetItem(treeWidget);
+        phaseItem->setText(0, phase);
+
+        for (auto subIt = subPhaseMap.constBegin(); subIt != subPhaseMap.constEnd(); ++subIt) {
+            const QString &subPhase = subIt.key();
+            const QStringList &messages = subIt.value();
+
+            if (subPhase.isEmpty()) {
+                // 如果 sub_phase 为空，直接将日志附加到 phase 下
+                for (const QString &message : messages) {
+                    QTreeWidgetItem *messageItem = new QTreeWidgetItem(phaseItem);
+                    messageItem->setText(0, message);
+                }
+            } else {
+                // 否则，创建 sub_phase 节点并附加日志
+                QTreeWidgetItem *subPhaseItem = new QTreeWidgetItem(phaseItem);
+                subPhaseItem->setText(0, subPhase);
+
+                for (const QString &message : messages) {
+                    QTreeWidgetItem *messageItem = new QTreeWidgetItem(subPhaseItem);
+                    messageItem->setText(0, message);
+                }
+            }
+        }
+
+        // 默认展开第一层节点
+        phaseItem->setExpanded(true);
     }
 }
-
 
 void MessageWidget::onSearchTextChanged(const QString &text)
 {

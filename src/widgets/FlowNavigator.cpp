@@ -183,7 +183,6 @@ FlowNavigator::FlowNavigator(QWidget *parent)
         } else if (item == proAutoConnect) {
             // 自动连接，连接后记录连接状态
             HardWareManager::instance().autoConnect();
-            qDebug() << "asfasf";
         }
         /* else if (item == downFlashItem) {
             TaskManager::instance().handleTreeItemActivation(15);

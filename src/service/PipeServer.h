@@ -17,7 +17,8 @@
 #include <QJsonParseError>
 #include <QJsonObject>
 #include "base/InitialConfig.h"
-#include "widgets/LogWidget.h"
+#include "entity/LogPipeContent.h"
+#include "entity/DataPipeContent.h"
 
 class PipeServer : public QObject {
 Q_OBJECT
@@ -38,9 +39,11 @@ public:
 
 signals:
     // 在解析成功后发射这些信号，将数据传给外部模块
-    void logArrived(int level, const QString &message, const QString &phase);
-    void dataArrived(const QJsonValue &dataValue,const int status);
-    void controlCommandArrived(const QJsonObject &command);
+    void logArrived(LogPipeContent one_log);
+    void dataArrived(DataPipeContent one_data);
+    void controlCommandArrived(const QString &phase, const QJsonObject &command);
+    // 一个阶段的结束信号
+    // void processFinished(const QString &phase,const int status);
 
 private slots:
     void handleLogConnection();

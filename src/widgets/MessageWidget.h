@@ -9,16 +9,18 @@
 #include <QHBoxLayout>
 #include <QString>
 
+// 定义日志存储结构
+using LogStorage = QMap<QString, QMap<QString, QStringList>>; // Phase -> (SubPhase -> List of Messages)
+
 class MessageWidget : public QWidget
 {
 Q_OBJECT
 
 public:
-    // 单例模式，提供全局访问点
     static MessageWidget *instance(QWidget *parent = nullptr);
 
-    // 添加日志消息
-    void addMessage(int level, const QString &message, const QString &phase, QTreeWidgetItem *parent = nullptr);
+    // 从 LogStorage 构建树
+    void populateTreeFromLogStorage(const LogStorage &logStorage);
 
 private slots:
     void onSearchTextChanged(const QString &text); // 搜索框文本变化时过滤
@@ -36,7 +38,7 @@ private:
     QPushButton *expandButton; // 展开按钮
     QPushButton *collapseButton; // 折叠按钮
 
-    void setupUI(); // 初始化UI
+    void init(); // 初始化UI
     bool filterTreeItem(QTreeWidgetItem *item, const QString &text); // 过滤树形项
 
     // 禁用拷贝构造和赋值操作
