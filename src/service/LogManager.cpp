@@ -34,12 +34,12 @@ LogManager::~LogManager() = default;
 void LogManager::addLog(const LogPipeContent& one_log) {
 
 
-    if (one_log.getMessage().isEmpty() || one_log.getPhase().isEmpty() || one_log.getSubPhase().isEmpty()) {
+    if (one_log.getMessageContent().isEmpty() || one_log.getPhase().isEmpty() || one_log.getSubPhase().isEmpty()) {
         qWarning() << "Invalid log data. Skipping entry.";
         return;
     }
 
-    QString message = one_log.getMessage();
+    QString message = one_log.getMessageContent();
     message = message.trimmed();
 
     // 同步到logwidget

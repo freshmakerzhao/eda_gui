@@ -121,7 +121,7 @@ public:
 
     //! Returns the PostScript level.
     //!
-    //! \sa setLevel()
+    //! \sa setLevelCode()
     int level() const;
 
     //! Returns true if trailing blank lines are included in a fold block.
