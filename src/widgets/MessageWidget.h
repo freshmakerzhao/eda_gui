@@ -23,8 +23,6 @@ public:
     void populateTreeFromLogStorage(const LogStorage &logStorage);
 
 private slots:
-    void onSearchTextChanged(const QString &text); // 搜索框文本变化时过滤
-    void onClearSearch();                          // 清空搜索
     void onExpandAll();                            // 展开所有项
     void onCollapseAll();                          // 折叠所有项
 
@@ -32,15 +30,21 @@ private:
     explicit MessageWidget(QWidget *parent = nullptr); // 私有构造函数
     ~MessageWidget(); // 私有析构函数
 
+    QWidget* baseWidget;
     QTreeWidget *treeWidget;   // 树形控件
+    QList<QTreeWidgetItem *> searchResults;
+    int currentResultIndex = -1;
+
     QLineEdit *searchBox;      // 搜索框
     QPushButton *clearButton;  // 清除搜索按钮
     QPushButton *expandButton; // 展开按钮
     QPushButton *collapseButton; // 折叠按钮
 
     void init(); // 初始化UI
-    bool filterTreeItem(QTreeWidgetItem *item, const QString &text); // 过滤树形项
-
+    void filterTreeItems(QTreeWidget *treeWidget, const QString &text);
+    void filterTreeItemRecursive(QTreeWidgetItem *item, const QString &text);
+    bool hasVisibleChildren(QTreeWidgetItem *item);
+    void navigateSearchResult(int step);
     // 禁用拷贝构造和赋值操作
     Q_DISABLE_COPY(MessageWidget)
 };

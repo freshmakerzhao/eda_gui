@@ -12,12 +12,7 @@
 #include <QString>
 #include <QJsonObject>
 
-// 日志级别枚举
 enum class StatusCode {
-    INFO_LOG,
-    WARNING_LOG,
-    CRITICAL_WARNING_LOG,
-    ERROR_LOG,
     SUCCESS,
     BAD_REQUEST,
     UNAUTHORIZED,
@@ -25,34 +20,46 @@ enum class StatusCode {
     INTERNAL_SERVER_ERROR
 };
 
+enum class LevelCode {
+    INFO_LOG,
+    WARNING_LOG,
+    CRITICAL_WARNING_LOG,
+    ERROR_LOG,
+    ALWAYS_LOG,
+};
+
 class LogPipeContent {
 private:
-    QString m_type;      // 数据类型
-    StatusCode m_level = StatusCode::INFO_LOG;    // 日志级别
-    QString m_message;   // 日志内容
+    QString m_pipe_type;      // 数据类型
+    LevelCode m_level_code = LevelCode::INFO_LOG;    // 日志级别
+    QString m_message_content;   // 日志内容
+    QString m_category;   // 日志标识类别
     QString m_phase;     // 阶段信息
-    QString m_subPhase;  // 子阶段信息
+    QString m_sub_phase;  // 子阶段信息
 
 public:
     // 构造函数
     LogPipeContent() = default;
-    LogPipeContent(const QString &type, int level, const QString &message, const QString &phase, const QString &subPhase);
+    LogPipeContent(const QString &pipe_type, int level_code, const QString &message_content, const QString &category, const QString &phase, const QString &sub_phase);
 
     // Getter 和 Setter 方法
-    QString getType() const;
-    void setType(const QString &type);
+    QString getPipeType() const;
+    void setPipeType(const QString &pipe_type);
 
-    StatusCode getLevel() const;
-    void setLevel(StatusCode level);
+    LevelCode getLevelCode() const;
+    void setLevelCode(LevelCode level_code);
 
-    QString getMessage() const;
-    void setMessage(const QString &message);
+    QString getMessageContent() const;
+    void setMessageContent(const QString &message_content);
+
+    QString getCategory() const;
+    void setCategory(const QString &category);
 
     QString getPhase() const;
     void setPhase(const QString &phase);
 
     QString getSubPhase() const;
-    void setSubPhase(const QString &subPhase);
+    void setSubPhase(const QString &sub_phase);
 
     // 转换为 JSON 对象
     QJsonObject toJson() const;
