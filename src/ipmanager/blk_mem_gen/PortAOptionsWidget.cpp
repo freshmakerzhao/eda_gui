@@ -30,7 +30,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     portADepthLineEdit->setText("16");
     QHBoxLayout *portADepthLayout = new QHBoxLayout;
     portADepthLayout->addWidget(portADepthLineEdit);
-    portADepthRangeLabel = new QLabel("Range: -- to --", this);
+    portADepthRangeLabel = new QLabel("Range: 2 to 32768", this);
     portADepthLayout->addWidget(portADepthRangeLabel);
     fLayout->addRow("Port A Depth", portADepthLayout);
     fLayout->addRow(new QLabel("The Width and Depth values are used for Read Operation in Port A", this));
@@ -87,6 +87,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
 
 void PortAOptionsWidget::updatePortADepthRange()
 {
+    const int RAMB36E1_NUB = 128;
     // 在此处编写计算Port A Depth Range公式
     if(portAWidthLineEdit->text().isEmpty()) {
         portADepthLineEdit->clear();
@@ -98,11 +99,13 @@ void PortAOptionsWidget::updatePortADepthRange()
 
     int portAWidth = portAWidthLineEdit->text().toInt();
     if (portAWidth <= 0) return;
-    else if (portAWidth == 1) portADepthMax = 32768;
-    else if (portAWidth == 2) portADepthMax = 16385;
-    else if (portAWidth <= 4) portADepthMax = 8192;
-    else if (portAWidth <= 9) portADepthMax = 4096;
-    else if (portAWidth <= 18) portADepthMax = 2048;
+
+    int unitWidth = portAWidth / RAMB36E1_NUB;
+    if (unitWidth <= 1) portADepthMax = 32768;
+    else if (unitWidth <= 2) portADepthMax = 16385;
+    else if (unitWidth <= 4) portADepthMax = 8192;
+    else if (unitWidth <= 9) portADepthMax = 4096;
+    else if (unitWidth <= 18) portADepthMax = 2048;
     else portADepthMax = 1024;
 
     if(portAWidth > 4608)
