@@ -1,4 +1,6 @@
 #include "PortBOptionsWidget.h"
+#include <cmath>
+#include <unordered_map>
 
 PortBOptionsWidget::PortBOptionsWidget(QWidget *parent, PortAOptionsWidget *portA) :
     BasePage(parent)
@@ -78,24 +80,26 @@ void PortBOptionsWidget::UpdatePortBWidth(PortAOptionsWidget *portA) {
         portBWidthComboBox->clear();
         return;
     }
-    int i = 0;
     int portAWidth = portA->portAWidthLineEdit->text().toInt();
     int portADepth = portA->portADepthLineEdit->text().toInt();
     capacity = portAWidth * portADepth;
     std::vector<int> widths;
+
+    int count = 0;
+
     int width_less = portAWidth;
     widths.insert(widths.begin(), portAWidth);
-    while(width_less % 2 == 0) {
+    while(width_less % 2 == 0 && count < 6) {
         width_less /= 2;
         widths.insert(widths.begin(), width_less);
-        i ++;
+        count ++;
     }
-    i = 0;
+    count = 0;
     int width_greater = 2 * portAWidth;
-    while(width_greater <= 4608 && width_greater <= capacity) {
+    while(width_greater <= 4608 && width_greater <= capacity && count < 5) {
         widths.push_back(width_greater);
         width_greater *= 2;
-        i ++;
+        count ++;
     }
 
     portBWidthComboBox->clear();
