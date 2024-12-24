@@ -36,6 +36,10 @@ public:
         TopModule,
         DisplayPart,
         FamilyName,
+        BinFile,
+        RbtFile,
+        CRCOption,
+        CompressOption,
     };
 
     /**
@@ -57,20 +61,25 @@ public:
                      const QString &familyName = QString("MgiCubo"));
 
     bool writeProject();
-
+    void saveGenerateBitstreamOptions(tinyxml2::XMLElement *stepGenerateBitstreamElement);
     /**
      * 解析工程文件，将工程参数保存在Map
      * @param hprPath 工程文件(*.hpr)路径
      * @return
      */
     bool parseProject(const QString &hprPath);
-
+    bool parseRunsOptionValue(tinyxml2::XMLElement *runsRoot);
+    void parseStepOptions(tinyxml2::XMLElement *step);
     /**
      * 获取工程参数
      * @param key
      * @return
      */
     QString getParameter(const Project::ParamKey key) const;
+    void updateBinFileOption(const QString &binFileOptionStatus);
+    void updateRbtFileOption(const QString &rbtFileOptionStatus);
+    void updateCRCOption(const QString &crcOptionStatus);
+    void updateCompressOption(const QString &compressOptionStatus);
 
     /**
      * 获取所有工程参数

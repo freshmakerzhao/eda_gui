@@ -289,6 +289,23 @@ void ProjectManager::setTopModule(const QString &topModule)
     }
 }
 
+void ProjectManager::updateBinFileOption(const QString &binFileOptionStatus){
+    if (_project)
+        _project->updateBinFileOption(binFileOptionStatus);
+}
+void ProjectManager::updateRbtFileOption(const QString &rbtFileOptionStatus){
+    if (_project)
+        _project->updateRbtFileOption(rbtFileOptionStatus);
+}
+void ProjectManager::updateCompressOption(const QString &compressOptionStatus){
+    if (_project)
+        _project->updateCompressOption(compressOptionStatus);
+}
+void ProjectManager::updateCRCOption(const QString &crcOptionStatus){
+    if (_project)
+        _project->updateCRCOption(crcOptionStatus);
+}
+
 void ProjectManager::setDevicePart(const QString &deviceInfo)
 {
     if (_project) {
@@ -362,5 +379,13 @@ ProjectManager::~ProjectManager()
 {
     if (_project) {
         delete _project;
+    }
+}
+
+void ProjectManager::writeAndLoadProject()
+{
+    if (_project) {
+        _project->writeProject();
+        loadFiles(_project);
     }
 }

@@ -72,7 +72,7 @@ public:
      * @param project 工程实例
      */
     void loadFiles(Project *project);
-
+    void writeAndLoadProject();
     /**
      * 启动Wizard，添加Sources
      */
@@ -92,6 +92,11 @@ public:
     bool removeFileAction(const QString &path, const bool &erase = false);
 
     void setTopModule(const QString &topModule);
+
+    void updateBinFileOption(const QString &binFileOptionStatus);
+    void updateRbtFileOption(const QString &rbtFileOptionStatus);
+    void updateCRCOption(const QString &crcOptionStatus);
+    void updateCompressOption(const QString &compressOptionStatus);
 
     void setDevicePart(const QString &deviceInfo);
 

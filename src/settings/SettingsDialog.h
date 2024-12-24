@@ -8,6 +8,7 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include "GeneralPage.h"
+#include "BitstreamSettingPage.h"
 
 class SettingsDialog : public QDialog
 {
@@ -25,6 +26,7 @@ private:
     QStackedWidget *stackedWidget;
     QTreeWidget *treeWidget;
     GeneralPage *generalPage;
+    BitstreamSettingPage *bitstreamSettingPage;
 };
 
 #endif // SETTINGSDIALOG_H
