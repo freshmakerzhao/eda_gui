@@ -16,11 +16,13 @@
 #include <QScreen>
 #include <QDebug>
 
-static int GLOBAL_TILE_BLOCK_WIDTH  = 210;
-static int GLOBAL_TILE_BLOCK_HEIGHT = 100;
+static int SITE_NUB_ON_TILE = 2;
+static int GLOBAL_TILE_BLOCK_WIDTH  = 2100;
+static int GLOBAL_TILE_BLOCK_HEIGHT = 1000;
 
-static int GLOBAL_SITE_BLOCK_WIDTH  = 90;
-static int GLOBAL_SITE_BLOCK_HEIGHT = 80;
+static int SITE_GAP = 100;
+static int GLOBAL_SITE_BLOCK_WIDTH  = (GLOBAL_TILE_BLOCK_WIDTH - (SITE_NUB_ON_TILE+1) * SITE_GAP) / SITE_NUB_ON_TILE;
+static int GLOBAL_SITE_BLOCK_HEIGHT = GLOBAL_TILE_BLOCK_HEIGHT - 2 * SITE_GAP;
 
 // 全局资源路径
 namespace GlobalConfig {

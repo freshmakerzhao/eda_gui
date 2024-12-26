@@ -69,9 +69,9 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() & Qt::ControlModifier) {
         if (e->angleDelta().y() > 0)
-            view->zoomIn(6);
+            view->zoomIn(10);
         else
-            view->zoomOut(6);
+            view->zoomOut(10);
         e->accept();
     } else {
         QGraphicsView::wheelEvent(e);
@@ -110,9 +110,9 @@ View::View(const QString &name, QWidget *parent)
     zoomOutIcon->setIconSize(iconSize);
 
     zoomSlider = new QSlider;
-    zoomSlider->setMinimum(0);  // 设置滑块的最小值为0
+    zoomSlider->setMinimum(-250);  // 设置滑块的最小值为0
     zoomSlider->setMaximum(500); // 设置滑块的最大值为500
-    zoomSlider->setValue(250); // 设置滑块的初始值为250
+    zoomSlider->setValue(-150); // 设置滑块的初始值为250
     zoomSlider->setTickPosition(QSlider::TicksRight); // 设置滑块的刻度位置在右侧
 
     //用于放置放大和缩小按钮及滑块
