@@ -135,6 +135,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
             {"CMT_TOP_R_LOWER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 9}, {"Y_GAP", -7}}},
             {"CMT_TOP_R_LOWER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 16}, {"Y_GAP", -7}}},
             {"BRAM_L", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
+            {"BRAM_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
             {"DSP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
             {"DSP_L", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
             {"LIOB33", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
@@ -225,11 +226,8 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                     if (site.type == "SLICEL") {
                         SitesBlock* site_block = new SitesSliceL(
                             Qt::white,
-//                            GLOBAL_SITE_BLOCK_WIDTH,
-//                            GLOBAL_SITE_BLOCK_HEIGHT,
                             i,
                             j,
-//                            site.type,
                             site.name,
                             site.index
                             );
@@ -238,94 +236,175 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                     } else if (site.type == "SLICEM") {
                         SitesBlock* site_block = new SitesSliceM(
                             Qt::white,
-//                            GLOBAL_SITE_BLOCK_WIDTH,
-//                            GLOBAL_SITE_BLOCK_HEIGHT,
                             i,
                             j,
-//                            site.type,
                             site.name,
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
                         site_block->setPos(QPointF(SITE_GAP*(index+1) + GLOBAL_SITE_BLOCK_WIDTH*index, SITE_GAP));
+
                     } else if (site.type == "IOB33") {
                         SitesBlock* site_block = new SitesIOB33(
                             Qt::white,
-//                            GLOBAL_SITE_BLOCK_WIDTH,
-//                            GLOBAL_SITE_BLOCK_HEIGHT,
                             i,
                             j,
-//                            site.type,
                             site.name,
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
-                        //site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
                         site_block->setPos(QPointF(600, SITE_GAP));
+
                     } else if (site.type == "BUFR") {
                         SitesBlock* site_block = new SitesBUFR(
                             Qt::white,
-//                            GLOBAL_SITE_BLOCK_WIDTH-400,
-//                            GLOBAL_SITE_BLOCK_HEIGHT-650,
                             i,
                             j,
-//                            site.type,
                             site.name,
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
-                        // site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
-                        // site_block->setPos(QPointF(10*(index+1) + 10*index, 10));
-                        site_block->setPos(QPointF(800, SITE_GAP*(index-4+1) + SITE_GAP*(index-4)));
+                        site_block->setPos(QPointF(
+                                SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
+                                SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
+                        ));
                     } else if (site.type == "BUFIO") {
                         SitesBlock* site_block = new SitesBUFIO(
                             Qt::white,
-//                            GLOBAL_SITE_BLOCK_WIDTH-400,
-//                            GLOBAL_SITE_BLOCK_HEIGHT-650,
                             i,
                             j,
-//                            site.type,
                             site.name,
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
-                        // site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
-                        // site_block->setPos(QPointF(10*(index+1) + 10*index, 10));
-                        site_block->setPos(QPointF(SITE_GAP, SITE_GAP*(index+1) + SITE_GAP*index));
+                        site_block->setPos(QPointF(
+                                SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
+                                SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
+                        ));
                     } else if (site.type == "IDELAYCTRL") {
                         SitesBlock* site_block = new SitesIDELAYCTRL(
                             Qt::white,
-//                            GLOBAL_SITE_BLOCK_WIDTH-400,
-//                            GLOBAL_SITE_BLOCK_HEIGHT-450,
                             i,
                             j,
-//                            site.type,
                             site.name,
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
-                        // site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
-                        // site_block->setPos(QPointF(10*(index+1) + 10*index, 10));
-                        // site_block->setPos(QPointF(10, 10*(index+1) + 10*index));
-                        site_block->setPos(QPointF(1500, SITE_GAP*(index-8+1) + SITE_GAP*(index-8)));
-                    } else {
-                        SitesBlock* site_block = new Sites(
-                            Qt::white,
-//                            GLOBAL_SITE_BLOCK_WIDTH,
-//                            GLOBAL_SITE_BLOCK_HEIGHT,
-                            i,
-                            j,
-//                            site.type,
-                            site.name,
-                            site.index
-                            );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        site_block->setPos(QPointF(SITE_GAP*(index+1) + GLOBAL_SITE_BLOCK_WIDTH*index, SITE_GAP));
-                    }
+                        site_block->setPos(QPointF(
+                                SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
+                                SITE_GAP*(index%3+1) + site_block->getHeight()*(index%4)
+                                ));
 
+                    } else if (site.type == "OLOGICE3") {
+                        SitesBlock* site_block = new SitesOLOGICE3(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF (
+                                SITE_GAP*(index/2+1) + site_block->getWidth()*(index/2),
+                                SITE_GAP*(index%2+1) + site_block->getHeight()*(index%2)
+                                ));
+                    } else if (site.type == "ILOGICE3") {
+                        SitesBlock* site_block = new SitesILOGICE3(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos ( QPointF(
+                                SITE_GAP*(index/2+1) + site_block->getWidth()*(index/2),
+                                SITE_GAP*(index%2+1) + site_block->getHeight()*(index%2)
+                        ));
+                    } else if (site.type == "IDELAYE2") {
+                        SitesBlock* site_block = new SitesIDELAYE2(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos ( QPointF(
+                                SITE_GAP*(index/2+1) + site_block->getWidth()*(index/2),
+                                SITE_GAP*(index%2+1) + site_block->getHeight()*(index%2)
+                        ));
+
+                    }else {
+                            SitesBlock* site_block = new Sites(
+                                    Qt::white,
+                                    i,
+                                    j,
+                                    site.name,
+                                    site.index
+                                    );
+                            gridMatrix[i][j]->addSubBlock(site_block);
+                            site_block->setPos(QPointF(SITE_GAP*(index+1) + GLOBAL_SITE_BLOCK_WIDTH*index, SITE_GAP));
+                    }
                     // ------------------------------
                     site_type_set.insert(site.type);
                     // ------------------------------
+                }
+            } else {
+                for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
+                    NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
+                    if (site.type == "IOB33M" || site.type == "IOB33S") {
+                        SitesBlock* site_block = new SitesIOB33(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(600, SITE_GAP*(index+1) + site_block->getHeight()*index));
+                    } else if (site.type == "FIFO18E1") {
+                        SitesBlock* site_block_0 = new SitesRAMB36E1(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block_0);
+                        site_block_0->setPos(QPointF(SITE_GAP, SITE_GAP));
+                        site_type_set.insert("RAMB38E1");
+                        SitesBlock* site_block = new SitesFIFO18E1(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(2*SITE_GAP, SITE_GAP*(index+2) + site_block->getHeight()*index));
+                    } else if (site.type == "RAMB18E1") {
+                        SitesBlock* site_block = new SitesRAMB18E1(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(2*SITE_GAP, SITE_GAP*(index+2) + site_block->getHeight()*index));
+                    } else if (site.type == "DSP48E1") {
+                        SitesBlock* site_block = new SitesDSP48E1(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(SITE_GAP, SITE_GAP*(index+1) + site_block->getHeight()*index));
+                    }
+                    site_type_set.insert(site.type);
                 }
             }
         }
@@ -409,7 +488,7 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
     int colorIndex = 0;
 
     QPen pen;
-    pen.setWidth(5);
+    pen.setWidth(2);
     pen.setCosmetic(true);
 
     for (const auto& region : clock_region_bounding_boxes) {

@@ -69,9 +69,9 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() & Qt::ControlModifier) {
         if (e->angleDelta().y() > 0)
-            view->zoomIn(10);
+            view->zoomIn(40);
         else
-            view->zoomOut(10);
+            view->zoomOut(40);
         e->accept();
     } else {
         QGraphicsView::wheelEvent(e);

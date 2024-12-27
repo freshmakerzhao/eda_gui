@@ -161,11 +161,15 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     QLabel* colNumLabel = new QLabel("Number of col:");
     QLabel* siteNameLabel = new QLabel("Site:");
     QLabel* siteTypeLabel = new QLabel("Site type:");
+    QLabel* NameLabel = new QLabel("Name:");
+    QLabel* TypeLabel = new QLabel("Type:");
     tileTypeValue = new QLabel;
     rowNumValue = new QLabel;
     colNumValue = new QLabel;
     siteNameValue = new QLabel;
     siteTypeValue = new QLabel;
+    NameValue = new QLabel;
+    TypeValue = new QLabel;
     // 设置每个 QLabel 的最小宽度
     // const int labelMinimumWidth = 150;
     // tileTypeLabel->setMinimumWidth(labelMinimumWidth);
@@ -179,18 +183,24 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     colNumLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     siteNameLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     siteTypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    NameLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    TypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     tileTypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     rowNumValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     colNumValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     siteNameValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     siteTypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    NameValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    TypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     formLayout->addRow(tileTypeLabel, tileTypeValue);
     formLayout->addRow(rowNumLabel, rowNumValue);
     formLayout->addRow(colNumLabel, colNumValue);
     formLayout->addRow(siteNameLabel, siteNameValue);
     formLayout->addRow(siteTypeLabel, siteTypeValue);
+    formLayout->addRow(NameLabel, NameValue);
+    formLayout->addRow(TypeLabel, TypeValue);
 
     // 创建一个包含表单的widget
     QWidget *formWidget = new QWidget();
@@ -235,7 +245,10 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
            // 先断开再链接，避免多次链接
            connect(item, &Tiles::BlockClicked, this, &FrameView::showTileInfo);
            for (SitesBlock* site:item->child_items) {
-               connect(site, &SitesSliceL::SiteClicked, this, &FrameView::showSiteInfo);
+               connect(site, &SitesBlock::SiteClicked, this, &FrameView::showSiteInfo);
+               for (BelsBlock* bel: site->child_bel_items) {
+                   connect(bel, &BelsBlock::BelClicked, this, &FrameView::showBelInfo);
+               }
            }
        }
    }
@@ -250,6 +263,8 @@ void FrameView::showTileInfo(int col, int row) {
     colNumValue->setText(QString::number(col));
     siteNameValue->setText("");
     siteTypeValue->setText("");
+    NameValue->setText("");
+    TypeValue->setText("");
 }
 
 void FrameView::showSiteInfo(int col, int row,bool sites_visible_status,int index){
@@ -265,4 +280,23 @@ void FrameView::showSiteInfo(int col, int row,bool sites_visible_status,int inde
         siteNameValue->setText("");
         siteTypeValue->setText("");
     }
+    NameValue->setText("");
+    TypeValue->setText("");
+}
+
+void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_status, int index) {
+    NormalTile one = viewer.getTileInfo(col,row);
+    // 更新标签文本
+    tileTypeValue->setText(QString::fromStdString(one.types));
+    rowNumValue->setText(QString::number(row));
+    colNumValue->setText(QString::number(col));
+    if (bel_visible_status){
+        siteNameValue->setText(QString::fromStdString(one.cur_sites[index].name));
+        siteTypeValue->setText(QString::fromStdString(one.cur_sites[index].type));
+    } else {
+        siteNameValue->setText("");
+        siteTypeValue->setText("");
+    }
+    NameValue->setText("");
+    TypeValue->setText("");
 }

@@ -17,6 +17,8 @@ public:
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
     std::string getName() const;
+    int getWidth() const;
+    int getHeight() const;
 protected:
     int width;
     int height;

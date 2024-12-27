@@ -12,7 +12,7 @@
 #include "grid/view.h"
 #include <QDialog>
 #include <QWidget>
-#include "blocks/Sites.h"
+#include "blocks/SitesMods.h"
 #include <QLabel>
 #include "grid/ChipGridOperations.h"
 #include <QApplication>
@@ -44,10 +44,13 @@ private:
     QLabel *rowNumValue;
     QLabel *siteNameValue;
     QLabel *siteTypeValue;
+    QLabel *NameValue;
+    QLabel *TypeValue;
 
 public slots:
     void showTileInfo(int x,int y);
     void showSiteInfo(int x,int y,bool sites_visible_status,int index);
+    void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index);
 
 };
 

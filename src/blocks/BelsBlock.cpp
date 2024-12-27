@@ -8,8 +8,8 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-BelsBlock::BelsBlock(const QColor &color, int cur_width, int cur_height, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index)
-    : Block(cur_width, cur_height, color), site_index(site_index), name(cur_name), bel_type(bel_type) {
+BelsBlock::BelsBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index)
+    : Block(cur_width, cur_height, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_index(site_index), name(cur_name), bel_type(bel_type) {
 
 }
 
@@ -32,7 +32,7 @@ void BelsBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillCol
 }
 
 void BelsBlock::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    emit BelClicked(site_index, visible_status, index);
+    emit BelClicked(tile_index_x, tile_index_y, site_index, visible_status, index);
 }
 
 void BelsBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {

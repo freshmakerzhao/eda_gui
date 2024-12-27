@@ -79,3 +79,11 @@ void Block::updateVisibleStatus(bool status) {
 std::string Block::getName() const {
     return this->name;
 }
+
+int Block::getWidth() const {
+    return this->width;
+}
+
+int Block::getHeight() const {
+    return this->height;
+}
