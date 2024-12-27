@@ -185,10 +185,13 @@ void ProjectManager::loadFiles(Project *project)
     TclConsole::instance()->executeTclCommand(updateFileSetCmd);
     updateFileSetCmd = "update_fileset constrs";
     TclConsole::instance()->executeTclCommand(updateFileSetCmd);
+    updateFileSetCmd = "update_fileset simulations";
+    TclConsole::instance()->executeTclCommand(updateFileSetCmd);
 
-    // 存储设计文件与约束文件
+    // 存储设计文件，约束文件，仿真文件
     TaskManager::instance().sourcePathList = _project->sourceList;
     TaskManager::instance().constraintPathList = _project->constraintList;
+    TaskManager::instance().simPathList = _project->simList;
     // 设置工程参数
     TaskManager::instance().setParams(_project->getAllParameters());
     // 设置工程参数
@@ -196,6 +199,7 @@ void ProjectManager::loadFiles(Project *project)
     // 加载文件树
     FileManager::instance()->updateDesignSources(_project->sourceList);
     FileManager::instance()->updateConstraints(_project->constraintList);
+    FileManager::instance()->updateSimSources( _project->simList);
     // UI反馈
     MainWindow::instance()->showProjectTitle(0, _project->getParameter(Project::Path) + "/" + _project->getParameter(Project::Name) + ".hpr");
     MainWindow::instance()->setForm(0);
@@ -208,7 +212,7 @@ void ProjectManager::addSourcesAction()
 {
     if (_project == nullptr) {
         CustomMessageBox::showQuestion(MainWindow::instance(), "Warning",
-                                      "Please select or create a project.");
+                                       "Please select or create a project.");
         return;
     }
     Wizard wizard(MainWindow::instance(), 1);
@@ -246,6 +250,13 @@ void ProjectManager::addSourcesInProject(const QStringList &src, const int &mode
             _project->constraintList.append(targetPath + QFileInfo(file).fileName());
         }
         break;
+    case 2:
+        targetPath = path + "/simulations/";
+        foreach (const QString &file, src) {
+            QFile::copy(file, targetPath + QFileInfo(file).fileName());
+            _project->simList.append(targetPath + QFileInfo(file).fileName());
+        }
+        break;
     default:
         break;
     }
@@ -269,6 +280,8 @@ bool ProjectManager::removeFileAction(const QString &path, const bool &erase)
         _project->sourceList.removeOne(path);
     } else if (folderName == "constraints") {
         _project->constraintList.removeOne(path);
+    } else if(folderName == "simulations") {
+        _project->simList.removeOne(path);
     }
 
     if (erase) {
@@ -319,6 +332,14 @@ QStringList ProjectManager::getConstraintsList() const
         return QStringList();
     }
     return _project->constraintList;
+}
+
+QStringList ProjectManager::getSimSourcesList() const
+{
+    if (!_project) {
+        return QStringList();
+    }
+    return _project->simList;
 }
 
 void ProjectManager::closeProject()

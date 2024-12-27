@@ -16,8 +16,8 @@ struct ProcessMessage {
 };
 
 class ProcessManager
-        : public QObject {
-Q_OBJECT
+    : public QObject {
+    Q_OBJECT
 public:
     static ProcessManager& instance();
     QProcess *getProcess();
@@ -53,7 +53,7 @@ public:
     QString nextpName = nullptr;
 
     void excuteCommand(const QString &phase, const QStringList& command);
-
+    bool flowProcessFinished = true;
     /**
      * 初始化环境变量
      */

@@ -31,7 +31,7 @@ public:
     static FileManager *instance(QWidget *parent = nullptr);
 
 protected:
-    // void keyPressEvent(QKeyEvent* event) override;
+           // void keyPressEvent(QKeyEvent* event) override;
 
 public slots:
     void showContextMenu(const QPoint& pos);
@@ -47,6 +47,12 @@ public slots:
      * @param list Constraints文件路径列表
      */
     void updateConstraints(const QStringList &list);
+
+    /**
+     * @brief 更新simulation 文件
+     * @param list simulation 文件路径列表
+     */
+    void updateSimSources(const QStringList &list);
 
     void clickedFile(const QModelIndex& index);
 
@@ -78,6 +84,8 @@ private:
     QStandardItem *designsources;
 
     QStandardItem *constraints;
+
+    QStandardItem *simulationSource;
 
     QStandardItem *ipLists;
 
