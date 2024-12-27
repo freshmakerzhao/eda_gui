@@ -86,6 +86,20 @@ void FileManager::updateConstraints(const QStringList &list)
     }
 }
 
+void FileManager::updateSimSources(const QStringList &list)
+{
+    simulationSource->removeRows(0, simulationSource->rowCount());
+    foreach (const QString &file, list) {
+        QStandardItem* node = new QStandardItem(QIcon(":/icons/resource/icons/38-1icon_source_file.png"),QFileInfo(file).fileName());
+        node->setData(QFileInfo(file).filePath(), Qt::UserRole); // 设置Qt::UserRole数据
+        simulationSource->appendRow(node);
+    }
+
+    fileWatcher->addPath(QDir(ProjectManager::instance().getParameter(Project::Path)).filePath("ip"));
+    updateIPList();
+}
+
+
 void FileManager::clickedFile(const QModelIndex& index)
 {
     const QString path = index.data(Qt::UserRole).toString();
@@ -147,6 +161,7 @@ void FileManager::cleanFileItems()
 {
     designsources->removeRows(0, designsources->rowCount());
     constraints->removeRows(0, constraints->rowCount());
+    simulationSource->removeRows(0, simulationSource->rowCount());
     ipLists->removeRows(0, ipLists->rowCount());
 }
 
@@ -225,10 +240,12 @@ FileManager::FileManager(QWidget *parent) : QTreeView(parent)
     setModel(model);
     designsources = new QStandardItem("Design Sources");
     constraints = new QStandardItem("Constraints");
+    simulationSource = new QStandardItem("Simulation Sources");
     ipLists = new QStandardItem("IP Sources");
     model->setItem(0, 0, designsources);
     model->setItem(1, 0, constraints);
-    model->setItem(2, 0, ipLists);
+    model->setItem(2, 0, simulationSource);
+    model->setItem(3, 0, ipLists);
 
     fileWatcher = new QFileSystemWatcher(this);
     QObject::connect(fileWatcher, &QFileSystemWatcher::directoryChanged, [&](const QString &changedPath) {

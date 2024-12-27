@@ -52,6 +52,7 @@ public:
 
     QStringList sourcesFilesList;
     QStringList constraintFilesList;
+    QStringList simFileList;
     QString part;
     QString displayPart;
     QString familyName;
@@ -64,6 +65,7 @@ public:
         Page_ProjectName,
         Page_Source,
         Page_Constraint,
+        Page_Simulation_Source,
         Page_DefaultPart
     };
 

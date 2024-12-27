@@ -53,6 +53,9 @@ void ProcessManager::handleChannelReadyReadOutput()
 // process执行结束后触发
 void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus)
 {
+    if(!flowProcessFinished){
+        return;
+    }   // 一个flow 没有执行完成，不能显示窗口。
     if (curPhase == "Implementation") {
         // 延迟 5000 毫秒，但保持 UI 响应
         QEventLoop loop;
@@ -121,6 +124,7 @@ void ProcessManager::excuteCommand(const QString &phase, const QStringList& comm
     process->terminate(); // 执行前中断process
 
     QStringList script;
+    flowProcessFinished = true;
     if (phase == "Synthesis"){
         // script << "/c" << projectProperty["synthesizer_path"] << command;
     } else if (phase == "Implementation"){
@@ -131,7 +135,7 @@ void ProcessManager::excuteCommand(const QString &phase, const QStringList& comm
     } else if (phase == "Download Bitstream") {
         script << "/c" << command;
     } else if(phase == "Simulation Compile")  {
-         script << "/c" << command;
+        script << "/c" << command;
     } else if(phase == "Simulation Run")  {
         script << "/c" << command;
     }
@@ -147,6 +151,7 @@ void ProcessManager::excuteCommand(const QString &phase, const QStringList& comm
         qDebug() << command;
         process->start(projectProperty["synthesizer_path"], command);
     } else if(phase == "Simulation Compile") {
+        flowProcessFinished = false;
         process->start("cmd.exe", script);
         process->waitForFinished();  // 先编译出文件，再执行此文件。所以需要等此process执行完成才能执行仿真
     }
@@ -158,9 +163,9 @@ void ProcessManager::excuteCommand(const QString &phase, const QStringList& comm
 void ProcessManager::initEnvironment() {
     env = QProcessEnvironment::systemEnvironment();
 
-//    QString origin_path = env.value("PATH");
-//    origin_path += ";" + QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));
-//    qgetenv("WINDIR")
+    //    QString origin_path = env.value("PATH");
+    //    origin_path += ";" + QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));
+    //    qgetenv("WINDIR")
 
     QString system32_path =  QString("%1\\System32").arg(QString::fromLocal8Bit(qgetenv("WINDIR")));
     QString yosys_lib_path =  QString::fromStdString(StringUtilities::concatPath({GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));;

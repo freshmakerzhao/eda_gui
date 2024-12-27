@@ -30,11 +30,11 @@ public:
 
     // 两个选项的弹窗，true 左侧，false 右侧
     bool twoOptionMsg(
-            const QString &title,
-            const QString &text,
-            QMessageBox::StandardButton buttonLeft,
-            QMessageBox::StandardButton buttonRight
-    );
+        const QString &title,
+        const QString &text,
+        QMessageBox::StandardButton buttonLeft,
+        QMessageBox::StandardButton buttonRight
+        );
 
     /**
      * 关闭工程清除参数
@@ -50,10 +50,11 @@ public:
     //! 移除受监控的文件
     void removeWatchFile(const QString &filePath);
 
-//    QStringList sourceList;
-    // 存储设计与约束文件
+    //    QStringList sourceList;
+    // 存储设计，约束文件与仿真激励文件
     QList<QString> sourcePathList;
     QList<QString> constraintPathList;
+    QList<QString> simPathList;
 
 public slots:
     void handleMessage(ProcessMessage &msg);
