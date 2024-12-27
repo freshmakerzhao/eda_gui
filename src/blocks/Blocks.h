@@ -10,8 +10,7 @@
 #ifndef BLOCKS_H
 #define BLOCKS_H
 #include <QGraphicsItem>
-#include <blocks/Sites.h>
-#include <blocks/SitesSliceL.h>
+#include <blocks/SitesMods.h>
 
 class Blocks : public QGraphicsObject {
 Q_OBJECT

@@ -12,10 +12,10 @@
 class BelsBlock : public Block {
 Q_OBJECT
 public:
-    BelsBlock(const QColor &color, int cur_width, int cur_height, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index);
+    BelsBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index);
     std::string getBelName() const;
 signals:
-    void BelClicked(int site_index, bool bel_visible_status, int bel_index);
+    void BelClicked(int tile_index_x, int tile_index_y, int site_index, bool bel_visible_status, int bel_index);
 private:
     bool showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) override;
     void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
@@ -23,6 +23,8 @@ private:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 protected:
+    int tile_index_x;
+    int tile_index_y;
     int site_index;
     int index;
     std::string bel_type;
