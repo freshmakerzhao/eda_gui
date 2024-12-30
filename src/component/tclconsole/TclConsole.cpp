@@ -336,27 +336,27 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
 
 int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
-    const QString phaseCompile = "Simulation Compile";
+    const QString phaseSimulation ="Simulation Run";
     //  argv ： sim_design     编译源文件
     //  iverilog  -y  verilog\src\retarget\ -y verilog\src\unisims\ -o tb_run  sourve.v
 
     //   command
-    QStringList scriptCompile;
-    scriptCompile << "%SIMULATION_COMPILER_PATH%";
+    QStringList scriptSimRun;
+    scriptSimRun << "%SIMULATION_COMPILER_PATH%";
     //  -y lib
-    const QString designElementPath = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulationer\share\element_design_lib\)";
-    scriptCompile << QString("-y")<<(designElementPath + R"(retarget\)");
-    scriptCompile << QString("-y")<<(designElementPath +R"(unisims\)");
-    scriptCompile << QString("-y")<<(designElementPath +R"(glbl\)");
+   const QString designElementPath = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulationer\share\element_design_lib\)";
+    scriptSimRun << QString("-y")<<(designElementPath + R"(retarget\)");
+    scriptSimRun << QString("-y")<<(designElementPath + R"(unisims\)");
+    scriptSimRun << QString("-y")<<(designElementPath + R"(glbl\)");
     //  -o  compile_file
     const  QString compileFile = "tb_run";
     //scriptFirst << QString("-o  %1").arg("tb_run");
     // scriptFirst << QString("-o  tb_run");
-    scriptCompile << "-o" << compileFile;
-        // Design Sources
+    scriptSimRun << "-o" << compileFile;
+     // Design Sources
     QStringList sourceFileList;
     getOriginalFile(interp, sourceFileList, "source");
-    scriptCompile.append(sourceFileList);
+    scriptSimRun.append(sourceFileList);
     // 仿真路径
     const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
     const QString workDir = QString(workDirVar);
@@ -366,7 +366,7 @@ int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, c
     // 添加激励文件
     QStringList tbSourceFileList;
     getOriginalFile(interp, tbSourceFileList, "simulation");
-    scriptCompile.append(tbSourceFileList);
+    scriptSimRun.append(tbSourceFileList);
     // 生成波形配置文件
     const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
     if (topVar == nullptr) {
@@ -380,21 +380,18 @@ int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, c
         return TCL_ERROR;
     }
     //  添加波形配置文件
-    scriptCompile << configWaveFullFilePath;
+    scriptSimRun << configWaveFullFilePath;
 
     // generating command finish.
     QString info = QString("Starting sim_design\n");
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
     //  设置路径
     ProcessManager::instance().configWorkPath(simPath);
-    // 执行编译命令
-    ProcessManager::instance().excuteCommand(phaseCompile, scriptCompile);
 
     //  执行仿真:  vvp  compileFile
-    const QString phaseRunSim = "Simulation Run";
-    QStringList scriptRunSim;
-    scriptRunSim <<"%SIMULATION_RUN_PATH%" << compileFile;
-    ProcessManager::instance().excuteCommand(phaseRunSim, scriptRunSim);
+    scriptSimRun << "&&";
+    scriptSimRun <<"%SIMULATION_RUN_PATH%" << compileFile;
+    ProcessManager::instance().excuteCommand(phaseSimulation, scriptSimRun);
 
     return TCL_OK;
 }

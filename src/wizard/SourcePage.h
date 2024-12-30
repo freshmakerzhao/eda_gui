@@ -13,7 +13,7 @@
 
 #include "Wizard.h"
 
-enum eAddSourceType {
+enum AddSourceType {
     AddSources,
     AddSimulationSources
 };
@@ -22,7 +22,7 @@ class SourcesPage : public QWizardPage
 {
     Q_OBJECT
 public:
-    SourcesPage( QWidget *parent = nullptr, const int mode = 0, const eAddSourceType sourceType = eAddSourceType::AddSources);
+    SourcesPage(QWidget *parent = nullptr, const int mode = 0, const AddSourceType sourceType = AddSourceType::AddSources);
 
 private:
     QStandardItemModel *model;
@@ -30,7 +30,7 @@ private:
     WizTableView *tableView;
 
     int _mode;
-    eAddSourceType mSourceType;
+    AddSourceType mSourceType;
 
     const QMap<QString, QString> Map = {
         {"v", "verilog"}

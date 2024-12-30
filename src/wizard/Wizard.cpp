@@ -57,7 +57,7 @@ Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
         setPage(Page_AddGuide, new AddGuidePage);
         setPage(Page_Source, new SourcesPage(this, 1));
         setPage(Page_Constraint, new ConstraintPage);
-        setPage(Page_Simulation_Source, new SourcesPage(this, 1, eAddSourceType::AddSimulationSources ) );
+        setPage(Page_Simulation_Source, new SourcesPage(this, 1, AddSourceType::AddSimulationSources));
         connect(this, &QWizard::accepted, this, &Wizard::onAddFinish);
         break;
     case 2:
