@@ -22,7 +22,7 @@ AddGuidePage::AddGuidePage(QWidget *parent) : QWizardPage(parent)
     QButtonGroup *buttonGroup = new QButtonGroup(layout);
     radioBtn1 = new QRadioButton("Add or create design sources");
     radioBtn2 = new QRadioButton("Add or create constraints");
-    radioBtn3 = new QRadioButton( "Add or create simulation sources");
+    radioBtn3 = new QRadioButton("Add or create simulation sources");
 
     radioBtn1->setChecked(true);
 

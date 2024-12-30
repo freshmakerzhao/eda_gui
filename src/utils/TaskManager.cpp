@@ -43,7 +43,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 3) {
-        //        buildPack();
+//        buildPack();
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 6) {
@@ -177,7 +177,7 @@ void TaskManager::taskController(const int mode) {
                         "Re-running synthesis will result in resetting implementation and removing all results files. OK to proceed?",
                         QMessageBox::Ok,
                         QMessageBox::Cancel
-                        )){
+                )){
                     // 用户点击OK
                     this->setSynthSuccessMsgStatus(true);
                     this->setNextImplementProcessStatus(false);
@@ -197,7 +197,7 @@ void TaskManager::taskController(const int mode) {
                         "Synthesis has already completed and is up to date. Re-run anyway?",
                         QMessageBox::Ok,
                         QMessageBox::Cancel
-                        )){
+                )){
                     // 用户点击OK
                     this->setSynthSuccessMsgStatus(true);
                     this->setNextImplementProcessStatus(false);
@@ -235,7 +235,7 @@ void TaskManager::taskController(const int mode) {
                             "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
                             QMessageBox::Ok,
                             QMessageBox::Cancel
-                            )){
+                    )){
                         // 重新综合
                         // 综合命令
                         QString synthScript = buildSynthScript();
@@ -260,7 +260,7 @@ void TaskManager::taskController(const int mode) {
                             "A completed implementation run exists. Re-run anyway?",
                             QMessageBox::Ok,
                             QMessageBox::Cancel
-                            )){
+                    )){
                         // 重新implement
                         this->setSynthSuccessMsgStatus(false);
                         this->setNextImplementProcessStatus(true);
@@ -282,7 +282,7 @@ void TaskManager::taskController(const int mode) {
                             "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
                             QMessageBox::Ok,
                             QMessageBox::Cancel
-                            )){
+                    )){
                         // 重新综合
                         // 综合命令
                         QString synthScript = buildSynthScript();
@@ -320,7 +320,7 @@ void TaskManager::taskController(const int mode) {
                     "There is no netlist available. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
                     QMessageBox::Ok,
                     QMessageBox::Cancel
-                    )){
+            )){
                 // 综合
                 // 综合命令
                 QString synthScript = buildSynthScript();
@@ -444,34 +444,34 @@ void TaskManager::downloadBit(const QString &bitstream) {
 }
 
 void TaskManager::readBackRegister(const QString &registerAddress) {
-    //    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    //
-    //    std::string script = CommandBuilder::instance().generateReadBackRegisterCommands(partName, registerAddress);
+//    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+//
+//    std::string script = CommandBuilder::instance().generateReadBackRegisterCommands(partName, registerAddress);
 }
 
 void TaskManager::readBackMemory(const QString &rbdFilePath) {
-    //    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    //
-    //    std::string script = CommandBuilder::instance().generateReadMemoryCommands(partName, rbdFilePath);
+//    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+//
+//    std::string script = CommandBuilder::instance().generateReadMemoryCommands(partName, rbdFilePath);
 }
 
 void TaskManager::downloadFlash(const QString &projectImplPath1, const QString &topName1) {
-    //    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
-    //    if (projectImplPath1.isEmpty() && topName1.isEmpty()) {
-    //        std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath, partName, topName);
-    //    } else {
-    //        std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath1, partName, topName1);
-    //    }
+//    ProcessManager::instance().initEnvironment(familyName,GLOBAL_RESOURCE_PATH,archName,partName,constraintPathList,topName);
+//    if (projectImplPath1.isEmpty() && topName1.isEmpty()) {
+//        std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath, partName, topName);
+//    } else {
+//        std::string script = CommandBuilder::instance().generateDownloadFlashCommands(projectImplPath1, partName, topName1);
+//    }
 }
 
 // 两个选项的弹窗，true 左侧，false 右侧
 bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft, QMessageBox::StandardButton buttonRight) {
     // 等待用户响应
     int msg = CustomMessageBox::showQuestion(
-        MainWindow::instance(),
-        title,
-        text,
-        buttonLeft | buttonRight
+            MainWindow::instance(),
+            title,
+            text,
+            buttonLeft | buttonRight
         );
     // 根据用户选择做出响应
     if (msg == buttonLeft) {
@@ -493,11 +493,11 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
             qDebug() << msg.workPath;
             qDebug() << "============= =========== ==================";
             InfoWidget::instance()->updateSynthItem(
-                msg.workPath,
-                msg.phase + " Complete!",
-                msg.startTime,
-                msg.elapsedTime,
-                msg.displayPartName);
+                    msg.workPath,
+                    msg.phase + " Complete!",
+                    msg.startTime,
+                    msg.elapsedTime,
+                    msg.displayPartName);
             if(this->_showSynthSuccessMsg){
                 // 只有接下来不做操作时，才弹出窗口
                 // 跳转到资源展示窗口
@@ -511,11 +511,11 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
             }
         } else if (msg.phase == "Implementation"){
             InfoWidget::instance()->updateImplItem(
-                msg.workPath,
-                msg.phase + " Complete!",
-                msg.startTime,
-                msg.elapsedTime,
-                msg.displayPartName);
+                    msg.workPath,
+                    msg.phase + " Complete!",
+                    msg.startTime,
+                    msg.elapsedTime,
+                    msg.displayPartName);
             if(this->_showImplementSuccessMsg){
                 // 只有接下来不做操作时，才弹出窗口
                 // Implementation结束后，读取资源统计信息

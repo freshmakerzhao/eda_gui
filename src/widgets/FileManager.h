@@ -31,7 +31,7 @@ public:
     static FileManager *instance(QWidget *parent = nullptr);
 
 protected:
-           // void keyPressEvent(QKeyEvent* event) override;
+    // void keyPressEvent(QKeyEvent* event) override;
 
 public slots:
     void showContextMenu(const QPoint& pos);

@@ -237,19 +237,22 @@ bool Project::parseProject(const QString &hprPath)
     }
     constraintList = constrs;
 
+
     // ------------------------ simulation FileSet ----------------------------
-    QStringList simSrcs;
-    tinyxml2::XMLElement* simFileSet = fileSet->FirstChildElement("FileSet");
-    if (fileSet->Attribute("Name", "simulations")) {
-        tinyxml2::XMLElement* simFileElement = simFileSet->FirstChildElement("File");
-        while (simFileElement) {
-            const char* name = simFileElement->Attribute("Name");
-            const QString item = QString(name).replace("$PrjDir", prjDir);
-            simSrcs.append(item);
-            simFileElement = simFileElement->NextSiblingElement("File");
-        }
+    if (fileSet) {
+        fileSet = fileSet->NextSiblingElement("FileSet");
+        if (fileSet && fileSet->Attribute("Name", "simulations")) {
+            QStringList simSrcs;
+            tinyxml2::XMLElement* simFileElement = fileSet->FirstChildElement("File");
+            while (simFileElement) {
+                const char* name = simFileElement->Attribute("Name");
+                const QString item = QString(name).replace("$PrjDir", prjDir);
+                simSrcs.append(item);
+                simFileElement = simFileElement->NextSiblingElement("File");
+            }
         simList = simSrcs;
-    }  // else  不处理，兼容旧的没有此项内容的项目
+        }
+    }  //else 不处理，兼容旧的没有此项内容的项目
 
 
     // 输出解析结果
