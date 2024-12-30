@@ -67,12 +67,13 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "route_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "write_bitstream", TclWriteBitstreamCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "sim_design", TclSimCmd, nullptr, nullptr);
 }
 
 TclConsole::~TclConsole() {
     Tcl_DeleteInterp(interp);
     delete channelType;
-//    process->deleteLater();
+    //    process->deleteLater();
 }
 
 void TclConsole::onCommandEnter(QString text) {
@@ -299,14 +300,7 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     // qDebug() << topName;
 
     QStringList resultList;
-    const char *tclVarValue = Tcl_GetVar(interp, "source", 0);
-    if (tclVarValue != nullptr) {
-        // 将 Tcl 列表字符串转换为 QString
-        QString qStringList = QString::fromUtf8(tclVarValue);
-
-        // 将 QString 转换为 QStringList
-        resultList = qStringList.split(' ', Qt::SkipEmptyParts);
-    }
+    getOriginalFile(interp, resultList, "source");
 
     const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
     const QString workDir = QString(workDirVar);
@@ -340,6 +334,111 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     return TCL_OK;
 }
 
+int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
+{
+    const QString phaseSimulation ="Simulation Run";
+    //  argv ： sim_design     编译源文件
+    //  iverilog  -y  verilog\src\retarget\ -y verilog\src\unisims\ -o tb_run  sourve.v
+
+    //   command
+    QStringList scriptSimRun;
+    scriptSimRun << "%SIMULATION_COMPILER_PATH%";
+    //  -y lib
+   const QString designElementPath = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulationer\share\element_design_lib\)";
+    scriptSimRun << QString("-y")<<(designElementPath + R"(retarget\)");
+    scriptSimRun << QString("-y")<<(designElementPath + R"(unisims\)");
+    scriptSimRun << QString("-y")<<(designElementPath + R"(glbl\)");
+    //  -o  compile_file
+    const  QString compileFile = "tb_run";
+    //scriptFirst << QString("-o  %1").arg("tb_run");
+    // scriptFirst << QString("-o  tb_run");
+    scriptSimRun << "-o" << compileFile;
+     // Design Sources
+    QStringList sourceFileList;
+    getOriginalFile(interp, sourceFileList, "source");
+    scriptSimRun.append(sourceFileList);
+    // 仿真路径
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+    QDir dir(workDir);
+    const QString simPath = dir.filePath("runs/sim");
+
+    // 添加激励文件
+    QStringList tbSourceFileList;
+    getOriginalFile(interp, tbSourceFileList, "simulation");
+    scriptSimRun.append(tbSourceFileList);
+    // 生成波形配置文件
+    const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
+    if (topVar == nullptr) {
+        Tcl_SetResult(interp, const_cast<char*>("Top module not set"), TCL_STATIC);
+        return TCL_ERROR;
+    }
+    const QString topName = QString(topVar);
+    QString configWaveFullFilePath;
+    if(generateSimWaveConfigFilePath(topName, simPath, configWaveFullFilePath )) {
+        Tcl_SetResult(interp, const_cast<char*>("Unable to open the waveform configuration file."), TCL_STATIC);
+        return TCL_ERROR;
+    }
+    //  添加波形配置文件
+    scriptSimRun << configWaveFullFilePath;
+
+    // generating command finish.
+    QString info = QString("Starting sim_design\n");
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+    //  设置路径
+    ProcessManager::instance().configWorkPath(simPath);
+
+    //  执行仿真:  vvp  compileFile
+    scriptSimRun << "&&";
+    scriptSimRun <<"%SIMULATION_RUN_PATH%" << compileFile;
+    ProcessManager::instance().excuteCommand(phaseSimulation, scriptSimRun);
+
+    return TCL_OK;
+}
+
+int TclConsole::generateSimWaveConfigFilePath(const QString topName, const QString simPath, QString& configWaveFullFilePath )
+{
+    int error = 0;
+    // 默认的波形生成，只生成最上层的信号。
+    //  配置信息
+    const QString waveFileName = "hybrdLinkWaveFile.vcd";
+    const QString WaveSignalConfig = "1, " + topName;  // 1:只输出此层的信号，具体使用查询$dumpvars的使用
+    const QString moduleName = "hybrdLinkWaveConfigModule";
+    // 生成文件
+    const QDir simFilePath(simPath);
+    const QString configFileName(moduleName + ".v");
+    configWaveFullFilePath =  simFilePath.filePath(configFileName);
+
+    QFile onfigFile(configWaveFullFilePath);
+    if(onfigFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&onfigFile);
+        out << QString( "module %1 ();").arg(moduleName) <<Qt:: endl;
+        out << "initial begin" << Qt::endl;
+        out << QString( "$dumpfile( \"%1\") ;" ).arg(waveFileName ) <<Qt:: endl;
+        out << QString("$dumpvars( %1 ) ;").arg(WaveSignalConfig) <<Qt:: endl;
+        out << "end" << Qt::endl;
+        out << "endmodule" << Qt::endl;
+        onfigFile.close();
+        qDebug()  << "The waveform configuration file has been generated." <<Qt::endl;
+    } else {
+        qDebug() << "Unable to open the waveform configuration file."  << Qt::endl;
+        error = 1;
+    }
+    return error;
+}
+
+void TclConsole::getOriginalFile(Tcl_Interp *interp, QStringList& sourceFileList, const char* tclCommand)
+{
+    const char *tclVarValue = Tcl_GetVar(interp, tclCommand, 0);
+    if (tclVarValue != nullptr) {
+        // 将 Tcl 列表字符串转换为 QString
+        QString qStringList = QString::fromUtf8(tclVarValue);
+        // 将 QString 转换为 QStringList
+        sourceFileList = qStringList.split(' ', Qt::SkipEmptyParts);
+    }
+    return;
+}
+
 int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
     QStringList stringList;
@@ -358,6 +457,13 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
         listStr = listStr.trimmed();
         Tcl_SetVar(interp, "constrs", listStr.toUtf8().constData(), 0);
         Tcl_SetResult(interp, const_cast<char*>("INFO: Update constraints"), TCL_VOLATILE);
+    } else if (fileset == "simulations") {
+        stringList = ProjectManager::instance().getSimSourcesList();
+        QString listStr;
+        listStr = stringList.join(" ");
+        listStr = listStr.trimmed();
+        Tcl_SetVar(interp, "simulation", listStr.toUtf8().constData(), 0);
+        Tcl_SetResult(interp, const_cast<char*>("INFO: Update simulation sources"), TCL_VOLATILE);
     } else {
         std::string errorMsg = "Error: Option " + fileset +  ".";
         Tcl_SetResult(interp, (char*)errorMsg.c_str(), TCL_VOLATILE);

@@ -122,12 +122,23 @@ bool Project::writeProject(){
     tinyxml2::XMLElement* constrsfileSet = doc.NewElement("FileSet");
     constrsfileSet->SetAttribute("Name", "constraints");
     project->InsertEndChild(constrsfileSet);
-
     foreach (const QString constr, constraintList) {
         tinyxml2::XMLElement* fileElement = doc.NewElement("File");
         const QString item = "$PrjDir/constraints/" + QFileInfo(constr).fileName();
         fileElement->SetAttribute("Name", item.toStdString().c_str());
         constrsfileSet->InsertEndChild(fileElement);
+    }
+
+    //------------------- Simulation Source -----------------
+    tinyxml2::XMLElement* simSrcsfileSet = doc.NewElement("FileSet");
+    simSrcsfileSet->SetAttribute("Name", "simulations");
+    project->InsertEndChild(simSrcsfileSet);
+
+    foreach (const QString simSrc, simList) {
+        tinyxml2::XMLElement* fileElement = doc.NewElement("File");
+        const QString item = "$PrjDir/simulations/" + QFileInfo(simSrc).fileName();
+        fileElement->SetAttribute("Name", item.toStdString().c_str());
+        simSrcsfileSet->InsertEndChild(fileElement);
     }
 
     if (doc.SaveFile(hprPath.toStdString().c_str()) == tinyxml2::XML_SUCCESS) {
@@ -225,7 +236,25 @@ bool Project::parseProject(const QString &hprPath)
         fileElement1 = fileElement1->NextSiblingElement("File");
     }
     constraintList = constrs;
-    
+
+
+    // ------------------------ simulation FileSet ----------------------------
+    if (fileSet) {
+        fileSet = fileSet->NextSiblingElement("FileSet");
+        if (fileSet && fileSet->Attribute("Name", "simulations")) {
+            QStringList simSrcs;
+            tinyxml2::XMLElement* simFileElement = fileSet->FirstChildElement("File");
+            while (simFileElement) {
+                const char* name = simFileElement->Attribute("Name");
+                const QString item = QString(name).replace("$PrjDir", prjDir);
+                simSrcs.append(item);
+                simFileElement = simFileElement->NextSiblingElement("File");
+            }
+        simList = simSrcs;
+        }
+    }  //else 不处理，兼容旧的没有此项内容的项目
+
+
     // 输出解析结果
     qDebug() << "---------------------------------------------------------------";
     qDebug() << "Project Name:" << parameters[Project::Name];
@@ -242,6 +271,10 @@ bool Project::parseProject(const QString &hprPath)
     qDebug() << "Constraints----------------------------------------------------";
     foreach (const QString& constraint , this->constraintList) {
         qDebug() << " " << constraint;
+    }
+    qDebug() << "Simulation Sources--------------------------------------------";
+    foreach (const QString& simSource , this->simList) {
+        qDebug() << " " << simSource;
     }
     qDebug() << "---------------------------------------------------------------";
     return true;

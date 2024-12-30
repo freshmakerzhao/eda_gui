@@ -53,7 +53,6 @@ public:
     QString nextpName = nullptr;
 
     void excuteCommand(const QString &phase, const QStringList& command);
-
     /**
      * 初始化环境变量
      */

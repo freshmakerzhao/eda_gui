@@ -51,9 +51,10 @@ public:
     void removeWatchFile(const QString &filePath);
 
 //    QStringList sourceList;
-    // 存储设计与约束文件
+    // 存储设计，约束文件与仿真激励文件
     QList<QString> sourcePathList;
     QList<QString> constraintPathList;
+    QList<QString> simPathList;
 
 public slots:
     void handleMessage(ProcessMessage &msg);
@@ -65,6 +66,8 @@ private:
     QString projectSynthPath;
     // implement路径
     QString projectImplPath;
+    // simulation路径
+    QString projectSimPath;
     // part name
     QString partName;
     // display Part Name （临时解决）
@@ -100,6 +103,7 @@ private:
     QString buildSynthScript();
     QString buildImpScript();
     void buildBit(int mode);
+    QString buildSimScript();
 
     // SettingsDialog *settingDialog = nullptr;
 

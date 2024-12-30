@@ -153,6 +153,9 @@ void TaskManager::handleTreeItemActivation(const int &mode)
 
         dialog.exec();
         InfoWidget::instance()->setCurrentPage(2);
+    } else if (mode == 18) {
+        // simulation
+        publishScript(projectSimPath,buildSimScript());
     }
 }
 /**
@@ -348,6 +351,7 @@ void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
     QString path = params[Project::Path];
     projectSynthPath = path + "/runs/synth";
     projectImplPath = path + "/runs/impl";
+    projectSimPath = path + "/run/sim";
     projectPath = path;
     topName = params[Project::TopModule];
     // 存储partname
@@ -365,6 +369,7 @@ void TaskManager::cleanParams()
 {
     sourcePathList.clear();
     constraintPathList.clear();
+    simPathList.clear();
     projectSynthPath = "";
     projectImplPath = "";
     projectPath = "";
@@ -378,6 +383,7 @@ void TaskManager::cleanParams()
 void TaskManager::setWatchFiles() {
     fileWatcher->addPaths(sourcePathList);
     fileWatcher->addPaths(constraintPathList);
+    fileWatcher->addPaths(simPathList);
 }
 
 void TaskManager::addWatchFiles(const QStringList &filePath)
@@ -423,6 +429,10 @@ QString TaskManager::buildBitScript() {
     return QString("write_bitstream");
 }
 
+QString TaskManager::buildSimScript() {
+    return QString("sim_design");
+}
+
 void TaskManager::onFileChanged() {
     fileChanged = true;
     qDebug("\033[43m[FileWatcher]\033[0m File Changed");
@@ -462,7 +472,7 @@ bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessa
             title,
             text,
             buttonLeft | buttonRight
-    );
+        );
     // 根据用户选择做出响应
     if (msg == buttonLeft) {
         return true;

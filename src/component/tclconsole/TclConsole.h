@@ -69,6 +69,10 @@ private:
     static int TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
+    static int TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+    static int generateSimWaveConfigFilePath(const QString topName, const QString simPath, QString& configWaveFullFilePath);
+    static void getOriginalFile(Tcl_Interp *interp, QStringList& sourceFileList, const char* tclCommand);
 };
 
 

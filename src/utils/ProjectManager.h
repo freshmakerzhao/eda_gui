@@ -101,6 +101,8 @@ public:
 
     QStringList getConstraintsList() const;
 
+    QStringList getSimSourcesList() const;
+
     QStringList ipList;
 
 public slots:

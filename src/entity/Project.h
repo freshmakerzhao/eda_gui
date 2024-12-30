@@ -84,6 +84,7 @@ public:
 
     QStringList sourceList;     // Sources(绝对路径)
     QStringList constraintList; // Constraints(绝对路径)
+    QStringList simList; // 仿真文件(绝对路径)
 
 
 
