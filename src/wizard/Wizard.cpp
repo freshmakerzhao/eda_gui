@@ -57,6 +57,7 @@ Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
         setPage(Page_AddGuide, new AddGuidePage);
         setPage(Page_Source, new SourcesPage(this, 1));
         setPage(Page_Constraint, new ConstraintPage);
+        setPage(Page_Simulation_Source, new SourcesPage(this, 1, AddSourceType::AddSimulationSources));
         connect(this, &QWizard::accepted, this, &Wizard::onAddFinish);
         break;
     case 2:
@@ -86,6 +87,7 @@ void Wizard::onNewFinish()
         dir.mkdir("constraints");
         dir.mkdir("doc");
         dir.mkdir("ip");
+        dir.mkdir("simulations");
 
         // 创建runs文件夹
         if (dir.mkdir("runs")) {
@@ -95,7 +97,8 @@ void Wizard::onNewFinish()
             dir.mkdir(".works"); // 记录中间过程，方便后续在此基础上继续执行
             dir.mkdir("impl"); // pack place route
             dir.mkdir("synth"); // synth
-            qDebug() << "Folders Created Successfully including runs/.works、runs/impl and runs/synth";
+            dir.mkdir("sim");  // 仿真相关的文件存放的地方
+            qDebug() << "Folders Created Successfully including runs/.works、runs/impl、 runs/synth and runs/sim";
         } else {
             qDebug() << "Failed to create runs folder";
         }
@@ -154,6 +157,11 @@ void Wizard::onAddFinish()
     if (!constraintFilesList.empty()){
         ProjectManager::instance().addSourcesInProject(constraintFilesList, 1);
     }
+
+    if (!simFileList.empty()){
+        ProjectManager::instance().addSourcesInProject(simFileList, 2);
+    }
+
 }
 
 QStringList Wizard::getDeviceInfo() const

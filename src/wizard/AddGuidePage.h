@@ -29,6 +29,7 @@ protected:
 private:
     QRadioButton *radioBtn1;
     QRadioButton *radioBtn2;
+    QRadioButton *radioBtn3;
 };
 
 #endif // ADDGUIDEPAGE_H

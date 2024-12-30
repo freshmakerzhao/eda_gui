@@ -13,11 +13,16 @@
 
 #include "Wizard.h"
 
+enum AddSourceType {
+    AddSources,
+    AddSimulationSources
+};
+
 class SourcesPage : public QWizardPage
 {
     Q_OBJECT
 public:
-    SourcesPage(QWidget *parent = nullptr, const int mode = 0);
+    SourcesPage(QWidget *parent = nullptr, const int mode = 0, const AddSourceType sourceType = AddSourceType::AddSources);
 
 private:
     QStandardItemModel *model;
@@ -25,10 +30,12 @@ private:
     WizTableView *tableView;
 
     int _mode;
+    AddSourceType mSourceType;
 
     const QMap<QString, QString> Map = {
         {"v", "verilog"}
     };
+    QStringList& getMatchFileList( );
 
 private slots:
     void onAddFiles();

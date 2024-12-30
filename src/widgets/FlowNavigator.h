@@ -31,6 +31,7 @@ private:
     FlowNavigator(QWidget *parent = nullptr);
 
     QTreeWidgetItem *proMgrItem;
+    QTreeWidgetItem *simItem;
     QTreeWidgetItem *synthItem;
     QTreeWidgetItem *impItem;
     QTreeWidgetItem *proItem;
@@ -44,6 +45,10 @@ private:
     QTreeWidgetItem *ipCatalogItem;
     //! Project Summary
     QTreeWidgetItem *prjSummaryItem;
+
+    // ============== SIMULATION ===============
+    //! run simulation
+    QTreeWidgetItem *simRunItem;
 
     // ============== SYNTHESIS ================
     //! run synth

@@ -46,6 +46,7 @@ void FlowNavigator::downloadBitMode(const bool &f)
 FlowNavigator::FlowNavigator(QWidget *parent)
     : QTreeWidget(parent),
     proMgrItem(new QTreeWidgetItem(this, QStringList() << "PROJECT MANAGER")),
+    simItem(new QTreeWidgetItem(this, QStringList() << "SIMULATION")),
     synthItem(new QTreeWidgetItem(this, QStringList() << "SYNTHESIS")),
     impItem(new QTreeWidgetItem(this, QStringList() << "IMPLEMENTATION")),
     proItem(new QTreeWidgetItem(this, QStringList() << "PROGRAM AND DEBUG"))
@@ -68,6 +69,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // Project Summary
     prjSummaryItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Project Summary");
     prjSummaryItem->setIcon(0, QIcon(":/icons/resource/icons/20-icon_summary_2.png"));
+    // ================== 仿真 ==================
+    simRunItem = new QTreeWidgetItem(simItem, QStringList() << "Run Simulation");
     // ================== 综合 ==================
     synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run Synthesis");
     synthRunItem->setIcon(0, QIcon(":/icons/resource/icons/1-icon_start_process.png"));
@@ -191,6 +194,9 @@ FlowNavigator::FlowNavigator(QWidget *parent)
         } else if (item == readBackMemoryItem) {
             TaskManager::instance().handleTreeItemActivation(17);
         }*/
+         else if (item == simRunItem) {
+            TaskManager::instance().handleTreeItemActivation(18);
+        }
         clearSelection(); // 清除选中状态
     });
 

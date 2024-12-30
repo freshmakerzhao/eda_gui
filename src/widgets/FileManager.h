@@ -48,6 +48,12 @@ public slots:
      */
     void updateConstraints(const QStringList &list);
 
+    /**
+     * @brief 更新simulation 文件
+     * @param list simulation 文件路径列表
+     */
+    void updateSimSources(const QStringList &list);
+
     void clickedFile(const QModelIndex& index);
 
     void openFileAction();
@@ -78,6 +84,8 @@ private:
     QStandardItem *designsources;
 
     QStandardItem *constraints;
+
+    QStandardItem *simulationSource;
 
     QStandardItem *ipLists;
 

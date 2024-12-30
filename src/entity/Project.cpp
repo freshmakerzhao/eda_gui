@@ -160,6 +160,18 @@ bool Project::writeProject(){
     stepSynthElement->SetAttribute("Id", "SYNTHESIS");
     synthRunstrategyElement->InsertEndChild(stepSynthElement); // Step 插入 Strategy
 
+    //------------------- Simulation Source -----------------
+    tinyxml2::XMLElement* simSrcsfileSet = doc.NewElement("FileSet");
+    simSrcsfileSet->SetAttribute("Name", "simulations");
+    project->InsertEndChild(simSrcsfileSet);
+
+    foreach (const QString simSrc, simList) {
+        tinyxml2::XMLElement* fileElement = doc.NewElement("File");
+        const QString item = "$PrjDir/simulations/" + QFileInfo(simSrc).fileName();
+        fileElement->SetAttribute("Name", item.toStdString().c_str());
+        simSrcsfileSet->InsertEndChild(fileElement);
+    }
+
     // IMPLEMENTATION
     tinyxml2::XMLElement* implRunItem = doc.NewElement("Run");
     implRunItem->SetAttribute("Type", "IMPLEMENTATION");
@@ -324,6 +336,23 @@ bool Project::parseProject(const QString &hprPath)
     parseRunsOptionValue(runsRoot);
     // ------------------------ 解析 Runs 结束 ----------------------------
 
+    // ------------------------ simulation FileSet ----------------------------
+    if (fileSet) {
+        fileSet = fileSet->NextSiblingElement("FileSet");
+        if (fileSet && fileSet->Attribute("Name", "simulations")) {
+            QStringList simSrcs;
+            tinyxml2::XMLElement* simFileElement = fileSet->FirstChildElement("File");
+            while (simFileElement) {
+                const char* name = simFileElement->Attribute("Name");
+                const QString item = QString(name).replace("$PrjDir", prjDir);
+                simSrcs.append(item);
+                simFileElement = simFileElement->NextSiblingElement("File");
+            }
+        simList = simSrcs;
+        }
+    }  //else 不处理，兼容旧的没有此项内容的项目
+
+
     // 输出解析结果
     qDebug() << "---------------------------------------------------------------";
     qDebug() << "Project Name:" << parameters[Project::Name];
@@ -340,6 +369,10 @@ bool Project::parseProject(const QString &hprPath)
     qDebug() << "Constraints----------------------------------------------------";
     foreach (const QString& constraint , this->constraintList) {
         qDebug() << " " << constraint;
+    }
+    qDebug() << "Simulation Sources--------------------------------------------";
+    foreach (const QString& simSource , this->simList) {
+        qDebug() << " " << simSource;
     }
     qDebug() << "---------------------------------------------------------------";
     return true;

@@ -11,11 +11,12 @@
 #include "SourcePage.h"
 #include "dialog/AdvancedFileDialog.h"
 
-SourcesPage::SourcesPage(QWidget *parent, const int mode) : QWizardPage(parent)
+SourcesPage::SourcesPage(QWidget *parent, const int mode, const AddSourceType sourceType ) : QWizardPage(parent)
 {
     _mode = mode;
 
-    setTitle("Add Sources");
+    mSourceType = sourceType;
+    sourceType == AddSourceType::AddSources ? setTitle("Add sources") : setTitle("Add simulation sources");
     setSubTitle("Specify HDL files to add to your project. "
                 "Create a new source file on disk and add it to your project.");
 
@@ -77,13 +78,14 @@ void SourcesPage::onAddFiles()
         }
         items << new QStandardItem(QString(fileInfo.path()));
         model->appendRow(items);
-        Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->sourcesFilesList.append(fileName); // 添加文件路径到列表中
+        QStringList& saveFileList = getMatchFileList( );
+        saveFileList.append(fileName); // 添加文件路径到列表中
 
         qDebug() << "-----------------------------------------------------";
-        for(auto it : wizard->sourcesFilesList){
+        for(auto it : saveFileList){
             qDebug() << it;
         }
+
     }
 }
 
@@ -154,14 +156,13 @@ void SourcesPage::onCreateFile()
         }
         items << new QStandardItem("<Local to Project>");
         model->appendRow(items);
-        Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
-        wizard->sourcesFilesList.append(fileName); // 添加文件路径到列表中
+        QStringList& saveFileList = getMatchFileList( );
+        saveFileList.append(fileName); // 添加文件路径到列表中
 
         qDebug() << "-----------------------------------------------------";
-        for(auto it : wizard->sourcesFilesList){
+        for(auto it : saveFileList){
             qDebug() << it;
         }
-
         dialog.accept();
     });
 
@@ -172,11 +173,11 @@ void SourcesPage::onCreateFile()
 void SourcesPage::onRemoveFiles()
 {
     int currentIndex = 1;
-    Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
+    QStringList& saveFileList = getMatchFileList( );
     QModelIndexList selectedIndexes = tableView->selectionModel()->selectedRows();
     for (const QModelIndex &index : selectedIndexes) {
         model->removeRow(index.row());
-        wizard->sourcesFilesList.removeAt(index.row()); // 从文件路径列表中移除对应的文件路径
+        saveFileList.removeAt(index.row()); // 从文件路径列表中移除对应的文件路径
     }
     // 重新设置索引
     for (int row = 0; row < model->rowCount(); ++row) {
@@ -185,7 +186,7 @@ void SourcesPage::onRemoveFiles()
     currentIndex = model->rowCount() + 1; // 更新当前索引
 
     qDebug() << "-----------------------------------------------------";
-    for(auto it : wizard->sourcesFilesList){
+    for(auto it : saveFileList){
         qDebug() << it;
     }
 }
@@ -197,4 +198,15 @@ int SourcesPage::nextId() const
         return -1;
     }
     return QWizardPage::nextId();
+}
+
+// 添加文件路径到列表中
+QStringList& SourcesPage::getMatchFileList( ) {
+    Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
+    // 添加文件路径到列表中
+    if(mSourceType == AddSourceType::AddSources) {
+        return wizard->sourcesFilesList;
+    } else {
+        return wizard->simFileList;
+    }
 }

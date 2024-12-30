@@ -93,6 +93,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 
     // 回传给taskmanager
     emit finishMessage(msg);
+
 }
 
 ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(LogManager::instance())
@@ -126,10 +127,12 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
         script << "/c" << command;
     } else if (phase == "Download Bitstream") {
         script << "/c" << command;
+    } else if(phase == "Simulation Run")  {
+        script << "/c" << command;
     } else if (phase == "Auto Connect") {
         script << "/c" << command;
     }
-    
+
     qDebug() << "------------------------------------------------- ";
     qDebug() << script;
     qDebug() << "------------------------------------------------- ";
@@ -165,6 +168,8 @@ void ProcessManager::initEnvironment() {
     env.insert("BITSTREAMTOOL_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\bin\bitstreamTools.exe)");
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
     // projectProperty["implementation_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
+    env.insert("SIMULATION_COMPILER_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\iverilog.exe)" );
+    env.insert("SIMULATION_RUN_PATH",GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\vvp.exe)");
 }
 
 void ProcessManager::configDisplay(const QString &partname) {
