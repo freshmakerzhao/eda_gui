@@ -9,11 +9,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 是否需要检查 MAC 地址
 option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
 # 是否需要检查 软件有效期
-option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" ON)
+option(ENABLE_EXPIRATION_CHECK "Enable Software Expiration Check" OFF)
 # 仅编译GridView
 option(ONLY_COMPILE_GRIDVIEW "Only compile the GridView" OFF)
 # 打包部署
-option(PACK_DEPLOYED "Pack and deployed" OFF)
+option(PACK_DEPLOYED "Pack and deployed" ON)
 
 if (ENABLE_MAC_CHECK)
     message(STATUS "ENABLE_MAC_CHECK ON.")
