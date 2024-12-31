@@ -168,6 +168,16 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # Add resource files
 set(PROJECT_RESOURCES
     res.qrc
+        blocks/BelsBlock.cpp
+        blocks/BelsBlock.h
+        blocks/Block.cpp
+        blocks/Block.h
+        blocks/BelsMods.cpp
+        blocks/BelsMods.h
+        blocks/SitesMods.cpp
+        blocks/SitesMods.h
+        blocks/Sites.cpp
+        blocks/Sites.h
 )
 
 # Tell CMake to create the executable
