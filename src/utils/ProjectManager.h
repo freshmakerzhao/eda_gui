@@ -97,6 +97,7 @@ public:
     void updateRbtFileOption(const QString &rbtFileOptionStatus);
     void updateCRCOption(const QString &crcOptionStatus);
     void updateCompressOption(const QString &compressOptionStatus);
+    void setCompatibilityMode();
 
     void setDevicePart(const QString &deviceInfo);
 
