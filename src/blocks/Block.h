@@ -19,14 +19,19 @@ public:
     std::string getName() const;
     int getWidth() const;
     int getHeight() const;
+    void setTypeShow(const bool option);
+    void setTypeFontSize(const int size);
 protected:
     int width;
     int height;
     QColor block_color;
     std::string name;
+
+    bool show_type = true; //是否显示type字符
+    int type_font_size = 12; //显示type字符的大小
     bool visible_status = false;
-    virtual bool showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor){}
-    virtual void showComplete(QPainter *painter, const qreal lod, QColor &fillColor){}
+    virtual bool showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) = 0;
+    virtual void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) = 0;
 };
 
 
