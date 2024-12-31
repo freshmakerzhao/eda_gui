@@ -98,8 +98,6 @@ void InfoWidget::updateImplItem(const QString& implPath,
 //        }
 //    }
 
-    qDebug() << "Impl:" << lut6NumSynth << ffNumSynth;
-
     runsModel->item(1, 1)->setText(status); // Status
     runsModel->item(1, 2)->setText(QString::number(lut6NumSynth)); // LUT6
     runsModel->item(1, 3)->setText(QString::number(ffNumSynth)); // ff

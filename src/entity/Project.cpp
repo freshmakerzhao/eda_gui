@@ -47,6 +47,7 @@ void Project::initProject(const QString &name,
     parameters[Project::DisplayPart] = displayPart;
     parameters[Project::FamilyName] = familyName;
 
+    parameters[Project::CompatibilityMode] = "enable";
     parameters[Project::BinFile]        = "disable";
     parameters[Project::RbtFile]        = "disable";
     parameters[Project::CRCOption]      = "disable";
@@ -106,6 +107,11 @@ bool Project::writeProject(){
     displayPartOption->SetAttribute("Name", "DisplayPart");
     displayPartOption->SetAttribute("Val", parameters[Project::DisplayPart].toStdString().c_str());
     configuration->InsertEndChild(displayPartOption);
+
+    tinyxml2::XMLElement* CompatibilityModeOption = doc.NewElement("Option");
+    CompatibilityModeOption->SetAttribute("Name", "CompatibilityMode");
+    CompatibilityModeOption->SetAttribute("Val", parameters[Project::CompatibilityMode].toStdString().c_str());
+    configuration->InsertEndChild(CompatibilityModeOption);
     // ------------------ Configuration 结束 --------------------
 
     // ------------------ FileSet Design Sources 开始 --------------------
@@ -277,6 +283,8 @@ bool Project::parseProject(const QString &hprPath)
             parameters[Project::FamilyName] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "DisplayPart")
             parameters[Project::DisplayPart] = option->Attribute("Val");
+        if (std::string(option->Attribute("Name")) == "CompatibilityMode")
+            parameters[Project::CompatibilityMode] = option->Attribute("Val");
         option = option->NextSiblingElement("Option");
     }
     // ------------------------------ Configuration 结束 --------------------------------
@@ -355,13 +363,14 @@ bool Project::parseProject(const QString &hprPath)
 
     // 输出解析结果
     qDebug() << "---------------------------------------------------------------";
-    qDebug() << "Project Name:" << parameters[Project::Name];
-    qDebug() << "Part        :" << parameters[Project::Part];
-    qDebug() << "Arch        :" << parameters[Project::Arch];
-    qDebug() << "ArchName    :" << parameters[Project::ArchName];
-    qDebug() << "FamilyName    :" << parameters[Project::FamilyName];
-    qDebug() << "DisplayPart    :" << parameters[Project::DisplayPart];
-    qDebug() << "TopModule   :" << parameters[Project::TopModule];
+    qDebug() << "Project Name        :" << parameters[Project::Name];
+    qDebug() << "Part                :" << parameters[Project::Part];
+    qDebug() << "Arch                :" << parameters[Project::Arch];
+    qDebug() << "ArchName            :" << parameters[Project::ArchName];
+    qDebug() << "FamilyName          :" << parameters[Project::FamilyName];
+    qDebug() << "DisplayPart         :" << parameters[Project::DisplayPart];
+    qDebug() << "TopModule           :" << parameters[Project::TopModule];
+    qDebug() << "CompatibilityMode   :" << parameters[Project::CompatibilityMode];
     qDebug() << "Design Sources-------------------------------------------------";
     foreach (const QString& source , this->sourceList) {
         qDebug() << " " << source;
@@ -468,5 +477,10 @@ void Project::updateCompressOption(const QString &compressOptionStatus){
 }
 void Project::updateCRCOption(const QString &crcOptionStatus){
     parameters[Project::CRCOption] = crcOptionStatus;
+}
+
+void Project::setCompatibilityMode() {
+    parameters[Project::CompatibilityMode] = "enable";
+    writeProject();
 }
 

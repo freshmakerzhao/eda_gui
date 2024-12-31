@@ -10,8 +10,8 @@
 #include "LogPipeContent.h"
 
 // 构造函数
-LogPipeContent::LogPipeContent(const QString &pipe_type, int level_code, const QString &message_content, const QString &category, const QString &phase, const QString &sub_phase)
-        : m_pipe_type(pipe_type), m_message_content(message_content), m_category(category), m_phase(phase), m_sub_phase(sub_phase) {
+LogPipeContent::LogPipeContent(const QString &pipe_type, int level_code, const QString &message_content, const QString &category, const QString &phase, const QString &sub_phase, const QString &task_info)
+        : m_pipe_type(pipe_type), m_message_content(message_content), m_category(category), m_phase(phase), m_sub_phase(sub_phase), m_task_info(task_info) {
     if (level_code == 1) {
         m_level_code = LevelCode::INFO_LOG;
     } else if (level_code == 2) {

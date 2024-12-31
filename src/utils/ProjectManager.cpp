@@ -410,3 +410,8 @@ void ProjectManager::writeAndLoadProject()
         loadFiles(_project);
     }
 }
+
+void ProjectManager::setCompatibilityMode() {
+    if (_project)
+        _project->setCompatibilityMode();
+}

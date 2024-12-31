@@ -200,7 +200,7 @@ void PipeServer::processDataPipeMessage(const QString &serverName, const QByteAr
 
 // 解析logo信息
 void PipeServer::processLogPipeMessage(const QString &serverName, const QByteArray &data) {
-//     qDebug() << "Received log message from client on" << serverName << ":" << data;
+    qDebug() << "Received log message from client on" << serverName << ":" << data;
     QJsonObject jsonObj = parseJsonObject(data);
     if (jsonObj.isEmpty()) return; // 解析失败直接退出
 
@@ -238,8 +238,12 @@ void PipeServer::processLogPipeMessage(const QString &serverName, const QByteArr
         qWarning() << "Missing or invalid 'message' field in log message.";
     }
 
+    QString task_info = jsonObj.value("task_info").toString();
+    if (task_info.isEmpty()) {
+        qWarning() << "Missing or invalid 'task_info' field in log message.";
+    }
     // 创建 LogMessage 实体
-    LogPipeContent one_log(pipe_type, level_code.toInt(0), message_content, category, phase, sub_phase);
+    LogPipeContent one_log(pipe_type, level_code.toInt(0), message_content, category, phase, sub_phase, task_info);
 
     // 通过信号将日志信息传给外部
     emit logArrived(one_log);

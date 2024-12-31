@@ -36,11 +36,12 @@ private:
     QString m_category;   // 日志标识类别
     QString m_phase;     // 阶段信息
     QString m_sub_phase;  // 子阶段信息
+    QString m_task_info;  // 子任务信息
 
 public:
     // 构造函数
     LogPipeContent() = default;
-    LogPipeContent(const QString &pipe_type, int level_code, const QString &message_content, const QString &category, const QString &phase, const QString &sub_phase);
+    LogPipeContent(const QString &pipe_type, int level_code, const QString &message_content, const QString &category, const QString &phase, const QString &sub_phase, const QString &task_info);
 
     // Getter 和 Setter 方法
     QString getPipeType() const;

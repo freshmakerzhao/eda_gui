@@ -28,6 +28,9 @@ private:
     QString partFile = ":/resource/parts_hybrdchip_for_display.yaml";
     QLineEdit *lineEdit;
     QLabel *matchesLabel;
+    QRadioButton *compatibility_mode_button;
+    QLabel *compatibility_mode_label;
+    void onCompatibilityModeToggled(bool checked);
 private slots:
     void selectPart(const QModelIndex &index);
 

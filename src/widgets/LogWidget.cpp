@@ -11,9 +11,8 @@ LogWidget *LogWidget::instance(QWidget *parent)
     return _instance;
 }
 
-void LogWidget::appendLog(const QString &str)
-{
-//    // 获取当前文本光标
+void LogWidget::appendLog(const QString &str) {
+    // 获取当前文本光标
 //    QTextCursor cursor = logTextEdit->textCursor();
 //    // 将光标移动到文本末尾(否则会在用户鼠标点击位置插入信息）
 //    cursor.movePosition(QTextCursor::End);
