@@ -415,7 +415,11 @@ TaskManager::~TaskManager()
  * @return
  */
 QString TaskManager::buildSynthScript() {
-    return QString("synth_design");
+    QStringList options;
+
+    if (ProjectManager::instance().getParameter(Project::CompatibilityMode) == "enable")
+        options << "-compatibility_mode";
+    return QString("synth_design %1").arg(options.join(" "));
 }
 
 QString TaskManager::buildImpScript() {
@@ -423,7 +427,17 @@ QString TaskManager::buildImpScript() {
 }
 
 QString TaskManager::buildBitScript() {
-    return QString("write_bitstream");
+    QStringList options;
+
+    if (ProjectManager::instance().getParameter(Project::BinFile) == "enable")
+        options << "-bin";
+    if (ProjectManager::instance().getParameter(Project::RbtFile) == "enable")
+        options << "-rbt";
+    if (ProjectManager::instance().getParameter(Project::CRCOption) == "enable")
+        options << "-crc";
+    if (ProjectManager::instance().getParameter(Project::CompressOption) == "enable")
+        options << "-compress";
+    return QString("write_bitstream %1").arg(options.join(" "));
 }
 
 QString TaskManager::buildSimScript() {
