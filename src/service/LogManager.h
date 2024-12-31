@@ -25,16 +25,10 @@ class LogManager : public QObject {
 public:
     static LogManager& instance();
 
-    // 清空所有日志
-    void clearLogs();
     // 获取分类日志
 //    const std::vector<QString>& getLogs(LogLevel level) const;
     // 添加日志并分发到各个控件
     void addLog(const LogPipeContent& one_log);
-
-signals:
-    // 信号：通知 MessageWidget 构建日志树
-    void logFinished();
 
 private:
     LogManager();
@@ -49,7 +43,9 @@ public slots:
     // 处理日志到达信号
     void handleLogArrived(const LogPipeContent& one_log);
     // 处理数据到达信号
-     void handleDataArrived(const DataPipeContent& one_data);
+    void handleDataArrived(const DataPipeContent& one_data);
+    // 清空所有日志
+    void clearLogs();
 };
 
 #endif //HYBRDLINK_LOGMANAGER_H

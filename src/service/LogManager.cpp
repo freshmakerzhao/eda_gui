@@ -33,7 +33,6 @@ LogManager::~LogManager() = default;
 
 void LogManager::addLog(const LogPipeContent& one_log) {
 
-
     if (one_log.getMessageContent().isEmpty() || one_log.getPhase().isEmpty() || one_log.getSubPhase().isEmpty()) {
         qWarning() << "Invalid log data. Skipping entry.";
         return;
@@ -45,9 +44,14 @@ void LogManager::addLog(const LogPipeContent& one_log) {
     // 同步到logwidget
     LogWidget::instance()->appendLog(message);
 
+    if (one_log.getLevelCode() == LevelCode::ALWAYS_LOG) {
+        // always_log 不加入message
+        return;
+    }
+
     // ==================== 存储日志 =======================
     // 特殊阶段（synth、program）处理
-    if (one_log.getPhase() == "synth" || one_log.getPhase() == "PROGRAM_AND_DEBUG") {
+    if (one_log.getPhase() == "SYNTHESIS" || one_log.getPhase() == "PROGRAM_AND_DEBUG") {
         QMap<QString, QStringList> &phaseMessages = log_storage[one_log.getPhase()];
         QStringList &messages = phaseMessages[""]; // 特殊阶段不区分 sub_phase
         messages.append(message);
@@ -70,7 +74,7 @@ void LogManager::addLog(const LogPipeContent& one_log) {
 
 void LogManager::clearLogs() {
     log_storage.clear();
-    emit logFinished(); // 通知 MessageWidget 构建树
+    MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
 }
 
 void LogManager::handleLogArrived(const LogPipeContent& one_log) {
@@ -78,7 +82,5 @@ void LogManager::handleLogArrived(const LogPipeContent& one_log) {
 }
 
 void LogManager::handleDataArrived(const DataPipeContent& one_data) {
-    qDebug() << one_data.getData();
-    qDebug() << log_storage;
     MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
 }

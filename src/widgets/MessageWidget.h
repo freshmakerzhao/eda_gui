@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QString>
+#include "service/LogManager.h"
 
 // 定义日志存储结构
 using LogStorage = QMap<QString, QMap<QString, QStringList>>; // Phase -> (SubPhase -> List of Messages)
@@ -30,15 +31,16 @@ private:
     explicit MessageWidget(QWidget *parent = nullptr); // 私有构造函数
     ~MessageWidget(); // 私有析构函数
 
-    QWidget* baseWidget;
-    QTreeWidget *treeWidget;   // 树形控件
+    QWidget* baseWidget{};
+    QTreeWidget *treeWidget{};   // 树形控件
     QList<QTreeWidgetItem *> searchResults;
     int currentResultIndex = -1;
 
-    QLineEdit *searchBox;      // 搜索框
-    QPushButton *clearButton;  // 清除搜索按钮
-    QPushButton *expandButton; // 展开按钮
-    QPushButton *collapseButton; // 折叠按钮
+    QLineEdit *searchBox{};      // 搜索框
+    QPushButton *clearButton{};  // 清除搜索按钮
+    QPushButton *expandButton{}; // 展开按钮
+    QPushButton *collapseButton{}; // 折叠按钮
+    LogManager &logManager; // 成员变量引用
 
     void init(); // 初始化UI
     void filterTreeItems(QTreeWidget *treeWidget, const QString &text);

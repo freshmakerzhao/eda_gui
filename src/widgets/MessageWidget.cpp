@@ -17,7 +17,7 @@ MessageWidget *MessageWidget::instance(QWidget *parent)
 }
 
 MessageWidget::MessageWidget(QWidget *parent)
-        : QWidget(parent)
+        : QWidget(parent),logManager(LogManager::instance())
 {
     init();
 //    addMessage(1, "主模块", "a");
@@ -78,6 +78,10 @@ void MessageWidget::init()
     vlayout->setMargin(0);
 
     searchAction->setCheckable(true);
+
+    // 清除所有message
+    connect(cleanAction, &QAction::triggered, &logManager, &LogManager::clearLogs);
+    // ====================== 搜索框相关 ======================
     connect(searchAction, &QAction::triggered, [this, searchAction]() {
         baseWidget->setVisible(!baseWidget->isVisible());
         searchAction->setChecked(baseWidget->isVisible());
@@ -98,9 +102,9 @@ void MessageWidget::init()
         navigateSearchResult(1);
     });
 
-    // Clear 按钮清除
+    // Clear 按钮清除搜索框中的内容
     connect(clearBtn, &QPushButton::clicked, lineEdit, &QLineEdit::clear);
-
+    // ====================== 搜索框相关 ======================
 //
 //    searchBox = new QLineEdit(this);
 //    searchBox->setPlaceholderText("搜索日志...");

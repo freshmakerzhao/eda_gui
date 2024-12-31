@@ -31,6 +31,7 @@ void ProcessManager::configWorkPath(const QString &path) {
 // 实时回显数据
 void ProcessManager::handleChannelReadyReadOutput()
 {
+    // ============= 启动标准输出流监听 ====================
 //    // 获取标准输出
 //    QByteArray normalOutput = process->readAllStandardOutput();
 //    // 获取错误输出
@@ -47,6 +48,7 @@ void ProcessManager::handleChannelReadyReadOutput()
 //    if (!errorOutputStr.isEmpty()){
 //        LogWidget::instance()->appendLog(errorOutputStr);
 //    }
+    // ============= 启动标准输出流监听 ====================
 }
 
 // process执行结束后触发
@@ -58,6 +60,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
         QTimer::singleShot(5000, &loop, &QEventLoop::quit);
         loop.exec();
     }
+    // =================== 启动标准输出流监听 ====================
 //    QTextCodec *tc = QTextCodec::codecForName("GBK");
 //
 //    // 读取可能剩余的标准输出
@@ -65,7 +68,7 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 //    // 转码
 //    QString outputStr = tc->toUnicode(remainingOutput);
 //    if (!remainingOutput.isEmpty()) {
-////        LogWidget::instance()->appendLog(outputStr);
+//        LogWidget::instance()->appendLog(outputStr);
 //    }
 //
 //    // 读取可能剩余的标准错误
@@ -73,9 +76,9 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 //    // 转码
 //    outputStr = tc->toUnicode(remainingError);
 //    if (!remainingError.isEmpty()) {
-////        LogWidget::instance()->appendLog(outputStr);
+//        LogWidget::instance()->appendLog(outputStr);
 //    }
-
+    // =================== 启动标准输出流监听 ====================
     // 结束时间
     this->endTimeForCal = TimeUtilities::getCurTime();
     // 持续时间
@@ -98,10 +101,11 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(LogManager::instance())
 {
     process = new QProcess();
+    // ============== 启动管道监听 ==============
     pipeServer.start(); // 启动管道监听
-    // readyReadStandardOutput 信号，有输出则显示在message中
-    // connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(handleReadyReadStandardOutput()));
-    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
+    // ============== 启动管道监听 ==============
+
+//    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
     // finished 信号，process执行完毕后触发
     connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
 }
@@ -115,7 +119,6 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
     this->curPhase = phase; // 当前执行阶段
     MainWindow::instance()->setRunState(QString("Run %1...").arg(curPhase), true);
     process->setProcessEnvironment(env);
-
     process->terminate(); // 执行前中断process
 
     QStringList script;
@@ -151,11 +154,6 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
 
 void ProcessManager::initEnvironment() {
     env = QProcessEnvironment::systemEnvironment();
-
-//    QString origin_path = env.value("PATH");
-//    origin_path += ";" + QString::fromStdString(StringUtilities::concatPath({GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));
-//    qgetenv("WINDIR")
-
     QString system32_path =  QString("%1\\System32").arg(QString::fromLocal8Bit(qgetenv("WINDIR")));
     QString yosys_lib_path =  QString::fromStdString(StringUtilities::concatPath({GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString(), "yosys", "lib"}));;
     QString path = system32_path + ";" + yosys_lib_path;
@@ -165,8 +163,8 @@ void ProcessManager::initEnvironment() {
     env.insert("FRAMES2BIT", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\xc7frames2bit.exe)");
     env.insert("IMPL_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)");
     env.insert("BITSTREAMTOOL_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\bin\bitstreamTools.exe)");
+    env.insert("PARSE_BITSTREAM_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\parse_bitstream.exe)");
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
-    // projectProperty["implementation_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\implementation\bin\implementation.exe)";
     env.insert("SIMULATION_COMPILER_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\iverilog.exe)" );
     env.insert("SIMULATION_RUN_PATH",GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\vvp.exe)");
 }

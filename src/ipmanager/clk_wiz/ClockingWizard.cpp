@@ -466,9 +466,6 @@ void ClockingWizard::updateOutputClockInforJson(QTableView *tableView, QStandard
         for (auto &[v, m, d, o_list] : v_m_d_o_lists) {
             std::vector<OutputData> cur_group(outputClockCount); // 当前的 group 存储
             bool valid_group = true; // 标记当前组是否有效
-            if (v == 2000 && m == 60){
-                qDebug() << 123;
-            }
             // 使用当前组v m d o，与所有端口进行匹配
             for (int output_clock_index = 0; output_clock_index < outputClockCount; ++output_clock_index) {
                 QJsonValue clk_content_value = outputClockContentArray.at(output_clock_index);

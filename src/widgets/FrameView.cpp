@@ -132,7 +132,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 #else          
     // ----------- 默认使用runs/impl目录下的place.json文件可视化资源使用情况 -----------
     QDir dir(projectImplPath);
-    usageJsonPath = dir.filePath("place.json");
+    usageJsonPath = dir.filePath("route.json");
 #endif
         if (QFile(usageJsonPath).exists()) {
             viewer.setAllTileWhite(scene);
