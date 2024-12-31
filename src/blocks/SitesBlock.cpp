@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QGraphicsView>
 #include <QStyleOptionGraphicsItem>
 
 SitesBlock::SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, std::string &cur_name, int site_index)
@@ -23,6 +24,9 @@ bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillC
 }
 
 void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(!visible_status)
+        return;
+
     QPen oldPen = painter->pen();
     QPen pen = oldPen;
     pen.setWidth(1);
@@ -31,19 +35,31 @@ void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillCo
 
     painter->drawRect(QRect(0, 0, width, height));
 
-    if(lod >= 0.06 && visible_status) {
-        for (BelsBlock *bel_item: child_bel_items) {
-            bel_item->updateVisibleStatus(true);
-        }
-        QFont font("Times");
-        font.setPointSizeF(50);
-        painter->setFont(font);
-        painter->drawText(QRect(20, 0, width, 800), Qt::AlignLeft | Qt::AlignBottom,
-                          QString(QString::fromStdString(site_type)));
-    } else {
-        for (BelsBlock *bel_item: child_bel_items) {
-            bel_item->updateVisibleStatus(false);
-        }
+    for (BelsBlock *bel_item: child_bel_items) {
+        bel_item->updateVisibleStatus(lod >= 0.05);
+    }
+
+    //获取当前视图的缩放比例
+    QGraphicsView *view = scene()->views().first();
+    qreal scaleFactor = view->transform().m11();
+
+    //保存当前的变换状态
+    QTransform originalTransform = painter->transform();
+
+    // 使用反向缩放因子，确保文本大小不受缩放影响
+    painter->scale(1 / scaleFactor, 1 / scaleFactor);
+    QFont font("Times");
+    font.setPointSize(type_font_size);
+    painter->setFont(font);
+
+    int text_len = site_type.size() * type_font_size;
+    if (text_len <= width * scaleFactor) {
+        QRectF text_rect = QRect(2, height * scaleFactor - type_font_size - 6, width, 20);
+        painter->drawText(
+                text_rect,
+                Qt::AlignLeft | Qt::AlignTop,
+                QString(QString::fromStdString(site_type))
+        );
     }
 }
 

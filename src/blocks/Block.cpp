@@ -32,6 +32,14 @@ void Block::setColor(const QColor &color) {
     block_color = color;
 }
 
+void Block::setTypeFontSize(const int size) {
+    type_font_size = size;
+}
+
+void Block::setTypeShow(const bool option) {
+    show_type = option;
+}
+
 void Block::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(widget);
 

@@ -46,7 +46,8 @@ public:
 class BelsRegInit: public BelsBlock {
 public:
     BelsRegInit(const QColor &color, int tile_index_x, int tile_index_y, int site_index, const std::string &cur_name, int bel_index)
-            : BelsBlock(color, 60, 60, tile_index_x, tile_index_y, site_index, cur_name, "REG_INIT", bel_index) {}
+            : BelsBlock(color, 60, 60, tile_index_x, tile_index_y, site_index, cur_name, "REG_INIT", bel_index) {
+    }
 };
 
 #endif //HYBRDLINK_BELSMODS_H
