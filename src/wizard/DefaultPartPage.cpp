@@ -113,11 +113,19 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     compatibilityModeLayout->addWidget(compatibility_mode_button);
     compatibilityModeLayout->addWidget(compatibility_mode_label);
     // ---------------- 兼容模式 单选按钮 -----------------
+    connect(compatibility_mode_button, &QRadioButton::clicked,
+            this, &DefaultPartPage::onCompatibilityModeButtonClicked);
 
 
     // 在页面中添加布局
     layout->addLayout(compatibilityModeLayout);
     setLayout(layout);
+}
+
+void DefaultPartPage::onCompatibilityModeButtonClicked(bool checked) {
+    Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
+    // 点击兼容模式的按钮后 跟新wizard compatibilityMode
+    wizard->compatibilityMode = checked ? "enable" : "disable";
 }
 
 bool DefaultPartPage::isComplete() const
@@ -126,7 +134,6 @@ bool DefaultPartPage::isComplete() const
     if (tableView->selectionModel()->selectedIndexes().isEmpty()) {
         return false; // 不满足条件，禁止进入下一步
     }
-    ProjectManager::instance().updateCompressOption(compatibility_mode_button->isChecked() ? "enable" : "disable");
     return true;
 }
 

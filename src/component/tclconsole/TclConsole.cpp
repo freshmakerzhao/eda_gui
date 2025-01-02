@@ -238,7 +238,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const QString task = QString(argv[0]);
 
     if (task == "impl_design") {
-        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--hybrdchip", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
+        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--hybrdchip", "--debug", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
         info = "Starting Implementation Task";
     } else if (task == "pack_design") {
         addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
@@ -304,6 +304,7 @@ int TclConsole::TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, in
 
 int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
+    qDebug() << "=================== zhaoshuai ==========================";
     const QString phase = "Synthesis";
     // 是否为兼容模式
     bool isCompatibilityMode = false;
@@ -384,6 +385,8 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
     }
     // 加密网表
     script << "-U";
+    // log verbose
+    script << "-v 9";
 
     QString info = QString("Starting synth_design\n"
                            "Using part: %1\n"
