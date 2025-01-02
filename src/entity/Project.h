@@ -59,7 +59,8 @@ public:
                      const QString &arch,
                      const QString &archName,
                      const QString &displayPart = QString("MC1P110-FC484L-1"),
-                     const QString &familyName = QString("MgiCubo"));
+                     const QString &familyName = QString("MgiCubo"),
+                     const QString &compatibilityMode = QString("enable"));
 
     bool writeProject();
     void saveGenerateBitstreamOptions(tinyxml2::XMLElement *stepGenerateBitstreamElement);
@@ -81,6 +82,7 @@ public:
     void updateRbtFileOption(const QString &rbtFileOptionStatus);
     void updateCRCOption(const QString &crcOptionStatus);
     void updateCompressOption(const QString &compressOptionStatus);
+    void updateCompatibilityOption(const QString &compatibilityOptionStatus);
     void setCompatibilityMode();
 
     /**

@@ -43,7 +43,8 @@ public:
                        const QStringList &designSrcs,
                        const QStringList &constraints,
                        const QString &displayPart = QString("MC1P110-FC484L-1"),
-                       const QString &familyName = QString("MgiCubo"));
+                       const QString &familyName = QString("MgiCubo"),
+                       const QString &compatibilityMode = QString("enable"));
 
     /**
      * Reopen project on startup
@@ -97,6 +98,7 @@ public:
     void updateRbtFileOption(const QString &rbtFileOptionStatus);
     void updateCRCOption(const QString &crcOptionStatus);
     void updateCompressOption(const QString &compressOptionStatus);
+    void updateCompatibilityOption(const QString &compatibilityOptionStatus);
     void setCompatibilityMode();
 
     void setDevicePart(const QString &deviceInfo);

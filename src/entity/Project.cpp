@@ -36,7 +36,8 @@ void Project::initProject(const QString &name,
                           const QString &arch,
                           const QString &archName,
                           const QString &displayPart,
-                          const QString &familyName)
+                          const QString &familyName,
+                          const QString &compatibilityMode)
 {
     parameters[Project::Name] = name;         // 工程名称
     parameters[Project::Path] = path;         // 工程路径(绝对)
@@ -47,7 +48,7 @@ void Project::initProject(const QString &name,
     parameters[Project::DisplayPart] = displayPart;
     parameters[Project::FamilyName] = familyName;
 
-    parameters[Project::CompatibilityMode] = "enable";
+    parameters[Project::CompatibilityMode] = compatibilityMode;
     parameters[Project::BinFile]        = "disable";
     parameters[Project::RbtFile]        = "disable";
     parameters[Project::CRCOption]      = "disable";
@@ -474,6 +475,9 @@ void Project::updateRbtFileOption(const QString &rbtFileOptionStatus){
 }
 void Project::updateCompressOption(const QString &compressOptionStatus){
     parameters[Project::CompressOption] = compressOptionStatus;
+}
+void Project::updateCompatibilityOption(const QString &compatibilityOptionStatus){
+    parameters[Project::CompatibilityMode] = compatibilityOptionStatus;
 }
 void Project::updateCRCOption(const QString &crcOptionStatus){
     parameters[Project::CRCOption] = crcOptionStatus;

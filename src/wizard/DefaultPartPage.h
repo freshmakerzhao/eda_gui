@@ -33,6 +33,7 @@ private:
     void onCompatibilityModeToggled(bool checked);
 private slots:
     void selectPart(const QModelIndex &index);
+    void onCompatibilityModeButtonClicked(bool checked);
 
 };
 

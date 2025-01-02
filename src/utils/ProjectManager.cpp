@@ -51,7 +51,8 @@ bool ProjectManager::createProject(const QString &name,
                                    const QStringList &designSrcs,
                                    const QStringList &constraints,
                                    const QString &displayPart,
-                                   const QString &familyName)
+                                   const QString &familyName,
+                                   const QString &compatibilityMode)
 {
     // 此处的project是一个临时对象，生成工程文件后销毁
     Project *project = new Project;
@@ -61,7 +62,8 @@ bool ProjectManager::createProject(const QString &name,
                          arch,
                          archName,
                          displayPart,
-                         familyName);
+                         familyName,
+                         compatibilityMode);
     project->sourceList = designSrcs;
     project->constraintList = constraints;
     project->writeProject();
@@ -313,6 +315,10 @@ void ProjectManager::updateRbtFileOption(const QString &rbtFileOptionStatus){
 void ProjectManager::updateCompressOption(const QString &compressOptionStatus){
     if (_project)
         _project->updateCompressOption(compressOptionStatus);
+}
+void ProjectManager::updateCompatibilityOption(const QString &compatibilityOptionStatus){
+    if (_project)
+        _project->updateCompatibilityOption(compatibilityOptionStatus);
 }
 void ProjectManager::updateCRCOption(const QString &crcOptionStatus){
     if (_project)
