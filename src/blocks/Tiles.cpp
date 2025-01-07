@@ -47,11 +47,8 @@ void Tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 
     // 计算缩放等级，画面越小,细节越少，lod越接近于0; 画面越大，细节越多，lod越趋近于1
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    if (lod < 0.005) {
-        // 当缩小到非常小时，不需要内部细节，直接用颜色覆盖即可
-        painter->fillRect(QRectF(0, 0, tile_width, tile_height), fillColor);
-        return;
-    }
+
+    painter->fillRect(QRectF(0, 0, tile_width, tile_height), fillColor);
 
     QPen oldPen = painter->pen();
     QPen pen = oldPen;

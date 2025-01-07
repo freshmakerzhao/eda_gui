@@ -6,6 +6,8 @@
 #include <iostream>
 #include <regex>
 #include <utility>
+#include <algorithm>
+#include <QDebug>
 // 处理tile颜色、width、height
 std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGridOperations::buildTileInfoMap(const nlohmann::basic_json<>& colorJson){
     std::map<std::string, std::map<std::string, std::map<std::string, int>>> tile_info_map;
@@ -207,8 +209,19 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     {
         for(int j = 0; j < totalSize.height; ++j)
         {
+            const std::unordered_set<std::basic_string<char>> DISABLE_SHOW_TILE = {
+                    "SKIP"
+//                    "L_TEEM_INR",
+//                    "IO_INT_INTERFACE_L",
+//                    "INT_L",
+//                    "INT_R",
+//                    "INT_INTERFACE_R",
+//                    "NULL"
+            };
+            std::string type = gridTypeMatrix[i][j].types;
+            auto it = DISABLE_SHOW_TILE.find(type);
             // 遇到skip跳过
-            if(gridTypeMatrix[i][j].types == "SKIP"){
+            if(it != DISABLE_SHOW_TILE.end()){
                 continue;
             }
             gridMatrix[i][j] = new Tiles(
@@ -691,12 +704,13 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
             if (!cell.contains("attributes") || !cell["attributes"].contains("NEXTPNR_BEL")) continue;
             const auto& bells = cell["attributes"]["NEXTPNR_BEL"];
             for (const auto& bell : bells) {
-                const std::string& value = bell.get_ref<const std::string&>();
+                const std::string &value = bell.get_ref<const std::string&>();
                 size_t pos = value.find('/');
                 if (pos != std::string::npos) {
-                    used_site.insert(value.substr(0, pos));
-                } else {
-                    used_site.insert(value);
+                    const std::string site = value.substr(0, pos);
+                    used_site[site].insert(value);
+//                } else {
+//                    used_site.insert.;
                 }
             }
         }
@@ -717,8 +731,9 @@ bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
                     if (used_site.find(site.name) != used_site.end()) {
                         for (auto item : gridMatrix[i][j]->child_items) {
                             if (item->getName() == site.name) {
-                                QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
-                                item->setColor(color);
+                                //QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
+//                                item->setColor(QColor(Qt::green));
+                                item->setUsed(used_site[site.name]);
                             }
                         }
                     }

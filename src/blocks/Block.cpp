@@ -8,8 +8,8 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-Block::Block(int cur_width, int cur_height, const QColor &color)
-    : width(cur_width), height(cur_height) {
+Block::Block(int cur_width, int cur_height, const std::string &name, const QColor &color)
+    : width(cur_width), height(cur_height), name(name) {
     this->block_color = color;
     setFlag(ItemIsSelectable);
     //开启悬浮操作
@@ -42,46 +42,50 @@ void Block::setTypeShow(const bool option) {
 
 void Block::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(widget);
-
     Q_UNUSED(widget);
 
     if (!visible_status){
         return;
     }
 
-    QColor fillColor = (option->state & QStyle::State_Selected) ? block_color.darker(150) : block_color;
-    if (option->state & QStyle::State_MouseOver){
-        // 鼠标悬浮高亮
-        fillColor = fillColor.lighter(125);
-    }
-
-    QPen oldPen = painter->pen();
-    QPen pen = oldPen;
+    QPen pen = painter->pen();
     pen.setWidth(1);
     pen.setCosmetic(true);
     painter->setPen(pen);
 
     // 计算缩放等级，画面越小,细节越少，lod越接近于0; 画面越大，细节越多，lod越趋近于1
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    if(showThumbnail(painter, lod, fillColor))
+    if(showThumbnail(painter, lod, block_color))
         return;
-
-    QBrush b = painter->brush();
-    // 设置点击控件后使其变暗
-    painter->setBrush(QBrush(fillColor.darker(option->state & QStyle::State_Sunken ? 120 : 100)));
 
     painter->save();
 
-    showComplete(painter, lod, fillColor);
+    if(used_status)
+        painter->setBrush(QColor(QColor(0, 255, 0, 127)));
+
+    painter->save();
+
+    showComplete(painter, lod, block_color);
 
     painter->restore();
 
-    painter->setBrush(b);
+    //点击选中显示
+    if (option->state & QStyle::State_Selected) {
+        pen.setWidth(4);
+        painter->setPen(pen);
+        painter->setBrush(QColor(100, 100, 100, 127));
+        painter->drawRect(QRect(0, 0, width, height));
+    }
+    painter->restore();
 }
 
 void Block::updateVisibleStatus(bool status) {
     visible_status = status;
     update();
+}
+
+void Block::setUsed() {
+    used_status = true;
 }
 
 std::string Block::getName() const {

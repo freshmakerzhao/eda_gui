@@ -12,15 +12,17 @@
 
 
 #include <QGraphicsItem>
+#include <unordered_set>
 #include "BelsBlock.h"
 #include "Block.h"
 
 class SitesBlock : public Block {
 Q_OBJECT
 public:
-    SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, std::string &cur_name, int site_index);
+    SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, const std::string &cur_name, int site_index);
     QVector<BelsBlock*> child_bel_items;
     void updateVisibleStatus(bool status) override;
+    void setUsed(std::unordered_set<std::string> bels);
 signals:
     void SiteClicked(int tile_index_x, int tile_index_y,bool sites_visible_status,int index);
 private:

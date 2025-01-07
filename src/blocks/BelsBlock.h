@@ -13,7 +13,6 @@ class BelsBlock : public Block {
 Q_OBJECT
 public:
     BelsBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index);
-    std::string getBelName() const;
 signals:
     void BelClicked(int tile_index_x, int tile_index_y, int site_index, bool bel_visible_status, int bel_index);
 private:
