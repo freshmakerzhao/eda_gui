@@ -34,7 +34,7 @@ PortAOptionsWidget::PortAOptionsWidget(QWidget *parent) :
     portADepthLayout->addWidget(portADepthRangeLabel);
     fLayout->addRow("Port A Depth", portADepthLayout);
     fLayout->addRow(new QLabel("The Width and Depth values are used for Read Operation in Port A", this));
-    updatePortADepthRange();
+    updatePortADepthRange();//update depth range
 
     connect(portAWidthLineEdit, &QLineEdit::textChanged, this, &PortAOptionsWidget::updatePortADepthRange);
 
