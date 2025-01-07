@@ -10,19 +10,22 @@
 #include <QStyleOptionGraphicsItem>
 
 BelsBlock::BelsBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index)
-    : Block(cur_width, cur_height, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_index(site_index), name(cur_name), bel_type(bel_type) {
+    : Block(cur_width, cur_height, cur_name, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_index(site_index), bel_type(bel_type) {
 
 }
 
 bool BelsBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
-    if(lod >= 0.001) return false;
-        painter->drawRect(QRect(0, 0, width, height));
-    return true;
+//    if(lod >= 0.001) return false;
+//        painter->drawRect(QRect(0, 0, width, height));
+//    return true;
+    return false;
 }
 
 void BelsBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
-    painter->drawRect(QRect(0, 0, width, height));
     if(visible_status) {
+        if(used_status)
+            painter->setBrush(QColor(QColor(0, 255, 0, 127)));
+        painter->drawRect(QRect(0, 0, width, height));
 
         if(!show_type)
             return;

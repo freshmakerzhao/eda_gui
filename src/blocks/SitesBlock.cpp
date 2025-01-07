@@ -14,12 +14,17 @@
 #include <QGraphicsView>
 #include <QStyleOptionGraphicsItem>
 
-SitesBlock::SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, std::string &cur_name, int site_index)
-: Block(cur_width, cur_height, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y),  site_type(site_type), name(cur_name), site_index(site_index) {}
+SitesBlock::SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, const std::string &cur_name, int site_index)
+: Block(cur_width, cur_height, cur_name, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y),  site_type(site_type),  site_index(site_index) {}
 
 bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
-    if(lod >= 0.02) return false;
-    //painter->fillRect(QRectF(0, 0, width, height), fillColor);
+    if(lod >= 0.01) return false;
+    if(used_status) {
+        painter->fillRect(QRectF(0, 0, width, height), QColor(Qt::green));
+    }
+    for (auto bel_item: child_bel_items) {
+        bel_item->updateVisibleStatus(false);
+    }
     return true;
 }
 
@@ -33,11 +38,19 @@ void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillCo
     pen.setCosmetic(true);
     painter->setPen(pen);
 
-    painter->drawRect(QRect(0, 0, width, height));
 
-    for (BelsBlock *bel_item: child_bel_items) {
-        bel_item->updateVisibleStatus(lod >= 0.05);
+    if (lod >= 0.05) {
+        for (auto bel_item: child_bel_items) {
+            bel_item->updateVisibleStatus(true);
+        }
+        painter->setBrush(Qt::NoBrush);
+    } else {
+        for (auto bel_item: child_bel_items) {
+            bel_item->updateVisibleStatus(false);
+        }
     }
+
+    painter->drawRect(QRect(0, 0, width, height));
 
     //获取当前视图的缩放比例
     QGraphicsView *view = scene()->views().first();
@@ -80,6 +93,16 @@ void SitesBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 void SitesBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mouseReleaseEvent(event);
     update();
+}
+
+void SitesBlock::setUsed(std::unordered_set<std::string> bels) {
+    used_status = true;
+    for(auto bel_name : bels){
+        for(auto bel : this->child_bel_items) {
+            if(bel->getName() == bel_name)
+                bel->setUsed();
+        }
+    }
 }
 
 void SitesBlock::updateVisibleStatus(bool status) {

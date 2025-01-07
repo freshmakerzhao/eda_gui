@@ -36,7 +36,7 @@ public:
     std::vector<SubItem> usageGrid;
 
     // std::vector<std::string> used_site;
-    std::unordered_set<std::string> used_site;
+    std::unordered_map<std::string, std::unordered_set<std::string>> used_site;
 
     std::unordered_set<QGraphicsRectItem *> clock_region_rects;
 
