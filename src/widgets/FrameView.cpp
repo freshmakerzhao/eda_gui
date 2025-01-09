@@ -17,6 +17,10 @@
 #include <QGraphicsView>
 #include <QFormLayout>
 #include <utility>
+#include <QLineEdit>
+#include <QCompleter>
+#include <QStringListModel>
+#include "blocks/Block.h"
 
 FrameView::FrameView(const std::string& tileGridPath, const std::string& tileColorPathLocal,QString projectImplPath,QWidget *parent)
         :  QWidget(parent), scene(new QGraphicsScene(this))
@@ -40,6 +44,41 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 
     QWidget *rightTopWidget = new QWidget(splitterRight);
     QVBoxLayout *rightTopLayout = new QVBoxLayout(rightTopWidget);
+
+    //搜索框
+    QLineEdit* searchBox = new QLineEdit("Please enter a cell");
+
+    //设置自动补全
+    QStringListModel* autoCompleterModel = new QStringListModel();
+    QCompleter* autoCompleter = new QCompleter(autoCompleterModel);
+    autoCompleter->setCaseSensitivity(Qt::CaseInsensitive); // 忽略大小写
+    autoCompleter->setFilterMode(Qt::MatchContains); // 支持模糊匹配
+    searchBox->setCompleter(autoCompleter);
+
+    connect(searchBox, &QLineEdit::returnPressed, [=]() {
+        std::string input = searchBox->text().toStdString();
+        size_t pos = input.find('/');
+        if(pos != std::string::npos) {
+            std::string site_name = input.substr(0, pos);
+            auto it = viewer.siteBlockMap.find(site_name);
+            if(it == viewer.siteBlockMap.end())
+                return;
+            SitesBlock* site_block = viewer.siteBlockMap[site_name];
+            for(auto bel_block : site_block->child_bel_items) {
+                if(input == bel_block->getName()) {
+                    view->cellLocationShow(bel_block);
+                    bel_block->launchClicked();
+                    return;
+                }
+            }
+        } else {
+            auto it = viewer.siteBlockMap.find(input);
+            if(it == viewer.siteBlockMap.end())
+                return;
+            view->cellLocationShow(viewer.siteBlockMap[input]);
+            viewer.siteBlockMap[input]->launchClicked();
+        }
+    });
 
     // 上部分的按钮
     // QPushButton* right_top_load_arch = new QPushButton("加载架构信息");
@@ -66,6 +105,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     rightTopUsage->setEnabled(false);
 
     // right_top_layout->addWidget(right_top_load_arch, 0, Qt::AlignHCenter);
+    rightTopLayout->addWidget(searchBox, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopBlockName, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopSites, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopClockRegion, 0, Qt::AlignHCenter);
@@ -122,6 +162,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
             rightTopClockRegion->setText("Hide Clock Region");
         }
         showClockRegion = !showClockRegion;
+        view->cellLocationShow(viewer.gridMatrix[13][10]->child_items[0]);
     });
 
     // 资源占用
@@ -284,19 +325,21 @@ void FrameView::showSiteInfo(int col, int row,bool sites_visible_status,int inde
     TypeValue->setText("");
 }
 
-void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_status, int index) {
+void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name) {
     NormalTile one = viewer.getTileInfo(col,row);
     // 更新标签文本
     tileTypeValue->setText(QString::fromStdString(one.types));
     rowNumValue->setText(QString::number(row));
     colNumValue->setText(QString::number(col));
     if (bel_visible_status){
-        siteNameValue->setText(QString::fromStdString(one.cur_sites[index].name));
-        siteTypeValue->setText(QString::fromStdString(one.cur_sites[index].type));
+        siteNameValue->setText(QString::fromStdString(one.cur_sites[site_index].name));
+        siteTypeValue->setText(QString::fromStdString(one.cur_sites[site_index].type));
+        NameValue->setText(QString::fromStdString(name));
+        TypeValue->setText(QString::fromStdString(bel_type));
     } else {
         siteNameValue->setText("");
         siteTypeValue->setText("");
+        NameValue->setText("");
+        TypeValue->setText("");
     }
-    NameValue->setText("");
-    TypeValue->setText("");
 }

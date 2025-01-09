@@ -9,9 +9,25 @@
 #include <QGraphicsView>
 #include <QStyleOptionGraphicsItem>
 
-BelsBlock::BelsBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index)
-    : Block(cur_width, cur_height, cur_name, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_index(site_index), bel_type(bel_type) {
+bool BelsBlock::bel_visible_status = false;
 
+BelsBlock::BelsBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, int site_index, const std::string &cur_name, const std::string &bel_type, int bel_index)
+    : Block(cur_width, cur_height, cur_name, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y), site_index(site_index), bel_type(bel_type), index(bel_index) {
+}
+
+bool BelsBlock::isMatches(const std::string &bel_name) {
+    if(bel_name.size() != name.size())
+        return false;
+    int count = 0;
+    for(int i = 0; i < name.size(); i++) {
+        if(bel_name[i] != name[i])
+            count++;
+    }
+    return count <= 1;
+}
+
+bool BelsBlock::isUsed() {
+    return used_status;
 }
 
 bool BelsBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
@@ -22,7 +38,7 @@ bool BelsBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillCo
 }
 
 void BelsBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
-    if(visible_status) {
+    if(getVisibleStatus()) {
         if(used_status)
             painter->setBrush(QColor(QColor(0, 255, 0, 127)));
         painter->drawRect(QRect(0, 0, width, height));
@@ -52,8 +68,21 @@ void BelsBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillCol
     }
 }
 
+bool BelsBlock::getVisibleStatus() {
+    return bel_visible_status;
+}
+
+void BelsBlock::updateVisibleStatus(bool option) {
+    bel_visible_status = option;
+    update();
+}
+
 void BelsBlock::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    emit BelClicked(tile_index_x, tile_index_y, site_index, visible_status, index);
+    emit BelClicked(tile_index_x, tile_index_y, site_index, getVisibleStatus(), index, bel_type, this->name);
+}
+
+void BelsBlock::launchClicked() {
+    emit BelClicked(tile_index_x, tile_index_y, site_index, getVisibleStatus(), index, bel_type, this->name);
 }
 
 void BelsBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {

@@ -32,7 +32,7 @@ private:
     int index_x;
     int index_y;
     QColor tile_color;
-    bool tiles_name_visible_status = true;
+    bool tiles_name_visible_status = false;
 
 };
 
