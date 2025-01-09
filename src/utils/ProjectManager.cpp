@@ -391,6 +391,8 @@ void ProjectManager::closeProject()
     MainWindow::instance()->showProjectTitle(1);
     // 显示起始页
     MainWindow::instance()->setForm(1);
+    // 重置RunState
+    MainWindow::instance()->resetRunState();
     // 重新初始化DesignRuns表
     InfoWidget::instance()->initDesignRunsView();
     // 更新最近使用工程列表

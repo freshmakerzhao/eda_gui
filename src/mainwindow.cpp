@@ -172,6 +172,12 @@ void MainWindow::resizeUi()
 
 void MainWindow::setRunState(const QString &phase, const bool &flag)
 {
+    if (!phaseLabel->isVisible()) {
+        phaseLabel->show();
+    }
+    if (!movieLabel->isVisible()) {
+        movieLabel->show();
+    }
     phaseLabel->setText(phase);
     if (flag) {
         movie->start();
@@ -185,6 +191,12 @@ void MainWindow::setRunState(const QString &phase, const bool &flag)
             movieLabel->setScaledContents(true);
         }
     }
+}
+
+void MainWindow::resetRunState()
+{
+    phaseLabel->hide();
+    movieLabel->hide();
 }
 
 void MainWindow::onNewTriggered()
