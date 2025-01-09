@@ -36,6 +36,11 @@ public:
         TopModule,
         DisplayPart,
         FamilyName,
+        BinFile,
+        RbtFile,
+        CRCOption,
+        CompressOption,
+        CompatibilityMode,
     };
 
     /**
@@ -54,23 +59,31 @@ public:
                      const QString &arch,
                      const QString &archName,
                      const QString &displayPart = QString("MC1P110-FC484L-1"),
-                     const QString &familyName = QString("MgiCubo"));
+                     const QString &familyName = QString("MgiCubo"),
+                     const QString &compatibilityMode = QString("enable"));
 
     bool writeProject();
-
+    void saveGenerateBitstreamOptions(tinyxml2::XMLElement *stepGenerateBitstreamElement);
     /**
      * 解析工程文件，将工程参数保存在Map
      * @param hprPath 工程文件(*.hpr)路径
      * @return
      */
     bool parseProject(const QString &hprPath);
-
+    bool parseRunsOptionValue(tinyxml2::XMLElement *runsRoot);
+    void parseStepOptions(tinyxml2::XMLElement *step);
     /**
      * 获取工程参数
      * @param key
      * @return
      */
     QString getParameter(const Project::ParamKey key) const;
+    void updateBinFileOption(const QString &binFileOptionStatus);
+    void updateRbtFileOption(const QString &rbtFileOptionStatus);
+    void updateCRCOption(const QString &crcOptionStatus);
+    void updateCompressOption(const QString &compressOptionStatus);
+    void updateCompatibilityOption(const QString &compatibilityOptionStatus);
+    void setCompatibilityMode();
 
     /**
      * 获取所有工程参数

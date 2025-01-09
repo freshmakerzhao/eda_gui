@@ -56,6 +56,9 @@ private:
     static Tcl_WideInt QtTclWideSeekProc(ClientData instanceData, Tcl_WideInt offset, int seekMode, int *errorCode);
 
     // ---------------------------- TCL Command ------------------------------
+
+    static int TclHardwareCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
+
     static int TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);
 
     static int TclSetDeviceCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]);

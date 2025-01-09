@@ -8,8 +8,10 @@
   ******************************************************************************
   */
 
+#include <QRadioButton>
 #include "DefaultPartPage.h"
 #include "utils/DeviceInfoUtils.h"
+#include "utils/ProjectManager.h"
 
 DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 {
@@ -42,12 +44,14 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView->setColumnHidden(9, true);
     tableView->setColumnHidden(10, true);
     tableView->setColumnHidden(11, true);
+
     QObject::connect(tableView, &QTableView::clicked, this, &DefaultPartPage::selectPart);
 
     // Filter
     QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
     proxyModel->setSourceModel(model);
     tableView->setModel(proxyModel);
+
     lineEdit = new QLineEdit(this);
     lineEdit->setClearButtonEnabled(true);
     lineEdit->setFixedSize(220, 30);
@@ -66,7 +70,6 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     });
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-
 
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
     hBoxLayout->setMargin(0);
@@ -88,13 +91,41 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
         columnWidths.append(tableView->columnWidth(col) + 20);
     }
 
-    // Set the mode to Interactive to allow manual resizing after automatic adjustment
+    // 设置成交互模式，并支持手动调节大小
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 
-    // Set the widths back to the original sizes
+    // 设置初始宽度
     for (int col = 0; col < model->columnCount(); ++col) {
         tableView->setColumnWidth(col, columnWidths.at(col));
     }
+
+    // ---------------- 兼容模式 单选按钮 -----------------
+    // 创建单选按钮
+    compatibility_mode_button = new QRadioButton("Enable compatibility mode", this);
+    compatibility_mode_button->setChecked(true); // 默认启用
+
+    // 提示信息，创建项目后无法更改
+    compatibility_mode_label = new QLabel("This option cannot be changed after creating the project.", this);
+    compatibility_mode_label->setStyleSheet("color: gray; font-style: italic;");
+
+    // 创建布局并添加单选按钮和提示信息
+    QVBoxLayout *compatibilityModeLayout = new QVBoxLayout;
+    compatibilityModeLayout->addWidget(compatibility_mode_button);
+    compatibilityModeLayout->addWidget(compatibility_mode_label);
+    // ---------------- 兼容模式 单选按钮 -----------------
+    connect(compatibility_mode_button, &QRadioButton::clicked,
+            this, &DefaultPartPage::onCompatibilityModeButtonClicked);
+
+
+    // 在页面中添加布局
+    layout->addLayout(compatibilityModeLayout);
+    setLayout(layout);
+}
+
+void DefaultPartPage::onCompatibilityModeButtonClicked(bool checked) {
+    Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
+    // 点击兼容模式的按钮后 跟新wizard compatibilityMode
+    wizard->compatibilityMode = checked ? "enable" : "disable";
 }
 
 bool DefaultPartPage::isComplete() const
@@ -120,7 +151,6 @@ void DefaultPartPage::selectPart(const QModelIndex &index) {
 
         qDebug() << "[DefaultPartPage] wizard param: "<< wizard->part << wizard->archName << wizard->arch << wizard->familyName << wizard->displayPart;
     }
-
     emit completeChanged();
 }
 

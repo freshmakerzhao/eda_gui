@@ -8,9 +8,6 @@
   ******************************************************************************
   */
 #include "CommandBuilder.h"
-#include <sstream>
-#include "utils/StringUtilities.h"
-#include "ProcessManager.h"
 //获取实例
 CommandBuilder& CommandBuilder::instance()
 {
@@ -25,10 +22,10 @@ CommandBuilder::~CommandBuilder()
 {
 }
 
-std::string CommandBuilder::generateDownloadBitCommands(const QString& bitstream){
+std::string CommandBuilder::generateDownloadBitCommands(const QString& bitstream, const QString& cable_name){
     std::stringstream cmd;
     cmd << "%BITSTREAMTOOL_PATH%";
-    cmd << " -c digilent_hs3";
+    cmd << (" -c " + cable_name).toStdString();
     cmd << " " << (bitstream).toStdString();
     return cmd.str();
 }

@@ -43,7 +43,8 @@ public:
                        const QStringList &designSrcs,
                        const QStringList &constraints,
                        const QString &displayPart = QString("MC1P110-FC484L-1"),
-                       const QString &familyName = QString("MgiCubo"));
+                       const QString &familyName = QString("MgiCubo"),
+                       const QString &compatibilityMode = QString("enable"));
 
     /**
      * Reopen project on startup
@@ -72,7 +73,7 @@ public:
      * @param project 工程实例
      */
     void loadFiles(Project *project);
-
+    void writeAndLoadProject();
     /**
      * 启动Wizard，添加Sources
      */
@@ -92,6 +93,13 @@ public:
     bool removeFileAction(const QString &path, const bool &erase = false);
 
     void setTopModule(const QString &topModule);
+
+    void updateBinFileOption(const QString &binFileOptionStatus);
+    void updateRbtFileOption(const QString &rbtFileOptionStatus);
+    void updateCRCOption(const QString &crcOptionStatus);
+    void updateCompressOption(const QString &compressOptionStatus);
+    void updateCompatibilityOption(const QString &compatibilityOptionStatus);
+    void setCompatibilityMode();
 
     void setDevicePart(const QString &deviceInfo);
 

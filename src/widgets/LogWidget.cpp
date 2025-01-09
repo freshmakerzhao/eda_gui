@@ -1,4 +1,6 @@
 #include "LogWidget.h"
+#include "service/PipeServer.h"
+#include "service/LogManager.h"
 
 LogWidget *LogWidget::instance(QWidget *parent)
 {
@@ -9,8 +11,14 @@ LogWidget *LogWidget::instance(QWidget *parent)
     return _instance;
 }
 
-void LogWidget::appendLog(const QString &str)
-{
+void LogWidget::appendLog(const QString &str) {
+    // 获取当前文本光标
+//    QTextCursor cursor = logTextEdit->textCursor();
+//    // 将光标移动到文本末尾(否则会在用户鼠标点击位置插入信息）
+//    cursor.movePosition(QTextCursor::End);
+//    logTextEdit->setTextCursor(cursor);
+//    // 插入log
+//    logTextEdit->insertPlainText(str);
     logTextEdit->appendPlainText(str);
 }
 
@@ -18,6 +26,8 @@ LogWidget::LogWidget(QWidget* parent)
     : QWidget(parent)
 {
     init();
+    // 获取 PipeServer 的单例实例
+    PipeServer &pipeServer = PipeServer::instance();
 }
 
 void LogWidget::init()
@@ -105,4 +115,3 @@ void LogWidget::init()
         QApplication::clipboard()->setText(logTextEdit->toPlainText());
     });
 }
-

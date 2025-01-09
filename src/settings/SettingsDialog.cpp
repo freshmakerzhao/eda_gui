@@ -1,4 +1,6 @@
 #include "SettingsDialog.h"
+#include "utils/ProjectManager.h"
+#include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent)
@@ -11,16 +13,21 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     treeWidget = new QTreeWidget(this);
     treeWidget->setFixedWidth(300);
     treeWidget->setHeaderLabel("Project Settings");
-    QTreeWidgetItem *generalitem = new QTreeWidgetItem(QStringList() << "General");
+    QTreeWidgetItem *generalItem = new QTreeWidgetItem(QStringList() << "General");
+    QTreeWidgetItem *bitstreamItem = new QTreeWidgetItem(QStringList() << "Bitstream");
     QList<QTreeWidgetItem *> settingsItemslist;
-    settingsItemslist.append(generalitem);
+    settingsItemslist.append(generalItem);
+    settingsItemslist.append(bitstreamItem);
     treeWidget->addTopLevelItems(settingsItemslist);
 
     //创建QStackedwidget控件
     stackedWidget = new QStackedWidget(this);
     //将控件添加到堆栈窗口中
     generalPage =  new GeneralPage(this);
+    bitstreamSettingPage =  new BitstreamSettingPage(this);
     stackedWidget->addWidget(generalPage);
+    stackedWidget->addWidget(bitstreamSettingPage);
+    bitstreamSettingPage->loadSettings(); // 初始化复选框状态
 
     // 使用一个水平布局管理器对对话框进行布局
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -51,5 +58,7 @@ void SettingsDialog::accept()
 {
     generalPage->setDevicePart();
     generalPage->setTopModule();
+    bitstreamSettingPage->applySettings();
+    ProjectManager::instance().writeAndLoadProject();
     QDialog::accept();
 }

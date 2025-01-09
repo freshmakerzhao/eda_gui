@@ -31,8 +31,8 @@ private:
     void init();
 
     QWidget* baseWidget;
-
     SearchTextEdit *logTextEdit;
+
 };
 
 

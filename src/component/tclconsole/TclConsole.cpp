@@ -61,6 +61,7 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "set_work_dir", TclSetWorkDirCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "set_top_module", TclSetTopModuleCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "synth_design", TclSynthCmd, nullptr, nullptr);
+    Tcl_CreateCommand(interp, "auto_connect", TclHardwareCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "impl_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "pack_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "place_design", TclImplCmd, nullptr, nullptr);
@@ -141,6 +142,54 @@ void TclConsole::executeTclCommand(const QString &command) {
     output->moveCursor(QTextCursor::End);
 }
 
+int TclConsole::TclHardwareCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
+    QStringList script;
+    QString info;
+    const QString task = QString(argv[0]);
+    std::map<std::string, std::string> args;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-cable") {
+            if (i + 1 < argc) { // 校验
+                args[arg] = argv[++i];
+            } else {
+                std::string errorMsg = "Error: Option " + arg + " requires a value.";
+                Tcl_SetResult(interp, (char*)errorMsg.c_str(), TCL_VOLATILE);
+                return TCL_ERROR;
+            }
+        } else {
+            Tcl_SetResult(interp, (char*)"Warning: Unknown option ", TCL_STATIC);
+        }
+    }
+    if (task == "auto_connect") {
+        script << "%BITSTREAMTOOL_PATH%";
+        script << "-c";
+        if (args.find("-cable") != args.end()) {
+            script << QString::fromStdString(args["-cable"]);
+        } else {
+            script << "digilent_hs3";
+        }
+        script << "--read-register-from-address";
+        script << "01100,10110,00111,01001,10001,01101,10000";
+        script << "--father-process-id";
+        script << InitialConfig::instance().pid_str;
+        info = "Starting Auto Connect";
+    } else {
+        info = "Unknown Hardware Command";
+    }
+
+    Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
+
+    const QString phase = "Auto Connect";
+    const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
+    const QString workDir = QString(workDirVar);
+    QDir dir(workDir);
+    const QString implPath = dir.filePath("runs/impl");
+    ProcessManager::instance().configWorkPath(implPath);
+    ProcessManager::instance().executeCommand(phase, script);
+    return TCL_OK;
+}
+
 int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
     const char* topVar = Tcl_GetVar(interp, "top_module", TCL_GLOBAL_ONLY);
     if (topVar == nullptr) {
@@ -189,11 +238,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const QString task = QString(argv[0]);
 
     if (task == "impl_design") {
-        addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
-        script << "&&";
-        addCommonArgs(packJsonPath, placeJsonPath, {"--no-pack", "--no-route", "-l", "log_place.log"});
-        script << "&&";
-        addCommonArgs(placeJsonPath, routeJsonPath, {"--fasm", fasmPath, "--no-pack", "--no-place", "-l", "log_route.log"});
+        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--hybrdchip", "--debug", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
         info = "Starting Implementation Task";
     } else if (task == "pack_design") {
         addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
@@ -208,12 +253,11 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
         info = "Unknown implement command";
     }
 
-
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     const QString phase = "Implementation";
     ProcessManager::instance().configWorkPath(implPath);
-    ProcessManager::instance().excuteCommand(phase, script);
+    ProcessManager::instance().executeCommand(phase, script);
     return TCL_OK;
 }
 
@@ -260,7 +304,10 @@ int TclConsole::TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, in
 
 int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
+    qDebug() << "=================== zhaoshuai ==========================";
     const QString phase = "Synthesis";
+    // 是否为兼容模式
+    bool isCompatibilityMode = false;
     std::map<std::string, std::string> args;
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -273,6 +320,9 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
                 Tcl_SetResult(interp, (char*)errorMsg.c_str(), TCL_VOLATILE);
                 return TCL_ERROR;
             }
+        } else if (arg == "-compatibility_mode") {
+            // 当传入 compatibility_mode 时，表示开启兼容模式，isCompatibilityMode 置为 true
+            isCompatibilityMode = true;
         } else {
             Tcl_SetResult(interp, (char*)"Warning: Unknown option ", TCL_STATIC);
         }
@@ -307,13 +357,18 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
 
     QDir dir(workDir);
     const QString jsonPath = dir.filePath("runs/synth/" + topName + ".json");
-    const QString edifPath = dir.filePath("runs/synth/" + topName + ".edn");
+//    const QString edifPath = dir.filePath("runs/synth/" + topName + ".edn");
+    const QString viewVerilogPath = dir.filePath("runs/synth/" + topName + ".v");
     const QString synthPath = dir.filePath("runs/synth");
 
     QStringList script;
     script << "-p";
-    script << QString("synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top %1; write_json %2; write_edif -pvector bra %3;")
-                  .arg(topName, jsonPath, edifPath);
+//    script << QString("synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top %1; write_json %2; write_edif -pvector bra %3;")
+//                  .arg(topName, jsonPath, edifPath);
+
+    script << QString("synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -process_number %1 -top %2; select -module %2; write_json -selected %3; write_verilog -selected %4; ")
+            .arg(InitialConfig::instance().pid_str, topName, jsonPath, viewVerilogPath);
+
     // Design Sources
     for (const QString &item : resultList) {
         script << item;
@@ -324,13 +379,23 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
         script << item;
     }
 
+    // 非兼容模式下 增加 -R ，表示能够加载hybrdchip原语
+    if (!isCompatibilityMode){
+        script << "-R";
+    }
+    // 加密网表
+    script << "-U";
+    // log verbose
+    script << "-v 9";
+
     QString info = QString("Starting synth_design\n"
                            "Using part: %1\n"
                            "Top: %2").arg(deviceModel, topName);
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     ProcessManager::instance().configWorkPath(synthPath);
-    ProcessManager::instance().excuteCommand(phase, script);
+    ProcessManager::instance().executeCommand(phase, script);
+    qDebug() << script;
     return TCL_OK;
 }
 
@@ -391,7 +456,7 @@ int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, c
     //  执行仿真:  vvp  compileFile
     scriptSimRun << "&&";
     scriptSimRun <<"%SIMULATION_RUN_PATH%" << compileFile;
-    ProcessManager::instance().excuteCommand(phaseSimulation, scriptSimRun);
+    ProcessManager::instance().executeCommand(phaseSimulation, scriptSimRun);
 
     return TCL_OK;
 }
@@ -473,11 +538,33 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
     return TCL_OK;
 }
 
-int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char **argv) {
-
-
+int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
     QStringList script;
     QString part_name = ProjectManager::instance().getParameter(Project::Part);
+
+    bool enableCRC = false;
+    bool enableCompress = false;
+    bool generatorBin = false;
+    bool generatorRbt = false;
+    bool parse_bitstream_mode = false;
+
+    std::map<std::string, std::string> args;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-crc") {
+            enableCRC = true;
+            parse_bitstream_mode = true;
+        } else if (arg == "-compress"){
+            enableCompress = true;
+            parse_bitstream_mode = true;
+        } else if (arg == "-bin"){
+            generatorBin = true;
+            parse_bitstream_mode = true;
+        } else if (arg == "-rbt"){
+            generatorRbt = true;
+            parse_bitstream_mode = true;
+        }
+    }
 
     const char *workDirVar = Tcl_GetVar(interp, "work_dir", 0);
     const QString workDir = QString(workDirVar);
@@ -493,6 +580,8 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     const QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
     const QString framesPath = dir.filePath("runs/impl/" + topName + ".frames");
     const QString bitstreamPath = dir.filePath("runs/impl/" + topName + ".bit");
+    const QString binPath = dir.filePath("runs/impl/" + topName + ".bin");
+    const QString rbtPath = dir.filePath("runs/impl/" + topName + ".rbt");
 
     script << "%FASM2FRAMES%";
     script << "--part";
@@ -503,6 +592,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << framesPath;
     script << "--fn_in";
     script << fasmPath;
+    script << "--start_decompression"; // 解密
     script << "&&";
     script << "%FRAMES2BIT%";
     script << "--part_file";
@@ -513,12 +603,32 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << framesPath;
     script << "--output_file";
     script << bitstreamPath;
+    script << "--process_number";
+    script << InitialConfig::instance().pid_str;
+
+//    PARSE_BITSTREAM_PATH
+
+    if (parse_bitstream_mode){
+        // 如果有 parse_bitstream 的扩展功能
+        script << "&&";
+        script << "%PARSE_BITSTREAM_PATH%";
+        script << "--file";
+        script << bitstreamPath;
+        if (enableCRC)
+            script << "--CRC";
+        if (enableCompress)
+            script << "--COMPRESS";
+        if (generatorBin)
+            script << "--bin";
+        if (generatorRbt)
+            script << "--rbt";
+    }
 
     QString info = "Starting Generate Bitstream Task\n";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     const QString phase = "Generate Bitstream";
     ProcessManager::instance().configWorkPath(implPath);
-    ProcessManager::instance().excuteCommand(phase, script);
+    ProcessManager::instance().executeCommand(phase, script);
     return TCL_OK;
 }

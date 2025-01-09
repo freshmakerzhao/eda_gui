@@ -8,7 +8,7 @@
 #include "widgets/FrameView.h"
 #include "mainwindow.h"
 #include "FileHelper.h"
-#include "HardWareManager.h"
+#include "service/HardWareManager.h"
 #include "dialog/AdvancedFileDialog.h"
 #include "base/Globals.h"
 
@@ -55,10 +55,8 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 8) {
-
         QString arguments = buildBitScript();
         publishScript(projectSynthPath,arguments);
-
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 9) {
@@ -82,7 +80,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         // frameView->show();
     } else if (mode == 10) {
         // downloadBit();
-        HardWareManager::instance().openProgramDevice(0);
+        HardWareManager::instance().openProgramDeviceAndDownload(0);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 11) {
@@ -101,7 +99,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     } else if (mode == 14) {
         MainWindow::instance()->showPrjSummary();
     } else if (mode == 15) {
-        HardWareManager::instance().openProgramDevice(1);
+        HardWareManager::instance().openProgramDeviceAndDownload(1);
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 16) {
         // HardWareManager::instance().openProgramDevice(2);
@@ -359,7 +357,6 @@ void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
     displayPartName = params[Project::DisplayPart];
     archName = params[Project::ArchName];
     arch = params[Project::Arch];
-
 }
 
 /**
@@ -418,7 +415,11 @@ TaskManager::~TaskManager()
  * @return
  */
 QString TaskManager::buildSynthScript() {
-    return QString("synth_design");
+    QStringList options;
+
+    if (ProjectManager::instance().getParameter(Project::CompatibilityMode) == "enable")
+        options << "-compatibility_mode";
+    return QString("synth_design %1").arg(options.join(" "));
 }
 
 QString TaskManager::buildImpScript() {
@@ -426,7 +427,17 @@ QString TaskManager::buildImpScript() {
 }
 
 QString TaskManager::buildBitScript() {
-    return QString("write_bitstream");
+    QStringList options;
+
+    if (ProjectManager::instance().getParameter(Project::BinFile) == "enable")
+        options << "-bin";
+    if (ProjectManager::instance().getParameter(Project::RbtFile) == "enable")
+        options << "-rbt";
+    if (ProjectManager::instance().getParameter(Project::CRCOption) == "enable")
+        options << "-crc";
+    if (ProjectManager::instance().getParameter(Project::CompressOption) == "enable")
+        options << "-compress";
+    return QString("write_bitstream %1").arg(options.join(" "));
 }
 
 QString TaskManager::buildSimScript() {
@@ -438,9 +449,10 @@ void TaskManager::onFileChanged() {
     qDebug("\033[43m[FileWatcher]\033[0m File Changed");
 }
 
-void TaskManager::downloadBit(const QString &bitstream) {
-    std::string script = CommandBuilder::instance().generateDownloadBitCommands(bitstream);
-    ProcessManager::instance().excuteCommand("Download Bitstream", QStringList() << QString::fromStdString(script));
+// 烧写位流
+void TaskManager::downloadBit(const QString &bitstream, const QString &cable_name) {
+    std::string script = CommandBuilder::instance().generateDownloadBitCommands(bitstream, cable_name);
+    ProcessManager::instance().executeCommand("Download Bitstream", QStringList() << QString::fromStdString(script));
 }
 
 void TaskManager::readBackRegister(const QString &registerAddress) {
@@ -535,7 +547,6 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
 
 // 将命令提交给tcl console
 void TaskManager::publishScript(const QString &workPath, const QString &tclCommand) {
-    // ProcessManager::instance().configWorkPath(workPath);
     Q_UNUSED(workPath); // 在TclConsole设置路径
     TclConsole::instance()->executeTclCommand(tclCommand);
 }

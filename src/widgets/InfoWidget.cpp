@@ -1,6 +1,7 @@
 #include "InfoWidget.h"
 #include "LogWidget.h"
 #include "utils/json.hpp"
+#include "MessageWidget.h"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
@@ -96,8 +97,6 @@ void InfoWidget::updateImplItem(const QString& implPath,
 //            *(itImpl->second) += value.get<int>();
 //        }
 //    }
-
-    qDebug() << "Impl:" << lut6NumSynth << ffNumSynth;
 
     runsModel->item(1, 1)->setText(status); // Status
     runsModel->item(1, 2)->setText(QString::number(lut6NumSynth)); // LUT6
@@ -219,9 +218,8 @@ InfoWidget::InfoWidget(QWidget *parent)
     tabWidget->addTab(TclConsole::instance(), "Tcl Console");
     // tabWidget->setTabEnabled(0, false);
     // =========================== Msg =============================
-    msg = new QPlainTextEdit(this), msg->setReadOnly(true);
-    tabWidget->addTab(msg, "Messages");
-    tabWidget->setTabEnabled(1, false);
+//    msg = new QPlainTextEdit(this), msg->setReadOnly(true);
+    tabWidget->addTab(MessageWidget::instance(), "Messages");
     // =========================== Log =============================
     tabWidget->addTab(LogWidget::instance(),"Log");
     // ============================ Rpt ============================

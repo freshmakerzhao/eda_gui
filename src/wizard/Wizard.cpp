@@ -139,7 +139,8 @@ void Wizard::onNewFinish()
                                              sourcetmp,
                                              constrainttmp,
                                              displayPart,
-                                             familyName);
+                                             familyName,
+                                             compatibilityMode);
     // ============================= 清除缓存 =================================
     QDir dircache("Cache");
     if (!dircache.isEmpty()) {
