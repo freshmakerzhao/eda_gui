@@ -7,6 +7,9 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include <unordered_map>
+#include <typeindex>
+
 
 Block::Block(int cur_width, int cur_height, const std::string &name, const QColor &color)
     : width(cur_width), height(cur_height), name(name) {
@@ -32,19 +35,11 @@ void Block::setColor(const QColor &color) {
     block_color = color;
 }
 
-void Block::setTypeFontSize(const int size) {
-    type_font_size = size;
-}
-
-void Block::setTypeShow(const bool option) {
-    show_type = option;
-}
-
 void Block::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(widget);
     Q_UNUSED(widget);
 
-    if (!visible_status){
+    if (!getVisibleStatus()){
         return;
     }
 
@@ -79,16 +74,12 @@ void Block::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     painter->restore();
 }
 
-void Block::updateVisibleStatus(bool status) {
-    visible_status = status;
-    update();
-}
-
 void Block::setUsed() {
     used_status = true;
 }
 
 std::string Block::getName() const {
+    qDebug() << QString::fromStdString(this->name);
     return this->name;
 }
 

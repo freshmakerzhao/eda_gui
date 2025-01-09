@@ -30,8 +30,8 @@ public:
 private:
     void setupMatrix();
     void populateScene();
-    bool showTilesName = true;
-    bool showSites = false;
+    bool showTilesName = false;
+    bool showSites = true;
     bool showClockRegion = false;
     QString tileJsonPath = "";
     QString usageJsonPath = "";
@@ -50,7 +50,7 @@ private:
 public slots:
     void showTileInfo(int x,int y);
     void showSiteInfo(int x,int y,bool sites_visible_status,int index);
-    void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index);
+    void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name);
 
 };
 

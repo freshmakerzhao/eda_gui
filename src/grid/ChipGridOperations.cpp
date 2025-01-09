@@ -248,6 +248,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(SITE_GAP*(index+1) + GLOBAL_SITE_BLOCK_WIDTH*index, SITE_GAP));
                     } else if (site.type == "SLICEM") {
                         SitesBlock* site_block = new SitesSliceM(
@@ -258,6 +259,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(SITE_GAP*(index+1) + GLOBAL_SITE_BLOCK_WIDTH*index, SITE_GAP));
 
                     } else if (site.type == "IOB33") {
@@ -269,6 +271,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(600, SITE_GAP));
 
                     } else if (site.type == "BUFR") {
@@ -280,6 +283,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(
                                 SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
                                 SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
@@ -293,6 +297,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(
                                 SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
                                 SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
@@ -306,6 +311,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             site.index
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(
                                 SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
                                 SITE_GAP*(index%3+1) + site_block->getHeight()*(index%4)
@@ -320,6 +326,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF (
                                 SITE_GAP*(index/2+1) + site_block->getWidth()*(index/2),
                                 SITE_GAP*(index%2+1) + site_block->getHeight()*(index%2)
@@ -333,6 +340,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos ( QPointF(
                                 SITE_GAP*(index/2+1) + site_block->getWidth()*(index/2),
                                 SITE_GAP*(index%2+1) + site_block->getHeight()*(index%2)
@@ -346,6 +354,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos ( QPointF(
                                 SITE_GAP*(index/2+1) + site_block->getWidth()*(index/2),
                                 SITE_GAP*(index%2+1) + site_block->getHeight()*(index%2)
@@ -360,6 +369,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                     site.index
                                     );
                             gridMatrix[i][j]->addSubBlock(site_block);
+                            siteBlockMap[site.name] = site_block;
                             site_block->setPos(QPointF(SITE_GAP*(index+1) + GLOBAL_SITE_BLOCK_WIDTH*index, SITE_GAP));
                     }
                     // ------------------------------
@@ -379,6 +389,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(600, SITE_GAP*(index+1) + site_block->getHeight()*index));
                     } else if (site.type == "FIFO18E1") {
                         SitesBlock* site_block_0 = new SitesRAMB36E1(
@@ -389,6 +400,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block_0);
+                        siteBlockMap[site.name] = site_block_0;
                         site_block_0->setPos(QPointF(GAP, GAP));
                         site_type_set.insert("RAMB38E1");
                         SitesBlock* site_block = new SitesFIFO18E1(
@@ -399,6 +411,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(2 * GAP, GAP*(index+2) + site_block->getHeight()*index));
                     } else if (site.type == "RAMB18E1") {
                         SitesBlock* site_block = new SitesRAMB18E1(
@@ -409,6 +422,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(2 * GAP, GAP*(index+2) + site_block->getHeight()*index));
                     } else if (site.type == "DSP48E1") {
                         SitesBlock* site_block = new SitesDSP48E1(
@@ -419,6 +433,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index+1) + site_block->getHeight()*index));
 
                     } else if (site.type == "OUT_FIFO") {
@@ -430,6 +445,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index+1) + site_block->getHeight()*index));
                     } else if (site.type == "IN_FIFO") {
                         SitesBlock* site_block = new SitesINFIFO(
@@ -440,6 +456,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index+1) + site_block->getHeight()*index));
 
                     } else if (site.type == "MMCME2_ADV") {
@@ -451,6 +468,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index+1) + site_block->getHeight()*index));
 
                     } else if (site.type == "PLLE2_ADV") {
@@ -462,6 +480,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index+1) + site_block->getHeight()*index));
 
                     } else if (site.type == "PHASER_OUT_PHY") {
@@ -473,6 +492,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index+1) + site_block->getHeight()*index));
                     } else if (site.type == "PHASER_IN_PHY") {
                         SitesBlock* site_block = new SitesPhaserINPHY(
@@ -483,6 +503,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index+1) + site_block->getHeight()*index));
                     } else if (site.type == "PHY_CONTROL") {
                         SitesBlock* site_block = new SitesPHYControl(
@@ -493,6 +514,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP*(index) + site_block->getHeight()*(index-1)));
                     } else if (site.type == "PHASER_REF") {
                         SitesBlock* site_block = new SitesPhaserREF(
@@ -503,6 +525,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF(GAP, GAP + 4650*(index+2)));
 
                     } else if (site.type == "OLOGICE3") {
@@ -514,6 +537,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos(QPointF (
                                 SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
                                 SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
@@ -527,6 +551,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos ( QPointF(
                                 SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
                                 SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
@@ -540,6 +565,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 site.index
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
+                        siteBlockMap[site.name] = site_block;
                         site_block->setPos ( QPointF(
                                 SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
                                 SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)

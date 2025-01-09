@@ -13,6 +13,7 @@
 #include <QCoreApplication>
 #include <fstream>
 #include <unordered_set>
+#include "blocks/Block.h"
 
 struct BoundingBox {
     double x0 = std::numeric_limits<double>::infinity(); // Minimum x
@@ -33,6 +34,7 @@ public:
     // 架构信息
     std::vector<std::vector<NormalTile>> gridTypeMatrix; // 存储tile_grid
     std::vector<std::vector<Blocks*>> gridMatrix; // 存储绘图对象 graphicItem
+    std::unordered_map<std::string, SitesBlock*> siteBlockMap;
     std::vector<SubItem> usageGrid;
 
     // std::vector<std::string> used_site;
