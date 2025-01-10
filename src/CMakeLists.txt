@@ -76,9 +76,9 @@ find_package(Qt5 COMPONENTS OpenGL)
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
 find_package(Qt5 COMPONENTS Core Xml REQUIRED)
 
-# Include the PowerEditor library
-add_subdirectory(external/XScintilla EXCLUDE_FROM_ALL)
-include_directories(${CMAKE_SOURCE_DIR}/external/XScintilla/src)
+# Include the ExScintilla library
+add_subdirectory(external/ExScintilla EXCLUDE_FROM_ALL)
+include_directories(${CMAKE_SOURCE_DIR}/external/ExScintilla/src)
 
 # Include the YAML library
 add_subdirectory(external/yaml-cpp)
@@ -106,12 +106,12 @@ link_directories(${TCL_LIBRARY_DIR})
 # Disable external-library warnings
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Use -w with GCC or Clang to disable all warnings
-    target_compile_options(PowerEditor PRIVATE -w)
+    target_compile_options(ExScintilla PRIVATE -w)
     target_compile_options(yaml-cpp PRIVATE -w)
     target_compile_options(qt5advanceddocking PRIVATE -w)
 # elseif(MSVC)
     # Use /W0 with MSVC to disable all warnings
-#     target_compile_options(PowerEditor PRIVATE /W0)
+#     target_compile_options(ExScintilla PRIVATE /W0)
 #     target_compile_options(yaml-cpp PRIVATE /W0)
 #     target_compile_options(qt5advanceddocking PRIVATE /W0)
 endif()
@@ -157,7 +157,6 @@ file(GLOB PROJECT_HEADERS
     component/tclconsole/*.h
     settings/*.h
     service/*.h
-    include/Qsci/*.h
     include/tinyxml2/*.h
     *.h
 )
@@ -184,7 +183,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     Qt5::Network
     Qt5::Xml
-    PowerEditor
+    ExScintilla
     yaml-cpp
     qt5advanceddocking${CMAKE_SHARED_LIBRARY_SUFFIX}
     libcrypto-1_1-x64

@@ -13,7 +13,7 @@
 #include <QTabWidget>
 #include <QPainter>
 #include <QPainterPath>
-#include "Editor.h"
+#include "TextEditor.h"
 
 class EditorManager : public QTabWidget
 {
@@ -39,7 +39,7 @@ public:
      * 返回当前编辑器指针
      * @return
      */
-    Editor *currentEditor();
+    TextEditor *currentEditor();
 
 public slots:
     /**

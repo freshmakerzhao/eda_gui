@@ -1,0 +1,102 @@
+// This module implements the ExsciLexerCSharp class.
+
+
+
+#include "Exsci/exscilexercsharp.h"
+
+#include <qcolor.h>
+#include <qfont.h>
+
+
+// The ctor.
+ExsciLexerCSharp::ExsciLexerCSharp(QObject *parent)
+    : ExsciLexerCPP(parent)
+{
+}
+
+
+// The dtor.
+ExsciLexerCSharp::~ExsciLexerCSharp()
+{
+}
+
+
+// Returns the language name.
+const char *ExsciLexerCSharp::language() const
+{
+    return "C#";
+}
+
+
+// Returns the foreground colour of the text for a style.
+QColor ExsciLexerCSharp::defaultColor(int style) const
+{
+    if (style == VerbatimString)
+        return QColor(0x00,0x7f,0x00);
+
+    return ExsciLexerCPP::defaultColor(style);
+}
+
+
+// Returns the end-of-line fill for a style.
+bool ExsciLexerCSharp::defaultEolFill(int style) const
+{
+    if (style == VerbatimString)
+        return true;
+
+    return ExsciLexerCPP::defaultEolFill(style);
+}
+
+
+// Returns the font of the text for a style.
+QFont ExsciLexerCSharp::defaultFont(int style) const
+{
+    if (style == VerbatimString)
+#if defined(Q_OS_WIN)
+        return QFont("Courier New",10);
+#elif defined(Q_OS_MAC)
+        return QFont("Courier", 12);
+#else
+        return QFont("Bitstream Vera Sans Mono",9);
+#endif
+
+    return ExsciLexerCPP::defaultFont(style);
+}
+
+
+// Returns the set of keywords.
+const char *ExsciLexerCSharp::keywords(int set) const
+{
+    if (set != 1)
+        return 0;
+
+    return "abstract as base bool break byte case catch char checked "
+           "class const continue decimal default delegate do double else "
+           "enum event explicit extern false finally fixed float for "
+           "foreach goto if implicit in int interface internal is lock "
+           "long namespace new null object operator out override params "
+           "private protected public readonly ref return sbyte sealed "
+           "short sizeof stackalloc static string struct switch this "
+           "throw true try typeof uint ulong unchecked unsafe ushort "
+           "using virtual void while";
+}
+
+
+// Returns the user name of a style.
+QString ExsciLexerCSharp::description(int style) const
+{
+    if (style == VerbatimString)
+        return tr("Verbatim string");
+
+    return ExsciLexerCPP::description(style);
+}
+
+
+// Returns the background colour of the text for a style.
+QColor ExsciLexerCSharp::defaultPaper(int style) const
+{
+    if (style == VerbatimString)
+        return QColor(0xe0,0xff,0xe0);
+
+    return ExsciLexer::defaultPaper(style);
+}
