@@ -1,6 +1,7 @@
 #ifndef TCLCONSOLE_H
 #define TCLCONSOLE_H
 
+#include <QApplication>
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QColor>

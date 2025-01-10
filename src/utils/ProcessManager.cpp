@@ -54,12 +54,12 @@ void ProcessManager::handleChannelReadyReadOutput()
 // process执行结束后触发
 void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus)
 {
-    if (curPhase == "Implementation") {
-        // 延迟 5000 毫秒，但保持 UI 响应
-        QEventLoop loop;
-        QTimer::singleShot(5000, &loop, &QEventLoop::quit);
-        loop.exec();
-    }
+    // if (curPhase == "Implementation") {
+    //     // 延迟 5000 毫秒，但保持 UI 响应
+    //     QEventLoop loop;
+    //     QTimer::singleShot(5000, &loop, &QEventLoop::quit);
+    //     loop.exec();
+    // }
     // =================== 启动标准输出流监听 ====================
 //    QTextCodec *tc = QTextCodec::codecForName("GBK");
 //
