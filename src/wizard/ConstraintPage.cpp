@@ -11,9 +11,11 @@
 #include "ConstraintPage.h"
 #include "dialog/AdvancedFileDialog.h"
 
-ConstraintPage::ConstraintPage(QWidget *parent) : QWizardPage(parent)
+ConstraintPage::ConstraintPage(QWidget *parent, const WizardMode &wizardMode) : QWizardPage(parent)
 {
-    setTitle("Add Constraints");
+    _wizardMode = wizardMode;
+
+    setTitle("Add or Create Constraints");
     setSubTitle("Specify or create constraint files for physical and "
                 "timing constraints.");
 
@@ -190,4 +192,13 @@ void ConstraintPage::onRemoveFiles()
     for(auto it : wizard->constraintFilesList){
         qDebug() << it;
     }
+}
+
+int ConstraintPage::nextId() const
+{
+    // 跳过其他页面
+    if (_wizardMode == WizardMode::ADD_SOURCES) {
+        return -1;
+    }
+    return QWizardPage::nextId();
 }

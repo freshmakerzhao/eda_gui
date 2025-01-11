@@ -46,6 +46,7 @@ public:
     void resizeUi();
 
     void setRunState(const QString &phase, const bool &flag);
+    void resetRunState();
 
 public slots:
     void onNewTriggered();

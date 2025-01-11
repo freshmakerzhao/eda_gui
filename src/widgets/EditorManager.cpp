@@ -33,7 +33,7 @@ void EditorManager::createEditorTab(const QString &path)
         }
     }
 
-    Editor *editor = new Editor(this); // 创建对象
+    TextEditor *editor = new TextEditor(this); // 创建对象
     editor->setProperty("filePath", path);
     if (!editor->openFile(path)) {
         CustomMessageBox::showError(MainWindow::instance(), "Failed", "Cannot open File.");
@@ -62,7 +62,7 @@ bool EditorManager::saveAllFiles()
     }
 
     for (int i = 0; i < this->count(); ++i) {
-        Editor *editor = qobject_cast<Editor*>(this->widget(i));
+        TextEditor *editor = qobject_cast<TextEditor*>(this->widget(i));
         if (editor->isModified()) {
             if(!editor->saveFile()) {
                 return false;
@@ -82,7 +82,7 @@ bool EditorManager::saveAllFiles()
 bool EditorManager::isModified()
 {
     for (int i = 0; i < this->count(); ++i) {
-        Editor *editor = qobject_cast<Editor*>(this->widget(i));
+        TextEditor *editor = qobject_cast<TextEditor*>(this->widget(i));
         if (editor->isModified()) {
             return true;
         }
@@ -94,9 +94,9 @@ bool EditorManager::isModified()
  * 返回当前编辑器指针
  * @return
  */
-Editor *EditorManager::currentEditor()
+TextEditor *EditorManager::currentEditor()
 {
-    return (Editor*) this->currentWidget();
+    return (TextEditor*) this->currentWidget();
 }
 
 /**
@@ -105,7 +105,7 @@ Editor *EditorManager::currentEditor()
  */
 void EditorManager::editorEdit(const int op)
 {
-    Editor *editor = qobject_cast<Editor*>(this->currentWidget());
+    TextEditor *editor = qobject_cast<TextEditor*>(this->currentWidget());
     if (!editor) {
         return;
     }
@@ -135,7 +135,7 @@ void EditorManager::editorEdit(const int op)
 
 void EditorManager::editorSave()
 {
-    Editor *editor = (Editor*) this->currentWidget();
+    TextEditor *editor = (TextEditor*) this->currentWidget();
 
     if(editor) {
         if(editor->saveFile()) {
@@ -149,7 +149,7 @@ void EditorManager::editorSave()
 
 void EditorManager::editorSaveAs()
 {
-    Editor *editor = (Editor*) this->currentWidget();
+    TextEditor *editor = (TextEditor*) this->currentWidget();
     if(editor) {
         if(editor->saveAsFile()) {
             qDebug() << "Save_As Success";
@@ -172,7 +172,7 @@ bool EditorManager::cleanEditorTab()
     }
 
     while (this->count() > 0) {
-        Editor *editor = qobject_cast<Editor*>(this->widget(0));
+        TextEditor *editor = qobject_cast<TextEditor*>(this->widget(0));
         delete editor;
     }
     return true;
@@ -183,7 +183,7 @@ bool EditorManager::cleanEditorTab()
  */
 void EditorManager::setSavePointFlag()
 {
-    Editor *editor = (Editor*) this->currentWidget();
+    TextEditor *editor = (TextEditor*) this->currentWidget();
     setTabText(currentIndex(), QFileInfo(editor->property("filePath").toString()).fileName() + "[*]");
 }
 
@@ -192,7 +192,7 @@ void EditorManager::setSavePointFlag()
  */
 void EditorManager::resetSavePointFlag()
 {
-    Editor *editor = (Editor*) this->currentWidget();
+    TextEditor *editor = (TextEditor*) this->currentWidget();
     setTabText(currentIndex(), QFileInfo(editor->property("filePath").toString()).fileName());
 }
 
@@ -204,7 +204,7 @@ void EditorManager::onTabWidgetCurrentChanged(int index)
 
 void EditorManager::onTabWidgetTabCloseRequested(int index)
 {
-    Editor *editor = qobject_cast<Editor*>(this->widget(index));
+    TextEditor *editor = qobject_cast<TextEditor*>(this->widget(index));
     if (editor->isModified()) {
         // qDebug() << "File" << index << "has been Modified";
         CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "The document has been modified.\n"

@@ -9,7 +9,7 @@
   */
 #include "mainwindow.h"
 #include "wizard/Wizard.h"
-#include "widgets/Editor.h"
+#include "widgets/TextEditor.h"
 #include "widgets/InfoWidget.h"
 #include "widgets/FlowNavigator.h"
 #include "widgets/Form.h"
@@ -39,7 +39,7 @@ MainWindow *MainWindow::instance()
 
 void MainWindow::updateActionState()
 {
-    Editor *editor = EditorManager::instance()->currentEditor();
+    TextEditor *editor = EditorManager::instance()->currentEditor();
     saveAction->setEnabled(editor != nullptr);
     saveasAction->setEnabled(editor != nullptr);
     cutAction->setEnabled(editor != nullptr && !editor->isReadOnly());
@@ -172,6 +172,12 @@ void MainWindow::resizeUi()
 
 void MainWindow::setRunState(const QString &phase, const bool &flag)
 {
+    if (!phaseLabel->isVisible()) {
+        phaseLabel->show();
+    }
+    if (!movieLabel->isVisible()) {
+        movieLabel->show();
+    }
     phaseLabel->setText(phase);
     if (flag) {
         movie->start();
@@ -185,6 +191,12 @@ void MainWindow::setRunState(const QString &phase, const bool &flag)
             movieLabel->setScaledContents(true);
         }
     }
+}
+
+void MainWindow::resetRunState()
+{
+    phaseLabel->hide();
+    movieLabel->hide();
 }
 
 void MainWindow::onNewTriggered()

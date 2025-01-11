@@ -64,11 +64,11 @@ void GeneralPage::setDevicePart()
 
 void GeneralPage::startWizard()
 {
-    Wizard w(this, 2);
-    if (w.exec() != QWizard::Accepted) {
+    Wizard wizard(this, WizardMode::SET_DEVICE);
+    if (wizard.exec() != QWizard::Accepted) {
         return;
     }
-    deviceInfo = w.getDeviceInfo();
+    deviceInfo = wizard.getDeviceInfo();
     qDebug() << "DeviceInfo: " << deviceInfo;
     if (deviceInfo.at(3) == tempDeviceName) {
         projectDeviceLineEdit->setText(QString("%1 (active)").arg(deviceInfo.at(3)));

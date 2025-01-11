@@ -14,18 +14,22 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     treeWidget->setFixedWidth(300);
     treeWidget->setHeaderLabel("Project Settings");
     QTreeWidgetItem *generalItem = new QTreeWidgetItem(QStringList() << "General");
+    QTreeWidgetItem *textEditorItem = new QTreeWidgetItem(QStringList() << "Text Editor");
     QTreeWidgetItem *bitstreamItem = new QTreeWidgetItem(QStringList() << "Bitstream");
     QList<QTreeWidgetItem *> settingsItemslist;
     settingsItemslist.append(generalItem);
+    settingsItemslist.append(textEditorItem);
     settingsItemslist.append(bitstreamItem);
     treeWidget->addTopLevelItems(settingsItemslist);
 
     //创建QStackedwidget控件
-    stackedWidget = new QStackedWidget(this);
+    stackedWidget = new QStackedWidget;
     //将控件添加到堆栈窗口中
-    generalPage =  new GeneralPage(this);
-    bitstreamSettingPage =  new BitstreamSettingPage(this);
+    generalPage =  new GeneralPage;
+    bitstreamSettingPage =  new BitstreamSettingPage;
+    textEditorSettingPage = new TextEditorSettingPage;
     stackedWidget->addWidget(generalPage);
+    stackedWidget->addWidget(textEditorSettingPage);
     stackedWidget->addWidget(bitstreamSettingPage);
     bitstreamSettingPage->loadSettings(); // 初始化复选框状态
 
@@ -58,6 +62,7 @@ void SettingsDialog::accept()
 {
     generalPage->setDevicePart();
     generalPage->setTopModule();
+    textEditorSettingPage->setEncoding();
     bitstreamSettingPage->applySettings();
     ProjectManager::instance().writeAndLoadProject();
     QDialog::accept();

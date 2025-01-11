@@ -3,6 +3,7 @@
 #include "utils/ProcessManager.h"
 #include "utils/ProjectManager.h"
 #include "base/Globals.h"
+#include "dialog/CustomMessageBox.h"
 
 const QColor TclConsole::NORMAL_COLOR = QColor::fromRgbF(0, 0, 0);
 const QColor TclConsole::ERROR_COLOR = QColor::fromRgbF(1.0, 0, 0);
@@ -211,6 +212,14 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
         resultList = qStringList.split(' ', Qt::SkipEmptyParts);
     }
 
+    if (resultList.isEmpty()) {
+        const std::string errorMessage = "There are no Design Constraints in the project. Please use \"Add Source\" to add files.";
+        Tcl_SetResult(interp, const_cast<char*>(errorMessage.c_str()), TCL_STATIC);
+        QWidget *parent = QApplication::activeWindow();
+        CustomMessageBox::showError(nullptr, "Run lmplementation", QString::fromStdString(errorMessage));
+        return TCL_ERROR;
+    }
+
     QDir dir(workDir);
     const QString implPath = dir.filePath("runs/impl");
     const QString synthJsonPath = dir.filePath("runs/synth/" + topName + ".json");
@@ -304,7 +313,6 @@ int TclConsole::TclSetTopModuleCmd(ClientData clientData, Tcl_Interp *interp, in
 
 int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[])
 {
-    qDebug() << "=================== zhaoshuai ==========================";
     const QString phase = "Synthesis";
     // 是否为兼容模式
     bool isCompatibilityMode = false;

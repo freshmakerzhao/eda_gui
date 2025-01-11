@@ -12,6 +12,7 @@
 
 
 #include <QString>
+#include <QSettings>
 
 class InitialConfig {
 
