@@ -14,6 +14,7 @@
 #include "SourcePage.h"
 #include "ConstraintPage.h"
 #include "DefaultPartPage.h"
+#include "ConfigurationPage.h".h"
 #include "utils/ProjectManager.h"
 
 Wizard::Wizard(QWidget *parent, const WizardMode &wizardMode)
@@ -47,6 +48,7 @@ Wizard::Wizard(QWidget *parent, const WizardMode &wizardMode)
     case WizardMode::CREATE_PROJECT:
         addPage(new NewGuidePage);
         addPage(new ProjectNamePage);
+        addPage(new ConfigurationPage);
         addPage(new SourcesPage);
         addPage(new ConstraintPage);
         addPage(new DefaultPartPage);

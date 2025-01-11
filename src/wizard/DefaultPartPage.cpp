@@ -98,35 +98,8 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     for (int col = 0; col < model->columnCount(); ++col) {
         tableView->setColumnWidth(col, columnWidths.at(col));
     }
-
-    // ---------------- 兼容模式 单选按钮 -----------------
-    // 创建单选按钮
-    compatibility_mode_button = new QRadioButton("Enable compatibility mode", this);
-    compatibility_mode_button->setChecked(true); // 默认启用
-
-    // 提示信息，创建项目后无法更改
-    compatibility_mode_label = new QLabel("This option cannot be changed after creating the project.", this);
-    compatibility_mode_label->setStyleSheet("color: gray; font-style: italic;");
-
-    // 创建布局并添加单选按钮和提示信息
-    QVBoxLayout *compatibilityModeLayout = new QVBoxLayout;
-    compatibilityModeLayout->addWidget(compatibility_mode_button);
-    compatibilityModeLayout->addWidget(compatibility_mode_label);
-    // ---------------- 兼容模式 单选按钮 -----------------
-    connect(compatibility_mode_button, &QRadioButton::clicked,
-            this, &DefaultPartPage::onCompatibilityModeButtonClicked);
-
-
-    // 在页面中添加布局
-    layout->addLayout(compatibilityModeLayout);
-    setLayout(layout);
 }
 
-void DefaultPartPage::onCompatibilityModeButtonClicked(bool checked) {
-    Wizard *wizard = qobject_cast<Wizard*>(this->wizard());
-    // 点击兼容模式的按钮后 跟新wizard compatibilityMode
-    wizard->compatibilityMode = checked ? "enable" : "disable";
-}
 
 bool DefaultPartPage::isComplete() const
 {
