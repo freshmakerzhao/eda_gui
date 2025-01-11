@@ -69,6 +69,11 @@ TextEditor::TextEditor(QWidget *parent)
     setMarginsForegroundColor(QColor(85, 156, 179));
     // 行号背景颜色
     setMarginsBackgroundColor(QColor(240, 240, 240));
+
+    configCodec();
+    // setEolMode(ExsciScintilla::EolWindows);
+    // setEolVisibility(true);
+
 }
 
 TextEditor::~TextEditor()
@@ -87,14 +92,14 @@ bool TextEditor::openFile(const QString &path)
     if (!fileInfo.isFile()) {
         return false;
     }
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
     if (fileInfo.suffix() == "v") {
         apis = new ExsciAPIs(verilogLexer);
         QStringList keywords;
         QFile file(":/resource/keywords.txt");
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (file.open(QIODevice::ReadOnly)) {
             QTextStream in(&file);
             while (!in.atEnd()) {
                 QString keyword = in.readLine();
@@ -116,7 +121,7 @@ bool TextEditor::openFile(const QString &path)
         setLexer(tclLexer);
     }
     QTextStream in(&file);
-    in.setCodec("UTF-8");   // Decoding files using UTF-8
+    in.setCodec(encoding.toStdString().c_str());
     this->setText(in.readAll());
     file.close();
     this->setModified(false);
@@ -138,9 +143,12 @@ bool TextEditor::saveFile()
                                  "The file is read-only. Writing operation failed.");
             return false;
         }
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+
+        //! In `QIODevice::Text` mode, `QTextStream` automatically converts `\n`
+        //! to the appropriate newline character for the operating system.
+        if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
-            out.setCodec("UTF-8");
+            out.setCodec(encoding.toStdString().c_str());
             out << this->text();
             file.close();
             this->setModified(false);
@@ -176,13 +184,13 @@ bool TextEditor::saveAsFile()
     QString path = dialog.selectedFiles().value(0, "");
     QFile file(path);
     // 处理另存为文件异常
-    if (!file.open(QIODevice::WriteOnly | QFile::Text)) {
+    if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox::warning(this, "Warning", "Cannot write file:\n" + file.errorString());
         return false;
     }
     _path = path;
     QTextStream out(&file);
-    out.setCodec("UTF-8");
+    out.setCodec(encoding.toStdString().c_str());
     out << this->text();
     file.close();
     this->setModified(false);
@@ -246,4 +254,10 @@ void TextEditor::resizeLineWidth()
 {
     // 设置行号的宽度
     setMarginWidth(0, QString::number(lines()).size() * _width + 16);
+}
+
+void TextEditor::configCodec()
+{
+    QSettings settings("HybrdChip", "HybrdLink");
+    encoding = settings.value("TextEditor/encoding", "UTF-8").toString();
 }

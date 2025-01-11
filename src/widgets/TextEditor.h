@@ -8,6 +8,7 @@
 #include <QContextMenuEvent>
 #include <QAction>
 #include <QKeyEvent>
+#include <QSettings>
 
 #include "Exsci/exsciscintilla.h"
 #include "Exsci/exsciapis.h"      // 自动补全的apis
@@ -40,6 +41,11 @@ private slots:
     void resizeLineWidth();
 
 private:
+    void configCodec();
+
+private:
+    QString encoding;
+
     int _width = 16; // 字符宽度
     ExsciLexerVerilog *verilogLexer;
     ExsciLexerTCL *tclLexer;
