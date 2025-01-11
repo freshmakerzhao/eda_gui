@@ -217,7 +217,7 @@ void ProjectManager::addSourcesAction()
                                        "Please select or create a project.");
         return;
     }
-    Wizard wizard(MainWindow::instance(), 1);
+    Wizard wizard(MainWindow::instance(), WizardMode::ADD_SOURCES);
     wizard.exec();
     _project->writeProject();
     loadFiles(_project);

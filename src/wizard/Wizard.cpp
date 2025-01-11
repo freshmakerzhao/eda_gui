@@ -16,7 +16,8 @@
 #include "DefaultPartPage.h"
 #include "utils/ProjectManager.h"
 
-Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
+Wizard::Wizard(QWidget *parent, const WizardMode &wizardMode)
+    : QWizard(parent)
 {
     qDebug() << "[Wizard] Constructing...";
     resize(960, 640);
@@ -42,9 +43,8 @@ Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
     customButton->setEnabled(currentId() != 0);
 #endif
 
-    switch (mode) {
-    case 0:     // 完整新建工程流程
-        qDebug() << "[Wizard] mode 0";
+    switch (wizardMode) {
+    case WizardMode::CREATE_PROJECT:
         addPage(new NewGuidePage);
         addPage(new ProjectNamePage);
         addPage(new SourcesPage);
@@ -52,16 +52,14 @@ Wizard::Wizard(QWidget *parent, const int &mode) : QWizard(parent)
         addPage(new DefaultPartPage);
         connect(this, &QWizard::accepted, this, &Wizard::onNewFinish);
         break;
-    case 1:     // 添加Sources
-        qDebug() << "[Wizard] mode 1";
+    case WizardMode::ADD_SOURCES:
         setPage(Page_AddGuide, new AddGuidePage);
-        setPage(Page_Source, new SourcesPage(this, 1));
-        setPage(Page_Constraint, new ConstraintPage);
-        setPage(Page_Simulation_Source, new SourcesPage(this, 1, AddSourceType::AddSimulationSources));
+        setPage(Page_Source, new SourcesPage(this, WizardMode::ADD_SOURCES));
+        setPage(Page_Constraint, new ConstraintPage(this, WizardMode::ADD_SOURCES));
+        setPage(Page_Simulation_Source, new SourcesPage(this, WizardMode::ADD_SOURCES, AddSourceType::AddSimulationSources));
         connect(this, &QWizard::accepted, this, &Wizard::onAddFinish);
         break;
-    case 2:
-        qDebug() << "[Wizard] mode 2";
+    case WizardMode::SET_DEVICE:
         addPage(new DefaultPartPage);
     default:
         break;

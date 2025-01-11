@@ -11,12 +11,13 @@
 #include "SourcePage.h"
 #include "dialog/AdvancedFileDialog.h"
 
-SourcesPage::SourcesPage(QWidget *parent, const int mode, const AddSourceType sourceType ) : QWizardPage(parent)
+SourcesPage::SourcesPage(QWidget *parent, const WizardMode &wizardMode, const AddSourceType sourceType )
+    : QWizardPage(parent)
 {
-    _mode = mode;
+    _wizardMode = wizardMode;
 
-    mSourceType = sourceType;
-    sourceType == AddSourceType::AddSources ? setTitle("Add sources") : setTitle("Add simulation sources");
+    _sourceType = sourceType;
+    sourceType == AddSourceType::AddSources ? setTitle("Add or Create Design Sources") : setTitle("Add or Create Simulation Sources");
     setSubTitle("Specify HDL files to add to your project. "
                 "Create a new source file on disk and add it to your project.");
 
@@ -194,7 +195,7 @@ void SourcesPage::onRemoveFiles()
 int SourcesPage::nextId() const
 {
     // 跳过其他页面
-    if (_mode == 1) {
+    if (_wizardMode == WizardMode::ADD_SOURCES) {
         return -1;
     }
     return QWizardPage::nextId();
@@ -204,7 +205,7 @@ int SourcesPage::nextId() const
 QStringList& SourcesPage::getMatchFileList( ) {
     Wizard* wizard = qobject_cast<Wizard*>(this->wizard());
     // 添加文件路径到列表中
-    if(mSourceType == AddSourceType::AddSources) {
+    if(_sourceType == AddSourceType::AddSources) {
         return wizard->sourcesFilesList;
     } else {
         return wizard->simFileList;

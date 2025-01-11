@@ -22,15 +22,17 @@ class SourcesPage : public QWizardPage
 {
     Q_OBJECT
 public:
-    SourcesPage(QWidget *parent = nullptr, const int mode = 0, const AddSourceType sourceType = AddSourceType::AddSources);
+    SourcesPage(QWidget *parent = nullptr,
+                const WizardMode &wizardMode = WizardMode::CREATE_PROJECT,
+                const AddSourceType sourceType = AddSourceType::AddSources);
 
 private:
     QStandardItemModel *model;
 
     WizTableView *tableView;
 
-    int _mode;
-    AddSourceType mSourceType;
+    WizardMode _wizardMode;
+    AddSourceType _sourceType;
 
     const QMap<QString, QString> Map = {
         {"v", "verilog"}

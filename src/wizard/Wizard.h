@@ -33,11 +33,18 @@
 #include <QDebug>
 #include "WizCommon.h"
 
+enum class WizardMode {
+    CREATE_PROJECT,
+    ADD_SOURCES,
+    SET_DEVICE
+};
+
 class Wizard : public QWizard
 {
     Q_OBJECT
 public:
-    Wizard(QWidget *parent = nullptr, const int &mode = 0);
+    Wizard(QWidget *parent = nullptr,
+           const WizardMode &wizardMode = WizardMode::CREATE_PROJECT);
     ~Wizard();
 
 private slots:
