@@ -12,6 +12,8 @@
 #include <QString>
 #include <QFileInfo>
 #include <QCoreApplication>
+#include <QApplication>
+#include <QScreen>
 #include <QDebug>
 
 static int GLOBAL_TILE_BLOCK_WIDTH  = 210;
@@ -24,7 +26,11 @@ static int GLOBAL_SITE_BLOCK_HEIGHT = 80;
 namespace GlobalConfig {
     extern QString GLOBAL_RESOURCE_PATH;
 
+    extern qreal SCALE_FACTOR;
+
     void initGlobalResourcePath();
+
+    void initScaleFactor();
 }
 
 #endif //CHIP_GLOBALS_H
