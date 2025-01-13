@@ -36,51 +36,62 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     //右部分割窗口
     QSplitter *splitterRight =new QSplitter(Qt::Vertical, splitterMain);
     splitterRight->setOpaqueResize(false);
+    //调整尺寸分配
     QList<int> sizes;
-    sizes << 100 << splitterRight->width() - 100; // 左边窗口200像素，右边窗口占据剩余空间
+    sizes << splitterMain->width() - 230 << 230; // 左边窗口200像素，右边窗口占据剩余空间
     splitterMain->setSizes(sizes);
-    splitterMain->setStretchFactor(0, 0);
+    // 设置拉伸因子，优先拉伸右侧窗口
+    splitterMain->setStretchFactor(0, 1);
+    splitterMain->setStretchFactor(1, 0);
+
     splitterRight->setStretchFactor(1, 1);
 
-    QWidget *rightTopWidget = new QWidget(splitterRight);
-    QVBoxLayout *rightTopLayout = new QVBoxLayout(rightTopWidget);
 
     //搜索框
-    QLineEdit* searchBox = new QLineEdit("Please enter a cell");
+    QWidget* searchWidget = new QWidget(splitterRight);
+    QVBoxLayout* searchVLayout = new QVBoxLayout;
+    QHBoxLayout* searchHLayout = new QHBoxLayout;
+    searchBox = new QLineEdit();
 
-    //设置自动补全
-    QStringListModel* autoCompleterModel = new QStringListModel();
-    QCompleter* autoCompleter = new QCompleter(autoCompleterModel);
-    autoCompleter->setCaseSensitivity(Qt::CaseInsensitive); // 忽略大小写
-    autoCompleter->setFilterMode(Qt::MatchContains); // 支持模糊匹配
-    searchBox->setCompleter(autoCompleter);
+//    QStringList allKeywords;
+//    for(auto word : viewer.siteBlockMap) {
+//        allKeywords.append(QString::fromStdString(word.first));
+//    }
+    QCompleter* searchCompleter = new QCompleter;
+    searchCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 
-    connect(searchBox, &QLineEdit::returnPressed, [=]() {
-        std::string input = searchBox->text().toStdString();
-        size_t pos = input.find('/');
-        if(pos != std::string::npos) {
-            std::string site_name = input.substr(0, pos);
-            auto it = viewer.siteBlockMap.find(site_name);
-            if(it == viewer.siteBlockMap.end())
-                return;
-            SitesBlock* site_block = viewer.siteBlockMap[site_name];
-            for(auto bel_block : site_block->child_bel_items) {
-                if(input == bel_block->getName()) {
-                    view->cellLocationShow(bel_block);
-                    bel_block->launchClicked();
-                    return;
+    QPushButton* searchButton = new QPushButton("search");
+    searchButton->setFixedWidth(45);
+    searchVLayout->addWidget(new QLabel("Search cell: ", this));
+
+    searchBox->setCompleter(searchCompleter);
+    searchHLayout->addWidget(searchBox);
+    searchHLayout->addWidget(searchButton);
+    searchVLayout->addLayout(searchHLayout);
+    searchWidget->setLayout(searchVLayout);
+
+    connect(searchBox, &QLineEdit::returnPressed, this, &FrameView::showCell);
+    connect(searchBox, &QLineEdit::textChanged, [=](const QString &text) {
+        QStringList Cells = text.split("/");
+        QStringList filteredKeywords;
+        for (auto word : viewer.siteBlockMap) {
+            QString keyword = QString::fromStdString(word.first);
+            if (Cells[0] == QString::fromStdString(word.first)) { //如果stie的名称匹配，则提示bel级别的提示
+                for(auto bel : word.second->child_bel_items) {
+                    filteredKeywords.append(QString::fromStdString(bel->getName()));
                 }
+                break;
+            } else if (keyword.contains(text, Qt::CaseInsensitive)) {
+                filteredKeywords.append(keyword);
             }
-        } else {
-            auto it = viewer.siteBlockMap.find(input);
-            if(it == viewer.siteBlockMap.end())
-                return;
-            view->cellLocationShow(viewer.siteBlockMap[input]);
-            viewer.siteBlockMap[input]->launchClicked();
         }
+        searchCompleter->setModel(new QStringListModel(filteredKeywords, searchCompleter));
     });
+    connect(searchButton, &QPushButton::clicked, this, &FrameView::showCell);
 
     // 上部分的按钮
+    QWidget *rightTopWidget = new QWidget(splitterRight);
+    QVBoxLayout *rightTopLayout = new QVBoxLayout(rightTopWidget);
     // QPushButton* right_top_load_arch = new QPushButton("加载架构信息");
     QPushButton* rightTopBlockName = new QPushButton("Tile Name Off");
     QPushButton* rightTopSites = new QPushButton("Show Module Details");
@@ -105,7 +116,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     rightTopUsage->setEnabled(false);
 
     // right_top_layout->addWidget(right_top_load_arch, 0, Qt::AlignHCenter);
-    rightTopLayout->addWidget(searchBox, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopBlockName, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopSites, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopClockRegion, 0, Qt::AlignHCenter);
@@ -162,7 +172,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
             rightTopClockRegion->setText("Hide Clock Region");
         }
         showClockRegion = !showClockRegion;
-        view->cellLocationShow(viewer.gridMatrix[13][10]->child_items[0]);
     });
 
     // 资源占用
@@ -341,5 +350,38 @@ void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_s
         siteTypeValue->setText("");
         NameValue->setText("");
         TypeValue->setText("");
+    }
+}
+
+bool FrameView::searchCell(const std::string &cell_name) {
+    size_t pos = cell_name.find('/');
+    if(pos != std::string::npos) {
+        std::string site_name = cell_name.substr(0, pos);
+        auto it = viewer.siteBlockMap.find(site_name);
+        if(it == viewer.siteBlockMap.end())
+            return false;
+        SitesBlock* site_block = viewer.siteBlockMap[site_name];
+        for(auto bel_block : site_block->child_bel_items) {
+            if(cell_name == bel_block->getName()) {
+                view->cellLocationShow(bel_block);
+                bel_block->launchClicked();
+                return true;
+            }
+        }
+    } else {
+        auto it = viewer.siteBlockMap.find(cell_name);
+        if(it == viewer.siteBlockMap.end())
+            return false;
+        view->cellLocationShow(viewer.siteBlockMap[cell_name]);
+        viewer.siteBlockMap[cell_name]->launchClicked();
+        return true;
+    }
+    return false;
+}
+
+void FrameView::showCell() {
+    if(!searchCell(searchBox->text().toStdString())) {
+        searchBox->setPlaceholderText("Not found");
+        searchBox->clear();
     }
 }
