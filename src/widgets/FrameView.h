@@ -16,6 +16,7 @@
 #include <QLabel>
 #include "grid/ChipGridOperations.h"
 #include <QApplication>
+#include <QLineEdit>
 
 
 class QGraphicsScene;
@@ -26,6 +27,7 @@ Q_OBJECT
 
 public:
     FrameView(const std::string& tileGridPath = "", const std::string& tileColorPathLocal = "",QString projectImplPath = "",QWidget *parent = nullptr);
+    bool searchCell(const std::string &cell_name);
     View *view;
 private:
     void setupMatrix();
@@ -46,12 +48,13 @@ private:
     QLabel *siteTypeValue;
     QLabel *NameValue;
     QLabel *TypeValue;
+    QLineEdit *searchBox;
 
 public slots:
     void showTileInfo(int x,int y);
     void showSiteInfo(int x,int y,bool sites_visible_status,int index);
     void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name);
-
+    void showCell();
 };
 
 

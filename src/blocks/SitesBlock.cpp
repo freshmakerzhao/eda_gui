@@ -14,7 +14,7 @@
 #include <QGraphicsView>
 #include <QStyleOptionGraphicsItem>
 
-bool SitesBlock::site_visible_status = false;
+bool SitesBlock::site_visible_status = true;
 
 SitesBlock::SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, const std::string &cur_name, int site_index)
 : Block(cur_width, cur_height, cur_name, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y),  site_type(site_type),  site_index(site_index) {}
