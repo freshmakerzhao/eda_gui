@@ -68,7 +68,7 @@ void Tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     painter->setPen(QPen(Qt::black, 0));
 
     // Draw text
-    if (lod >= 0.02 && tiles_name_visible_status) {
+    if ( tiles_name_visible_status) {
         QFont font("Times", 100);
         font.setStyleStrategy(QFont::ForceOutline); // 强制字体以轮廓方式渲染
         painter->setFont(font);

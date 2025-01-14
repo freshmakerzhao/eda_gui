@@ -34,7 +34,7 @@ public:
     // 架构信息
     std::vector<std::vector<NormalTile>> gridTypeMatrix; // 存储tile_grid
     std::vector<std::vector<Blocks*>> gridMatrix; // 存储绘图对象 graphicItem
-    std::unordered_map<std::string, SitesBlock*> siteBlockMap;
+    std::unordered_map<std::string, std::unordered_map<std::string, SitesBlock*>> siteBlockMap;
     std::vector<SubItem> usageGrid;
 
     // std::vector<std::string> used_site;

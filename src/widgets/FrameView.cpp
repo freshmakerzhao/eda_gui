@@ -52,40 +52,47 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     QVBoxLayout* searchVLayout = new QVBoxLayout;
     QHBoxLayout* searchHLayout = new QHBoxLayout;
     searchBox = new QLineEdit();
+    searchCompleter.setCaseSensitivity(Qt::CaseInsensitive);
+    searchCompleter.setCompletionMode(QCompleter::PopupCompletion);
+    searchBox->setCompleter(&searchCompleter);
 
-//    QStringList allKeywords;
-//    for(auto word : viewer.siteBlockMap) {
-//        allKeywords.append(QString::fromStdString(word.first));
-//    }
-    QCompleter* searchCompleter = new QCompleter;
-    searchCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 
     QPushButton* searchButton = new QPushButton("search");
     searchButton->setFixedWidth(45);
     searchVLayout->addWidget(new QLabel("Search cell: ", this));
 
-    searchBox->setCompleter(searchCompleter);
     searchHLayout->addWidget(searchBox);
     searchHLayout->addWidget(searchButton);
     searchVLayout->addLayout(searchHLayout);
     searchWidget->setLayout(searchVLayout);
 
     connect(searchBox, &QLineEdit::returnPressed, this, &FrameView::showCell);
-    connect(searchBox, &QLineEdit::textChanged, [=](const QString &text) {
-        QStringList Cells = text.split("/");
-        QStringList filteredKeywords;
-        for (auto word : viewer.siteBlockMap) {
-            QString keyword = QString::fromStdString(word.first);
-            if (Cells[0] == QString::fromStdString(word.first)) { //如果stie的名称匹配，则提示bel级别的提示
-                for(auto bel : word.second->child_bel_items) {
-                    filteredKeywords.append(QString::fromStdString(bel->getName()));
+    connect(searchBox, &QLineEdit::textChanged, this, &FrameView::searchUpdate);
+    connect(&searchCompleter, QOverload<const QString &>::of(&QCompleter::activated), [=](const QString &text) {
+//        QString current_word = searchCompleter.currentCompletion();
+        std::string site_type = text.split("_")[0].toStdString();
+        std::string site_name_in = text.split("/")[0].toStdString();
+
+        qDebug() << "text:" << text;
+
+        if(!text.contains("_X")) { //匹配site类型
+            for(auto site : viewer.siteBlockMap[site_type]) {
+                QString site_name = QString::fromStdString(site.first);
+                if(!searchWordList.contains(site_name)) {
+                    searchWordList << site_name;
                 }
-                break;
-            } else if (keyword.contains(text, Qt::CaseInsensitive)) {
-                filteredKeywords.append(keyword);
             }
+        } else if (!text.contains('/')) { //匹配site_name
+            for(auto bel : viewer.siteBlockMap[site_type][site_name_in]->child_bel_items) {
+                QString bel_name = QString::fromStdString(bel->getName());
+                if(!searchWordList.contains(bel_name)) {
+                    searchWordList << bel_name;
+                }
+            }
+        } else {
+            return;
         }
-        searchCompleter->setModel(new QStringListModel(filteredKeywords, searchCompleter));
+        searchWordListModel.setStringList(searchWordList);
     });
     connect(searchButton, &QPushButton::clicked, this, &FrameView::showCell);
 
@@ -179,7 +186,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 #if ONLY_COMPILE_GRIDVIEW
         // -------------------- 手动选择资源占用文件，方便测试 -----------------------------------
         usageJsonPath = FileHelper::addJsonFile();
-#else          
+#else
     // ----------- 默认使用runs/impl目录下的place.json文件可视化资源使用情况 -----------
     QDir dir(projectImplPath);
     usageJsonPath = dir.filePath("route.json");
@@ -287,6 +294,13 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
             rightTopSites->setEnabled(true);
             rightTopUsage->setText("Resource Usage");
         }
+
+        // 添加搜索框提示词
+        for (auto type_word : viewer.siteBlockMap) {
+            searchWordList << QString::fromStdString(type_word.first);
+        }
+        searchCompleter.setModel(&searchWordListModel);
+        searchWordListModel.setStringList(searchWordList);
     }
 
    for (auto& cols : viewer.gridMatrix) {
@@ -302,6 +316,8 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
            }
        }
    }
+
+
 }
 
 
@@ -354,13 +370,20 @@ void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_s
 }
 
 bool FrameView::searchCell(const std::string &cell_name) {
-    size_t pos = cell_name.find('/');
+    size_t pos = cell_name.find("_X");
+    std::string site_type = cell_name.substr(0, pos);
+    qDebug() << "site_type:" <<  QString::fromStdString(site_type);
+    auto it = viewer.siteBlockMap.find(site_type);
+    if(it == viewer.siteBlockMap.end())
+        return false;
+
+    pos = cell_name.find('/');
     if(pos != std::string::npos) {
         std::string site_name = cell_name.substr(0, pos);
-        auto it = viewer.siteBlockMap.find(site_name);
-        if(it == viewer.siteBlockMap.end())
+        auto it = viewer.siteBlockMap[site_type].find(site_name);
+        if(it == viewer.siteBlockMap[site_type].end())
             return false;
-        SitesBlock* site_block = viewer.siteBlockMap[site_name];
+        SitesBlock* site_block = viewer.siteBlockMap[site_type][site_name];
         for(auto bel_block : site_block->child_bel_items) {
             if(cell_name == bel_block->getName()) {
                 view->cellLocationShow(bel_block);
@@ -369,11 +392,11 @@ bool FrameView::searchCell(const std::string &cell_name) {
             }
         }
     } else {
-        auto it = viewer.siteBlockMap.find(cell_name);
-        if(it == viewer.siteBlockMap.end())
+        auto it = viewer.siteBlockMap[site_type].find(cell_name);
+        if(it == viewer.siteBlockMap[site_type].end())
             return false;
-        view->cellLocationShow(viewer.siteBlockMap[cell_name]);
-        viewer.siteBlockMap[cell_name]->launchClicked();
+        view->cellLocationShow(viewer.siteBlockMap[site_type][cell_name]);
+        viewer.siteBlockMap[site_type][cell_name]->launchClicked();
         return true;
     }
     return false;
@@ -384,4 +407,62 @@ void FrameView::showCell() {
         searchBox->setPlaceholderText("Not found");
         searchBox->clear();
     }
+}
+
+void FrameView::clearSearchWordList() {
+    searchWordList.clear();
+    for (auto type_word : viewer.siteBlockMap) {
+        searchWordList << QString::fromStdString(type_word.first);
+    }
+    searchWordListModel.setStringList(searchWordList);
+}
+
+void FrameView::searchUpdate(const QString &text) {
+
+    if(text.isEmpty()) {
+        clearSearchWordList();
+        return;
+    }
+
+    int row_count = searchCompleter.completionCount();
+    qDebug() << "row count:" << row_count;
+
+    if(row_count == 1) { //当提示框只有一个关键词时
+        QString current_word = searchCompleter.currentCompletion();
+        std::string site_type = current_word.split("_X")[0].toStdString();
+        std::string site_name_in = current_word.split("/")[0].toStdString();
+
+        qDebug() << "current_word:" << current_word;
+
+        if (!current_word.contains("_X")) { //匹配site类型
+            for (auto site: viewer.siteBlockMap[site_type]) {
+                QString site_name = QString::fromStdString(site.first);
+                if (!searchWordList.contains(site_name)) {
+                    searchWordList << site_name;
+                }
+            }
+            searchWordListModel.setStringList(searchWordList);
+
+            if (text.size() > searchTextLast.size())
+                searchBox->setText(current_word + "_X"); //自动补全
+
+            searchTextLast = text;
+            return;
+        }
+
+        if (text.size() > searchTextLast.size()) { //当用户是在添加字符串时
+            searchBox->setText(current_word); //有且只有一个提示词,则自动补全
+        }
+
+        if (!current_word.contains('/')) { //匹配site_name
+            for (auto bel: viewer.siteBlockMap[site_type][site_name_in]->child_bel_items) {
+                QString bel_name = QString::fromStdString(bel->getName());
+                if (!searchWordList.contains(bel_name)) {
+                    searchWordList << bel_name;
+                }
+            }
+            searchWordListModel.setStringList(searchWordList);
+        }
+    }
+    searchTextLast = text;
 }
