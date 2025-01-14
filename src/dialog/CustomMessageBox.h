@@ -39,6 +39,10 @@ protected:
 
 private:
     static void setButtonStyleSheet(CustomMessageBox &messageBox);
+
+    static const QString OK_AND_YES_BUTTON_STYLESHEET;
+
+    static const QString CANCEL_AND_NO_BUTTON_STYLESHEET;
 };
 
 #endif // CUSTOMMESSAGEBOX_H

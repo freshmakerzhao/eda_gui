@@ -26,8 +26,8 @@ GeneralPage::GeneralPage(QWidget *parent)
 
     projectDeviceSquareButton = new QPushButton(this);
     connect(projectDeviceSquareButton, &QPushButton::clicked, this, &GeneralPage::startWizard);
-    projectDeviceSquareButton->setFixedSize(projectDeviceSquareButton->height(), projectDeviceSquareButton->height()); // 设置为方形
-    projectDeviceSquareButton->setObjectName("squareButton");
+    // projectDeviceSquareButton->setFixedSize(projectDeviceSquareButton->height(), projectDeviceSquareButton->height()); // 设置为方形
+    // projectDeviceSquareButton->setObjectName("squareButton");
 
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addWidget(projectDeviceLineEdit);

@@ -8,7 +8,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     setWindowTitle("Settings");
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     // setWindowFlags(topWindow->windowFlags() | Qt::WindowStaysOnTopHint); // 将窗口置顶
-    setFixedSize(1000, 800);
+    resize(640 * GlobalConfig::SCALE_FACTOR, 520 * GlobalConfig::SCALE_FACTOR);
     // 创建一个QTreeWidget控件 并向其中添加列表项
     treeWidget = new QTreeWidget(this);
     treeWidget->setFixedWidth(300);

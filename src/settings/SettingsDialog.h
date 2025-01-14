@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include "base/Globals.h"
 #include "GeneralPage.h"
 #include "TextEditorSettingPage.h"
 #include "BitstreamSettingPage.h"

@@ -1,6 +1,6 @@
 #include "LogWidget.h"
 #include "service/PipeServer.h"
-#include "service/LogManager.h"
+#include "base/Globals.h"
 
 LogWidget *LogWidget::instance(QWidget *parent)
 {
@@ -32,7 +32,7 @@ LogWidget::LogWidget(QWidget* parent)
 
 void LogWidget::init()
 {
-    QToolBar *toolBar = new QToolBar(this);
+    QToolBar *toolBar = new QToolBar;
     toolBar->addSeparator();
     QAction *searchAction = new QAction(QIcon(":/icons/resource/icons/9-icon_search.png"),"Search", this);
     // searchAction->setIcon(QIcon(":/resource/search.ico"));
@@ -44,21 +44,17 @@ void LogWidget::init()
     toolBar->addSeparator();
     QAction *copyAction = new QAction(QIcon(":/icons/resource/icons/14-icon_copy_2.png"),"Copy", this);
     toolBar->addAction(copyAction);
-    toolBar->setIconSize(QSize(20, 20));
+    toolBar->setIconSize(QSize(14 * GlobalConfig::SCALE_FACTOR, 14 * GlobalConfig::SCALE_FACTOR));
     toolBar->addSeparator();
 
     // Widget
     baseWidget = new QWidget;
     baseWidget->setParent(this);
-    // baseWidget->setFixedHeight(65);
     baseWidget->setVisible(false);
 
     QPushButton *backWardBtn = new QPushButton("Backward", baseWidget);
-    backWardBtn->setFixedWidth(90);
     QPushButton *forWardBtn = new QPushButton("Forward", baseWidget);
-    forWardBtn->setFixedWidth(90);
     QPushButton *clearBtn = new QPushButton("Clear", baseWidget);
-    clearBtn->setFixedWidth(90);
 
     QLineEdit *lineEdit = new QLineEdit(this);
     lineEdit->setFixedWidth(250);
@@ -71,6 +67,7 @@ void LogWidget::init()
     hLayout->addWidget(backWardBtn);
     hLayout->addWidget(forWardBtn);
     hLayout->addWidget(clearBtn);
+    hLayout->addStretch();
     fLayout->addRow("Search:", hLayout);
 
     logTextEdit = new SearchTextEdit(this);

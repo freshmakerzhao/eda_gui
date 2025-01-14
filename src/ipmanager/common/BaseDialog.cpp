@@ -1,6 +1,7 @@
 #include "BaseDialog.h"
 
 BaseDialog::BaseDialog(QWidget *parent)
+    : QDialog(parent)
 {
     resize(1600, 900);
     setWindowTitle("Custom IP");

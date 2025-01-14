@@ -67,7 +67,7 @@ Form::Form(QWidget *parent)
 {
     qDebug() << "[Form] Constructing...";
     QPixmap logoPixmap(":/resource/logo.png");
-    QLabel *logoLabel = new QLabel(this);
+    QLabel *logoLabel = new QLabel;
     logoLabel->setPixmap(logoPixmap.scaled(250, 260, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     logoLabel->setFixedHeight(75);
     // 整体布局
@@ -75,17 +75,19 @@ Form::Form(QWidget *parent)
     mainLayout->addWidget(logoLabel, 0, Qt::AlignLeft);
     mainLayout->setMargin(30);
 
+    splitter = new QSplitter(Qt::Horizontal);
+    splitter->setHandleWidth(0);
+
     // 水平布局，存放下方两个区域，左侧区域为功能按钮，右侧区域为recentList
     QHBoxLayout *contentLayout = new QHBoxLayout;
     // ========================== 左侧功能区域 ==========================
     QVBoxLayout *leftLayout = new QVBoxLayout; // 左侧功能布局
     // ========================== Quick Start ==========================
     QWidget *leftWidgetOne = new QWidget();
-    leftWidgetOne->setFixedHeight(190); // 设置固定高度
     QVBoxLayout *leftGroupLayoutOne = new QVBoxLayout(leftWidgetOne);
     // 创建标题
     QLabel *titleLabelOne = new QLabel("Quick Start");
-    titleLabelOne->setStyleSheet("font-size: 32px;padding-left: 4px;color: white; border: none;");
+    titleLabelOne->setStyleSheet("font-size: 18pt;padding-left: 4px;color: white; border: none;");
     // 创建按钮
     QPushButton *leftCreateProjectBtn = new QPushButton("Create Project >");
     connect(leftCreateProjectBtn, &QPushButton::clicked, MainWindow::instance(), &MainWindow::onNewTriggered);
@@ -120,7 +122,7 @@ Form::Form(QWidget *parent)
             "QPushButton { "
                 "border: none; "
                 "text-align: left; "
-                "font-size: 15px; "
+                "font-size: 10pt; "
                 "background-color: transparent; " /* 设置背景为透明 */
                 "color: white; "
                 "padding-left: 10px; "
@@ -136,11 +138,10 @@ Form::Form(QWidget *parent)
 
     // ========================== Tasks ==========================
     QWidget *leftWidgetTwo = new QWidget();
-    leftWidgetTwo->setFixedHeight(190); // 设置固定高度
     QVBoxLayout *leftGroupLayoutTwo = new QVBoxLayout(leftWidgetTwo);
     // 创建标题
     QLabel *titleLabelTwo = new QLabel("Tasks");
-    titleLabelTwo->setStyleSheet("font-size: 32px;padding-left: 4px;");
+    titleLabelTwo->setStyleSheet("font-size: 18pt;padding-left: 4px;");
     // 创建按钮
     QPushButton *button4 = new QPushButton("Manage IP >");
     QPushButton *button5 = new QPushButton("Open Hardware Manager >");
@@ -166,7 +167,7 @@ Form::Form(QWidget *parent)
             "QPushButton { "
                 "border: none; "
                 "text-align: left; "
-                "font-size: 15px; "
+                "font-size: 10pt; "
                 "background-color: transparent; " /* 设置背景为透明 */
                 "color: white; "
                 "padding-left: 10px; "
@@ -181,11 +182,10 @@ Form::Form(QWidget *parent)
     // ========================== Learning Center ==========================
 
     QWidget *leftWidgetThree = new QWidget();
-    leftWidgetThree->setFixedHeight(190); // 设置固定高度
     QVBoxLayout *leftGroupLayoutThree = new QVBoxLayout(leftWidgetThree);
     // 创建标题
     QLabel *titleLabelThree = new QLabel("Learning Center");
-    titleLabelThree->setStyleSheet("font-size: 32px;padding-left: 4px;");
+    titleLabelThree->setStyleSheet("font-size: 18pt;padding-left: 4px;");
     // 创建按钮
     QPushButton *button7 = new QPushButton("Documention One >");
     QPushButton *button8 = new QPushButton("Documention Two >");
@@ -209,7 +209,7 @@ Form::Form(QWidget *parent)
             "QPushButton { "
                 "border: none; "
                 "text-align: left; "
-                "font-size: 15px; "
+                "font-size: 10pt; "
                 "background-color: transparent; " /* 设置背景为透明 */
                 "color: white; "
                 "padding-left: 10px; "
@@ -223,11 +223,8 @@ Form::Form(QWidget *parent)
     // ========================== 调整左侧部分布局 ==========================
     QWidget *leftWidget = new QWidget;
     leftWidget->setLayout(leftLayout);
-//    leftWidget->setFixedHeight(600); // 设置左侧布局的固定高度
 
-    contentLayout->addWidget(leftWidget);
-    contentLayout->setAlignment(leftWidget, Qt::AlignTop); // 设置顶部对齐
-
+    splitter->addWidget(leftWidget);
     // ========================== 右侧功能区域 ==========================
     QVBoxLayout *rightLayout = new QVBoxLayout; // 右侧功能区域
     // 模拟数据
@@ -236,8 +233,6 @@ Form::Form(QWidget *parent)
     // ========================== Recent Project ============================
     QGroupBox *rightGroupBoxOne = new QGroupBox("Recent Projects");
     QVBoxLayout *rightGroupLayoutOne = new QVBoxLayout(rightGroupBoxOne);
-    rightGroupBoxOne->setFixedHeight(500);  // 设置右侧区域的固定宽度
-    rightGroupBoxOne->setFixedWidth(700);  // 设置右侧区域的固定宽度
     recentListWidget = new QListWidget;
     updateRecent();
     // 设置 QListWidget 的样式表
@@ -252,12 +247,10 @@ Form::Form(QWidget *parent)
     // ========================== Recent IP ============================
     QGroupBox *rightGroupBoxTwo = new QGroupBox("Recent IP Locations");
     QVBoxLayout *rightGroupLayoutTwo = new QVBoxLayout(rightGroupBoxTwo);
-    rightGroupBoxTwo->setFixedWidth(700);  // 设置右侧区域的固定宽度
     QListWidget *listWidget2 = new QListWidget;
 
     for (int i = 0; i < titles.size(); ++i) {
         QListWidgetItem *listWidgetItem = new QListWidgetItem;
-        // listWidgetItem->setSizeHint(QSize(0, 50));  // 设置 item 的大小
         listWidget2->addItem(listWidgetItem);  // 将 item 添加到 listWidget 中
         // 创建 custom list item
         RecentItemWidget *customListItem = new RecentItemWidget(titles[i], paths[i], listWidget2);
@@ -281,8 +274,13 @@ Form::Form(QWidget *parent)
     rightLayout->addWidget(rightGroupBoxOne);
     rightLayout->addWidget(rightGroupBoxTwo);
     contentLayout->addLayout(rightLayout);
+    QWidget *rightContentWidget = new QWidget;
     // 将内容布局添加到主布局中
-    mainLayout->addLayout(contentLayout);
+    rightContentWidget->setLayout(contentLayout);
+    splitter->addWidget(rightContentWidget);
+    mainLayout->addWidget(splitter, 0, Qt::AlignTop);
+    splitter->setStretchFactor(0, 12);
+    splitter->setStretchFactor(1, 9);
 }
 
 Form::~Form(){
