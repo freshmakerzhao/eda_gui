@@ -21,11 +21,11 @@ enum class StatusCode {
 };
 
 enum class LevelCode {
+    ALWAYS_LOG,
     INFO_LOG,
     WARNING_LOG,
     CRITICAL_WARNING_LOG,
-    ERROR_LOG,
-    ALWAYS_LOG,
+    ERROR_LOG
 };
 
 class LogPipeContent {

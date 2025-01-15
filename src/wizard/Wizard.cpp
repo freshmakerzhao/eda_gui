@@ -14,7 +14,7 @@
 #include "SourcePage.h"
 #include "ConstraintPage.h"
 #include "DefaultPartPage.h"
-#include "ConfigurationPage.h".h"
+#include "ConfigurationPage.h"
 #include "utils/ProjectManager.h"
 
 Wizard::Wizard(QWidget *parent, const WizardMode &wizardMode)

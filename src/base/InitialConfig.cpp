@@ -32,7 +32,7 @@ InitialConfig::InitialConfig()
 
 void InitialConfig::initializeApplicationConfig() {
     QCoreApplication::setApplicationName("HybrdLink");
-    QCoreApplication::setApplicationVersion("v1.0.0-beta");
+    QCoreApplication::setApplicationVersion("v1.3.2-beta");
     QCoreApplication::setOrganizationName("HybrdChip");
     QCoreApplication::setOrganizationDomain("www.hybrdchip.com");
 
