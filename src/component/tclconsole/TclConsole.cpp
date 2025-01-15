@@ -247,7 +247,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const QString task = QString(argv[0]);
 
     if (task == "impl_design") {
-        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--hybrdchip", "--debug", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
+        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--U", "--debug", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
         info = "Starting Implementation Task";
     } else if (task == "pack_design") {
         addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
@@ -371,12 +371,8 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
 
     QStringList script;
     script << "-p";
-//    script << QString("synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top %1; write_json %2; write_edif -pvector bra %3;")
-//                  .arg(topName, jsonPath, edifPath);
-
-    script << QString("synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -process_number %1 -top %2; select -module %2; write_json -selected %3; write_verilog -selected %4; ")
-            .arg(InitialConfig::instance().pid_str, topName, jsonPath, viewVerilogPath);
-
+    script << QString("synth_xilinx -flatten -nowidelut -abc9 -arch xc7 -top %1; select -module %1; write_json -selected %2; write_verilog -selected %3; ")
+            .arg(topName, jsonPath, viewVerilogPath);
     // Design Sources
     for (const QString &item : resultList) {
         script << item;
@@ -387,8 +383,12 @@ int TclConsole::TclSynthCmd(ClientData clientData, Tcl_Interp *interp, int argc,
         script << item;
     }
 
-    // 非兼容模式下 增加 -R ，表示能够加载hybrdchip原语
-    if (!isCompatibilityMode){
+    // 进程id
+    script << "-K";
+    script << InitialConfig::instance().pid_str;
+
+    // 兼容模式下 增加 -R ，表示开启兼容模式，能够加载hybrdchip之外的原语
+    if (isCompatibilityMode){
         script << "-R";
     }
     // 加密网表

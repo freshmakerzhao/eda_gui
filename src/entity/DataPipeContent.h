@@ -17,11 +17,11 @@
 
 class DataPipeContent {
 private:
-    QString m_pipe_type;      // 管道信息类型
-    StatusCode m_status_code = StatusCode::SUCCESS;    // 结束状态
-    QJsonValue m_data;   // 实际数据
-    QString m_phase;     // 阶段信息
-    QString m_sub_phase;  // 子阶段信息
+    QString m_pipe_type;                                // 管道信息类型
+    StatusCode m_status_code = StatusCode::SUCCESS;     // 结束状态
+    QJsonValue m_data;                                  // 实际数据
+    QString m_phase;                                    // 阶段信息
+    QString m_sub_phase;                                // 子阶段信息
 
 public:
     // 构造函数
