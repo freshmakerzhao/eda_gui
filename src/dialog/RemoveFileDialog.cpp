@@ -16,7 +16,6 @@ RemoveFileDialog::RemoveFileDialog(QWidget *parent, const QString &path)
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setWindowTitle("Remove File");
     QLabel *label = new QLabel("Do you want to remove this file from project?", this);
-    label->setFixedHeight(25);
     filePathLabel = new QLabel(path, this); // 显示目标文件的路径
     filePathLabel->setGeometry(QRect(1, 1, 1, 1));
     filePathLabel->setWordWrap(true);

@@ -11,6 +11,7 @@
 #include "FlowNavigator.h"
 #include "utils/TaskManager.h"
 #include "service/HardWareManager.h"
+#include "base/Globals.h"
 
 FlowNavigator *FlowNavigator::instance()
 {
@@ -55,7 +56,9 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     setColumnCount(1);
     setHeaderHidden(true);
     // setIndentation(20);
-    setStyleSheet("QTreeWidget::item { height: 45px; }");
+    int itemHeight = static_cast<int>(30 * GlobalConfig::SCALE_FACTOR);  // 根据 DPI 缩放
+    QString styleSheet = QString("QTreeWidget::item { height: %1px; }").arg(itemHeight);
+    setStyleSheet(styleSheet);
     // ============ PROJECT MANAGER ============
     // Settings
     settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");

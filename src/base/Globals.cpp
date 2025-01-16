@@ -21,6 +21,7 @@
 //std::string GLOBAL_ARCH_NAME;
 
 QString GlobalConfig::GLOBAL_RESOURCE_PATH = "";
+qreal GlobalConfig::SCALE_FACTOR = 1.0f;
 
 void GlobalConfig::initGlobalResourcePath() {
     // 打包用
@@ -51,4 +52,16 @@ void GlobalConfig::initGlobalResourcePath() {
 #endif
 
     qDebug() << GLOBAL_RESOURCE_PATH;
+}
+
+void GlobalConfig::initScaleFactor()
+{
+    try {
+        QScreen *screen = QApplication::primaryScreen();
+        qreal dpi = screen->logicalDotsPerInch();
+        SCALE_FACTOR = dpi / 96.0;
+        qDebug() << "Scale Factor: " << SCALE_FACTOR;
+    } catch (...) {
+        qDebug() << "Scale Factor calculation failed.";
+    }
 }

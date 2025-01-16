@@ -16,12 +16,13 @@
 #include "DefaultPartPage.h"
 #include "ConfigurationPage.h"
 #include "utils/ProjectManager.h"
+#include "base/Globals.h"
 
 Wizard::Wizard(QWidget *parent, const WizardMode &wizardMode)
     : QWizard(parent)
 {
     qDebug() << "[Wizard] Constructing...";
-    resize(960, 640);
+    resize(800 * GlobalConfig::SCALE_FACTOR, 500 * GlobalConfig::SCALE_FACTOR);
     setWindowTitle("Wizard");
     // setWizardStyle(QWizard::NStyles);
     // QPixmap pix(":/resource/icon.png");

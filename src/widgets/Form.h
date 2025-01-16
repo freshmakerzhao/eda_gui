@@ -19,6 +19,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPainter>
+#include <QSplitter>
 #include <QDebug>
 
 class Form : public QWidget
@@ -39,6 +40,8 @@ private:
     std::string extractProjectName(const std::string& path);
     
     QListWidget *recentListWidget; // Recent Project
+
+    QSplitter *splitter;
 };
 
 #endif // FORM_H

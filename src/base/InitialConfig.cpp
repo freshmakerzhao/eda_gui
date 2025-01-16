@@ -24,6 +24,7 @@ InitialConfig &InitialConfig::instance()
 InitialConfig::InitialConfig()
 {
     GlobalConfig::initGlobalResourcePath();
+    GlobalConfig::initScaleFactor();
     QSettings settings("HybrdChip", "HybrdLink");
     if (!settings.contains("TextEditor/encoding")) {
         settings.setValue("TextEditor/encoding", "UTF-8");

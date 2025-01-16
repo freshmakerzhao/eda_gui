@@ -28,32 +28,33 @@ ProjectSummary *ProjectSummary::instance()
 ProjectSummary::ProjectSummary(QWidget* parent)
         : QWidget(parent)
 {
-    resize(800, 500);
     init();
 }
 
 
 void ProjectSummary::init()
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
+    vBoxLayout->setMargin(0);
+    QScrollArea *scrollArea = new QScrollArea;
+    vBoxLayout->addWidget(scrollArea);
+    scrollArea->setWidgetResizable(true);
+    QWidget *mainWidget = new QWidget;
+    scrollArea->setWidget(mainWidget);
+    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
     // ==================================  顶部的 Widget 开始 ==================================
     QWidget *topWidget = new QWidget();
     QVBoxLayout *settingsGroupLayout = new QVBoxLayout(topWidget);
-    topWidget->setFixedHeight(250);
     // ================================== 顶部标题部分 开始 ==================================
     QLabel *titleLabel = new QLabel("Setting");
     titleLabel->setAlignment(Qt::AlignLeft);
     titleLabel->setAlignment(Qt::AlignVCenter);
-    titleLabel->setFixedHeight(25);
-    titleLabel->setStyleSheet(
-                              "font-weight: bold; font-size: 12px; "
-                              "background-color: rgb(237, 237, 237);"
-    );
+    titleLabel->setStyleSheet(TITLE_LABEL_STYLESHEET);
     // ================================== 顶部标题部分 结束 ==================================
 
     // ================================== Setting 内容 开始 ==================================
     QWidget *settingsWidget = new QWidget();
-    settingsWidget->setStyleSheet("background-color: rgb(247, 247, 247);");
+    settingsWidget->setStyleSheet(CONTENT_WIDGET_STYLESHEET);
     QFormLayout *settingsLayout = new QFormLayout(settingsWidget);
 
     // Project name
@@ -66,17 +67,8 @@ void ProjectSummary::init()
     QLabel *settingsPrdFamilyLabel = new QLabel("Product family:");
     QLabel *settingsPrdFamilyValueLabel = settingsPrjFamily;
 
-    settingsPrjNameLabel->setFixedHeight(rowHeight);
-    settingsPrjNameLabel->setFixedWidth(leftLabelWidth);
-    settingsPrjNameValueLabel->setFixedHeight(rowHeight);
     settingsPrjNameValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    settingsPrjLocationLabel->setFixedHeight(rowHeight);
-    settingsPrjLocationLabel->setFixedWidth(leftLabelWidth);
-    settingsPrjLocationValueLabel->setFixedHeight(rowHeight);
     settingsPrjLocationValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    settingsPrdFamilyLabel->setFixedHeight(rowHeight);
-    settingsPrdFamilyLabel->setFixedWidth(leftLabelWidth);
-    settingsPrdFamilyValueLabel->setFixedHeight(rowHeight);
     settingsPrdFamilyValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
     settingsLayout->addRow(settingsPrjNameLabel, settingsPrjNameValueLabel); // Project name
@@ -100,15 +92,9 @@ void ProjectSummary::init()
     QLabel *settingsPrjTopModuleLabel = new QLabel("Top module name:");
     QPushButton *settingsPrjTopModuleValueButton = settingsPrjTopModuleName;
 
-    settingsPrjPartLabel->setFixedHeight(rowHeight);
-    settingsPrjPartLabel->setFixedWidth(leftLabelWidth);
-    settingsPrjPartValueButton->setFixedHeight(rowHeight);
     settingsPrjPartValueButton->setStyleSheet(buttonStyle);
     settingsPrjPartValueButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    settingsPrjTopModuleLabel->setFixedHeight(rowHeight);
-    settingsPrjTopModuleLabel->setFixedWidth(leftLabelWidth);
-    settingsPrjTopModuleValueButton->setFixedHeight(rowHeight);
     settingsPrjTopModuleValueButton->setStyleSheet(buttonStyle);
     settingsPrjTopModuleValueButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
@@ -126,12 +112,9 @@ void ProjectSummary::init()
     // ==================================  顶部的 Widget 结束 ==================================
 
     // ================================== 下方布局部分 开始 ==================================
-
-    QWidget *bottomWidget = new QWidget();
-    QHBoxLayout *bottomLayout = new QHBoxLayout(bottomWidget);
-    // 去除 bottomLayout 布局的边距,使其能够与上方对齐
-    bottomLayout->setContentsMargins(0, 0, 0, 0);
-
+    // 分割左右部分
+    splitter = new QSplitter(Qt::Horizontal);
+    splitter->setHandleWidth(10);
     // ================================== 下方 左侧 布局 开始 ==================================
 
     // ================================== 下方左侧 synthesis 开始 ==================================
@@ -141,8 +124,7 @@ void ProjectSummary::init()
     QLabel *synthesisTitleLabel = new QLabel("Synthesis");
     synthesisTitleLabel->setAlignment(Qt::AlignLeft);
     synthesisTitleLabel->setAlignment(Qt::AlignVCenter);
-    synthesisTitleLabel->setFixedHeight(25);
-    synthesisTitleLabel->setStyleSheet("font-weight: bold; font-size: 12px; background-color: rgb(237, 237, 237);");
+    synthesisTitleLabel->setStyleSheet(TITLE_LABEL_STYLESHEET);
 
     // ================================== 下方左侧 synthesis title 结束 ==================================
 
@@ -151,8 +133,7 @@ void ProjectSummary::init()
     QVBoxLayout *leftLayout = new QVBoxLayout;
     QWidget *synthesisWidget = new QWidget;
 
-    synthesisWidget->setStyleSheet("background-color: rgb(247, 247, 247);");
-    synthesisWidget->setFixedHeight(95);
+    synthesisWidget->setStyleSheet(CONTENT_WIDGET_STYLESHEET);
     QFormLayout *synthesisLayout = new QFormLayout(synthesisWidget);
 
     // Synthesis Status
@@ -162,13 +143,7 @@ void ProjectSummary::init()
     QLabel *synthesisPartLabel = new QLabel("Part");
     QLabel *synthesisPartValueLabel = synthesisPart;
 
-    synthesisStatusLabel->setFixedHeight(rowHeight);
-    synthesisStatusLabel->setFixedWidth(leftLabelWidth);
-    synthesisStatusValueLabel->setFixedHeight(rowHeight);
     synthesisStatusValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    synthesisPartLabel->setFixedHeight(rowHeight);
-    synthesisPartLabel->setFixedWidth(leftLabelWidth);
-    synthesisPartValueLabel->setFixedHeight(rowHeight);
     synthesisPartValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
     synthesisLayout->addRow(synthesisStatusLabel, synthesisStatusValueLabel); // Synthesis Status
@@ -181,19 +156,19 @@ void ProjectSummary::init()
     QLabel *utilizationTitleLabel = new QLabel("Utilization");
     utilizationTitleLabel->setAlignment(Qt::AlignLeft);
     utilizationTitleLabel->setAlignment(Qt::AlignVCenter);
-    utilizationTitleLabel->setFixedHeight(25);
-    utilizationTitleLabel->setStyleSheet("font-weight: bold; font-size: 12px; background-color: rgb(237, 237, 237);");
+    utilizationTitleLabel->setStyleSheet(TITLE_LABEL_STYLESHEET);
 
     // ================================== 下方左侧 Utilization title 结束 ==================================
 
     // ================================== 下方左侧 Utilization 内容 开始 ==================================
 
     QWidget *utilizationWidget = new QWidget;
-    utilizationWidget->setStyleSheet("background-color: rgb(247, 247, 247);");
+    utilizationWidget->setStyleSheet(CONTENT_WIDGET_STYLESHEET);
     QHBoxLayout *utilizationTableLayout = new QHBoxLayout(utilizationWidget);
 
     // 创建表格
     QTableWidget *tableWidget = new QTableWidget(6, 4);
+    tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tableWidget->setHorizontalHeaderLabels(QStringList() << "Resource" << "Estimation" << "Available" << "Utilization %");
 
     // 使每列宽度平均分配整个表格
@@ -201,10 +176,10 @@ void ProjectSummary::init()
 
     // 创建一个调色板并设置选中颜色
     QPalette palette = tableWidget->palette();
-    palette.setColor(QPalette::Highlight, QColor(204, 222, 253));  // 设置选中背景色为黄色
+    palette.setColor(QPalette::Highlight, QColor(204, 222, 253));  // 设置选中背景色
     tableWidget->setPalette(palette);
 
-    header->setSectionResizeMode(QHeaderView::Stretch);
+    // header->setSectionResizeMode(QHeaderView::Stretch);
     tableWidget->verticalHeader()->setVisible(false); // 隐藏行索引
     tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers); // 不允许编辑
     tableWidget->resizeColumnsToContents();  // 调整列宽以适应内容
@@ -217,13 +192,15 @@ void ProjectSummary::init()
     leftLayout->addWidget(synthesisWidget);
     leftLayout->addWidget(utilizationTitleLabel);
     leftLayout->addWidget(utilizationWidget);
+    leftLayout->addStretch();
 
     // 将左侧布局添加到主布局
     QWidget *leftContainer = new QWidget;
     leftContainer->setLayout(leftLayout);
 
     leftContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    bottomLayout->addWidget(leftContainer);
+    leftContainer->setMinimumWidth(500);
+    splitter->addWidget(leftContainer);
 
     // ================================== 下方左侧 Utilization 内容 结束 ==================================
 
@@ -234,8 +211,7 @@ void ProjectSummary::init()
     QLabel *implementationTitleLabel = new QLabel("Implementation");
     implementationTitleLabel->setAlignment(Qt::AlignLeft);
     implementationTitleLabel->setAlignment(Qt::AlignVCenter);
-    implementationTitleLabel->setFixedHeight(25);
-    implementationTitleLabel->setStyleSheet("font-weight: bold; font-size: 12px; background-color: rgb(237, 237, 237);");
+    implementationTitleLabel->setStyleSheet(TITLE_LABEL_STYLESHEET);
 
     // ================================== 下方右侧 implementation title 结束 ==================================
 
@@ -243,8 +219,7 @@ void ProjectSummary::init()
 
     QVBoxLayout *rightLayout = new QVBoxLayout;
     QWidget *implementationWidget = new QWidget;
-    implementationWidget->setStyleSheet("background-color: rgb(247, 247, 247);");
-    implementationWidget->setFixedHeight(95);
+    implementationWidget->setStyleSheet(CONTENT_WIDGET_STYLESHEET);
 
     QFormLayout *implementationLayout = new QFormLayout(implementationWidget);
 
@@ -255,13 +230,7 @@ void ProjectSummary::init()
     QLabel *implementationPartLabel = new QLabel("Part");
     QLabel *implementationPartValueLabel = implementationPart;
 
-    implementationStatusLabel->setFixedHeight(rowHeight);
-    implementationStatusLabel->setFixedWidth(rightlabelWidth);
-    implementationStatusValueLabel->setFixedHeight(rowHeight);
     implementationStatusValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    implementationPartLabel->setFixedHeight(rowHeight);
-    implementationPartLabel->setFixedWidth(rightlabelWidth);
-    implementationPartValueLabel->setFixedHeight(rowHeight);
     implementationPartValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
     implementationLayout->addRow(implementationStatusLabel, implementationStatusValueLabel); // implementation Status
@@ -274,15 +243,14 @@ void ProjectSummary::init()
     QLabel *timingTitleLabel = new QLabel("Timing");
     timingTitleLabel->setAlignment(Qt::AlignLeft);
     timingTitleLabel->setAlignment(Qt::AlignVCenter);
-    timingTitleLabel->setFixedHeight(25);
-    timingTitleLabel->setStyleSheet("font-weight: bold; font-size: 12px; background-color: rgb(237, 237, 237);");
+    timingTitleLabel->setStyleSheet(TITLE_LABEL_STYLESHEET);
 
     // ================================== 下方右侧 Timing title 结束 ==================================
 
     // ================================== 下方右侧 timing 内容 开始 ==================================
 
     QWidget *timingWidget = new QWidget;
-    timingWidget->setStyleSheet("background-color: rgb(247, 247, 247);");
+    timingWidget->setStyleSheet(CONTENT_WIDGET_STYLESHEET);
     QFormLayout *timingLayout = new QFormLayout(timingWidget);
 
     // 最差的负的时差
@@ -301,21 +269,9 @@ void ProjectSummary::init()
     QLabel *timingTotalNumberOfEndpointsLabel = new QLabel("Total Number Of Endpoints:");
     QLabel *timingTotalNumberOfEndpointsValueLabel = timingTotalNumberOfEndpoints;
 
-    timingWorstNegativeSlackLabel->setFixedHeight(rowHeight);
-    timingWorstNegativeSlackLabel->setFixedWidth(rightlabelWidth);
-    timingWorstNegativeSlackValueLabel->setFixedHeight(rowHeight);
     timingWorstNegativeSlackValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    timingTotalNegativeSlackLabel->setFixedHeight(rowHeight);
-    timingTotalNegativeSlackLabel->setFixedWidth(rightlabelWidth);
-    timingTotalNegativeSlackValueLabel->setFixedHeight(rowHeight);
     timingTotalNegativeSlackValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    timingNumberOfFailingEndpointsLabel->setFixedHeight(rowHeight);
-    timingNumberOfFailingEndpointsLabel->setFixedWidth(rightlabelWidth);
-    timingNumberOfFailingEndpointsValueLabel->setFixedHeight(rowHeight);
     timingNumberOfFailingEndpointsValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    timingTotalNumberOfEndpointsLabel->setFixedHeight(rowHeight);
-    timingTotalNumberOfEndpointsLabel->setFixedWidth(rightlabelWidth);
-    timingTotalNumberOfEndpointsValueLabel->setFixedHeight(rowHeight);
     timingTotalNumberOfEndpointsValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
     timingLayout->addRow(timingWorstNegativeSlackLabel, timingWorstNegativeSlackValueLabel); // Synthesis Status
@@ -329,22 +285,21 @@ void ProjectSummary::init()
     rightLayout->addWidget(implementationWidget);
     rightLayout->addWidget(timingTitleLabel);
     rightLayout->addWidget(timingWidget);
+    rightLayout->addStretch();
 
     // 将右侧布局添加到主布局
     QWidget *rightContainer = new QWidget;
     rightContainer->setLayout(rightLayout);
     rightContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    bottomLayout->addWidget(rightContainer);
-
+    splitter->addWidget(rightContainer);
     // ================================== 下方布局部分 结束 ==================================
-    mainLayout->addWidget(bottomWidget, 0, Qt::AlignTop);
+    mainLayout->addWidget(splitter, 0, Qt::AlignTop);
     // 添加一个弹簧，将它放在布局的底部
     QSpacerItem *verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     mainLayout->addSpacerItem(verticalSpacer);
     // 将子窗口添加到主布局中，不允许扩展
     mainLayout->setAlignment(topWidget, Qt::AlignTop); // 设置顶部对齐
-    setLayout(mainLayout);
-    setStyleSheet("background-color: rgb(247, 247, 247);");
+    setStyleSheet(CONTENT_WIDGET_STYLESHEET);
 }
 
 void ProjectSummary::setParams(const QMap<Project::ParamKey, QString> &params) {

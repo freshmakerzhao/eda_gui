@@ -306,7 +306,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("HybrdLink");
     this->setWindowIcon(QIcon(":/resource/icon.png"));
     // 设置窗口初始大小
-    this->resize(1700, 960);
+    this->resize(1120 * GlobalConfig::SCALE_FACTOR, 640 * GlobalConfig::SCALE_FACTOR);
     // =================== MENUBAR ====================
     menuBar = new QMenuBar(this), this->setMenuBar(menuBar);
     fileMenu = menuBar->addMenu("&File");
@@ -380,7 +380,8 @@ MainWindow::MainWindow(QWidget *parent)
     toolbar->addActions({cutAction, copyAction, pasteAction}), toolbar->addSeparator();
     toolbar->addActions({undoAction, redoAction}), toolbar->addSeparator();
     // 设置工具栏图标的大小
-    toolbar->setIconSize(QSize(20, 20));
+    toolbar->setIconSize(QSize(14 * GlobalConfig::SCALE_FACTOR, 20 * GlobalConfig::SCALE_FACTOR));
+    toolbar->layout()->setSpacing(12);
     // toolbar->addActions({chipPlannerAction});
     addToolBar(toolbar);
     // ================= EDITOR TAB ====================

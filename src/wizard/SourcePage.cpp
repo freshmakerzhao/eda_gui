@@ -40,13 +40,13 @@ SourcesPage::SourcesPage(QWidget *parent, const WizardMode &wizardMode, const Ad
     tableView->setColumnWidth(1, 250);
     tableView->setColumnWidth(3, 340);
 
-    QPushButton *addFilesButton = new QPushButton("Add Files");addFilesButton->setFixedSize(160, 45);
+    QPushButton *addFilesButton = new QPushButton("Add Files");
     connect(addFilesButton, &QPushButton::clicked, this, &SourcesPage::onAddFiles);
 
-    QPushButton *createFileButton = new QPushButton("Create File");createFileButton->setFixedSize(160, 45);
+    QPushButton *createFileButton = new QPushButton("Create File");
     connect(createFileButton, &QPushButton::clicked, this, &SourcesPage::onCreateFile);
 
-    QPushButton *removeButton = new QPushButton("Remove File");removeButton->setFixedSize(160, 45);
+    QPushButton *removeButton = new QPushButton("Remove File");
     connect(removeButton, &QPushButton::clicked, this, &SourcesPage::onRemoveFiles);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -93,7 +93,6 @@ void SourcesPage::onAddFiles()
 void SourcesPage::onCreateFile()
 {
     QDialog dialog(this);
-    dialog.setFixedSize(320, 180);
     dialog.setWindowTitle("Create Source File");
     QComboBox *comboBox = new QComboBox(&dialog);
     comboBox->addItem("Verilog");

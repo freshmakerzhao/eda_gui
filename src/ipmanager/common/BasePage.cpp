@@ -1,6 +1,7 @@
 #include "BasePage.h"
 
 BasePage::BasePage(QWidget *parent)
+    : QWidget(parent)
 {
     QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
     vBoxLayout->setMargin(0);

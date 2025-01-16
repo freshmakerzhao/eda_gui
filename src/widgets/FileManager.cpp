@@ -12,6 +12,7 @@
 #include "mainwindow.h"
 #include "utils/ProjectManager.h"
 #include "dialog/RemoveFileDialog.h"
+#include "base/Globals.h"
 #include <QLineEdit>
 
 FileManager *FileManager::instance(QWidget *parent)
@@ -228,7 +229,9 @@ void FileManager::updateIPList()
 FileManager::FileManager(QWidget *parent) : QTreeView(parent)
 {
     qDebug() << "[FileManager] Constructing...";
-    setStyleSheet("QTreeView::item { height: 32px; }");
+    int itemHeight = static_cast<int>(22 * GlobalConfig::SCALE_FACTOR);
+    QString styleSheet = QString("QTreeView::item { height: %1px; }").arg(itemHeight);
+    setStyleSheet(styleSheet);
     setHeaderHidden(true);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setContextMenuPolicy(Qt::CustomContextMenu);

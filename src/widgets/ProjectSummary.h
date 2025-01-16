@@ -15,6 +15,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
+#include <QScrollArea>
+#include <QSplitter>
 #include "entity/Project.h"
 
 class ProjectSummary : public QWidget
@@ -33,9 +35,6 @@ private:
 
     void init();
 
-    int rightlabelWidth = 265;
-    int leftLabelWidth = 160;
-    int rowHeight = 30;
     QLabel *settingsPrjName = new QLabel("NA");
     QLabel *settingsPrjLocation = new QLabel("NA");
     QLabel *settingsPrjFamily = new QLabel("NA");
@@ -56,6 +55,17 @@ private:
     QLabel *timingNumberOfFailingEndpoints = new QLabel("NA");
     // 节点总数
     QLabel *timingTotalNumberOfEndpoints = new QLabel("NA");
+
+    const QString TITLE_LABEL_STYLESHEET = ".QLabel {"
+                                           "    font-weight: bold; "
+                                           "    background-color: rgb(237, 237, 237);"
+                                           "}";
+
+    const QString CONTENT_WIDGET_STYLESHEET = ".QWidget {"
+                                      "     background-color: rgb(247, 247, 247);"
+                                      "}";
+
+    QSplitter *splitter;
 };
 
 

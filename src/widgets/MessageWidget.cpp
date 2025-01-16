@@ -1,5 +1,5 @@
 #include "MessageWidget.h"
-#include "utils/TimeUtilities.h"
+#include "base/Globals.h"
 #include <QTreeWidgetItem>
 #include <QHeaderView>
 #include <QToolBar>
@@ -38,19 +38,16 @@ void MessageWidget::init()
     QAction *cleanAction = new QAction(QIcon(":/icons/resource/icons/15-icon_discard.png"),"Clean", this);
     toolBar->addAction(cleanAction);
     toolBar->addSeparator();
-    toolBar->setIconSize(QSize(20, 20));
-    toolBar->addSeparator();
+    toolBar->setIconSize(QSize(14 * GlobalConfig::SCALE_FACTOR, 14 * GlobalConfig::SCALE_FACTOR));
+    // toolBar->addSeparator();
 
     // Widget
     baseWidget = new QWidget(this);
     baseWidget->setVisible(false);
 
     QPushButton *backWardBtn = new QPushButton("Backward", baseWidget);
-    backWardBtn->setFixedWidth(90);
     QPushButton *forWardBtn = new QPushButton("Forward", baseWidget);
-    forWardBtn->setFixedWidth(90);
     QPushButton *clearBtn = new QPushButton("Clear", baseWidget);
-    clearBtn->setFixedWidth(90);
 
     QLineEdit *lineEdit = new QLineEdit(this);
     lineEdit->setFixedWidth(250);
@@ -63,6 +60,7 @@ void MessageWidget::init()
     hLayout->addWidget(backWardBtn);
     hLayout->addWidget(forWardBtn);
     hLayout->addWidget(clearBtn);
+    hLayout->addStretch();
     fLayout->addRow("Search:", hLayout);
 
     // 初始化 tree 控件
