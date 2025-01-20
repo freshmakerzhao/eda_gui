@@ -41,12 +41,15 @@ public:
     void setRecentMenu();
     void showIPCatalog();
     void showPrjSummary();
+    void showProperties();
     void setCurrentDock(const int &type); // 跳转到对应的DockWidget
 
     void resizeUi();
 
     void setRunState(const QString &phase, const bool &flag);
     void resetRunState();
+
+    void resetUi();
 
 public slots:
     void onNewTriggered();

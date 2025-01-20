@@ -387,16 +387,10 @@ void ProjectManager::closeProject()
     FileManager::instance()->cleanFileItems();
     // 清除任务管理器参数
     TaskManager::instance().cleanParams();
-    // 还原主窗口Title
-    MainWindow::instance()->showProjectTitle(1);
-    // 显示起始页
-    MainWindow::instance()->setForm(1);
-    // 重置RunState
-    MainWindow::instance()->resetRunState();
+    // 重置窗体
+    MainWindow::instance()->resetUi();
     // 重新初始化DesignRuns表
     InfoWidget::instance()->initDesignRunsView();
-    // 更新最近使用工程列表
-    Form::instance()->updateRecent();
 }
 
 ProjectManager::ProjectManager()

@@ -27,6 +27,7 @@
 #include "base/TreeViewBase.h"
 #include "base/Globals.h"
 #include "service/RecentService.h"
+#include "component/properties/Properties.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -142,6 +143,11 @@ void MainWindow::showPrjSummary()
     // PrjSummaryWidget->show();
 }
 
+void MainWindow::showProperties()
+{
+    PropertiesWidget->toggleView(true);
+}
+
 void MainWindow::setCurrentDock(const int &type)
 {
     switch (type) {
@@ -197,6 +203,23 @@ void MainWindow::resetRunState()
 {
     phaseLabel->hide();
     movieLabel->hide();
+}
+
+void MainWindow::resetUi()
+{
+    // 显示起始页
+    setForm(1);
+    // 更新最近使用工程列表
+    Form::instance()->updateRecent();
+    // 重置 RunState
+    resetRunState();
+    // 默认显示Summary
+    PrjSummaryWidget->toggleView(true);
+    PrjSummaryWidget->setAsCurrentTab();
+    // 默认隐藏Properties
+    PropertiesWidget->toggleView(false);
+    // 还原主窗口Title
+    showProjectTitle(1);
 }
 
 void MainWindow::onNewTriggered()
@@ -432,9 +455,10 @@ MainWindow::MainWindow(QWidget *parent)
     // SourcesWidget->setWidget(FileManager::instance());
     SourcesWidget->setWidget(new TreeViewBase(FileManager::instance()));
 
-//    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
-//    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget,SourcesWidget->dockAreaWidget());
-//    PropertiesWidget->setWidget(new QLabel("This is a test"));
+    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
+    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget);
+    PropertiesWidget->setWidget(Properties::instance());
+    PropertiesWidget->toggleView(false);
 
     EditWidget = new ads::CDockWidget("Text Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
@@ -452,7 +476,7 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(ManagerDock->toggleViewAction());
     viewMenu->addSeparator();
     viewMenu->addAction(SourcesWidget->toggleViewAction());
-//    viewMenu->addAction(PropertiesWidget->toggleViewAction());
+    viewMenu->addAction(PropertiesWidget->toggleViewAction());
     viewMenu->addAction(EditWidget->toggleViewAction());
 
     IPManagerWidget = new ads::CDockWidget("IP Catalog", DockManager);
@@ -466,8 +490,7 @@ MainWindow::MainWindow(QWidget *parent)
     DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
     PrjSummaryWidget->setWidget(ProjectSummary::instance());
 
-    PrjSummaryWidget->setMinimumSize(770, 10);
-    SourcesWidget->setMinimumSize(40, 10);
+    SourcesWidget->setMinimumWidth(400);
 
     initMenuStateBar();
 }
