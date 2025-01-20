@@ -24,7 +24,7 @@ void Properties::updateHardwareProperties(QJsonObject dataObj)
 
     for (auto it = dataObj.begin(); it != dataObj.end(); ++it) {
         QJsonObject obj = it.value().toObject();
-        QString name = obj.value("name").toString();
+        QString name = obj.value("register_name").toString();
         QString hexValue = obj.value("hex_value").toString();
 
         // 创建行数据
@@ -61,26 +61,8 @@ Properties::Properties(QWidget *parent)
     QString jsonString = R"({
         "data": {
             "01100": {
-                "name": "A",
-                "address": "01100",
-                "hex_value": "0x13631093",
-                "bin_value": "0b00010011011000110001000010010011"
-            },
-            "01101": {
-                "name": "B",
-                "address": "01101",
-                "hex_value": "0x13631093",
-                "bin_value": "0b00010011011000110001000010010011"
-            },
-            "01110": {
-                "name": "C",
-                "address": "01110",
-                "hex_value": "0x13631093",
-                "bin_value": "0b00010011011000110001000010010011"
-            },
-            "01111": {
-                "name": "D",
-                "address": "01111",
+                "register_name": "CONFIG_STATUS",
+                "register_address": "00111",
                 "hex_value": "0x13631093",
                 "bin_value": "0b00010011011000110001000010010011"
             }
