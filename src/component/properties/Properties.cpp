@@ -8,6 +8,7 @@
   ******************************************************************************
   */
 #include "Properties.h"
+#include "base/TreeViewBase.h"
 
 Properties *Properties::instance(QWidget *parent)
 {
@@ -50,10 +51,11 @@ Properties::Properties(QWidget *parent)
     mainLayout->setMargin(0);
 
     treeView = new QTreeView;
-    treeView->setHeaderHidden(true);
-    mainLayout->addWidget(treeView);
+    // treeView->setHeaderHidden(true);
+    mainLayout->addWidget(new TreeViewBase(treeView, false));
 
     _model = new QStandardItemModel(treeView);
+    _model->setHorizontalHeaderLabels({"Attribute", "Hex Value"});
     treeView->setModel(_model);
     connect(_model, &QStandardItemModel::dataChanged,
             this, &Properties::onDataChanged);
