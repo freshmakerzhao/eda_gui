@@ -8,44 +8,44 @@
 SearchTextEdit::SearchTextEdit(QWidget *parent)
     : QPlainTextEdit(parent)
 {
-    setStyleSheet("border:1px solid #DCDCDC");
-    m_lastMatchCursor = textCursor();
+    setObjectName("SearchTextEdit");
+    _lastMatchCursor = textCursor();
 }
 
 void SearchTextEdit::searchForward(const QString &text)
 {
-    m_searchText = text;
+    _searchText = text;
     QTextCursor cursor = textCursor();
-    cursor.setPosition(m_lastMatchCursor.position());
+    cursor.setPosition(_lastMatchCursor.position());
 
-    QTextCursor matchCursor = document()->find(m_searchText, cursor);
+    QTextCursor matchCursor = document()->find(_searchText, cursor);
     if (matchCursor.isNull()) {
         // Wrap around and search from the beginning
-        matchCursor = document()->find(m_searchText);
+        matchCursor = document()->find(_searchText);
     }
 
     if (!matchCursor.isNull()) {
         setTextCursor(matchCursor);
-        m_lastMatchCursor = matchCursor;
+        _lastMatchCursor = matchCursor;
         highlightMatch(matchCursor);
     }
 }
 
 void SearchTextEdit::searchBackward(const QString &text)
 {
-    m_searchText = text;
+    _searchText = text;
     QTextCursor cursor = textCursor();
-    cursor.setPosition(m_lastMatchCursor.position(), QTextCursor::KeepAnchor);
+    cursor.setPosition(_lastMatchCursor.position(), QTextCursor::KeepAnchor);
 
-    QTextCursor matchCursor = document()->find(m_searchText, cursor, QTextDocument::FindBackward);
+    QTextCursor matchCursor = document()->find(_searchText, cursor, QTextDocument::FindBackward);
     if (matchCursor.isNull()) {
         // Wrap around and search from the end
-        matchCursor = document()->find(m_searchText, QTextDocument::FindBackward);
+        matchCursor = document()->find(_searchText, QTextDocument::FindBackward);
     }
 
     if (!matchCursor.isNull()) {
         setTextCursor(matchCursor);
-        m_lastMatchCursor = matchCursor;
+        _lastMatchCursor = matchCursor;
         highlightMatch(matchCursor);
     }
 }
@@ -70,14 +70,3 @@ void SearchTextEdit::clearHighlight()
     clearCursor.select(QTextCursor::Document);
     clearCursor.setCharFormat(format);
 }
-
-// void SearchTextEdit::keyPressEvent(QKeyEvent *event)
-// {
-//     if (event->matches(QKeySequence::FindNext)) {
-//         searchForward(m_searchText);
-//     } else if (event->matches(QKeySequence::FindPrevious)) {
-//         searchBackward(m_searchText);
-//     } else {
-//         QPlainTextEdit::keyPressEvent(event);
-//     }
-// }

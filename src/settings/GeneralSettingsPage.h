@@ -1,5 +1,6 @@
-#ifndef GENERALPAGE_H
-#define GENERALPAGE_H
+
+#ifndef GENERALSETTINGSPAGE_H
+#define GENERALSETTINGSPAGE_H
 
 #include <QWidget>
 #include <QFormLayout>
@@ -8,10 +9,10 @@
 #include <QLabel>
 #include <QAction>
 
-class GeneralPage : public QWidget
+class GeneralSettingsPage : public QWidget
 {
 public:
-    GeneralPage(QWidget *parent = nullptr);
+    GeneralSettingsPage(QWidget *parent = nullptr);
 
     void setTopModule();
 
@@ -34,4 +35,4 @@ public slots:
     void startWizard();
 };
 
-#endif // GENERALPAGE_H
+#endif // GENERALSETTINGSPAGE_H

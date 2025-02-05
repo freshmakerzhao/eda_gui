@@ -20,8 +20,6 @@
 #include "utils/ProjectManager.h"
 #include "entity/XmlRecent.h"
 #include "utils/ProcessManager.h"
-#include "utils/XmlUtilities.h"
-#include "base/InitialConfig.h"
 #include "ipmanager/IPManager.h"
 #include "widgets/ProjectSummary.h"
 #include "dialog/AdvancedFileDialog.h"

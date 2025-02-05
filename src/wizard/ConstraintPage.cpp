@@ -26,7 +26,7 @@ ConstraintPage::ConstraintPage(QWidget *parent, const WizardMode &wizardMode) : 
     model->setHeaderData(2, Qt::Horizontal, QObject::tr("File Type"));
     model->setHeaderData(3, Qt::Horizontal, QObject::tr("Location"));
 
-    tableView = new WizTableView(this);
+    tableView = new WizTableView;
     tableView->setDisplayText("Use Add Flles or Create File buttons below");
     tableView->setModel(model);
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);

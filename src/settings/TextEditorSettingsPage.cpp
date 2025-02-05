@@ -1,12 +1,9 @@
-#include "TextEditorSettingPage.h"
+#include "TextEditorSettingsPage.h"
 
-TextEditorSettingPage::TextEditorSettingPage(QWidget *parent)
+TextEditorSettingsPage::TextEditorSettingsPage(QWidget *parent)
     : QWidget(parent)
 {
-    this->setObjectName("TextEditorSettingPage");
-    setStyleSheet("#TextEditorSettingPage { background-image: url(:/resource/white.png); }"
-                  "#TextEditorSettingPage { border:4px solid #DCDCDC; }"
-                  );
+    setObjectName("TextEditorSettingsPage");
 
     QLabel *label = new QLabel("<b>Text Editor</b><br> You need to restart the Text Editor to apply these settings.", this);
     label->setStyleSheet("border-bottom: 3px dashed #DCDCDC;"
@@ -28,7 +25,7 @@ TextEditorSettingPage::TextEditorSettingPage(QWidget *parent)
     formLayout->addRow("Encoding:", encodingComboBox);
 }
 
-void TextEditorSettingPage::setEncoding()
+void TextEditorSettingsPage::setEncoding()
 {
     QSettings settings("HybrdChip", "HybrdLink");
     settings.setValue("TextEditor/encoding", encodingComboBox->currentText());

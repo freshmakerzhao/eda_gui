@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file           : BitstreamSettingPage.cpp
+  * @file           : BitstreamSettingsPage.cpp
   * @author         : zs
   * @description    : None
   * @attention      : None
@@ -8,16 +8,14 @@
   ******************************************************************************
   */
 #include <QLabel>
-#include "BitstreamSettingPage.h"
+#include "BitstreamSettingsPage.h"
 #include "utils/ProjectManager.h"
 #include "wizard/Wizard.h"
 
-BitstreamSettingPage::BitstreamSettingPage(QWidget *parent)
+BitstreamSettingsPage::BitstreamSettingsPage(QWidget *parent)
         : QWidget(parent)
 {
-    this->setObjectName("BitstreamSettingPage");
-    setStyleSheet("#BitstreamSettingPage { background-color: white; }"
-                  "#BitstreamSettingPage { border:4px solid #DCDCDC; }");
+    setObjectName("BitstreamSettingsPage");
 
     // 顶部说明文字
     QLabel *header_label = new QLabel("<b>Write Bitstream</b><br> Specify various settings related to writing Bitstream. ", this);
@@ -55,7 +53,7 @@ BitstreamSettingPage::BitstreamSettingPage(QWidget *parent)
     setLayout(mainLayout);
 }
 
-void BitstreamSettingPage::applySettings() {
+void BitstreamSettingsPage::applySettings() {
     // 更新 Project 参数
     ProjectManager::instance().updateBinFileOption(generate_bin_file_checkBox->isChecked() ? "enable" : "disable");
     ProjectManager::instance().updateRbtFileOption(generate_rbt_file_checkBox->isChecked() ? "enable" : "disable");
@@ -63,7 +61,7 @@ void BitstreamSettingPage::applySettings() {
     ProjectManager::instance().updateCompressOption(enable_compress_option->isChecked() ? "enable" : "disable");
 }
 
-void BitstreamSettingPage::loadSettings()
+void BitstreamSettingsPage::loadSettings()
 {
     // 设置复选框状态，根据参数值是否为 "enable"
     generate_rbt_file_checkBox->setChecked(ProjectManager::instance().getParameter(Project::RbtFile) == "enable");

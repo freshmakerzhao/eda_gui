@@ -1,5 +1,5 @@
-#ifndef TEXTEDITORSETTINGPAGE_H
-#define TEXTEDITORSETTINGPAGE_H
+#ifndef TEXTEDITORSETTINGSPAGE_H
+#define TEXTEDITORSETTINGSPAGE_H
 
 #include <QWidget>
 #include <QFormLayout>
@@ -10,10 +10,10 @@
 #include <QComboBox>
 #include <QSettings>
 
-class TextEditorSettingPage : public QWidget
+class TextEditorSettingsPage : public QWidget
 {
 public:
-    TextEditorSettingPage(QWidget *parent = nullptr);
+    TextEditorSettingsPage(QWidget *parent = nullptr);
 
     void setEncoding();
 
@@ -21,4 +21,4 @@ private:
     QComboBox *encodingComboBox;
 };
 
-#endif // TEXTEDITORSETTINGPAGE_H
+#endif // TEXTEDITORSETTINGSPAGE_H

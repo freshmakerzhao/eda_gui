@@ -42,29 +42,28 @@ void MessageWidget::init()
     // toolBar->addSeparator();
 
     // Widget
-    baseWidget = new QWidget(this);
+    baseWidget = new QWidget;
     baseWidget->setVisible(false);
 
-    QPushButton *backWardBtn = new QPushButton("Backward", baseWidget);
-    QPushButton *forWardBtn = new QPushButton("Forward", baseWidget);
-    QPushButton *clearBtn = new QPushButton("Clear", baseWidget);
+    QPushButton *backwardButton = new QPushButton("Backward", baseWidget);
+    QPushButton *forwardButton = new QPushButton("Forward", baseWidget);
+    QPushButton *clearButton = new QPushButton("Clear", baseWidget);
 
-    QLineEdit *lineEdit = new QLineEdit(this);
+    QLineEdit *lineEdit = new QLineEdit;
     lineEdit->setFixedWidth(250);
 
     QFormLayout *fLayout = new QFormLayout(baseWidget);
     fLayout->setMargin(0);
-    // fLayout->addRow("Search:", lineEdit);
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addWidget(lineEdit);
-    hLayout->addWidget(backWardBtn);
-    hLayout->addWidget(forWardBtn);
-    hLayout->addWidget(clearBtn);
+    hLayout->addWidget(backwardButton);
+    hLayout->addWidget(forwardButton);
+    hLayout->addWidget(clearButton);
     hLayout->addStretch();
     fLayout->addRow("Search:", hLayout);
 
     // 初始化 tree 控件
-    treeWidget = new QTreeWidget(this);
+    treeWidget = new QTreeWidget;
     // 隐藏标题栏（无分栏）
     treeWidget->setHeaderHidden(true);
 
@@ -91,17 +90,17 @@ void MessageWidget::init()
     });
 
     // Backward 按钮导航
-    connect(backWardBtn, &QPushButton::clicked, this, [this]() {
+    connect(backwardButton, &QPushButton::clicked, this, [this]() {
         navigateSearchResult(-1);
     });
 
     // Forward 按钮导航
-    connect(forWardBtn, &QPushButton::clicked, this, [this]() {
+    connect(forwardButton, &QPushButton::clicked, this, [this]() {
         navigateSearchResult(1);
     });
 
     // Clear 按钮清除搜索框中的内容
-    connect(clearBtn, &QPushButton::clicked, lineEdit, &QLineEdit::clear);
+    connect(clearButton, &QPushButton::clicked, lineEdit, &QLineEdit::clear);
     // ====================== 搜索框相关 ======================
 //
 //    searchBox = new QLineEdit(this);

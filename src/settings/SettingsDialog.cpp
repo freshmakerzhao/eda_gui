@@ -1,5 +1,6 @@
 #include "SettingsDialog.h"
 #include "utils/ProjectManager.h"
+#include "base/Globals.h"
 #include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
@@ -25,13 +26,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     treeWidget->addTopLevelItems(settingsItemslist);
 
     //将控件添加到堆栈窗口中
-    generalPage =  new GeneralPage;
-    bitstreamSettingPage =  new BitstreamSettingPage;
-    textEditorSettingPage = new TextEditorSettingPage;
-    stackedWidget->addWidget(generalPage);
-    stackedWidget->addWidget(textEditorSettingPage);
-    stackedWidget->addWidget(bitstreamSettingPage);
-    bitstreamSettingPage->loadSettings(); // 初始化复选框状态
+    generalSettingsPage =  new GeneralSettingsPage;
+    bitstreamSettingsPage =  new BitstreamSettingsPage;
+    textEditorSettingsPage = new TextEditorSettingsPage;
+    stackedWidget->addWidget(generalSettingsPage);
+    stackedWidget->addWidget(textEditorSettingsPage);
+    stackedWidget->addWidget(bitstreamSettingsPage);
+    bitstreamSettingsPage->loadSettings(); // 初始化复选框状态
 
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
     hBoxLayout->addWidget(splitter);
@@ -62,10 +63,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
 void SettingsDialog::accept()
 {
-    generalPage->setDevicePart();
-    generalPage->setTopModule();
-    textEditorSettingPage->setEncoding();
-    bitstreamSettingPage->applySettings();
+    generalSettingsPage->setDevicePart();
+    generalSettingsPage->setTopModule();
+    textEditorSettingsPage->setEncoding();
+    bitstreamSettingsPage->applySettings();
     ProjectManager::instance().writeAndLoadProject();
     QDialog::accept();
 }
