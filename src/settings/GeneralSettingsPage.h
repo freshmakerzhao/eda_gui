@@ -1,4 +1,12 @@
-
+/**
+  ******************************************************************************
+  * @file           : GeneralSettingsPage.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/5/26
+  ******************************************************************************
+  */
 #ifndef GENERALSETTINGSPAGE_H
 #define GENERALSETTINGSPAGE_H
 

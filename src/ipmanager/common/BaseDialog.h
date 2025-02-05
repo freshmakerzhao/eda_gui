@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : BaseDialog.h
+  * @author         : ksy
+  * @description    : Base class for all ip configuration dialogs.
+  * @attention      : None
+  * @date           : 2024/11/7
+  ******************************************************************************
+  */
 #ifndef BASEDIALOG_H
 #define BASEDIALOG_H
 

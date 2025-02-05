@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : GeneralSettingsPage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/5/26
+  ******************************************************************************
+  */
 #include "GeneralSettingsPage.h"
 #include "utils/ProjectManager.h"
 #include "wizard/Wizard.h"
@@ -9,8 +18,7 @@ GeneralSettingsPage::GeneralSettingsPage(QWidget *parent)
 
     QLabel *label = new QLabel("<b>General</b><br> Specify values for various settings used throughout the design flow. "
                                "These settings apply to the current project.", this);
-    label->setStyleSheet("border-bottom: 3px dashed #DCDCDC;"
-                        "border-radius: 0px;");
+    label->setObjectName("SettingsPageTitleLabel");
     label->setWordWrap(true);
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
     hBoxLayout->addWidget(label);

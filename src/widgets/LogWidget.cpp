@@ -22,6 +22,11 @@ void LogWidget::appendLog(const QString &str) {
     logTextEdit->appendPlainText(str);
 }
 
+void LogWidget::clearLog()
+{
+    logTextEdit->clear();
+}
+
 LogWidget::LogWidget(QWidget* parent)
     : QWidget(parent)
 {

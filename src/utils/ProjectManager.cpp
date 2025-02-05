@@ -389,8 +389,8 @@ void ProjectManager::closeProject()
     TaskManager::instance().cleanParams();
     // 重置窗体
     MainWindow::instance()->resetUi();
-    // 重新初始化DesignRuns表
-    InfoWidget::instance()->initDesignRunsView();
+    // 重置InfoWidget
+    InfoWidget::instance()->resetInfoWidget();
 }
 
 ProjectManager::ProjectManager()

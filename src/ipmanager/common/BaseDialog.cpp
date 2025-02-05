@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : BaseDialog.cpp
+  * @author         : ksy
+  * @description    : Base class for all ip configuration dialogs.
+  * @attention      : None
+  * @date           : 2024/11/7
+  ******************************************************************************
+  */
 #include "BaseDialog.h"
 
 BaseDialog::BaseDialog(QWidget *parent)

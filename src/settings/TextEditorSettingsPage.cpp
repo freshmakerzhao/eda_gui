@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : TextEditorSettingsPage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2025/1/11
+  ******************************************************************************
+  */
 #include "TextEditorSettingsPage.h"
 
 TextEditorSettingsPage::TextEditorSettingsPage(QWidget *parent)
@@ -6,8 +15,7 @@ TextEditorSettingsPage::TextEditorSettingsPage(QWidget *parent)
     setObjectName("TextEditorSettingsPage");
 
     QLabel *label = new QLabel("<b>Text Editor</b><br> You need to restart the Text Editor to apply these settings.", this);
-    label->setStyleSheet("border-bottom: 3px dashed #DCDCDC;"
-                         "border-radius: 0px;");
+    label->setObjectName("SettingsPageTitleLabel");
     label->setWordWrap(true);
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
     hBoxLayout->addWidget(label);

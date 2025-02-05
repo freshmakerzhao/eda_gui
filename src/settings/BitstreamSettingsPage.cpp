@@ -18,28 +18,28 @@ BitstreamSettingsPage::BitstreamSettingsPage(QWidget *parent)
     setObjectName("BitstreamSettingsPage");
 
     // 顶部说明文字
-    QLabel *header_label = new QLabel("<b>Write Bitstream</b><br> Specify various settings related to writing Bitstream. ", this);
-    header_label->setStyleSheet("border-bottom: 3px dashed #DCDCDC;"
-                                "border-radius: 0px;");
+    QLabel *header_label = new QLabel("<b>Write Bitstream</b><br> Specify various settings related to writing Bitstream. ");
     header_label->setWordWrap(true);
+
+    header_label->setObjectName("SettingsPageTitleLabel");
 
     // 创建一个表单布局，用于组织字段
     QFormLayout *formLayout = new QFormLayout;
 
     // 添加可选项的复选框
-    generate_rbt_file_checkBox = new QCheckBox("Generate rbt file", this);
+    generate_rbt_file_checkBox = new QCheckBox("Generate rbt file");
     generate_rbt_file_checkBox->setStyleSheet("padding-left: 30px;"); // 增加缩进
     formLayout->addRow(generate_rbt_file_checkBox);
 
-    generate_bin_file_checkBox = new QCheckBox("Generate bin file", this);
+    generate_bin_file_checkBox = new QCheckBox("Generate bin file");
     generate_bin_file_checkBox->setStyleSheet("padding-left: 30px;"); // 增加缩进
     formLayout->addRow(generate_bin_file_checkBox);
 
-    enable_crc_option = new QCheckBox("Enable crc option", this);
+    enable_crc_option = new QCheckBox("Enable crc option");
     enable_crc_option->setStyleSheet("padding-left: 30px;"); // 增加缩进
     formLayout->addRow(enable_crc_option);
 
-    enable_compress_option = new QCheckBox("Enable compress option", this);
+    enable_compress_option = new QCheckBox("Enable compress option");
     enable_compress_option->setStyleSheet("padding-left: 30px;"); // 增加缩进
     formLayout->addRow(enable_compress_option);
 

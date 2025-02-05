@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : InfoWidget.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/2/18
+  ******************************************************************************
+  */
 #include "InfoWidget.h"
 #include "LogWidget.h"
 #include "utils/json.hpp"
@@ -137,6 +146,13 @@ void InfoWidget::updateImplItem(const QString& implPath,
     outFile.close();
 }
 
+void InfoWidget::resetInfoWidget()
+{
+    initDesignRunsView();
+    MessageWidget::instance()->clearMessage();
+    LogWidget::instance()->clearLog();
+}
+
 void InfoWidget::initDesignRunsView(const QString &prjPath)
 {
     const QString synthPath = prjPath + "/runs/synth";
@@ -207,27 +223,24 @@ InfoWidget::InfoWidget(QWidget *parent)
     : QWidget(parent)
 {
     qDebug() << "[InfoWidget] Constructing...";
-    tabWidget = new QTabWidget(this);
+    tabWidget = new QTabWidget;
     QGridLayout *layout = new QGridLayout(this);
     layout->setMargin(0);
     layout->addWidget(tabWidget);
 
-    // =========================== Csg =============================
-    // csl = new QPlainTextEdit(this);
-//    tclConsole = new TclConsole(this);
+    // ---------------------- Tcl Console ---------------------
     tabWidget->addTab(TclConsole::instance(), "Tcl Console");
     // tabWidget->setTabEnabled(0, false);
-    // =========================== Msg =============================
-//    msg = new QPlainTextEdit(this), msg->setReadOnly(true);
+    // ----------------------- Messages -----------------------
     tabWidget->addTab(MessageWidget::instance(), "Messages");
-    // =========================== Log =============================
+    // ------------------------- Log --------------------------
     tabWidget->addTab(LogWidget::instance(),"Log");
-    // ============================ Rpt ============================
-    rpt = new QPlainTextEdit(this), rpt->setReadOnly(true);
+    // ----------------------- Reports ------------------------
+    rpt = new QPlainTextEdit, rpt->setReadOnly(true);
     tabWidget->addTab(rpt, "Reports");
     tabWidget->setTabEnabled(3, false);
-    // ======================== Design Runs ========================
-    runsView = new QTreeView(this);
+    // --------------------- Design Runs ----------------------
+    runsView = new QTreeView;
     tabWidget->addTab(runsView, "Design Runs");
     tabWidget->setCurrentIndex(4);
     runsModel = new QStandardItemModel(runsView);

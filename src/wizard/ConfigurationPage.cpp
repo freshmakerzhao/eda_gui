@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : ConfigurationPage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2025/1/11
+  ******************************************************************************
+  */
 #include "ConfigurationPage.h"
 
 ConfigurationPage::ConfigurationPage(QWidget *parent)

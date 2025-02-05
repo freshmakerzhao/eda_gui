@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : TextEditorSettingsPage.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2025/1/11
+  ******************************************************************************
+  */
 #ifndef TEXTEDITORSETTINGSPAGE_H
 #define TEXTEDITORSETTINGSPAGE_H
 

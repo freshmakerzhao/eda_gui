@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : SearchTextEdit.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/5/6
+  ******************************************************************************
+  */
 #ifndef SEARCHTEXTEDIT_H
 #define SEARCHTEXTEDIT_H
 

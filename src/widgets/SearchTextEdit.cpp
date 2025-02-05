@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : SearchTextEdit.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/5/6
+  ******************************************************************************
+  */
 #include "SearchTextEdit.h"
 
 #include <QTextDocument>

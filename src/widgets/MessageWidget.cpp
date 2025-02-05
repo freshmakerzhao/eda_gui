@@ -197,6 +197,11 @@ void MessageWidget::populateTreeFromLogStorage(const LogStorage &logStorage)
     }
 }
 
+void MessageWidget::clearMessage()
+{
+    treeWidget->clear();
+}
+
 void MessageWidget::onExpandAll()
 {
     treeWidget->expandAll();

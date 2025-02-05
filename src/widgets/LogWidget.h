@@ -25,6 +25,8 @@ public:
 
     void appendLog(const QString& str);
 
+    void clearLog();
+
 private:
     LogWidget(QWidget* parent = nullptr);
 

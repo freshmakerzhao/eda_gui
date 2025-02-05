@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : ConfigurationPage.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2025/1/11
+  ******************************************************************************
+  */
 #ifndef CONFIGURATIONPAGE_H
 #define CONFIGURATIONPAGE_H
 
