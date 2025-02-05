@@ -75,7 +75,7 @@ private:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void initMenuStateBar();
+    void initCornerWidget();
 
     QMenuBar *menuBar;
     QMenu *fileMenu;

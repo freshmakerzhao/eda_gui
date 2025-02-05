@@ -41,6 +41,9 @@ void ProjectSummary::init()
     scrollArea->setWidgetResizable(true);
     QWidget *mainWidget = new QWidget;
     scrollArea->setWidget(mainWidget);
+    scrollArea->setStyleSheet(".QScrollArea {"
+                              "  min-width: 40em; "
+                              "}");
     QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
     // ==================================  顶部的 Widget 开始 ==================================
     QWidget *topWidget = new QWidget();
@@ -199,7 +202,7 @@ void ProjectSummary::init()
     leftContainer->setLayout(leftLayout);
 
     leftContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    leftContainer->setMinimumWidth(500);
+    // leftContainer->setMinimumWidth(500);
     splitter->addWidget(leftContainer);
 
     // ================================== 下方左侧 Utilization 内容 结束 ==================================

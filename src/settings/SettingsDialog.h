@@ -2,6 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QSplitter>
 #include <QStackedWidget>
 #include <QTreeWidget>
 #include <QHBoxLayout>

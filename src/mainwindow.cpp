@@ -178,12 +178,9 @@ void MainWindow::resizeUi()
 
 void MainWindow::setRunState(const QString &phase, const bool &flag)
 {
-    if (!phaseLabel->isVisible()) {
-        phaseLabel->show();
-    }
-    if (!movieLabel->isVisible()) {
-        movieLabel->show();
-    }
+    phaseLabel->setVisible(true);
+    movieLabel->setVisible(true);
+
     phaseLabel->setText(phase);
     if (flag) {
         movie->start();
@@ -201,8 +198,8 @@ void MainWindow::setRunState(const QString &phase, const bool &flag)
 
 void MainWindow::resetRunState()
 {
-    phaseLabel->hide();
-    movieLabel->hide();
+    phaseLabel->setVisible(false);
+    movieLabel->setVisible(false);
 }
 
 void MainWindow::resetUi()
@@ -492,7 +489,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     SourcesWidget->setMinimumWidth(400);
 
-    initMenuStateBar();
+    initCornerWidget();
 }
 
 MainWindow::~MainWindow()
@@ -500,7 +497,7 @@ MainWindow::~MainWindow()
     qDebug() << "[MainWindow] Distructing...";
 }
 
-void MainWindow::initMenuStateBar()
+void MainWindow::initCornerWidget()
 {
     completeImage = new QImage(":/icons/resource/icons/25-icon_processing_completed.png");
     errorImage = new QImage(":/icons/resource/icons/16-1icon_error_status.png");
@@ -509,19 +506,23 @@ void MainWindow::initMenuStateBar()
     QHBoxLayout *layout = new QHBoxLayout(cornerWidget);
     layout->setMargin(0);
     phaseLabel = new QLabel();
-    phaseLabel->setAlignment(Qt::AlignRight);
+    phaseLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     phaseLabel->setMinimumWidth(300);
     phaseLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
+    const int menuBarInternalHeight = menuBar->heightForWidth(menuBar->width());
+    const int movieLabelHeight = menuBarInternalHeight * 0.7;
+
     movie = new QMovie(":/resource/gif/spinner.gif");
-    movie->setScaledSize(QSize(menuBar->height() - 6, menuBar->height() - 6));
+    movie->setScaledSize(QSize(movieLabelHeight, movieLabelHeight));
     movieLabel = new QLabel();
-    movieLabel->setMargin(3);
-    movieLabel->setFixedSize(menuBar->height(), menuBar->height());
+    movieLabel->setAlignment(Qt::AlignCenter);
+    // movieLabel->setMargin(3);
+    movieLabel->setFixedSize(movieLabelHeight, movieLabelHeight);
     movieLabel->setMovie(movie);
 
-    layout->addWidget(phaseLabel, 0, Qt::AlignRight);
-    layout->addWidget(movieLabel, 0, Qt::AlignRight);
+    layout->addWidget(phaseLabel, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(movieLabel, 0, Qt::AlignRight | Qt::AlignVCenter);
     layout->addStretch();
     layout->addSpacing(8);
 
