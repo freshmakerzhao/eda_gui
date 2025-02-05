@@ -23,6 +23,7 @@
 
 class QGraphicsScene;
 class QSplitter;
+class SearchBox;
 
 class FrameView  : public QWidget {
 Q_OBJECT
@@ -41,11 +42,9 @@ private:
     QString usageJsonPath = "";
     ChipGridOperations viewer;
     QGraphicsScene *scene;
-    // 搜索框提示词语
-    QString searchTextLast = "";
-    QCompleter searchCompleter;
-    QStringList searchWordList;
-    QStringListModel searchWordListModel;
+
+    //搜索框
+    SearchBox* searchBox;
 
     // 为在槽函数中调用
     QLabel *tileTypeValue;
@@ -55,16 +54,28 @@ private:
     QLabel *siteTypeValue;
     QLabel *NameValue;
     QLabel *TypeValue;
-    QLineEdit *searchBox;
 
-    void clearSearchWordList();
 public slots:
     void showTileInfo(int x,int y);
     void showSiteInfo(int x,int y,bool sites_visible_status,int index);
     void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name);
-    void searchUpdate(const QString &text); //搜索框自动补全
     void showCell();
 };
 
+class SearchBox : public QLineEdit {
+public:
+    SearchBox(ChipGridOperations* view, QWidget *parent = nullptr);
+    void setWords();
+    void clearWords();
+
+//protected:
+//    void keyPressEvent(QKeyEvent *event) override;
+private:
+    QCompleter* completer;
+    QStringList wordList;
+    QStringListModel* wordListModel;
+    QString textLast = "";
+    ChipGridOperations* view;
+};
 
 #endif //GRID_VIEW_FRAMEVIEW_H

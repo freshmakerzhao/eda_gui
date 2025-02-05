@@ -51,10 +51,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     QWidget* searchWidget = new QWidget(splitterRight);
     QVBoxLayout* searchVLayout = new QVBoxLayout;
     QHBoxLayout* searchHLayout = new QHBoxLayout;
-    searchBox = new QLineEdit();
-    searchCompleter.setCaseSensitivity(Qt::CaseInsensitive);
-    searchCompleter.setCompletionMode(QCompleter::PopupCompletion);
-    searchBox->setCompleter(&searchCompleter);
+    searchBox = new SearchBox(&viewer);
 
 
     QPushButton* searchButton = new QPushButton("search");
@@ -67,33 +64,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     searchWidget->setLayout(searchVLayout);
 
     connect(searchBox, &QLineEdit::returnPressed, this, &FrameView::showCell);
-    connect(searchBox, &QLineEdit::textChanged, this, &FrameView::searchUpdate);
-    connect(&searchCompleter, QOverload<const QString &>::of(&QCompleter::activated), [=](const QString &text) {
-//        QString current_word = searchCompleter.currentCompletion();
-        std::string site_type = text.split("_")[0].toStdString();
-        std::string site_name_in = text.split("/")[0].toStdString();
-
-        qDebug() << "text:" << text;
-
-        if(!text.contains("_X")) { //匹配site类型
-            for(auto site : viewer.siteBlockMap[site_type]) {
-                QString site_name = QString::fromStdString(site.first);
-                if(!searchWordList.contains(site_name)) {
-                    searchWordList << site_name;
-                }
-            }
-        } else if (!text.contains('/')) { //匹配site_name
-            for(auto bel : viewer.siteBlockMap[site_type][site_name_in]->child_bel_items) {
-                QString bel_name = QString::fromStdString(bel->getName());
-                if(!searchWordList.contains(bel_name)) {
-                    searchWordList << bel_name;
-                }
-            }
-        } else {
-            return;
-        }
-        searchWordListModel.setStringList(searchWordList);
-    });
     connect(searchButton, &QPushButton::clicked, this, &FrameView::showCell);
 
     // 上部分的按钮
@@ -296,11 +266,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
         }
 
         // 添加搜索框提示词
-        for (auto type_word : viewer.siteBlockMap) {
-            searchWordList << QString::fromStdString(type_word.first);
-        }
-        searchCompleter.setModel(&searchWordListModel);
-        searchWordListModel.setStringList(searchWordList);
+        searchBox->setWords();
     }
 
    for (auto& cols : viewer.gridMatrix) {
@@ -374,15 +340,19 @@ bool FrameView::searchCell(const std::string &cell_name) {
     std::string site_type = cell_name.substr(0, pos);
     qDebug() << "site_type:" <<  QString::fromStdString(site_type);
     auto it = viewer.siteBlockMap.find(site_type);
-    if(it == viewer.siteBlockMap.end())
+    if(it == viewer.siteBlockMap.end()) {
+        qDebug() << "not find site_type: " << QString::fromStdString(site_type);
         return false;
+    }
 
     pos = cell_name.find('/');
     if(pos != std::string::npos) {
         std::string site_name = cell_name.substr(0, pos);
         auto it = viewer.siteBlockMap[site_type].find(site_name);
-        if(it == viewer.siteBlockMap[site_type].end())
+        if(it == viewer.siteBlockMap[site_type].end()) {
+            qDebug() << "not find site_name: " << QString::fromStdString(site_name);
             return false;
+        }
         SitesBlock* site_block = viewer.siteBlockMap[site_type][site_name];
         for(auto bel_block : site_block->child_bel_items) {
             if(cell_name == bel_block->getName()) {
@@ -409,60 +379,103 @@ void FrameView::showCell() {
     }
 }
 
-void FrameView::clearSearchWordList() {
-    searchWordList.clear();
-    for (auto type_word : viewer.siteBlockMap) {
-        searchWordList << QString::fromStdString(type_word.first);
-    }
-    searchWordListModel.setStringList(searchWordList);
-}
 
-void FrameView::searchUpdate(const QString &text) {
+SearchBox::SearchBox(ChipGridOperations* view, QWidget *parent):view(view) {
+    completer = new QCompleter(this);
+    wordListModel = new QStringListModel(this);
 
-    if(text.isEmpty()) {
-        clearSearchWordList();
-        return;
-    }
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
+    setCompleter(completer);
 
-    int row_count = searchCompleter.completionCount();
-    qDebug() << "row count:" << row_count;
-
-    if(row_count == 1) { //当提示框只有一个关键词时
-        QString current_word = searchCompleter.currentCompletion();
-        std::string site_type = current_word.split("_X")[0].toStdString();
-        std::string site_name_in = current_word.split("/")[0].toStdString();
-
-        qDebug() << "current_word:" << current_word;
-
-        if (!current_word.contains("_X")) { //匹配site类型
-            for (auto site: viewer.siteBlockMap[site_type]) {
+    connect(completer, QOverload<const QString &>::of(&QCompleter::highlighted), [=](const QString &text) {
+        std::string site_type = text.split("_X")[0].toStdString();
+        std::string site_name_in = text.split("/")[0].toStdString();
+//
+        qDebug() << "selected_word:" << text;
+//
+        if (!text.contains("_X")) { //匹配site类型
+            qDebug() << "is site type";
+            for (auto site: view->siteBlockMap[site_type]) {
                 QString site_name = QString::fromStdString(site.first);
-                if (!searchWordList.contains(site_name)) {
-                    searchWordList << site_name;
+                if (!wordList.contains(site_name)) {
+                    wordList << site_name;
                 }
             }
-            searchWordListModel.setStringList(searchWordList);
+//            wordListModel->setStringList(wordList);
+        }
 
-            if (text.size() > searchTextLast.size())
-                searchBox->setText(current_word + "_X"); //自动补全
+    });
 
-            searchTextLast = text;
+    connect(completer, QOverload<const QString &>::of(&QCompleter::activated), [=](const QString &text) {
+        wordListModel->setStringList(wordList);
+//        qDebug() << "is site type";
+//      this->setText(text);
+    });
+
+    connect(this, &QLineEdit::textChanged, [=](const QString &text) {
+        if(text.isEmpty()) {
+            clearWords();
             return;
         }
 
-        if (text.size() > searchTextLast.size()) { //当用户是在添加字符串时
-            searchBox->setText(current_word); //有且只有一个提示词,则自动补全
-        }
+        int row_count = completer->completionCount();
+        qDebug() << "row count:" << row_count;
 
-        if (!current_word.contains('/')) { //匹配site_name
-            for (auto bel: viewer.siteBlockMap[site_type][site_name_in]->child_bel_items) {
-                QString bel_name = QString::fromStdString(bel->getName());
-                if (!searchWordList.contains(bel_name)) {
-                    searchWordList << bel_name;
+        if(row_count == 1) { //当提示框只有一个关键词时
+            QString current_word = completer->currentCompletion();
+            std::string site_type = current_word.split("_X")[0].toStdString();
+            std::string site_name_in = current_word.split("/")[0].toStdString();
+
+            qDebug() << "current_word:" << current_word << "from searchUpdate()";
+
+            if (!current_word.contains("_X")) { //匹配site类型
+                for (auto site: view->siteBlockMap[site_type]) {
+                    QString site_name = QString::fromStdString(site.first);
+                    if (!wordList.contains(site_name)) {
+                        wordList << site_name;
+                    }
                 }
+                wordListModel->setStringList(wordList);
+
+                if (text.size() > textLast.size())
+                    this->setText(current_word + "_X"); //自动补全
+
+                textLast = text;
+                return;
             }
-            searchWordListModel.setStringList(searchWordList);
+
+            if (text.size() > textLast.size()) { //当用户是在添加字符串时
+                this->setText(current_word); //有且只有一个提示词,则自动补全
+            }
+
+            if (!current_word.contains('/')) { //匹配site_name
+                for (auto bel: view->siteBlockMap[site_type][site_name_in]->child_bel_items) {
+                    QString bel_name = QString::fromStdString(bel->getName());
+                    if (!wordList.contains(bel_name)) {
+                        wordList << bel_name;
+                    }
+                }
+                wordListModel->setStringList(wordList);
+            }
         }
+        textLast = text;
+
+    });
+}
+
+void SearchBox::clearWords() {
+    wordList.clear();
+    for (auto type_word : view->siteBlockMap) {
+        wordList << QString::fromStdString(type_word.first);
     }
-    searchTextLast = text;
+    wordListModel->setStringList(wordList);
+}
+
+void SearchBox::setWords() {
+    for (auto type_word : view->siteBlockMap) {
+        wordList << QString::fromStdString(type_word.first);
+    }
+    completer->setModel(wordListModel);
+    wordListModel->setStringList(wordList);
 }
