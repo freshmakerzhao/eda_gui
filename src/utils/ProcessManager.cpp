@@ -152,6 +152,17 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
     }
 }
 
+void ProcessManager::kill()
+{
+#if WIN32
+    qint64 pid = process->processId();
+    QProcess proc;
+    proc.startDetached("taskkill", QStringList() << "/F" << "/T" << "/PID" << QString::number(pid));
+#else
+    process->kill();
+#endif
+}
+
 void ProcessManager::initEnvironment() {
     env = QProcessEnvironment::systemEnvironment();
     QString system32_path =  QString("%1\\System32").arg(QString::fromLocal8Bit(qgetenv("WINDIR")));

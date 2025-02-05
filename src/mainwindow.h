@@ -129,6 +129,7 @@ private:
     QLabel *movieLabel;
     QImage *completeImage;
     QImage *errorImage;
+    QPushButton *cancelRunButton;
 };
 
 #endif // MAINWINDOW_H

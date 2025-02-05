@@ -19,6 +19,7 @@
 #include "dialog/CustomMessageBox.h"
 #include "utils/ProjectManager.h"
 #include "entity/XmlRecent.h"
+#include "utils/ProcessManager.h"
 #include "utils/XmlUtilities.h"
 #include "base/InitialConfig.h"
 #include "ipmanager/IPManager.h"
@@ -199,6 +200,7 @@ void MainWindow::setRunState(const QString &phase, const bool &flag)
 void MainWindow::resetRunState()
 {
     phaseLabel->setVisible(false);
+    cancelRunButton->setVisible(false);
     movieLabel->setVisible(false);
 }
 
@@ -507,8 +509,8 @@ void MainWindow::initCornerWidget()
     layout->setMargin(0);
     phaseLabel = new QLabel();
     phaseLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    phaseLabel->setMinimumWidth(300);
-    phaseLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    // phaseLabel->setMinimumWidth(300);
+    // phaseLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     const int menuBarInternalHeight = menuBar->heightForWidth(menuBar->width());
     const int movieLabelHeight = menuBarInternalHeight * 0.7;
@@ -521,17 +523,33 @@ void MainWindow::initCornerWidget()
     movieLabel->setFixedSize(movieLabelHeight, movieLabelHeight);
     movieLabel->setMovie(movie);
 
+    cancelRunButton = new QPushButton("Cancel");
+    cancelRunButton->setVisible(false);
+    cancelRunButton->setStyleSheet("QPushButton { "
+                                   "border: none; "
+                                   "color: rgb(22, 97, 247); "
+                                   "background-color: transparent; "
+                                   "text-align: left; "
+                                   "} "
+                                   "QPushButton:hover { text-decoration: underline; }");
+
     layout->addWidget(phaseLabel, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(cancelRunButton, 0, Qt::AlignRight | Qt::AlignVCenter);
     layout->addWidget(movieLabel, 0, Qt::AlignRight | Qt::AlignVCenter);
     layout->addStretch();
     layout->addSpacing(8);
 
     menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
-    QObject::connect(movie, &QMovie::stateChanged, [this](QMovie::MovieState state) {
+    QObject::connect(movie, &QMovie::stateChanged, [cornerWidget, this](QMovie::MovieState state) {
         (state == QMovie::NotRunning) ? movieLabel->clear() : movieLabel->setMovie(movie);
+        (state == QMovie::NotRunning) ? cancelRunButton->setVisible(false) : cancelRunButton->setVisible(true);
+        menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
     });
 
     movieLabel->setScaledContents(true);
+
+    QObject::connect(cancelRunButton, &QPushButton::clicked, &ProcessManager::instance(), &ProcessManager::kill);
+
 }
 
 void MainWindow::onClearTriggered() {

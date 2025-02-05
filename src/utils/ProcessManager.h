@@ -55,6 +55,8 @@ public:
 
     void executeCommand(const QString &phase, const QStringList& command);
 
+    void kill();
+
     /**
      * 初始化环境变量
      */
