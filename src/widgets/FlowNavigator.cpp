@@ -11,7 +11,6 @@
 #include "FlowNavigator.h"
 #include "utils/TaskManager.h"
 #include "service/HardWareManager.h"
-#include "base/Globals.h"
 
 FlowNavigator *FlowNavigator::instance()
 {
@@ -56,9 +55,7 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     setColumnCount(1);
     setHeaderHidden(true);
     // setIndentation(20);
-    int itemHeight = static_cast<int>(30 * GlobalConfig::SCALE_FACTOR);  // 根据 DPI 缩放
-    QString styleSheet = QString("QTreeWidget::item { height: %1px; }").arg(itemHeight);
-    setStyleSheet(styleSheet);
+    setStyleSheet("QTreeWidget::item { height: 1.65em; }");
     // ============ PROJECT MANAGER ============
     // Settings
     settingsItem = new QTreeWidgetItem(proMgrItem, QStringList() << "Settings");
@@ -74,6 +71,7 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     prjSummaryItem->setIcon(0, QIcon(":/icons/resource/icons/20-icon_summary_2.png"));
     // ================== 仿真 ==================
     simRunItem = new QTreeWidgetItem(simItem, QStringList() << "Run Simulation");
+    simRunItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
     // ================== 综合 ==================
     synthRunItem = new QTreeWidgetItem(synthItem, QStringList() << "Run Synthesis");
     synthRunItem->setIcon(0, QIcon(":/icons/resource/icons/1-icon_start_process.png"));

@@ -302,7 +302,7 @@ void MainWindow::onAboutTriggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (EditorManager::instance()->isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(this,
+        CustomMessageBox::StandardButton btn = CustomMessageBox::question(this,
                                                                               "Warning", "There are unsaved files, are you sure you want to close?",
                                                                               QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::Yes) {

@@ -23,7 +23,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     ProcessManager::instance().configDisplay(displayPartName);
     if (this->arch == ""){
         // 用户未选择架构时
-        CustomMessageBox::showQuestion(MainWindow::instance(), "Failed", "Please select or create a project.");
+        CustomMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
         return;
     }
     if (!MainWindow::instance()->saveAllFile()) {
@@ -479,7 +479,7 @@ void TaskManager::downloadFlash(const QString &projectImplPath1, const QString &
 // 两个选项的弹窗，true 左侧，false 右侧
 bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft, QMessageBox::StandardButton buttonRight) {
     // 等待用户响应
-    int msg = CustomMessageBox::showQuestion(
+    int msg = CustomMessageBox::question(
             MainWindow::instance(),
             title,
             text,
@@ -515,7 +515,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
                 // 需要弹窗则弹窗
-                CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
+                CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
             }
             if(this->_hasNextImplementProcess){
                 // 如果需要做
@@ -533,15 +533,15 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
                 // Implementation结束后，读取资源统计信息
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
-                CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
+                CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
             }
         } else {
             // 生成码流结束提示，后续在此扩展
-            CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
+            CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
     } else {
         MainWindow::instance()->setRunState(msg.phase + " failed.", false);
-        CustomMessageBox::showError(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
+        CustomMessageBox::critical(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
     }
 }
 
