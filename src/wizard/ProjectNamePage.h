@@ -28,6 +28,8 @@ private:
     QLineEdit *nameLineEdit;
     QLineEdit *pathLineEdit;
     QLabel *warningLabel;
+
+    bool enableAutoSetName = true;
 };
 
 #endif // PROJECTNAMEPAGE_H
