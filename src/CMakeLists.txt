@@ -167,6 +167,8 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # Add resource files
 set(PROJECT_RESOURCES
     res.qrc
+        utils/MemoryUtilities.cpp
+        utils/MemoryUtilities.h
 )
 
 # Tell CMake to create the executable
@@ -188,6 +190,7 @@ target_link_libraries(${PROJECT_NAME}
     qt5advanceddocking${CMAKE_SHARED_LIBRARY_SUFFIX}
     libcrypto-1_1-x64
     libssl-1_1-x64
+    psapi
     tcl86
 )
 

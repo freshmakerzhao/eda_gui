@@ -11,6 +11,7 @@
 #include "service/HardWareManager.h"
 #include "dialog/AdvancedFileDialog.h"
 #include "base/Globals.h"
+#include "widgets/LogWidget.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -539,6 +540,14 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
             // 生成码流结束提示，后续在此扩展
             CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
+        //输出阶段耗时，内存占用
+        LogWidget::instance()->appendLog(
+                msg.phase + "_design:" +
+                " Time (s): elapsed = " + msg.elapsedTime +
+                " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
+                " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
+                );
+        LogWidget::instance()->appendLog(QString("-").repeated(100));
     } else {
         MainWindow::instance()->setRunState(msg.phase + " failed.", false);
         CustomMessageBox::showError(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");

@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "service/PipeServer.h"
 #include "service/LogManager.h"
+#include "utils/MemoryUtilities.h"
 
 struct ProcessMessage {
     QString phase;
@@ -36,12 +37,16 @@ public:
     QString curProjectPath;
     // 开始执行的时间（用于显示）
     QString startTime;
+    // 上个子阶段开始的时间 (用于计算)
+    std::chrono::system_clock::time_point lastTime;
     // 开始执行的时间（用于计算）
     std::chrono::system_clock::time_point startTimeForCal;
     // 结束执行的时间（用于计算）
     std::chrono::system_clock::time_point  endTimeForCal;
     // 执行总用时（用于显示）
     QString elapsedTime;
+    // 上个子阶段的内存占用
+    float lastMemory;
     // partName
     QString partName;
     // displayPart
@@ -67,6 +72,12 @@ public:
      */
     std::string getProperty(const std::string& key);
 
+    //获取时间间隔
+    QString getElapsedTime();
+    //获取进程占用内存峰值
+    float getPeak() const;
+    //获取进程占用内存增加量
+    float getGain();
 private:
     ProcessManager();
     ~ProcessManager();
@@ -74,7 +85,7 @@ private:
     PipeServer &pipeServer; // 成员变量引用
     LogManager &logManager; // 成员变量引用
     void initializePipeServer();            // 初始化管道服务
-
+    MemoryUtilities *memoryUtilities;
 private slots:
     void handleFinished(int exitCode,QProcess::ExitStatus exitStatus);
     void handleChannelReadyReadOutput();
