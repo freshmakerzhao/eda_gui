@@ -14,6 +14,7 @@
 #include "widgets/LogWidget.h"
 #include "widgets/MessageWidget.h"
 #include "component/properties/Properties.h"
+#include "utils/ProcessManager.h"
 
 
 LogManager& LogManager::instance()
@@ -42,8 +43,21 @@ void LogManager::addLog(const LogPipeContent& one_log) {
     QString message = one_log.getMessageContent();
     message = message.trimmed();
 
+   //输出上一个子阶段所占用的cpu和内存资源
+    static QString lastSubPhase = one_log.getSubPhase();
+    if(one_log.getPhase() != lastSubPhase) {
+        LogWidget::instance()->appendLog(
+                "Finished " + lastSubPhase +
+                ": Time (s): elapsed = " + ProcessManager::instance().getElapsedTime() +
+                " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
+                " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
+        );
+        LogWidget::instance()->appendLog(QString("-").repeated(100));
+    }
+    lastSubPhase = one_log.getPhase();
+
     // 同步到logwidget
-    LogWidget::instance()->appendLog(message);
+        LogWidget::instance()->appendLog(message);
 
     if (one_log.getLevelCode() == LevelCode::ALWAYS_LOG) {
         // always_log 不加入message
