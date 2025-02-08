@@ -8,6 +8,7 @@
 #include <utility>
 #include <algorithm>
 #include <QDebug>
+#include "utils/ProjectManager.h"
 // 处理tile颜色、width、height
 std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGridOperations::buildTileInfoMap(const nlohmann::basic_json<>& colorJson){
     std::map<std::string, std::map<std::string, std::map<std::string, int>>> tile_info_map;
@@ -69,12 +70,14 @@ void ChipGridOperations::setColorsToTiles(NormalTile& tile,std::map<std::string,
     }
 }
 
-void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal) {
+void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal, std::string pinsInfoPathLocal) {
     clearVector();
     this->tileColorPath = std::move(tileColorPathLocal);
     this->tileFilePath = std::move(tileFilePathLocal);
+    this->pinsInfoPath = std::move(pinsInfoPathLocal);
     std::ifstream tile_file(this->tileFilePath);
     std::ifstream color_file(this->tileColorPath);
+    std::ifstream pins_file(this->pinsInfoPath);
 
     if (!tile_file) {
         qDebug() << "Could not open tile_file\n";
@@ -84,6 +87,11 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     if (!color_file) {
         qDebug() << "Could not open color_file\n";
         qDebug() << QString::fromStdString(this->tileColorPath);
+        return;
+    }
+    if (!pins_file) {
+        qDebug() << "Could not open pins_file\n";
+        qDebug() << QString::fromStdString(this->pinsInfoPath);
         return;
     }
 
@@ -108,6 +116,12 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     totalSize.width = 0;
     totalSize.height = 0;
 
+    // ================ 获取引脚信息 ================
+
+    nlohmann::json pins_json_data;
+    pins_file >> pins_json_data;
+    pins_file.close(); // 关闭文件
+
     for (const auto& entry : tile_json_data.items()) {
         // 行列是相反的，x是列号，y是行号
         int grid_x = entry.value()["grid_x"];
@@ -123,9 +137,10 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     //  ================ 初始化grid  ================
 
     gridTypeMatrix.resize(totalSize.width, std::vector<NormalTile>(totalSize.height));
+    const std::string device = ProjectManager::instance().getParameter(Project::DisplayPart).toStdString();
 
     for (const auto& entry  : tile_json_data.items()) {
-        NormalTile item(entry.key(),entry.value());
+        NormalTile item(entry.key(), entry.value(), pins_json_data[device]);
         setColorsToTiles(item,tile_info_map);
         gridTypeMatrix[item.grid_x][item.grid_y] = item; // 位置信息与tilegrid中x,y相同
     }
@@ -270,7 +285,8 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                             i,
                             j,
                             site.name,
-                            site.index
+                            site.index,
+                            site.pin
                             );
                         gridMatrix[i][j]->addSubBlock(site_block);
                         size_t pos = site.name.find("_X");
@@ -390,18 +406,32 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 const int GAP = 3 * SITE_GAP;
                 for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
                     NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
-                    if (site.type == "IOB33M" || site.type == "IOB33S") {
-                        SitesBlock* site_block = new SitesIOB33(
+                    if (site.type == "IOB33M") {
+                        SitesBlock *site_block = new SitesIOB33M(
                                 Qt::white,
                                 i,
                                 j,
                                 site.name,
-                                site.index
+                                site.index,
+                                site.pin
                         );
                         gridMatrix[i][j]->addSubBlock(site_block);
                         size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                        site_block->setPos(QPointF(600, SITE_GAP*(index+1) + site_block->getHeight()*index));
+                        siteBlockMap[site.name.substr(0, pos)][site.name] = site_block;
+                        site_block->setPos(QPointF(600, SITE_GAP * (index + 1) + site_block->getHeight() * index));
+                    } else if (site.type == "IOB33S") {
+                            SitesBlock* site_block = new SitesIOB33S(
+                                    Qt::white,
+                                    i,
+                                    j,
+                                    site.name,
+                                    site.index,
+                                    site.pin
+                            );
+                            gridMatrix[i][j]->addSubBlock(site_block);
+                            size_t pos = site.name.find("_X");
+                            siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
+                            site_block->setPos(QPointF(600, SITE_GAP*(index+1) + site_block->getHeight()*index));
                     } else if (site.type == "FIFO18E1") {
                         size_t pos = site.name.find("_X");
                         std::string RAMB36_name = "RAMB36" + site.name.substr(pos, site.name.size()-1);

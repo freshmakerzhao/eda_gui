@@ -16,6 +16,7 @@ BelsBlock::BelsBlock(const QColor &color, int cur_width, int cur_height, int til
 }
 
 bool BelsBlock::isMatches(const std::string &bel_name) {
+    qDebug() << QString::fromStdString(bel_name);
     if(bel_name.size() != name.size())
         return false;
     int count = 0;

@@ -22,7 +22,7 @@
 #include <QStringListModel>
 #include "blocks/Block.h"
 
-FrameView::FrameView(const std::string& tileGridPath, const std::string& tileColorPathLocal,QString projectImplPath,QWidget *parent)
+FrameView::FrameView(const std::string& tileGridPath, const std::string& tileColorPathLocal, const std::string& pinsInfoPathLocal, QString projectImplPath,QWidget *parent)
         :  QWidget(parent), scene(new QGraphicsScene(this))
 {
     this->setWindowIcon(QIcon(":/resource/icon.png"));
@@ -257,7 +257,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 
     // 显示用户当前选择架构
     if (!tileGridPath.empty()){
-        viewer.buildTileGridAndCellsMatrix(tileGridPath, tileColorPathLocal);
+        viewer.buildTileGridAndCellsMatrix(tileGridPath, tileColorPathLocal, pinsInfoPathLocal);
         if (viewer.showGridView(scene)) {
             rightTopBlockName->setEnabled(true);
             rightTopUsage->setEnabled(true);
