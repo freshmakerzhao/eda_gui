@@ -3,46 +3,36 @@
 
 #include <QMessageBox>
 #include <QPushButton>
+#include <QApplication>
 
 class CustomMessageBox : public QMessageBox
 {
+    Q_OBJECT
 public:
-    CustomMessageBox(QWidget *parent = nullptr);
+    CustomMessageBox(QWidget *parent = nullptr);    
 
-    static StandardButton showWarning(QWidget *parent, const QString &title,
-                                          const QString &text, StandardButtons buttons = Ok,
-                                          StandardButton defaultButton = NoButton);
-
-    static StandardButton showInformation(QWidget *parent, const QString &title,
-                                          const QString &text, StandardButtons buttons = Ok,
-                                          StandardButton defaultButton = NoButton);
-
-    static StandardButton showQuestion(
-            QWidget *parent,
-            const QString &title,
-            const QString &text,
-            StandardButtons buttons = Ok,
-            StandardButton defaultButton = NoButton
-    );
-
-    static StandardButton showSuccess(QWidget *parent, const QString &title,
+    static StandardButton information(QWidget *parent, const QString &title,
                                       const QString &text, StandardButtons buttons = Ok,
                                       StandardButton defaultButton = NoButton);
-
-    static StandardButton showError(QWidget *parent, const QString &title,
-                                    const QString &text, StandardButtons buttons = Ok,
-                                    StandardButton defaultButton = NoButton);
-
-
-protected:
-    void resizeEvent(QResizeEvent *event) override;
+    static StandardButton question(QWidget *parent, const QString &title,
+                                   const QString &text, StandardButtons buttons = StandardButtons(Yes | No),
+                                   StandardButton defaultButton = NoButton);
+    static StandardButton warning(QWidget *parent, const QString &title,
+                                  const QString &text, StandardButtons buttons = Ok,
+                                  StandardButton defaultButton = NoButton);
+    static StandardButton critical(QWidget *parent, const QString &title,
+                                   const QString &text, StandardButtons buttons = Ok,
+                                   StandardButton defaultButton = NoButton);
 
 private:
+    static StandardButton showCustomMessage(QWidget *parent, const QString &title, const QString &text,
+                                            Icon icon, StandardButtons buttons, StandardButton defaultButton);
+
     static void setButtonStyleSheet(CustomMessageBox &messageBox);
 
-    static const QString OK_AND_YES_BUTTON_STYLESHEET;
+    static const QString HIGHLIGHT_BUTTON_STYLESHEET;
 
-    static const QString CANCEL_AND_NO_BUTTON_STYLESHEET;
+    static const QString DEFAULT_BUTTON_STYLESHEET;
 };
 
 #endif // CUSTOMMESSAGEBOX_H

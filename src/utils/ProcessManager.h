@@ -13,8 +13,7 @@ struct ProcessMessage {
     QString elapsedTime;
     QString displayPartName;
     QString workPath;
-    QString statusInfo;
-    QString showInfoContent;
+    bool isCancel;
 };
 
 class ProcessManager : public QObject {
@@ -55,6 +54,8 @@ public:
 
     void executeCommand(const QString &phase, const QStringList& command);
 
+    void kill();
+
     /**
      * 初始化环境变量
      */
@@ -74,6 +75,8 @@ private:
     PipeServer &pipeServer; // 成员变量引用
     LogManager &logManager; // 成员变量引用
     void initializePipeServer();            // 初始化管道服务
+
+    bool isCancel = false;
 
 private slots:
     void handleFinished(int exitCode,QProcess::ExitStatus exitStatus);

@@ -83,7 +83,7 @@ bool ProjectManager::createProject(const QString &name,
  */
 bool ProjectManager::startProcess(const QString &hprPath)
 {
-    CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(),
+    CustomMessageBox::StandardButton btn = CustomMessageBox::question(MainWindow::instance(),
                                                                           "Question", "Open this Window?",
                                                                           QMessageBox::Yes | QMessageBox::No);
     if (btn == QMessageBox::Yes) {
@@ -120,7 +120,7 @@ bool ProjectManager::openProject(const QString &hprPath)
 
     Project *newOpenProject = new Project;
     if (!newOpenProject->parseProject(standardHprPath)) {
-        CustomMessageBox::showError(MainWindow::instance(), "Error",
+        CustomMessageBox::critical(MainWindow::instance(), "Error",
                                     "Failed to open project, File parsing error.");
         delete newOpenProject;
         return false;
@@ -213,7 +213,7 @@ void ProjectManager::loadFiles(Project *project)
 void ProjectManager::addSourcesAction()
 {
     if (_project == nullptr) {
-        CustomMessageBox::showQuestion(MainWindow::instance(), "Warning",
+        CustomMessageBox::question(MainWindow::instance(), "Warning",
                                        "Please select or create a project.");
         return;
     }
@@ -387,16 +387,10 @@ void ProjectManager::closeProject()
     FileManager::instance()->cleanFileItems();
     // 清除任务管理器参数
     TaskManager::instance().cleanParams();
-    // 还原主窗口Title
-    MainWindow::instance()->showProjectTitle(1);
-    // 显示起始页
-    MainWindow::instance()->setForm(1);
-    // 重置RunState
-    MainWindow::instance()->resetRunState();
-    // 重新初始化DesignRuns表
-    InfoWidget::instance()->initDesignRunsView();
-    // 更新最近使用工程列表
-    Form::instance()->updateRecent();
+    // 重置窗体
+    MainWindow::instance()->resetUi();
+    // 重置InfoWidget
+    InfoWidget::instance()->resetInfoWidget();
 }
 
 ProjectManager::ProjectManager()

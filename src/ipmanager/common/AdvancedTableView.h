@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : AdvancedTableView.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/11/4
+  ******************************************************************************
+  */
 #ifndef ADVANCEDTABLEVIEW_H
 #define ADVANCEDTABLEVIEW_H
 
@@ -8,6 +17,7 @@
 #include <QComboBox>
 #include <QHeaderView>
 #include <QStandardItemModel>
+#include <QDebug>
 
 class AdvancedTableView : public QTableView {
     Q_OBJECT

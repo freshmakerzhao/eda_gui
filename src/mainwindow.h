@@ -41,12 +41,15 @@ public:
     void setRecentMenu();
     void showIPCatalog();
     void showPrjSummary();
+    void showProperties();
     void setCurrentDock(const int &type); // 跳转到对应的DockWidget
 
     void resizeUi();
 
     void setRunState(const QString &phase, const bool &flag);
     void resetRunState();
+
+    void resetUi();
 
 public slots:
     void onNewTriggered();
@@ -72,7 +75,7 @@ private:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void initMenuStateBar();
+    void initCornerWidget();
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
@@ -126,6 +129,7 @@ private:
     QLabel *movieLabel;
     QImage *completeImage;
     QImage *errorImage;
+    QPushButton *cancelRunButton;
 };
 
 #endif // MAINWINDOW_H

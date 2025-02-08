@@ -144,7 +144,7 @@ QJsonObject PipeServer::parseJsonObject(const QByteArray &data) {
 
 // 解析data信息
 void PipeServer::processDataPipeMessage(const QString &serverName, const QByteArray &data) {
-    // qDebug() << "Received data message from client on" << serverName << ":" << data;
+//    qDebug() << "Received data message from client on" << serverName << ":" << data;
     QJsonObject jsonObj = parseJsonObject(data);
     if (jsonObj.isEmpty()) {
         // 解析失败，通知上层处理

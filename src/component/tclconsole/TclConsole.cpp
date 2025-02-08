@@ -216,7 +216,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
         const std::string errorMessage = "There are no Design Constraints in the project. Please use \"Add Source\" to add files.";
         Tcl_SetResult(interp, const_cast<char*>(errorMessage.c_str()), TCL_STATIC);
         QWidget *parent = QApplication::activeWindow();
-        CustomMessageBox::showError(nullptr, "Run lmplementation", QString::fromStdString(errorMessage));
+        CustomMessageBox::critical(nullptr, "Run lmplementation", QString::fromStdString(errorMessage));
         return TCL_ERROR;
     }
 

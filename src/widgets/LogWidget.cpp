@@ -22,6 +22,11 @@ void LogWidget::appendLog(const QString &str) {
     logTextEdit->appendPlainText(str);
 }
 
+void LogWidget::clearLog()
+{
+    logTextEdit->clear();
+}
+
 LogWidget::LogWidget(QWidget* parent)
     : QWidget(parent)
 {
@@ -49,37 +54,33 @@ void LogWidget::init()
 
     // Widget
     baseWidget = new QWidget;
-    baseWidget->setParent(this);
     baseWidget->setVisible(false);
 
-    QPushButton *backWardBtn = new QPushButton("Backward", baseWidget);
-    QPushButton *forWardBtn = new QPushButton("Forward", baseWidget);
-    QPushButton *clearBtn = new QPushButton("Clear", baseWidget);
+    QPushButton *backwardButton = new QPushButton("Backward");
+    QPushButton *forwardButton = new QPushButton("Forward");
+    QPushButton *clearButton = new QPushButton("Clear");
 
-    QLineEdit *lineEdit = new QLineEdit(this);
+    QLineEdit *lineEdit = new QLineEdit;
     lineEdit->setFixedWidth(250);
 
     QFormLayout *fLayout = new QFormLayout(baseWidget);
     fLayout->setMargin(0);
-    // fLayout->addRow("Search:", lineEdit);
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addWidget(lineEdit);
-    hLayout->addWidget(backWardBtn);
-    hLayout->addWidget(forWardBtn);
-    hLayout->addWidget(clearBtn);
+    hLayout->addWidget(backwardButton);
+    hLayout->addWidget(forwardButton);
+    hLayout->addWidget(clearButton);
     hLayout->addStretch();
     fLayout->addRow("Search:", hLayout);
 
-    logTextEdit = new SearchTextEdit(this);
+    logTextEdit = new SearchTextEdit;
     logTextEdit->setReadOnly(true);
     QVBoxLayout* vlayout = new QVBoxLayout(this);
     vlayout->addWidget(toolBar);
     vlayout->setSpacing(0);
     vlayout->addWidget(baseWidget);
     vlayout->addWidget(logTextEdit);
-    // vlayout->addStretch();
     vlayout->setMargin(0);
-    // vlayout->setSpacing(0);
     searchAction->setCheckable(true);
     connect(searchAction, &QAction::triggered, [this, searchAction](bool) {
         if (baseWidget->isVisible()) {
@@ -91,17 +92,17 @@ void LogWidget::init()
         }
     });
 
-    connect(backWardBtn, &QPushButton::clicked, [=]() {
-        QString s = lineEdit->text();
-        logTextEdit->searchBackward(s);
+    connect(backwardButton, &QPushButton::clicked, [=]() {
+        QString text = lineEdit->text();
+        logTextEdit->searchBackward(text);
     });
 
-    connect(forWardBtn, &QPushButton::clicked, [=]() {
-        QString s = lineEdit->text();
-        logTextEdit->searchForward(s);
+    connect(forwardButton, &QPushButton::clicked, [=]() {
+        QString text = lineEdit->text();
+        logTextEdit->searchForward(text);
     });
 
-    connect(clearBtn, &QPushButton::clicked, [=]() {
+    connect(clearButton, &QPushButton::clicked, [=]() {
         lineEdit->clear();
         logTextEdit->clearHighlight();
     });

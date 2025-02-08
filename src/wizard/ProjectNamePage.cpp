@@ -17,15 +17,15 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
     setSubTitle("Enter a name for your project and specify a directory "
                 "where the project data files will be stored.");
 
-    QLabel *nameLabel = new QLabel("Project name:", this);
-    nameLineEdit = new QLineEdit(this);
+    QLabel *nameLabel = new QLabel("Project name:");
+    nameLineEdit = new QLineEdit;
     nameLineEdit->setClearButtonEnabled(true);
-    nameLineEdit->setText("project_1");
     registerField("projectName*", nameLineEdit);
 
     QLabel *pathLabel = new QLabel("Project path:");
-    pathLineEdit = new QLineEdit(QDir::homePath(), this);
+    pathLineEdit = new QLineEdit(QDir::homePath());
     pathLineEdit->setClearButtonEnabled(true);
+    registerField("projectPath*", pathLineEdit);
 
     nameLineEdit->setText(autoSetName(pathLineEdit->text()));
 
@@ -36,9 +36,20 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
             pathLineEdit->setText(path);
         }
     });
-    registerField("projectPath*", pathLineEdit);
 
-    warningLabel = new QLabel(this);
+    //! Close auto-naming after user input.
+    //! setText() will not trigger this signal.
+    connect(nameLineEdit, &QLineEdit::textEdited, [this]() {
+        enableAutoSetName = false;
+    });
+
+    connect(pathLineEdit, &QLineEdit::textChanged, [this]() {
+        if (enableAutoSetName) {
+            nameLineEdit->setText(autoSetName(pathLineEdit->text()));
+        }
+    });
+
+    warningLabel = new QLabel;
     warningLabel->setStyleSheet("color: red;");
 
     QGridLayout *layout = new QGridLayout(this);

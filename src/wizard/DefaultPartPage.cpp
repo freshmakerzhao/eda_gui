@@ -11,14 +11,13 @@
 #include <QRadioButton>
 #include "DefaultPartPage.h"
 #include "utils/DeviceInfoUtils.h"
-#include "utils/ProjectManager.h"
 
 DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 {
     setTitle("Default Part");
     setSubTitle("Choose a default part for your project.");
 
-    tableView = new QTableView(this);
+    tableView = new QTableView;
     tableView->verticalHeader()->setVisible(false); // 不显示行号
 
     // 启用水平滚动条
@@ -31,15 +30,11 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
 
     // 设置整个表格为只读
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // 设置第一列的宽度为190
-    // tableView->setColumnWidth(0, 190);
 
-    // 设置宽度自适应
-//    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     // 将同一行标记为选中状态
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
     tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
-    // 隐藏第四 第五列 archName/arch/family_name 仅供程序使用，用户无需获取
+    // 隐藏 archName/arch/family_name 仅供程序使用，用户无需获取
     tableView->setColumnHidden(8, true);
     tableView->setColumnHidden(9, true);
     tableView->setColumnHidden(10, true);
@@ -52,11 +47,10 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     proxyModel->setSourceModel(model);
     tableView->setModel(proxyModel);
 
-    lineEdit = new QLineEdit(this);
+    lineEdit = new QLineEdit;
     lineEdit->setClearButtonEnabled(true);
-    lineEdit->setFixedSize(220, 30);
 
-    matchesLabel = new QLabel(this);
+    matchesLabel = new QLabel;
 
     connect(lineEdit, &QLineEdit::textChanged, [proxyModel, this](const QString &text){
         proxyModel->setFilterRegExp(QRegExp(text, Qt::CaseInsensitive, QRegExp::Wildcard));
@@ -75,6 +69,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     hBoxLayout->setMargin(0);
     hBoxLayout->addWidget(lineEdit);
     hBoxLayout->addWidget(matchesLabel);
+    hBoxLayout->addStretch();
 
     QFormLayout *formLayout = new QFormLayout;
     formLayout->addRow("Search:", hBoxLayout);

@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : SearchTextEdit.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/5/6
+  ******************************************************************************
+  */
 #ifndef SEARCHTEXTEDIT_H
 #define SEARCHTEXTEDIT_H
 
@@ -16,12 +25,10 @@ public slots:
     void searchBackward(const QString &text);
     void clearHighlight();
 private:
-    QString m_searchText;
-    QTextCursor m_lastMatchCursor;
+    QString _searchText;
+    QTextCursor _lastMatchCursor;
 
     void highlightMatch(const QTextCursor &cursor);
-
-    // void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif // SEARCHTEXTEDIT_H

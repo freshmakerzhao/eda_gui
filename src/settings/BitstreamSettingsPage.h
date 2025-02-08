@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file           : BitstreamSettingPage.h
+  * @file           : BitstreamSettingsPage.h
   * @author         : zs
   * @description    : None
   * @attention      : None
   * @date           : 2024/12/19
   ******************************************************************************
   */
-#ifndef HYBRDLINK_BITSTREAMSETTINGPAGE_H
-#define HYBRDLINK_BITSTREAMSETTINGPAGE_H
+#ifndef BITSTREAMSETTINGSPAGE_H
+#define BITSTREAMSETTINGSPAGE_H
 
 #include <QWidget>
 #include <QFormLayout>
@@ -22,10 +22,10 @@
 #include <QHBoxLayout>
 #include <QSpacerItem>
 
-class BitstreamSettingPage : public QWidget {
+class BitstreamSettingsPage : public QWidget {
 
 public:
-    BitstreamSettingPage(QWidget *parent = nullptr);
+    BitstreamSettingsPage(QWidget *parent = nullptr);
 
     // 应用设置
     void applySettings();
@@ -39,4 +39,4 @@ private:
     QCheckBox *enable_compress_option;
 };
 
-#endif //HYBRDLINK_BITSTREAMSETTINGPAGE_H
+#endif //BITSTREAMSETTINGSPAGE_H
