@@ -60,26 +60,26 @@ Properties::Properties(QWidget *parent)
     connect(_model, &QStandardItemModel::dataChanged,
             this, &Properties::onDataChanged);
 
-    QString jsonString = R"({
-        "data": {
-            "01100": {
-                "register_name": "CONFIG_STATUS",
-                "register_address": "00111",
-                "hex_value": "0x13631093",
-                "bin_value": "0b00010011011000110001000010010011"
-            }
-        }
-    })";
+    // QString jsonString = R"({
+    //     "data": {
+    //         "01100": {
+    //             "register_name": "CONFIG_STATUS",
+    //             "register_address": "00111",
+    //             "hex_value": "0x13631093",
+    //             "bin_value": "0b00010011011000110001000010010011"
+    //         }
+    //     }
+    // })";
 
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonString.toUtf8());
-    if (jsonDoc.isNull() || !jsonDoc.isObject()) {
-        qDebug() << "Invalid JSON";
-    }
+    // QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonString.toUtf8());
+    // if (jsonDoc.isNull() || !jsonDoc.isObject()) {
+    //     qDebug() << "Invalid JSON";
+    // }
 
-    QJsonObject rootObj = jsonDoc.object();
-    QJsonObject dataObj = rootObj.value("data").toObject();
+    // QJsonObject rootObj = jsonDoc.object();
+    // QJsonObject dataObj = rootObj.value("data").toObject();
 
-    updateHardwareProperties(dataObj);
+    // updateHardwareProperties(dataObj);
 }
 
 Properties::~Properties()

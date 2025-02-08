@@ -501,9 +501,6 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
         MainWindow::instance()->setRunState(msg.phase + " Complete!", false);
         if (msg.phase == "Synthesis"){
             // 综合结束后，读取资源统计信息
-            qDebug() << "============= =========== ==================";
-            qDebug() << msg.workPath;
-            qDebug() << "============= =========== ==================";
             InfoWidget::instance()->updateSynthItem(
                     msg.workPath,
                     msg.phase + " Complete!",
@@ -539,10 +536,18 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
             // 生成码流结束提示，后续在此扩展
             CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
+        return;
+    }
+
+    // Terminate or Fail
+    if (msg.isCancel) {
+        MainWindow::instance()->resetRunState();
     } else {
         MainWindow::instance()->setRunState(msg.phase + " failed.", false);
         CustomMessageBox::critical(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
     }
+
+
 }
 
 // 将命令提交给tcl console

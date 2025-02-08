@@ -64,6 +64,7 @@ void MessageWidget::init()
 
     // 初始化 tree 控件
     treeWidget = new QTreeWidget;
+    treeWidget->setObjectName("MessageTreeWidget");
     // 隐藏标题栏（无分栏）
     treeWidget->setHeaderHidden(true);
 

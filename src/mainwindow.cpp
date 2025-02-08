@@ -178,6 +178,7 @@ void MainWindow::resizeUi()
 void MainWindow::setRunState(const QString &phase, const bool &flag)
 {
     phaseLabel->setVisible(true);
+    cancelRunButton->setVisible(true);
     movieLabel->setVisible(true);
 
     phaseLabel->setText(phase);
