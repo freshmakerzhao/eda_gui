@@ -27,14 +27,15 @@ public:
 signals:
     void SiteClicked(int tile_index_x, int tile_index_y,bool sites_visible_status,int index);
 private:
-    bool showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) override;
-    void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
-    bool getVisibleStatus() override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
-    void setBelShow(bool option);
 protected:
+    void setBelShow(bool option);
+    bool getVisibleStatus() override;
+    bool showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) override;
+    void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
+
     static bool site_visible_status;
     int tile_index_x;
     int tile_index_y;

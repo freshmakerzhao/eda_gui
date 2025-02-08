@@ -29,6 +29,7 @@ class ChipGridOperations : public QMainWindow{
 public:
     std::string tileFilePath;
     std::string tileColorPath;
+    std::string pinsInfoPath;
     TotalSize totalSize;
 
     // 架构信息
@@ -47,7 +48,7 @@ public:
     std::map<std::string, BoundingBox> clock_region_bounding_boxes;
 
     ChipGridOperations();
-    void buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal);
+    void buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal, std::string pinsInfoPathLocal);
     void setSkipTile(int curX, int curY, int height);
     void setColorsToTiles(NormalTile& tile,std::map<std::string, std::map<std::string, std::map<std::string, int>>> colorMap);
 

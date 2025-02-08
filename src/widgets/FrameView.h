@@ -29,7 +29,7 @@ class FrameView  : public QWidget {
 Q_OBJECT
 
 public:
-    FrameView(const std::string& tileGridPath = "", const std::string& tileColorPathLocal = "",QString projectImplPath = "",QWidget *parent = nullptr);
+    FrameView(const std::string& tileGridPath = "", const std::string& tileColorPathLocal = "", const std::string& pinsInfoPathLocal = "", QString projectImplPath = "",QWidget *parent = nullptr);
     bool searchCell(const std::string &cell_name);
     View *view;
 private:

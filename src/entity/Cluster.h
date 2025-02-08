@@ -82,12 +82,13 @@ struct Cluster {
 };
 
 struct NormalSite {
-    NormalSite(std::string  name, std::string  type, int index)
-            : name(std::move(name)), type(std::move(type)), index(index) {
+    NormalSite(std::string  name, std::string  type, std::string pin, int index)
+            : name(std::move(name)), type(std::move(type)), pin(std::move(pin)), index(index) {
     }
     NormalSite() = default;
     std::string name;
     std::string type;
+    std::string pin;
     int index{};
 };
 
@@ -112,7 +113,7 @@ struct NormalTile {
     bool is_multi_rows = false; // 是否跨越多行
     std::vector<NormalSite> cur_sites;
     // 从 JSON 对象构造 NormalTile 实例
-    explicit NormalTile(const std::string& key, const  nlohmann::json& value) {
+    explicit NormalTile(const std::string& key, const  nlohmann::json& value, const nlohmann::json& pins) {
         grid_x = value["grid_x"];
         grid_y = value["grid_y"];
         types = value["type"];
@@ -136,7 +137,11 @@ struct NormalTile {
         for (auto it = sites.begin(); it != sites.end(); ++it) {
             std::string name = it.key();
             std::string type = it.value();
-            NormalSite site(name, type, index);
+            std::string pin = "";
+            if(type == "IOB33" || type == "IOB33M" || type == "IOB33S")
+                if(pins.contains(name))
+                    pin = pins[name]["pin_name"];
+            NormalSite site(name, type, pin, index);
             index++;
             cur_sites.push_back(site);
         }

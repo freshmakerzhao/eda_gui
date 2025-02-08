@@ -138,7 +138,26 @@ public:
 
 class SitesIOB33 : public SitesBlock {
 public:
-    SitesIOB33(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+    SitesIOB33(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index, std::string &pin_name);
+private:
+    void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
+    std::string pin_name;
+};
+
+class SitesIOB33S : public SitesBlock {
+public:
+    SitesIOB33S(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index, std::string &pin_name);
+private:
+    void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
+    std::string pin_name;
+};
+
+class SitesIOB33M : public SitesBlock {
+public:
+    SitesIOB33M(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index, std::string &pin_name);
+private:
+    void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
+    std::string pin_name;
 };
 
 class SitesSliceL : public SitesBlock {
