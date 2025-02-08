@@ -124,6 +124,7 @@ private:
     ads::CDockWidget *IPManagerWidget;
     ads::CDockWidget *PrjSummaryWidget;
 
+    QWidget *cornerWidget;
     QLabel *phaseLabel;
     QMovie *movie;
     QLabel *movieLabel;

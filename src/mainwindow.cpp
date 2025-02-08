@@ -194,6 +194,8 @@ void MainWindow::setRunState(const QString &phase, const bool &flag)
             movieLabel->setScaledContents(true);
         }
     }
+
+    menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
 }
 
 void MainWindow::resetRunState()
@@ -201,6 +203,7 @@ void MainWindow::resetRunState()
     phaseLabel->setVisible(false);
     cancelRunButton->setVisible(false);
     movieLabel->setVisible(false);
+    menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
 }
 
 void MainWindow::resetUi()
@@ -503,7 +506,7 @@ void MainWindow::initCornerWidget()
     completeImage = new QImage(":/icons/resource/icons/25-icon_processing_completed.png");
     errorImage = new QImage(":/icons/resource/icons/16-1icon_error_status.png");
 
-    QWidget *cornerWidget = new QWidget;
+    cornerWidget = new QWidget;
     QHBoxLayout *layout = new QHBoxLayout(cornerWidget);
     layout->setMargin(0);
     phaseLabel = new QLabel();
@@ -539,7 +542,7 @@ void MainWindow::initCornerWidget()
     layout->addSpacing(8);
 
     menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
-    QObject::connect(movie, &QMovie::stateChanged, [cornerWidget, this](QMovie::MovieState state) {
+    QObject::connect(movie, &QMovie::stateChanged, [this](QMovie::MovieState state) {
         (state == QMovie::NotRunning) ? movieLabel->clear() : movieLabel->setMovie(movie);
         (state == QMovie::NotRunning) ? cancelRunButton->setVisible(false) : cancelRunButton->setVisible(true);
         menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
