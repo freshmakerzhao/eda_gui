@@ -37,7 +37,6 @@ void Block::setColor(const QColor &color) {
 
 void Block::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(widget);
-    Q_UNUSED(widget);
 
     if (!getVisibleStatus()){
         return;

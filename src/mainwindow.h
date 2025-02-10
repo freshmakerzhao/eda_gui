@@ -61,8 +61,6 @@ public slots:
     void onSaveAsTriggered();
     void onEditTriggered();
 
-    void onChipPlannerTriggered();
-
     void onDocumentationTriggered();
     void onAboutTriggered();
 
@@ -106,11 +104,7 @@ private:
     QAction *documentation;
     QAction *aboutAction;
 
-    QAction *chipPlannerAction;
-
     QToolBar *toolbar;
-
-    // ChipPlanner chipPlanner;
 
     QDockWidget *NavigationBar;
     QDockWidget *BottomDock;
