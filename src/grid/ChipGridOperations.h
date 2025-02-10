@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QGraphicsScene>
 #include "utils/json.hpp"
-#include "entity/Cluster.h"
+#include "entity/TileGridDataMap.h"
 #include "blocks/Blocks.h"
 #include <QCoreApplication>
 #include <fstream>
