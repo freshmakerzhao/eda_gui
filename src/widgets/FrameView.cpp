@@ -29,17 +29,14 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     view = new View("view");
     //主分割窗口
     QSplitter *splitterMain = new QSplitter(Qt::Horizontal, parent);
+    splitterMain->setHandleWidth(15);
 
     view->view()->setScene(scene);
     splitterMain->addWidget(view);
 
     //右部分割窗口
     QSplitter *splitterRight =new QSplitter(Qt::Vertical, splitterMain);
-    splitterRight->setOpaqueResize(false);
-    //调整尺寸分配
-    QList<int> sizes;
-    sizes << splitterMain->width() - 230 << 230; // 左边窗口200像素，右边窗口占据剩余空间
-    splitterMain->setSizes(sizes);
+
     // 设置拉伸因子，优先拉伸右侧窗口
     splitterMain->setStretchFactor(0, 1);
     splitterMain->setStretchFactor(1, 0);
@@ -55,8 +52,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 
 
     QPushButton* searchButton = new QPushButton("search");
-    searchButton->setFixedWidth(45);
-    searchVLayout->addWidget(new QLabel("Search cell: ", this));
+    searchVLayout->addWidget(new QLabel("Search cell: "));
 
     searchHLayout->addWidget(searchBox);
     searchHLayout->addWidget(searchButton);
@@ -81,7 +77,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 
     // 设置按钮大小不变
     QSize buttonSize = QSize(rightTopUsage->sizeHint().width(), rightTopUsage->sizeHint().height());
-    // right_top_load_arch->setFixedSize(buttonSize);
     rightTopBlockName->setFixedSize(buttonSize);
     rightTopSites->setFixedSize(buttonSize);
     rightTopClockRegion->setFixedSize(buttonSize);
@@ -92,12 +87,10 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     rightTopSites->setEnabled(false);
     rightTopUsage->setEnabled(false);
 
-    // right_top_layout->addWidget(right_top_load_arch, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopBlockName, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopSites, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopClockRegion, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopUsage, 0, Qt::AlignHCenter);
-    // right_top_layout->addWidget(right_top_four, 0, Qt::AlignHCenter);
 
     QWidget *rightBottomWidget = new QWidget(splitterRight);
 
@@ -197,13 +190,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     siteTypeValue = new QLabel;
     NameValue = new QLabel;
     TypeValue = new QLabel;
-    // 设置每个 QLabel 的最小宽度
-    // const int labelMinimumWidth = 150;
-    // tileTypeLabel->setMinimumWidth(labelMinimumWidth);
-    // rowNumLabel->setMinimumWidth(labelMinimumWidth);
-    // colNumLabel->setMinimumWidth(labelMinimumWidth);
-    // siteNameLabel->setMinimumWidth(labelMinimumWidth);
-    // siteTypeLabel->setMinimumWidth(labelMinimumWidth);
 
     tileTypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     rowNumLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
