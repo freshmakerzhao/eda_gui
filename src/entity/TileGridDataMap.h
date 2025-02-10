@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @File           : Cluster.h
+  * @File           : TileGridDataMap.h
   * @Author         : zs
   * @Description    : None
   * @Date           : 23-10-27
   ******************************************************************************
   */
 
-#ifndef CLUSTER_H
-#define CLUSTER_H
+#ifndef TILEGRIDDATAMAP_H
+#define TILEGRIDDATAMAP_H
 #include "utils/json.hpp"
 #include <string>
 #include <utility>
@@ -55,8 +55,8 @@ struct SubItem {
 };
 
 
-struct Cluster {
-    Cluster() = default;
+struct TileGridDataMap {
+    TileGridDataMap() = default;
 
     int x_coordinate{};
     int y_coordinate{};
@@ -65,8 +65,8 @@ struct Cluster {
     std::string label;
     std::vector<SubItem> sub;
 
-    // 从 JSON 对象构造 Cluster 实例
-    Cluster(const nlohmann::basic_json<>& j) {
+    // 从 JSON 对象构造 TileGridDataMap 实例
+    TileGridDataMap(const nlohmann::basic_json<>& j) {
         x_coordinate = j["x_coordinate"];
         y_coordinate = j["y_coordinate"];
         style = j["style"];
