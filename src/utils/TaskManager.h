@@ -109,6 +109,7 @@ private:
 
     QFileSystemWatcher *fileWatcher;
 
+    bool phaseWorkStatus = false; //工作状态
     bool fileChanged = false;
     //! 设计文件被修改的flag
     void onFileChanged();
@@ -132,6 +133,7 @@ public:
 
     void readBackMemory(const QString &rbdFilePath);
     void readBackRegister(const QString &registerAddress);
+    bool getWorkStatus()const;
 
     QString buildBitScript();
 };

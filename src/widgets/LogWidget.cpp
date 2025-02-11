@@ -1,6 +1,7 @@
 #include "LogWidget.h"
 #include "service/PipeServer.h"
 #include "base/Globals.h"
+#include <QDebug>
 
 LogWidget *LogWidget::instance(QWidget *parent)
 {
@@ -11,7 +12,7 @@ LogWidget *LogWidget::instance(QWidget *parent)
     return _instance;
 }
 
-void LogWidget::appendLog(const QString &str) {
+void LogWidget::appendLog(const QString &phaseType, const QString &str) {
     // 获取当前文本光标
 //    QTextCursor cursor = logTextEdit->textCursor();
 //    // 将光标移动到文本末尾(否则会在用户鼠标点击位置插入信息）
@@ -19,23 +20,49 @@ void LogWidget::appendLog(const QString &str) {
 //    logTextEdit->setTextCursor(cursor);
 //    // 插入log
 //    logTextEdit->insertPlainText(str);
-    logTextEdit->appendPlainText(str);
+    std::string phaseTypeDebug = phaseType.toStdString();
+    if(!phaseType.compare("synthesis", Qt::CaseInsensitive)) //不区分大小写比较
+        synthesisLogWidget->logTextEdit->appendPlainText(str.chopped(1));
+    else if(!phaseType.compare("implementation", Qt::CaseInsensitive))
+        implementationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
+    else if(!phaseType.compare("simulation", Qt::CaseInsensitive))
+        simulationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
+
+//    logTextEdit->appendPlainText(str);
+}
+
+void LogWidget::appendLog(const LogPipeContent &one_log) {
+    this->appendLog(one_log.getPhase(), one_log.getMessageContent());
 }
 
 void LogWidget::clearLog()
 {
-    logTextEdit->clear();
+    synthesisLogWidget->logTextEdit->clear();
+    implementationLogWidget->logTextEdit->clear();
+    simulationLogWidget->logTextEdit->clear();
 }
 
 LogWidget::LogWidget(QWidget* parent)
     : QWidget(parent)
 {
-    init();
+    phaseTabWidget = new QTabWidget(this);
+    phaseTabWidget->setTabPosition(QTabWidget::South);//设置标签页在下方
+
+    synthesisLogWidget = new SingleLogWidget("synthesis", this);
+    implementationLogWidget = new SingleLogWidget("implementation", this);
+    simulationLogWidget = new SingleLogWidget("simulation", this);
+
+    phaseTabWidget->addTab(synthesisLogWidget, "Synthesis");
+    phaseTabWidget->addTab(implementationLogWidget, "Implementation");
+    phaseTabWidget->addTab(simulationLogWidget, "Simulation");
+
+    QVBoxLayout* vlayout = new QVBoxLayout(this);
+    vlayout->addWidget(phaseTabWidget);
     // 获取 PipeServer 的单例实例
     PipeServer &pipeServer = PipeServer::instance();
 }
 
-void LogWidget::init()
+SingleLogWidget::SingleLogWidget(const std::string &phase, QWidget* parent)
 {
     QToolBar *toolBar = new QToolBar;
     toolBar->addSeparator();

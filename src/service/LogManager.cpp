@@ -45,19 +45,27 @@ void LogManager::addLog(const LogPipeContent& one_log) {
 
    //输出上一个子阶段所占用的cpu和内存资源
     static QString lastSubPhase = one_log.getSubPhase();
-    if(one_log.getPhase() != lastSubPhase) {
+    static QString lastPhase = one_log.getPhase();
+    QString curSubPhase = one_log.getSubPhase();
+    QString curPhase = one_log.getPhase();
+    if(
+        curSubPhase != lastSubPhase && curPhase == lastPhase &&
+        !( curSubPhase == "pack"  && lastSubPhase == "route")
+    ) {
         LogWidget::instance()->appendLog(
+                lastPhase,
                 "Finished " + lastSubPhase +
                 ": Time (s): elapsed = " + ProcessManager::instance().getElapsedTime() +
                 " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
                 " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
         );
-        LogWidget::instance()->appendLog(QString("-").repeated(100));
+        LogWidget::instance()->appendLog(lastPhase, QString("-").repeated(100));
     }
-    lastSubPhase = one_log.getPhase();
+    lastSubPhase = one_log.getSubPhase();
+    lastPhase = one_log.getPhase();
 
     // 同步到logwidget
-        LogWidget::instance()->appendLog(message);
+        LogWidget::instance()->appendLog(one_log);
 
     if (one_log.getLevelCode() == LevelCode::ALWAYS_LOG) {
         // always_log 不加入message
