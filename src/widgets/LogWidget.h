@@ -14,8 +14,21 @@
 #include <QDebug>
 #include <QApplication>
 #include <QClipboard>
+#include <unordered_map>
 
 #include "SearchTextEdit.h"
+#include "entity/LogPipeContent.h"
+#include <QTabWidget>
+
+
+class SingleLogWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    SingleLogWidget(const std::string &phase, QWidget* parent = nullptr);
+    QWidget* baseWidget;
+    SearchTextEdit *logTextEdit;
+};
 
 class LogWidget : public QWidget
 {
@@ -23,15 +36,16 @@ class LogWidget : public QWidget
 public:
     static LogWidget *instance(QWidget *parent = nullptr);
 
-    void appendLog(const QString& str);
+    void appendLog(const QString &phaseType, const QString& str);
+    void appendLog(const LogPipeContent& one_log);
+    QTabWidget* phaseTabWidget;
 
 private:
     LogWidget(QWidget* parent = nullptr);
 
-    void init();
-
-    QWidget* baseWidget;
-    SearchTextEdit *logTextEdit;
+    SingleLogWidget* synthesisLogWidget;
+    SingleLogWidget* implementationLogWidget;
+    SingleLogWidget* simulationLogWidget;
 
 };
 
