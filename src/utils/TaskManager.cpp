@@ -63,13 +63,15 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         qDebug() << "[TaskManager] arch " << this->arch;
         std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
         std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+        std::string pinsInfoPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/pins_info_" + this->arch.toStdString() + ".json";
         qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
         qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
+        qDebug() << "[TaskManager] pinsInfoPath " << QString::fromStdString(pinsInfoPath);
         if (gridView) {
             delete gridView;  // 删除现存的对象
             gridView = nullptr;  // 确保指针不再指向已删除的对象
         }
-        gridView = new FrameView(tileGridPath,tileColorPath,projectImplPath);
+        gridView = new FrameView(tileGridPath,tileColorPath,pinsInfoPath, projectImplPath);
         gridView->resize(1000, 800);
         gridView->show();
     } else if (mode == 7) {

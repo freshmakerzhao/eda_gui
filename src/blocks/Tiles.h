@@ -4,13 +4,6 @@
 #include "Blocks.h"
 #include <QColor>
 #include <QGraphicsItem>
-#include "Sites.h"
-#include "SitesSliceL.h"
-#include "SitesSliceM.h"
-#include "SitesIOB33.h"
-#include "SitesBUFR.h"
-#include "SitesBUFIO.h"
-#include "SitesIDELAYCTRL.h"
 
 class Tiles : public Blocks
 {
@@ -39,7 +32,7 @@ private:
     int index_x;
     int index_y;
     QColor tile_color;
-    bool tiles_name_visible_status = true;
+    bool tiles_name_visible_status = false;
 
 };
 

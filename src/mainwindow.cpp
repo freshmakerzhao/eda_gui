@@ -282,11 +282,6 @@ void MainWindow::onEditTriggered()
     EditorManager::instance()->editorEdit(op);
 }
 
-void MainWindow::onChipPlannerTriggered()
-{
-    // chipPlanner.show();
-}
-
 void MainWindow::onDocumentationTriggered()
 {
     QString documentDir = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("../documents");
@@ -382,9 +377,6 @@ MainWindow::MainWindow(QWidget *parent)
     helpMenu->addActions({documentation, aboutAction});
     connect(documentation, &QAction::triggered, this, &MainWindow::onDocumentationTriggered);
     connect(aboutAction, &QAction::triggered, this, &MainWindow::onAboutTriggered);
-    // ================= CHIP PLANNER ==================
-    chipPlannerAction = new QAction("ChipPlanner", this);
-    connect(chipPlannerAction, &QAction::triggered, this, &MainWindow::onChipPlannerTriggered);
     // =================== TOOLBAR =====================
     toolbar = new QToolBar("Tools", this);
     QMenu *menu = new QMenu(this);
