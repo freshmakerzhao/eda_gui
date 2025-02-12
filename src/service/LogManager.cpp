@@ -33,49 +33,50 @@ LogManager::LogManager()
 
 LogManager::~LogManager() = default;
 
-void LogManager::addLog(const LogPipeContent& one_log) {
+void LogManager::addLog(const LogPipeContent& oneLog) {
 
-    if (one_log.getMessageContent().isEmpty() || one_log.getPhase().isEmpty() || one_log.getSubPhase().isEmpty()) {
+    if (oneLog.getMessageContent().isEmpty() || oneLog.getPhase().isEmpty() || oneLog.getSubPhase().isEmpty()) {
         qWarning() << "Invalid log data. Skipping entry.";
         return;
     }
 
-    QString message = one_log.getMessageContent();
+    QString message = oneLog.getMessageContent();
     message = message.trimmed();
 
    //输出上一个子阶段所占用的cpu和内存资源
-    static QString lastSubPhase = one_log.getSubPhase();
-    static QString lastPhase = one_log.getPhase();
-    QString curSubPhase = one_log.getSubPhase();
-    QString curPhase = one_log.getPhase();
-    if(
-        curSubPhase != lastSubPhase && curPhase == lastPhase &&
-        !( curSubPhase == "pack"  && lastSubPhase == "route")
-    ) {
-        LogWidget::instance()->appendLog(
-                lastPhase,
-                "Finished " + lastSubPhase +
-                ": Time (s): elapsed = " + ProcessManager::instance().getElapsedTime() +
-                " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
-                " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
-        );
-        LogWidget::instance()->appendLog(lastPhase, QString("-").repeated(100));
+    static QString lastSubPhase = oneLog.getSubPhase();
+    static QString lastPhase = oneLog.getPhase();
+    QString curSubPhase = oneLog.getSubPhase();
+    QString curPhase = oneLog.getPhase();
+    if(curSubPhase != lastSubPhase && curPhase == lastPhase) {
+        if(firstSubPhaseStatus) {
+            firstSubPhaseStatus = false;
+        } else {
+            LogWidget::instance()->appendLog(
+                    lastPhase,
+                    "Finished " + lastSubPhase +
+                    ": Time (s): elapsed = " + ProcessManager::instance().getElapsedTime() +
+                    " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
+                    " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
+            );
+            LogWidget::instance()->appendLog(lastPhase, QString("-").repeated(100));
+        }
     }
-    lastSubPhase = one_log.getSubPhase();
-    lastPhase = one_log.getPhase();
+    lastSubPhase = oneLog.getSubPhase();
+    lastPhase = oneLog.getPhase();
 
     // 同步到logwidget
-        LogWidget::instance()->appendLog(one_log);
+        LogWidget::instance()->appendLog(oneLog);
 
-    if (one_log.getLevelCode() == LevelCode::ALWAYS_LOG) {
+    if (oneLog.getLevelCode() == LevelCode::ALWAYS_LOG) {
         // always_log 不加入message
         return;
     }
 
     // ==================== 存储日志 =======================
     // 特殊阶段（synth、program）处理
-    if (one_log.getPhase() == "SYNTHESIS" || one_log.getPhase() == "PROGRAM_AND_DEBUG") {
-        QMap<QString, QStringList> &phaseMessages = log_storage[one_log.getPhase()];
+    if (oneLog.getPhase() == "SYNTHESIS" || oneLog.getPhase() == "PROGRAM_AND_DEBUG") {
+        QMap<QString, QStringList> &phaseMessages = log_storage[oneLog.getPhase()];
         QStringList &messages = phaseMessages[""]; // 特殊阶段不区分 sub_phase
         messages.append(message);
         return;
@@ -83,8 +84,8 @@ void LogManager::addLog(const LogPipeContent& one_log) {
 
     // 其他阶段处理
     QMap<QString, QMap<QString, QStringList>> &logStorage = log_storage;
-    QMap<QString, QStringList> &phaseMessages = logStorage[one_log.getPhase()];
-    QStringList &subPhaseMessages = phaseMessages[one_log.getSubPhase()];
+    QMap<QString, QStringList> &phaseMessages = logStorage[oneLog.getPhase()];
+    QStringList &subPhaseMessages = phaseMessages[oneLog.getSubPhase()];
     subPhaseMessages.append(message);
     // ==================== 存储日志 =======================
 }

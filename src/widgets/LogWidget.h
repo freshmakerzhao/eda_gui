@@ -38,17 +38,19 @@ public:
 
     void appendLog(const QString &phaseType, const QString& str);
     void appendLog(const LogPipeContent& one_log);
-    QTabWidget* phaseTabWidget;
+    void switchSynLog();
+    void switchImpLog();
+    void switchSimLog();
 
     void clearLog();
 
 private:
     LogWidget(QWidget* parent = nullptr);
 
+    QTabWidget* phaseTabWidget;
     SingleLogWidget* synthesisLogWidget;
     SingleLogWidget* implementationLogWidget;
     SingleLogWidget* simulationLogWidget;
-
 };
 
 

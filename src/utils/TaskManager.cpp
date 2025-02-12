@@ -36,7 +36,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         taskController(0);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-        LogWidget::instance()->phaseTabWidget->setCurrentIndex(0); //使log选中synthesis选项
+        LogWidget::instance()->switchSynLog(); //使log选中synthesis选项
     } else if (mode == 1) {
         // synthReport();
     } else if (mode == 2) {
@@ -44,7 +44,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         taskController(2);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
-        LogWidget::instance()->phaseTabWidget->setCurrentIndex(1); //使log选中implmentation选项
+        LogWidget::instance()->switchImpLog(); //使log选中implmentation选项
     } else if (mode == 3) {
 //        buildPack();
         // 激活 log 窗口
@@ -188,7 +188,6 @@ void TaskManager::taskController(const int mode) {
                     QString arguments = buildSynthScript();
                     publishScript(projectSynthPath,arguments);
                     fileChanged = false;
-                    phaseWorkStatus = true;
                     return;
                 } else {
                     // 取消操作
@@ -209,7 +208,6 @@ void TaskManager::taskController(const int mode) {
                     QString arguments = buildSynthScript();
                     publishScript(projectSynthPath,arguments);
                     fileChanged = false;
-                    phaseWorkStatus = true;
                     return;
                 } else {
                     // 取消操作
@@ -224,7 +222,6 @@ void TaskManager::taskController(const int mode) {
             QString arguments = buildSynthScript();
             publishScript(projectSynthPath,arguments);
             fileChanged = false;
-            phaseWorkStatus = true;
             return;
         }
     } else if (mode == 2){
@@ -254,7 +251,6 @@ void TaskManager::taskController(const int mode) {
                         setNextPhaseParam("implementation", projectImplPath, implScript);
                         publishScript(projectSynthPath,synthScript);
                         fileChanged = false;
-                        phaseWorkStatus = true;
                         return;
                     } else {
                         // 不操作
@@ -274,7 +270,6 @@ void TaskManager::taskController(const int mode) {
                         QString implScript = buildImpScript();
                         publishScript(projectImplPath,implScript);
                         fileChanged = false;
-                        phaseWorkStatus = true;
                         return;
                     } else {
                         // 不操作
@@ -305,7 +300,6 @@ void TaskManager::taskController(const int mode) {
                         // 执行综合
                         publishScript(projectSynthPath,synthScript);
                         fileChanged = false;
-                        phaseWorkStatus = true;
                         return;
                     } else {
                         // 不操作
@@ -319,7 +313,6 @@ void TaskManager::taskController(const int mode) {
                     QString implScript = buildImpScript();
                     publishScript(projectImplPath,implScript);
                     fileChanged = false;
-                    phaseWorkStatus = true;
                     return;
                 }
             }
@@ -343,7 +336,6 @@ void TaskManager::taskController(const int mode) {
                 setNextPhaseParam("implementation", projectImplPath, implScript);
                 publishScript(projectSynthPath,synthScript);
                 fileChanged = false;
-                phaseWorkStatus = true;
                 return;
             } else {
                 // 取消操作
@@ -570,7 +562,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
         MainWindow::instance()->setRunState(msg.phase + " failed.", false);
         CustomMessageBox::critical(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
     }
-    phaseWorkStatus = false;
+    LogManager::instance().firstSubPhaseStatus = true;
 }
 
 // 将命令提交给tcl console
@@ -604,8 +596,4 @@ void TaskManager::initMessageStatus() {
     this->_nextPhase = nullptr;
     this->_nextWorkPath = nullptr;
     this->_nextTclCommand = nullptr;
-}
-
-bool TaskManager::getWorkStatus() const {
-    return phaseWorkStatus;
 }
