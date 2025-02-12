@@ -137,3 +137,14 @@ SingleLogWidget::SingleLogWidget(const std::string &phase, QWidget* parent)
         QApplication::clipboard()->setText(logTextEdit->toPlainText());
     });
 }
+void LogWidget::switchSynLog() {
+    this->phaseTabWidget->setCurrentIndex(0);
+}
+
+void LogWidget::switchImpLog() {
+    this->phaseTabWidget->setCurrentIndex(1);
+}
+
+void LogWidget::switchSimLog() {
+    this->phaseTabWidget->setCurrentIndex(2);
+}
