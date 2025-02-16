@@ -1,13 +1,41 @@
+/**
+  ******************************************************************************
+  * @file           : TaskManager.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/3/4
+  ******************************************************************************
+  */
 #ifndef TASKMANAGER_H
 #define TASKMANAGER_H
 
 #include <QTreeWidget>
+#include <QQueue>
 #include <QDebug>
 #include <QFileSystemWatcher>
 #include "utils/ProjectManager.h"
-#include "settings/SettingsDialog.h"
-#include "dialog/CustomMessageBox.h"
 #include "ProcessManager.h"
+
+namespace FlowState {
+    static const QString NoStarted   = QStringLiteral("NoStarted");
+    static const QString NoAvailable = QStringLiteral("NoAvailable");
+    static const QString OutOfDate   = QStringLiteral("OutOfDate");
+    static const QString Complete    = QStringLiteral("Complete");
+    static const QString Fail        = QStringLiteral("Fail");
+}
+
+namespace FlowPhase {
+    static const QString Synthsis          = QStringLiteral("State/Synthsis");
+    static const QString Implementation    = QStringLiteral("State/Implementation");
+    static const QString GenerateBitstream = QStringLiteral("State/GenerateBitstream");
+}
+
+enum class FlowTask {
+    Synthesis,
+    Implementation,
+    WriteBitstream
+};
 
 class TaskManager : public QObject
 {
@@ -22,19 +50,10 @@ public:
      */
     void setParams(const QMap<Project::ParamKey, QString> &params);
 
-    /**
-     * 任务分配器
-     * @param mode 待执行任务
-     */
-    void taskController(const int mode);
+    //! Create state machine record file.
+    void initStateMachine();
 
-    // 两个选项的弹窗，true 左侧，false 右侧
-    bool twoOptionMsg(
-            const QString &title,
-            const QString &text,
-            QMessageBox::StandardButton buttonLeft,
-            QMessageBox::StandardButton buttonRight
-    );
+    void flowTaskController(const int &mode);
 
     /**
      * 关闭工程清除参数
@@ -50,7 +69,6 @@ public:
     //! 移除受监控的文件
     void removeWatchFile(const QString &filePath);
 
-//    QStringList sourceList;
     // 存储设计，约束文件与仿真激励文件
     QList<QString> sourcePathList;
     QList<QString> constraintPathList;
@@ -85,46 +103,31 @@ private:
     // family name xc7
     QString familyName = "xc7";
 
-    // 是否显示综合成功弹窗
-    bool _showSynthSuccessMsg = true;
-    // 是否显示布局布线成功弹窗
-    bool _showImplementSuccessMsg = true;
-    // 是否显示生成码流成功弹窗
-    bool _showGenBitSuccessMsg = true;
-    // 综合之后是否要执行implement
-    bool _hasNextImplementProcess = false;
-
 private:
     TaskManager();
     ~TaskManager();
 
-    QTreeWidget *taskTree;
-
     QString buildSynthScript();
     QString buildImpScript();
-    void buildBit(int mode);
+    QString buildBitScript();
     QString buildSimScript();
-
-    // SettingsDialog *settingDialog = nullptr;
 
     QFileSystemWatcher *fileWatcher;
 
     bool fileChanged = false;
-    //! 设计文件被修改的flag
+
+    //! Modifications to the sources will trigger the state machine update.
     void onFileChanged();
-    // 将命令提交给tcl console
-    void publishScript(const QString &workPath, const QString &tclCommand);
 
-    void setNextPhaseParam(const QString &nextPhase, const QString &nextWorkPath, const QString &nextTclCommand);
-    void setSynthSuccessMsgStatus(bool status);
-    void setImplementSuccessMsgStatus(bool status);
-    void setNextImplementProcessStatus(bool status);
-    void initMessageStatus();
+    QQueue<FlowTask> flowTaskQueue;
 
-    // 下一阶段使用的命令
-    QString _nextPhase = nullptr;
-    QString _nextWorkPath = nullptr;
-    QString _nextTclCommand = nullptr;
+    void handleFlowTaskQueue();
+
+    bool _isShowSuccessMessage = true;
+
+    void handleSynthClick();
+    void handleImplClick();
+    void handleGenBitClick();
 public:
     void downloadBit(const QString &bitstream, const QString &cable_name = "digilent_hs3");
     void downloadFlash(const QString &projectImplPath1, const QString &topName1);
@@ -133,7 +136,7 @@ public:
     void readBackMemory(const QString &rbdFilePath);
     void readBackRegister(const QString &registerAddress);
 
-    QString buildBitScript();
+
 };
 
 #endif // TASKMANAGER_H

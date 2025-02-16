@@ -128,6 +128,7 @@ bool ProjectManager::openProject(const QString &hprPath)
     ProjectManager::instance().loadFiles(newOpenProject);
     InfoWidget::instance()->initDesignRunsView(newOpenProject->getParameter(Project::Path));
     TaskManager::instance().setWatchFiles();
+    TaskManager::instance().initStateMachine();
 
     // 更新 Recent Projects 列表
     RecentService::writeRecentProject(standardHprPath);
