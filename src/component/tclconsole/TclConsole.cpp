@@ -22,10 +22,10 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setMargin(0);
 
-    output = new OutputEditor(this);
+    output = new OutputEditor;
     layout->addWidget(output);
 
-    input = new LineEditor(this);
+    input = new LineEditor;
     layout->addWidget(input);
 
     connect(input, &LineEditor::textLineInserted, this, &TclConsole::onCommandEnter);
@@ -64,9 +64,9 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     Tcl_CreateCommand(interp, "synth_design", TclSynthCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "auto_connect", TclHardwareCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "impl_design", TclImplCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "pack_design", TclImplCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "place_design", TclImplCmd, nullptr, nullptr);
-    Tcl_CreateCommand(interp, "route_design", TclImplCmd, nullptr, nullptr);
+    // Tcl_CreateCommand(interp, "pack_design", TclImplCmd, nullptr, nullptr);
+    // Tcl_CreateCommand(interp, "place_design", TclImplCmd, nullptr, nullptr);
+    // Tcl_CreateCommand(interp, "route_design", TclImplCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "update_fileset", TclUpdateFileSetCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "write_bitstream", TclWriteBitstreamCmd, nullptr, nullptr);
     Tcl_CreateCommand(interp, "sim_design", TclSimCmd, nullptr, nullptr);
@@ -75,14 +75,11 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
 TclConsole::~TclConsole() {
     Tcl_DeleteInterp(interp);
     delete channelType;
-    //    process->deleteLater();
 }
 
 void TclConsole::onCommandEnter(QString text) {
     QString command = text;
-    // if (!command.isEmpty()) {
     executeTclCommand(command);
-    // }
 }
 
 int TclConsole::QtTclOutput(ClientData clientData, const char *buf, int toWrite, int *errorCodePtr) {
@@ -456,7 +453,7 @@ int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, c
     scriptSimRun << configWaveFullFilePath;
 
     // generating command finish.
-    QString info = QString("Starting sim_design\n");
+    QString info = QString("Starting sim_design");
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
     //  设置路径
     ProcessManager::instance().configWorkPath(simPath);
@@ -632,7 +629,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
             script << "--rbt";
     }
 
-    QString info = "Starting Generate Bitstream Task\n";
+    QString info = "Starting Generate Bitstream Task";
     Tcl_SetResult(interp, const_cast<char*>(info.toStdString().c_str()), TCL_VOLATILE);
 
     const QString phase = "Generate Bitstream";
