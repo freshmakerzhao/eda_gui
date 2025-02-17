@@ -28,6 +28,7 @@ public:
     SingleLogWidget(const std::string &phase, QWidget* parent = nullptr);
     QWidget* baseWidget;
     SearchTextEdit *logTextEdit;
+    bool pauseStatus=false;
 };
 
 class LogWidget : public QWidget

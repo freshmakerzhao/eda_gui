@@ -21,11 +21,11 @@ void LogWidget::appendLog(const QString &phaseType, const QString &str) {
 //    // 插入log
 //    logTextEdit->insertPlainText(str);
     std::string phaseTypeDebug = phaseType.toStdString();
-    if(!phaseType.compare("synthesis", Qt::CaseInsensitive)) //不区分大小写比较
+    if(!phaseType.compare("synthesis", Qt::CaseInsensitive) && !synthesisLogWidget->pauseStatus) //不区分大小写比较
         synthesisLogWidget->logTextEdit->appendPlainText(str.chopped(1));
-    else if(!phaseType.compare("implementation", Qt::CaseInsensitive))
+    else if(!phaseType.compare("implementation", Qt::CaseInsensitive) && !implementationLogWidget->pauseStatus)
         implementationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
-    else if(!phaseType.compare("simulation", Qt::CaseInsensitive))
+    else if(!phaseType.compare("simulation", Qt::CaseInsensitive) && !simulationLogWidget->pauseStatus)
         simulationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
 
 //    logTextEdit->appendPlainText(str);
@@ -62,6 +62,9 @@ SingleLogWidget::SingleLogWidget(const std::string &phase, QWidget* parent)
     QAction *searchAction = new QAction(QIcon(":/icons/resource/icons/9-icon_search.png"),"Search", this);
     // searchAction->setIcon(QIcon(":/resource/search.ico"));
     toolBar->addAction(searchAction);
+    toolBar->addSeparator();
+    QAction *pauseAction = new QAction(QIcon(":/icons/resource/icons/12-3icon_pause.png"),"Pause", this);
+    toolBar->addAction(pauseAction);
     toolBar->addSeparator();
     QAction *cleanAction = new QAction(QIcon(":/icons/resource/icons/15-icon_discard.png"),"Clean", this);
     // cleanAction->setIcon(QIcon(":/resource/clean.ico"));
@@ -113,6 +116,17 @@ SingleLogWidget::SingleLogWidget(const std::string &phase, QWidget* parent)
         } else {
             baseWidget->setVisible(true);
             searchAction->setChecked(true);
+        }
+    });
+
+    pauseAction->setCheckable(true);
+    connect(pauseAction, &QAction::triggered, [this, pauseAction](bool) {
+        if (pauseStatus) {
+            pauseAction->setChecked(false);
+            pauseStatus = false;
+        } else {
+            pauseAction->setChecked(true);
+            pauseStatus = true;
         }
     });
 
