@@ -1,16 +1,21 @@
-#include "TextEditorSettingPage.h"
+/**
+  ******************************************************************************
+  * @file           : TextEditorSettingsPage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2025/1/11
+  ******************************************************************************
+  */
+#include "TextEditorSettingsPage.h"
 
-TextEditorSettingPage::TextEditorSettingPage(QWidget *parent)
+TextEditorSettingsPage::TextEditorSettingsPage(QWidget *parent)
     : QWidget(parent)
 {
-    this->setObjectName("TextEditorSettingPage");
-    setStyleSheet("#TextEditorSettingPage { background-image: url(:/resource/white.png); }"
-                  "#TextEditorSettingPage { border:4px solid #DCDCDC; }"
-                  );
+    setObjectName("TextEditorSettingsPage");
 
     QLabel *label = new QLabel("<b>Text Editor</b><br> You need to restart the Text Editor to apply these settings.", this);
-    label->setStyleSheet("border-bottom: 3px dashed #DCDCDC;"
-                         "border-radius: 0px;");
+    label->setObjectName("SettingsPageTitleLabel");
     label->setWordWrap(true);
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
     hBoxLayout->addWidget(label);
@@ -28,7 +33,7 @@ TextEditorSettingPage::TextEditorSettingPage(QWidget *parent)
     formLayout->addRow("Encoding:", encodingComboBox);
 }
 
-void TextEditorSettingPage::setEncoding()
+void TextEditorSettingsPage::setEncoding()
 {
     QSettings settings("HybrdChip", "HybrdLink");
     settings.setValue("TextEditor/encoding", encodingComboBox->currentText());

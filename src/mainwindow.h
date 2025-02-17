@@ -41,12 +41,15 @@ public:
     void setRecentMenu();
     void showIPCatalog();
     void showPrjSummary();
+    void showProperties();
     void setCurrentDock(const int &type); // 跳转到对应的DockWidget
 
     void resizeUi();
 
     void setRunState(const QString &phase, const bool &flag);
     void resetRunState();
+
+    void resetUi();
 
 public slots:
     void onNewTriggered();
@@ -57,8 +60,6 @@ public slots:
     void onSaveTriggered();
     void onSaveAsTriggered();
     void onEditTriggered();
-
-    void onChipPlannerTriggered();
 
     void onDocumentationTriggered();
     void onAboutTriggered();
@@ -72,7 +73,7 @@ private:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void initMenuStateBar();
+    void initCornerWidget();
 
     QMenuBar *menuBar;
     QMenu *fileMenu;
@@ -103,11 +104,7 @@ private:
     QAction *documentation;
     QAction *aboutAction;
 
-    QAction *chipPlannerAction;
-
     QToolBar *toolbar;
-
-    // ChipPlanner chipPlanner;
 
     QDockWidget *NavigationBar;
     QDockWidget *BottomDock;
@@ -121,11 +118,13 @@ private:
     ads::CDockWidget *IPManagerWidget;
     ads::CDockWidget *PrjSummaryWidget;
 
+    QWidget *cornerWidget;
     QLabel *phaseLabel;
     QMovie *movie;
     QLabel *movieLabel;
     QImage *completeImage;
     QImage *errorImage;
+    QPushButton *cancelRunButton;
 };
 
 #endif // MAINWINDOW_H

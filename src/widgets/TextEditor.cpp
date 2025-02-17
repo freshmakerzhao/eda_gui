@@ -139,7 +139,7 @@ bool TextEditor::saveFile()
         QFileInfo fileInfo(file);
         if (!fileInfo.isWritable()) {
             // 提示用户文件只读
-            CustomMessageBox::showWarning(MainWindow::instance(), "Warning",
+            CustomMessageBox::warning(MainWindow::instance(), "Warning",
                                  "The file is read-only. Writing operation failed.");
             return false;
         }

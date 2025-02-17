@@ -19,14 +19,14 @@
 #include "dialog/CustomMessageBox.h"
 #include "utils/ProjectManager.h"
 #include "entity/XmlRecent.h"
-#include "utils/XmlUtilities.h"
-#include "base/InitialConfig.h"
+#include "utils/ProcessManager.h"
 #include "ipmanager/IPManager.h"
 #include "widgets/ProjectSummary.h"
 #include "dialog/AdvancedFileDialog.h"
 #include "base/TreeViewBase.h"
 #include "base/Globals.h"
 #include "service/RecentService.h"
+#include "component/properties/Properties.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -142,6 +142,11 @@ void MainWindow::showPrjSummary()
     // PrjSummaryWidget->show();
 }
 
+void MainWindow::showProperties()
+{
+    PropertiesWidget->toggleView(true);
+}
+
 void MainWindow::setCurrentDock(const int &type)
 {
     switch (type) {
@@ -172,12 +177,10 @@ void MainWindow::resizeUi()
 
 void MainWindow::setRunState(const QString &phase, const bool &flag)
 {
-    if (!phaseLabel->isVisible()) {
-        phaseLabel->show();
-    }
-    if (!movieLabel->isVisible()) {
-        movieLabel->show();
-    }
+    phaseLabel->setVisible(true);
+    cancelRunButton->setVisible(true);
+    movieLabel->setVisible(true);
+
     phaseLabel->setText(phase);
     if (flag) {
         movie->start();
@@ -191,12 +194,33 @@ void MainWindow::setRunState(const QString &phase, const bool &flag)
             movieLabel->setScaledContents(true);
         }
     }
+
+    menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
 }
 
 void MainWindow::resetRunState()
 {
-    phaseLabel->hide();
-    movieLabel->hide();
+    phaseLabel->setVisible(false);
+    cancelRunButton->setVisible(false);
+    movieLabel->setVisible(false);
+    menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
+}
+
+void MainWindow::resetUi()
+{
+    // 显示起始页
+    setForm(1);
+    // 更新最近使用工程列表
+    Form::instance()->updateRecent();
+    // 重置 RunState
+    resetRunState();
+    // 默认显示Summary
+    PrjSummaryWidget->toggleView(true);
+    PrjSummaryWidget->setAsCurrentTab();
+    // 默认隐藏Properties
+    PropertiesWidget->toggleView(false);
+    // 还原主窗口Title
+    showProjectTitle(1);
 }
 
 void MainWindow::onNewTriggered()
@@ -258,11 +282,6 @@ void MainWindow::onEditTriggered()
     EditorManager::instance()->editorEdit(op);
 }
 
-void MainWindow::onChipPlannerTriggered()
-{
-    // chipPlanner.show();
-}
-
 void MainWindow::onDocumentationTriggered()
 {
     QString documentDir = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("../documents");
@@ -279,7 +298,7 @@ void MainWindow::onAboutTriggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (EditorManager::instance()->isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(this,
+        CustomMessageBox::StandardButton btn = CustomMessageBox::question(this,
                                                                               "Warning", "There are unsaved files, are you sure you want to close?",
                                                                               QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::Yes) {
@@ -358,9 +377,6 @@ MainWindow::MainWindow(QWidget *parent)
     helpMenu->addActions({documentation, aboutAction});
     connect(documentation, &QAction::triggered, this, &MainWindow::onDocumentationTriggered);
     connect(aboutAction, &QAction::triggered, this, &MainWindow::onAboutTriggered);
-    // ================= CHIP PLANNER ==================
-    chipPlannerAction = new QAction("ChipPlanner", this);
-    connect(chipPlannerAction, &QAction::triggered, this, &MainWindow::onChipPlannerTriggered);
     // =================== TOOLBAR =====================
     toolbar = new QToolBar("Tools", this);
     QMenu *menu = new QMenu(this);
@@ -432,9 +448,10 @@ MainWindow::MainWindow(QWidget *parent)
     // SourcesWidget->setWidget(FileManager::instance());
     SourcesWidget->setWidget(new TreeViewBase(FileManager::instance()));
 
-//    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
-//    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget,SourcesWidget->dockAreaWidget());
-//    PropertiesWidget->setWidget(new QLabel("This is a test"));
+    PropertiesWidget = new ads::CDockWidget("Properties", DockManager);
+    DockManager->addDockWidget(ads::BottomDockWidgetArea, PropertiesWidget);
+    PropertiesWidget->setWidget(Properties::instance());
+    PropertiesWidget->toggleView(false);
 
     EditWidget = new ads::CDockWidget("Text Editor", DockManager);
     DockManager->addDockWidget(ads::RightDockWidgetArea, EditWidget);
@@ -452,7 +469,7 @@ MainWindow::MainWindow(QWidget *parent)
     viewMenu->addAction(ManagerDock->toggleViewAction());
     viewMenu->addSeparator();
     viewMenu->addAction(SourcesWidget->toggleViewAction());
-//    viewMenu->addAction(PropertiesWidget->toggleViewAction());
+    viewMenu->addAction(PropertiesWidget->toggleViewAction());
     viewMenu->addAction(EditWidget->toggleViewAction());
 
     IPManagerWidget = new ads::CDockWidget("IP Catalog", DockManager);
@@ -466,10 +483,9 @@ MainWindow::MainWindow(QWidget *parent)
     DockManager->addDockWidgetTab(ads::RightDockWidgetArea, PrjSummaryWidget);
     PrjSummaryWidget->setWidget(ProjectSummary::instance());
 
-    PrjSummaryWidget->setMinimumSize(770, 10);
-    SourcesWidget->setMinimumSize(40, 10);
+    SourcesWidget->setMinimumWidth(400);
 
-    initMenuStateBar();
+    initCornerWidget();
 }
 
 MainWindow::~MainWindow()
@@ -477,37 +493,57 @@ MainWindow::~MainWindow()
     qDebug() << "[MainWindow] Distructing...";
 }
 
-void MainWindow::initMenuStateBar()
+void MainWindow::initCornerWidget()
 {
     completeImage = new QImage(":/icons/resource/icons/25-icon_processing_completed.png");
     errorImage = new QImage(":/icons/resource/icons/16-1icon_error_status.png");
 
-    QWidget *cornerWidget = new QWidget;
+    cornerWidget = new QWidget;
     QHBoxLayout *layout = new QHBoxLayout(cornerWidget);
     layout->setMargin(0);
     phaseLabel = new QLabel();
-    phaseLabel->setAlignment(Qt::AlignRight);
-    phaseLabel->setMinimumWidth(300);
-    phaseLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    phaseLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    // phaseLabel->setMinimumWidth(300);
+    // phaseLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    const int menuBarInternalHeight = menuBar->heightForWidth(menuBar->width());
+    const int movieLabelHeight = menuBarInternalHeight * 0.7;
 
     movie = new QMovie(":/resource/gif/spinner.gif");
-    movie->setScaledSize(QSize(menuBar->height() - 6, menuBar->height() - 6));
+    movie->setScaledSize(QSize(movieLabelHeight, movieLabelHeight));
     movieLabel = new QLabel();
-    movieLabel->setMargin(3);
-    movieLabel->setFixedSize(menuBar->height(), menuBar->height());
+    movieLabel->setAlignment(Qt::AlignCenter);
+    // movieLabel->setMargin(3);
+    movieLabel->setFixedSize(movieLabelHeight, movieLabelHeight);
     movieLabel->setMovie(movie);
 
-    layout->addWidget(phaseLabel, 0, Qt::AlignRight);
-    layout->addWidget(movieLabel, 0, Qt::AlignRight);
+    cancelRunButton = new QPushButton("Cancel");
+    cancelRunButton->setVisible(false);
+    cancelRunButton->setStyleSheet("QPushButton { "
+                                   "border: none; "
+                                   "color: rgb(22, 97, 247); "
+                                   "background-color: transparent; "
+                                   "text-align: left; "
+                                   "} "
+                                   "QPushButton:hover { text-decoration: underline; }");
+
+    layout->addWidget(phaseLabel, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(cancelRunButton, 0, Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(movieLabel, 0, Qt::AlignRight | Qt::AlignVCenter);
     layout->addStretch();
     layout->addSpacing(8);
 
     menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
     QObject::connect(movie, &QMovie::stateChanged, [this](QMovie::MovieState state) {
         (state == QMovie::NotRunning) ? movieLabel->clear() : movieLabel->setMovie(movie);
+        (state == QMovie::NotRunning) ? cancelRunButton->setVisible(false) : cancelRunButton->setVisible(true);
+        menuBar->setCornerWidget(cornerWidget, Qt::TopRightCorner);
     });
 
     movieLabel->setScaledContents(true);
+
+    QObject::connect(cancelRunButton, &QPushButton::clicked, &ProcessManager::instance(), &ProcessManager::kill);
+
 }
 
 void MainWindow::onClearTriggered() {
