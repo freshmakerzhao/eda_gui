@@ -31,6 +31,12 @@ void LogWidget::appendLog(const QString &phaseType, const QString &str) {
 //    logTextEdit->appendPlainText(str);
 }
 
+void LogWidget::clearLog() {
+    synthesisLogWidget->logTextEdit->clear();
+    implementationLogWidget->logTextEdit->clear();
+    simulationLogWidget->logTextEdit->clear();
+}
+
 void LogWidget::appendLog(const LogPipeContent &one_log) {
     this->appendLog(one_log.getPhase(), one_log.getMessageContent());
 }

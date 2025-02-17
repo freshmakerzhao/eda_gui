@@ -180,15 +180,15 @@ void ProcessManager::kill()
 
         if (proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0) {
             // taskkill 成功执行
-            LogWidget::instance()->appendLog("Process terminated successfully.");
+            LogWidget::instance()->appendLog(curPhase, "Process terminated successfully.");
             qDebug() << outputStr;
         } else {
             // 出现错误
-            LogWidget::instance()->appendLog(QString("taskkill failed. Error output:").arg(errorOutputStr));
+            LogWidget::instance()->appendLog(curPhase,QString("taskkill failed. Error output:").arg(errorOutputStr));
         }
     } else {
         // 等待超时或其他问题
-        LogWidget::instance()->appendLog("Failed to execute taskkill.");
+        LogWidget::instance()->appendLog(curPhase, "Failed to execute taskkill.");
     }
 #else
     process->kill();
