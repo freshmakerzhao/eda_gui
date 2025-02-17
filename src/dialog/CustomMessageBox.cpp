@@ -1,31 +1,27 @@
 #include "CustomMessageBox.h"
+#include <QDebug>
+#include <algorithm>
 
-const QString CustomMessageBox::OK_AND_YES_BUTTON_STYLESHEET =
-    "QPushButton {"
-    "   background-color: #4f7cce; "
-    "   color: white; "
-    "   border: 1px solid #4f7cce; "
-    "   width: 3.5em; "
-    "   padding: 6px 13px; "
-    "   height: 1.0em; "
-    "}"
-    "QPushButton:hover {"
-    "   background-color: #3a5b98; "
-    "   color: white; "
-    "}";
-
-const QString CustomMessageBox::CANCEL_AND_NO_BUTTON_STYLESHEET =
+const QString CustomMessageBox::DEFAULT_BUTTON_STYLESHEET =
     "QPushButton {"
     "   background-color: #ffffff; "
     "   color: black; "
     "   border: 1px solid #8c8c8c; "
-    "   width: 3.5em; "
-    "   padding: 6px 13px; "
-    "   height: 1.0em; "
     "}"
     "QPushButton:hover {"
     "   background-color: #ededed; "
     "   color: black; "
+    "}";
+
+const QString CustomMessageBox::HIGHLIGHT_BUTTON_STYLESHEET =
+    "QPushButton {"
+    "   background-color: #4f7cce; "
+    "   color: white; "
+    "   border: 1px solid #4f7cce; "
+    "}"
+    "QPushButton:hover {"
+    "   background-color: #3a5b98; "
+    "   color: white; "
     "}";
 
 CustomMessageBox::CustomMessageBox(QWidget *parent) : QMessageBox(parent)
@@ -42,88 +38,65 @@ CustomMessageBox::CustomMessageBox(QWidget *parent) : QMessageBox(parent)
                   );
 }
 
-QMessageBox::StandardButton CustomMessageBox::showWarning(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
+QMessageBox::StandardButton CustomMessageBox::information(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
+{
+    return showCustomMessage(parent, title, text, Icon::Information, buttons, defaultButton);
+}
+
+CustomMessageBox::StandardButton CustomMessageBox::warning(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
+{
+    return showCustomMessage(parent, title, text, Icon::Warning, buttons, defaultButton);
+}
+
+CustomMessageBox::StandardButton CustomMessageBox::question(QWidget *parent, const QString &title,
+                                                            const QString &text, StandardButtons buttons,
+                                                            StandardButton defaultButton)
+{
+    return showCustomMessage(parent, title, text, Icon::Question, buttons, defaultButton);
+}
+
+CustomMessageBox::StandardButton CustomMessageBox::critical(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
+{
+    return showCustomMessage(parent, title, text, Icon::Critical, buttons, defaultButton);
+}
+
+CustomMessageBox::StandardButton CustomMessageBox::showCustomMessage(QWidget *parent, const QString &title, const QString &text, Icon icon, StandardButtons buttons, StandardButton defaultButton)
 {
     CustomMessageBox messageBox(parent);
-    messageBox.setIcon(Warning);
+    messageBox.setIcon(icon);
     messageBox.setWindowTitle(title);
     messageBox.setText(text);
     messageBox.setStandardButtons(buttons);
     messageBox.setDefaultButton(defaultButton);
-    setButtonStyleSheet(messageBox);
+    messageBox.setButtonStyleSheet(messageBox);
     return static_cast<StandardButton>(messageBox.exec());
-}
-
-QMessageBox::StandardButton CustomMessageBox::showInformation(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
-{
-    CustomMessageBox messageBox(parent);
-    messageBox.setIcon(Information);
-    messageBox.setWindowTitle(title);
-    messageBox.setText(text);
-    messageBox.setStandardButtons(buttons);
-    messageBox.setDefaultButton(defaultButton);
-    setButtonStyleSheet(messageBox);
-    return static_cast<StandardButton>(messageBox.exec());
-}
-
-QMessageBox::StandardButton CustomMessageBox::showQuestion(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
-{
-    CustomMessageBox messageBox(parent);
-    messageBox.setIcon(Question);
-    messageBox.setWindowTitle(title);
-    messageBox.setText(text);
-    messageBox.setStandardButtons(buttons);
-    messageBox.setDefaultButton(defaultButton);
-    setButtonStyleSheet(messageBox);
-    return static_cast<StandardButton>(messageBox.exec());
-}
-
-QMessageBox::StandardButton CustomMessageBox::showSuccess(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
-{
-    CustomMessageBox messageBox(parent);
-    messageBox.setIcon(QMessageBox::NoIcon);
-    messageBox.setWindowTitle(title);
-    messageBox.setText(text);
-    messageBox.setStandardButtons(buttons);
-    messageBox.setDefaultButton(defaultButton);
-    setButtonStyleSheet(messageBox);
-    return static_cast<StandardButton>(messageBox.exec());
-}
-
-QMessageBox::StandardButton CustomMessageBox::showError(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons, StandardButton defaultButton)
-{
-    CustomMessageBox messageBox(parent);
-    messageBox.setIcon(Critical);
-    messageBox.setWindowTitle(title);
-    messageBox.setText(text);
-    messageBox.setStandardButtons(buttons);
-    messageBox.setDefaultButton(defaultButton);
-    setButtonStyleSheet(messageBox);
-    return static_cast<StandardButton>(messageBox.exec());
-}
-
-void CustomMessageBox::resizeEvent(QResizeEvent *event){
-    QMessageBox::resizeEvent(event);
-    this->setMinimumWidth(390);
-    this->setMinimumHeight(100);
 }
 
 void CustomMessageBox::setButtonStyleSheet(CustomMessageBox &messageBox)
 {
-    if (messageBox.button(QMessageBox::Yes)) {
-        messageBox.button(QMessageBox::Yes)->setStyleSheet(OK_AND_YES_BUTTON_STYLESHEET);
+    QSize sizeHint = QSize(0, 0);
+
+    QList<QAbstractButton*> buttons = messageBox.buttons();
+    for (QAbstractButton* button : buttons) {
+        sizeHint.setWidth(std::max(sizeHint.width(), button->sizeHint().width()));
+        sizeHint.setHeight(std::max(sizeHint.height(), button->sizeHint().height()));
+        button->setStyleSheet(DEFAULT_BUTTON_STYLESHEET);
     }
 
-    if (messageBox.button(QMessageBox::Ok)) {
-        messageBox.button(QMessageBox::Ok)->setStyleSheet(OK_AND_YES_BUTTON_STYLESHEET);
+    auto *yesButton = messageBox.button(QMessageBox::Yes);
+    if (yesButton) {
+        yesButton->setStyle(QApplication::style());
+        yesButton->setStyleSheet(HIGHLIGHT_BUTTON_STYLESHEET);
     }
 
-    if (messageBox.button(QMessageBox::No)) {
-        messageBox.button(QMessageBox::No)->setStyleSheet(CANCEL_AND_NO_BUTTON_STYLESHEET);
+    auto *okButton = messageBox.button(QMessageBox::Ok);
+    if (okButton) {
+        okButton->setStyle(QApplication::style());
+        okButton->setStyleSheet(HIGHLIGHT_BUTTON_STYLESHEET);
     }
 
-    if (messageBox.button(QMessageBox::Cancel)) {
-        messageBox.button(QMessageBox::Cancel)->setStyleSheet(CANCEL_AND_NO_BUTTON_STYLESHEET);
+    for (QAbstractButton* button : buttons) {
+        button->setFixedSize(sizeHint);
     }
 }
 

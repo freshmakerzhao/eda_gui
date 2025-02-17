@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : BasePage.cpp
+  * @author         : ksy
+  * @description    : Base class for all ip configuration pages.
+  * @attention      : None
+  * @date           : 2024/11/7
+  ******************************************************************************
+  */
 #include "BasePage.h"
 
 BasePage::BasePage(QWidget *parent)

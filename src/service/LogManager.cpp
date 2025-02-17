@@ -14,6 +14,7 @@
 #include "widgets/LogWidget.h"
 #include "widgets/MessageWidget.h"
 #include "utils/ProcessManager.h"
+#include "component/properties/Properties.h"
 
 
 LogManager& LogManager::instance()
@@ -105,5 +106,19 @@ void LogManager::handleLogArrived(const LogPipeContent& one_log) {
 }
 
 void LogManager::handleDataArrived(const DataPipeContent& one_data) {
-    MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
+    if (one_data.getPhase() == "COMMON") {
+        MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
+    } else if (one_data.getPhase() == "SIMULATION") {
+        MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
+    } else if (one_data.getPhase() == "SYNTHESIS") {
+        MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
+    } else if (one_data.getPhase() == "IMPLEMENTATION") {
+        MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
+    } else if (one_data.getPhase() == "PROGRAM_AND_DEBUG") {
+        // 处理返回的data
+        MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
+        Properties::instance()->updateHardwareProperties(one_data.getData().toObject());
+    } else {
+        MessageWidget::instance()->populateTreeFromLogStorage(log_storage);
+    }
 }

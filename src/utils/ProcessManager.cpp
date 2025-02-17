@@ -93,8 +93,8 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     msg.elapsedTime = elapsedTime;
     msg.displayPartName = displayPartName;
     msg.workPath = curProjectPath;
-    msg.statusInfo = this->curPhase + " Complete!";
-    msg.showInfoContent = this->curPhase + " successfully completed.";
+    msg.isCancel = this->isCancel;
+
     // 回传给taskmanager
     emit finishMessage(msg);
 
@@ -109,7 +109,6 @@ ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(
     pipeServer.start(); // 启动管道监听
     // ============== 启动管道监听 ==============
 
-
 //    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
     // finished 信号，process执行完毕后触发
     connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
@@ -122,6 +121,7 @@ ProcessManager::~ProcessManager()
 }
 
 void ProcessManager::executeCommand(const QString &phase, const QStringList &command) {
+    isCancel = false;
     this->curPhase = phase; // 当前执行阶段
     MainWindow::instance()->setRunState(QString("Run %1...").arg(curPhase), true);
     process->setProcessEnvironment(env);
@@ -161,6 +161,38 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
     //进程内存占用监听50ms获取一次
     memoryUtilities = new MemoryUtilities(process->processId(), 50);
     lastMemory = 0;
+}
+
+void ProcessManager::kill()
+{
+    isCancel = true;
+#if WIN32
+    qint64 pid = process->processId();
+    QProcess proc;
+    proc.start("taskkill", QStringList() << "/F" << "/T" << "/PID" << QString::number(pid));
+    QTextCodec *tc = QTextCodec::codecForName("GBK");
+    if (proc.waitForFinished()) {
+        QByteArray output = proc.readAllStandardOutput();
+        QByteArray errorOutput = proc.readAllStandardError();
+
+        QString outputStr = tc->toUnicode(output);
+        QString errorOutputStr = tc->toUnicode(errorOutput);
+
+        if (proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0) {
+            // taskkill 成功执行
+            LogWidget::instance()->appendLog("Process terminated successfully.");
+            qDebug() << outputStr;
+        } else {
+            // 出现错误
+            LogWidget::instance()->appendLog(QString("taskkill failed. Error output:").arg(errorOutputStr));
+        }
+    } else {
+        // 等待超时或其他问题
+        LogWidget::instance()->appendLog("Failed to execute taskkill.");
+    }
+#else
+    process->kill();
+#endif
 }
 
 void ProcessManager::initEnvironment() {

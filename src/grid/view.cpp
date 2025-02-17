@@ -49,6 +49,7 @@
 ****************************************************************************/
 
 #include "view.h"
+#include <algorithm>
 
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QtPrintSupport/qtprintsupportglobal.h>
@@ -69,9 +70,9 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() & Qt::ControlModifier) {
         if (e->angleDelta().y() > 0)
-            view->zoomIn(6);
+            view->zoomIn(40);
         else
-            view->zoomOut(6);
+            view->zoomOut(40);
         e->accept();
     } else {
         QGraphicsView::wheelEvent(e);
@@ -110,9 +111,9 @@ View::View(const QString &name, QWidget *parent)
     zoomOutIcon->setIconSize(iconSize);
 
     zoomSlider = new QSlider;
-    zoomSlider->setMinimum(0);  // 设置滑块的最小值为0
+    zoomSlider->setMinimum(-250);  // 设置滑块的最小值为0
     zoomSlider->setMaximum(500); // 设置滑块的最大值为500
-    zoomSlider->setValue(250); // 设置滑块的初始值为250
+    zoomSlider->setValue(-150); // 设置滑块的初始值为250
     zoomSlider->setTickPosition(QSlider::TicksRight); // 设置滑块的刻度位置在右侧
 
     //用于放置放大和缩小按钮及滑块
@@ -232,6 +233,36 @@ void View::resetView()
     resetButton->setEnabled(false);
 }
 
+void View::cellLocationShow(Block* cell) {
+    qreal cellWidth = cell->getWidth();
+    qreal cellHeight = cell->getHeight();
+
+    //获取窗口的大小
+    qreal viewportWidth = graphicsView->viewport()->width();
+    qreal viewportHeight = graphicsView->viewport()->height();
+
+    //计算缩放比例，确保cell的宽度和高度均能适配到视图
+    qreal scaleX = viewportWidth / (cellWidth * 1.2);
+    qreal scaleY = viewportHeight / (cellHeight * 1.2);
+
+    //选中较小的缩放比例，确保cell能完整地显示
+    qreal scaleFactor = std::min(scaleX, scaleY);
+
+    scaleFactor = std::clamp(scaleFactor, 0.1, 5.0);
+
+    qreal zoomVale = 250 + 50 * std::log2(scaleFactor);
+    zoomVale = std::clamp(zoomVale, -250.0, 500.0);
+
+    zoomSlider->setValue(zoomVale);
+    rotateSlider->setValue(0);
+
+    setupMatrix();
+    graphicsView->centerOn(cell);
+
+    //手动触发选中
+    cell->setSelected(true);
+}
+
 void View::setResetButtonEnabled()
 {
     resetButton->setEnabled(true);
@@ -285,11 +316,13 @@ void View::zoomIn(int level)
 {
 //    qDebug() << level;
     zoomSlider->setValue(zoomSlider->value() + level);
+    qDebug() << "zoom_size: " << zoomSlider->value();
 }
 
 void View::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
+    qDebug() << "zoom_size: " << zoomSlider->value();
 }
 
 void View::rotateLeft()

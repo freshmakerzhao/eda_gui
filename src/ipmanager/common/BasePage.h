@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : BasePage.h
+  * @author         : ksy
+  * @description    : Base class for all ip configuration pages.
+  * @attention      : None
+  * @date           : 2024/11/7
+  ******************************************************************************
+  */
 #ifndef BASEPAGE_H
 #define BASEPAGE_H
 

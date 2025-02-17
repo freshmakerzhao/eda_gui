@@ -8,11 +8,12 @@
 #include <QPushButton>
 #include <QGraphicsScene>
 #include "utils/json.hpp"
-#include "entity/Cluster.h"
+#include "entity/TileGridDataMap.h"
 #include "blocks/Blocks.h"
 #include <QCoreApplication>
 #include <fstream>
 #include <unordered_set>
+#include "blocks/Block.h"
 
 struct BoundingBox {
     double x0 = std::numeric_limits<double>::infinity(); // Minimum x
@@ -28,15 +29,17 @@ class ChipGridOperations : public QMainWindow{
 public:
     std::string tileFilePath;
     std::string tileColorPath;
+    std::string pinsInfoPath;
     TotalSize totalSize;
 
     // 架构信息
     std::vector<std::vector<NormalTile>> gridTypeMatrix; // 存储tile_grid
     std::vector<std::vector<Blocks*>> gridMatrix; // 存储绘图对象 graphicItem
+    std::unordered_map<std::string, std::unordered_map<std::string, SitesBlock*>> siteBlockMap;
     std::vector<SubItem> usageGrid;
 
     // std::vector<std::string> used_site;
-    std::unordered_set<std::string> used_site;
+    std::unordered_map<std::string, std::unordered_set<std::string>> used_site;
 
     std::unordered_set<QGraphicsRectItem *> clock_region_rects;
 
@@ -45,7 +48,7 @@ public:
     std::map<std::string, BoundingBox> clock_region_bounding_boxes;
 
     ChipGridOperations();
-    void buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal);
+    void buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal, std::string pinsInfoPathLocal);
     void setSkipTile(int curX, int curY, int height);
     void setColorsToTiles(NormalTile& tile,std::map<std::string, std::map<std::string, std::map<std::string, int>>> colorMap);
 

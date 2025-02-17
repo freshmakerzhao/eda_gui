@@ -1,31 +1,36 @@
-#include "GeneralPage.h"
+/**
+  ******************************************************************************
+  * @file           : GeneralSettingsPage.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/5/26
+  ******************************************************************************
+  */
+#include "GeneralSettingsPage.h"
 #include "utils/ProjectManager.h"
 #include "wizard/Wizard.h"
 
-GeneralPage::GeneralPage(QWidget *parent)
+GeneralSettingsPage::GeneralSettingsPage(QWidget *parent)
     : QWidget(parent)
 {
-    this->setObjectName("GeneralPage");
-    setStyleSheet("#GeneralPage { background-image: url(:/resource/white.png); }"
-                  "#GeneralPage { border:4px solid #DCDCDC; }"
-    );
+    setObjectName("GeneralSettingsPage");
 
     QLabel *label = new QLabel("<b>General</b><br> Specify values for various settings used throughout the design flow. "
                                "These settings apply to the current project.", this);
-    label->setStyleSheet("border-bottom: 3px dashed #DCDCDC;"
-                        "border-radius: 0px;");
+    label->setObjectName("SettingsPageTitleLabel");
     label->setWordWrap(true);
     QHBoxLayout *hBoxLayout = new QHBoxLayout;
     hBoxLayout->addWidget(label);
 
-    projectDeviceLineEdit = new QLineEdit(this);
+    projectDeviceLineEdit = new QLineEdit;
     projectDeviceLineEdit->setReadOnly(true);
-    QAction *action = new QAction(this);
+    QAction *action = new QAction;
     action->setIcon(QIcon(":/icons/resource/icons/28-icon_grid_view.png"));
     projectDeviceLineEdit->addAction(action, QLineEdit::LeadingPosition);
 
-    projectDeviceSquareButton = new QPushButton(this);
-    connect(projectDeviceSquareButton, &QPushButton::clicked, this, &GeneralPage::startWizard);
+    projectDeviceSquareButton = new QPushButton;
+    connect(projectDeviceSquareButton, &QPushButton::clicked, this, &GeneralSettingsPage::startWizard);
     // projectDeviceSquareButton->setFixedSize(projectDeviceSquareButton->height(), projectDeviceSquareButton->height()); // 设置为方形
     // projectDeviceSquareButton->setObjectName("squareButton");
 
@@ -34,7 +39,7 @@ GeneralPage::GeneralPage(QWidget *parent)
     // hLayout->addSpacing(5); // 添加一点间距
     hLayout->addWidget(projectDeviceSquareButton);
 
-    topModuleNameLineEdit = new QLineEdit(this);
+    topModuleNameLineEdit = new QLineEdit;
     topModuleNameLineEdit->setClearButtonEnabled(true);
 
     fLayout = new QFormLayout(this);
@@ -50,19 +55,19 @@ GeneralPage::GeneralPage(QWidget *parent)
     topModuleNameLineEdit->setText(topName);
 }
 
-void GeneralPage::setTopModule()
+void GeneralSettingsPage::setTopModule()
 {
     ProjectManager::instance().setTopModule(topModuleNameLineEdit->text());
 }
 
-void GeneralPage::setDevicePart()
+void GeneralSettingsPage::setDevicePart()
 {
     if (deviceInfo.isEmpty()) return;
     if (deviceInfo.first().isEmpty()) return;
     ProjectManager::instance().setDevicePart(deviceInfo.at(3));
 }
 
-void GeneralPage::startWizard()
+void GeneralSettingsPage::startWizard()
 {
     Wizard wizard(this, WizardMode::SET_DEVICE);
     if (wizard.exec() != QWizard::Accepted) {

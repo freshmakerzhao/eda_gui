@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file           : InfoWidget.h
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/2/18
+  ******************************************************************************
+  */
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
@@ -35,6 +44,8 @@ public:
                         const QString& startTime,
                         const QString& Elapsed,
                         const QString& partName);
+
+    void resetInfoWidget();
 
     void initDesignRunsView(const QString &prjPath = "");
 private:

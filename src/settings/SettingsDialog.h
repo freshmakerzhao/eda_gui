@@ -2,15 +2,15 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QSplitter>
 #include <QStackedWidget>
 #include <QTreeWidget>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
 #include <QPushButton>
-#include "base/Globals.h"
-#include "GeneralPage.h"
-#include "TextEditorSettingPage.h"
-#include "BitstreamSettingPage.h"
+#include "GeneralSettingsPage.h"
+#include "TextEditorSettingsPage.h"
+#include "BitstreamSettingsPage.h"
 
 class SettingsDialog : public QDialog
 {
@@ -27,9 +27,9 @@ public slots:
 private:
     QStackedWidget *stackedWidget;
     QTreeWidget *treeWidget;
-    GeneralPage *generalPage;
-    TextEditorSettingPage *textEditorSettingPage;
-    BitstreamSettingPage *bitstreamSettingPage;
+    GeneralSettingsPage *generalSettingsPage;
+    TextEditorSettingsPage *textEditorSettingsPage;
+    BitstreamSettingsPage *bitstreamSettingsPage;
 };
 
 #endif // SETTINGSDIALOG_H

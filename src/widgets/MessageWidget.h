@@ -23,6 +23,8 @@ public:
     // 从 LogStorage 构建树
     void populateTreeFromLogStorage(const LogStorage &logStorage);
 
+    void clearMessage();
+
 private slots:
     void onExpandAll();                            // 展开所有项
     void onCollapseAll();                          // 折叠所有项

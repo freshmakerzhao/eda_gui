@@ -43,6 +43,8 @@ public:
     void switchImpLog();
     void switchSimLog();
 
+    void clearLog();
+
 private:
     LogWidget(QWidget* parent = nullptr);
 

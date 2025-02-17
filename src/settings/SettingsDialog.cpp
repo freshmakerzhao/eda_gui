@@ -1,17 +1,20 @@
 #include "SettingsDialog.h"
 #include "utils/ProjectManager.h"
+#include "base/Globals.h"
 #include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+    treeWidget(new QTreeWidget),
+    stackedWidget(new QStackedWidget)
 {
     setWindowTitle("Settings");
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint); // 删除问号，只保留关闭
     // setWindowFlags(topWindow->windowFlags() | Qt::WindowStaysOnTopHint); // 将窗口置顶
     resize(640 * GlobalConfig::SCALE_FACTOR, 520 * GlobalConfig::SCALE_FACTOR);
-    // 创建一个QTreeWidget控件 并向其中添加列表项
-    treeWidget = new QTreeWidget(this);
-    treeWidget->setFixedWidth(300);
+    QSplitter *splitter = new QSplitter(Qt::Horizontal);
+
+    treeWidget->setStyleSheet(".QTreeWidget { border:4px solid #DCDCDC; }");
     treeWidget->setHeaderLabel("Project Settings");
     QTreeWidgetItem *generalItem = new QTreeWidgetItem(QStringList() << "General");
     QTreeWidgetItem *textEditorItem = new QTreeWidgetItem(QStringList() << "Text Editor");
@@ -22,24 +25,22 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     settingsItemslist.append(bitstreamItem);
     treeWidget->addTopLevelItems(settingsItemslist);
 
-    //创建QStackedwidget控件
-    stackedWidget = new QStackedWidget;
     //将控件添加到堆栈窗口中
-    generalPage =  new GeneralPage;
-    bitstreamSettingPage =  new BitstreamSettingPage;
-    textEditorSettingPage = new TextEditorSettingPage;
-    stackedWidget->addWidget(generalPage);
-    stackedWidget->addWidget(textEditorSettingPage);
-    stackedWidget->addWidget(bitstreamSettingPage);
-    bitstreamSettingPage->loadSettings(); // 初始化复选框状态
+    generalSettingsPage =  new GeneralSettingsPage;
+    bitstreamSettingsPage =  new BitstreamSettingsPage;
+    textEditorSettingsPage = new TextEditorSettingsPage;
+    stackedWidget->addWidget(generalSettingsPage);
+    stackedWidget->addWidget(textEditorSettingsPage);
+    stackedWidget->addWidget(bitstreamSettingsPage);
+    bitstreamSettingsPage->loadSettings(); // 初始化复选框状态
 
-    // 使用一个水平布局管理器对对话框进行布局
-    QHBoxLayout *hLayout = new QHBoxLayout;
-    hLayout->addWidget(treeWidget);
-    hLayout->addWidget(stackedWidget);
-    // 设置mainLayout的边框与对话框边缘的距离
-    hLayout->setMargin(5);
-    hLayout->setSpacing(15);
+    QHBoxLayout *hBoxLayout = new QHBoxLayout;
+    hBoxLayout->addWidget(splitter);
+    splitter->addWidget(treeWidget);
+    splitter->addWidget(stackedWidget);
+
+    hBoxLayout->setMargin(5);
+    hBoxLayout->setSpacing(15);
     // 信号与槽的连接，实现按选择显示窗体
     connect(treeWidget, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item) {
         int index = treeWidget->indexOfTopLevelItem(item);
@@ -53,17 +54,19 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     QVBoxLayout *vLayout = new QVBoxLayout(this);
-    vLayout->addLayout(hLayout);
+    vLayout->addLayout(hBoxLayout);
     vLayout->addWidget(buttonBox);
 
+    splitter->setStretchFactor(0, 9);
+    splitter->setStretchFactor(1, 16);
 }
 
 void SettingsDialog::accept()
 {
-    generalPage->setDevicePart();
-    generalPage->setTopModule();
-    textEditorSettingPage->setEncoding();
-    bitstreamSettingPage->applySettings();
+    generalSettingsPage->setDevicePart();
+    generalSettingsPage->setTopModule();
+    textEditorSettingsPage->setEncoding();
+    bitstreamSettingsPage->applySettings();
     ProjectManager::instance().writeAndLoadProject();
     QDialog::accept();
 }

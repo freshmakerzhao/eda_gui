@@ -24,7 +24,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     ProcessManager::instance().configDisplay(displayPartName);
     if (this->arch == ""){
         // 用户未选择架构时
-        CustomMessageBox::showQuestion(MainWindow::instance(), "Failed", "Please select or create a project.");
+        CustomMessageBox::critical(MainWindow::instance(), "Failed", "Please select or create a project.");
         return;
     }
     if (!MainWindow::instance()->saveAllFile()) {
@@ -66,13 +66,15 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         qDebug() << "[TaskManager] arch " << this->arch;
         std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
         std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+        std::string pinsInfoPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/pins_info_" + this->arch.toStdString() + ".json";
         qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
         qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
+        qDebug() << "[TaskManager] pinsInfoPath " << QString::fromStdString(pinsInfoPath);
         if (gridView) {
             delete gridView;  // 删除现存的对象
             gridView = nullptr;  // 确保指针不再指向已删除的对象
         }
-        gridView = new FrameView(tileGridPath,tileColorPath,projectImplPath);
+        gridView = new FrameView(tileGridPath,tileColorPath,pinsInfoPath, projectImplPath);
         gridView->resize(1000, 800);
         gridView->show();
     } else if (mode == 7) {
@@ -482,7 +484,7 @@ void TaskManager::downloadFlash(const QString &projectImplPath1, const QString &
 // 两个选项的弹窗，true 左侧，false 右侧
 bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft, QMessageBox::StandardButton buttonRight) {
     // 等待用户响应
-    int msg = CustomMessageBox::showQuestion(
+    int msg = CustomMessageBox::question(
             MainWindow::instance(),
             title,
             text,
@@ -504,9 +506,6 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
         MainWindow::instance()->setRunState(msg.phase + " Complete!", false);
         if (msg.phase == "Synthesis"){
             // 综合结束后，读取资源统计信息
-            qDebug() << "============= =========== ==================";
-            qDebug() << msg.workPath;
-            qDebug() << "============= =========== ==================";
             InfoWidget::instance()->updateSynthItem(
                     msg.workPath,
                     msg.phase + " Complete!",
@@ -518,7 +517,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
                 // 需要弹窗则弹窗
-                CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
+                CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
             }
             if(this->_hasNextImplementProcess){
                 // 如果需要做
@@ -536,12 +535,18 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
                 // Implementation结束后，读取资源统计信息
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
-                CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
+                CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
             }
         } else {
             // 生成码流结束提示，后续在此扩展
-            CustomMessageBox::showSuccess(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
+            CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
+        return;
+    }
+
+    // Terminate or Fail
+    if (msg.isCancel) {
+        MainWindow::instance()->resetRunState();
         //输出阶段耗时，内存占用
         LogWidget::instance()->appendLog(
                 msg.phase,
@@ -553,8 +558,10 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
         LogWidget::instance()->appendLog(msg.phase, QString("-").repeated(100));
     } else {
         MainWindow::instance()->setRunState(msg.phase + " failed.", false);
-        CustomMessageBox::showError(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
+        CustomMessageBox::critical(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
     }
+
+
     LogManager::instance().firstSubPhaseStatus = true;
 }
 

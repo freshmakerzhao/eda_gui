@@ -36,7 +36,7 @@ void EditorManager::createEditorTab(const QString &path)
     TextEditor *editor = new TextEditor(this); // 创建对象
     editor->setProperty("filePath", path);
     if (!editor->openFile(path)) {
-        CustomMessageBox::showError(MainWindow::instance(), "Failed", "Cannot open File.");
+        CustomMessageBox::critical(MainWindow::instance(), "Failed", "Cannot open File.");
         editor->deleteLater();
         return;
     }
@@ -53,7 +53,7 @@ void EditorManager::createEditorTab(const QString &path)
 bool EditorManager::saveAllFiles()
 {
     if (isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "There are unsaved files,"
+        CustomMessageBox::StandardButton btn = CustomMessageBox::question(MainWindow::instance(), "Warning", "There are unsaved files,"
                                                                              "  save and execute?",
                                                             QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::No) {
@@ -163,7 +163,7 @@ void EditorManager::editorSaveAs()
 bool EditorManager::cleanEditorTab()
 {
     if (isModified()) {
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "The document has been modified.\n"
+        CustomMessageBox::StandardButton btn = CustomMessageBox::question(MainWindow::instance(), "Warning", "The document has been modified.\n"
                                                                                                "Do you want to save your changes?",
                                                                               QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::No) {
@@ -207,7 +207,7 @@ void EditorManager::onTabWidgetTabCloseRequested(int index)
     TextEditor *editor = qobject_cast<TextEditor*>(this->widget(index));
     if (editor->isModified()) {
         // qDebug() << "File" << index << "has been Modified";
-        CustomMessageBox::StandardButton btn = CustomMessageBox::showQuestion(MainWindow::instance(), "Warning", "The document has been modified.\n"
+        CustomMessageBox::StandardButton btn = CustomMessageBox::question(MainWindow::instance(), "Warning", "The document has been modified.\n"
                                                                                                "Do you want to save your changes?",
                                                                               QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
         if (btn == QMessageBox::Yes) {
