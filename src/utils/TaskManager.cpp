@@ -11,6 +11,7 @@
 #include "service/HardWareManager.h"
 #include "dialog/AdvancedFileDialog.h"
 #include "base/Globals.h"
+#include "widgets/LogWidget.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -35,6 +36,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         taskController(0);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
+        LogWidget::instance()->switchSynLog(); //使log选中synthesis选项
     } else if (mode == 1) {
         // synthReport();
     } else if (mode == 2) {
@@ -42,6 +44,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         taskController(2);
         // 激活 log 窗口
         InfoWidget::instance()->setCurrentPage(2);
+        LogWidget::instance()->switchImpLog(); //使log选中implmentation选项
     } else if (mode == 3) {
 //        buildPack();
         // 激活 log 窗口
@@ -538,6 +541,17 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
             // 生成码流结束提示，后续在此扩展
             CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
+
+        //输出阶段耗时，内存占用
+        LogWidget::instance()->appendLog(
+            msg.phase,
+            msg.phase + "_design:" +
+            " Time (s): elapsed = " + msg.elapsedTime +
+            " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
+            " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
+            );
+        LogWidget::instance()->appendLog(msg.phase, QString("-").repeated(100));
+
         return;
     }
 
@@ -548,8 +562,7 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
         MainWindow::instance()->setRunState(msg.phase + " failed.", false);
         CustomMessageBox::critical(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
     }
-
-
+    LogManager::instance().firstSubPhaseStatus = true;
 }
 
 // 将命令提交给tcl console

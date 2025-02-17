@@ -7,6 +7,8 @@
 #include "utils/TimeUtilities.h"
 #include "base/Globals.h"
 #include "mainwindow.h"
+#include <QDebug>
+#include "utils/MemoryUtilities.h"
 
 ProcessManager& ProcessManager::instance()
 {
@@ -95,6 +97,9 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
 
     // 回传给taskmanager
     emit finishMessage(msg);
+
+    delete memoryUtilities;
+    lastMemory = 0;
 }
 
 ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(LogManager::instance())
@@ -104,6 +109,7 @@ ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(
     pipeServer.start(); // 启动管道监听
     // ============== 启动管道监听 ==============
 
+
 //    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
     // finished 信号，process执行完毕后触发
     connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
@@ -111,6 +117,7 @@ ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(
 
 ProcessManager::~ProcessManager()
 {
+    delete memoryUtilities;
     delete process;
 }
 
@@ -142,6 +149,7 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
     // 记录开始执行的时间
     this->startTime = TimeUtilities::getCurTimeAndFormat(); // 展示
     this->startTimeForCal = TimeUtilities::getCurTime(); // 计算
+    this->lastTime = startTimeForCal;
 
     // 启动进程
     if (phase == "Synthesis") {
@@ -150,6 +158,10 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
     } else {
         process->start("cmd.exe", script);
     }
+
+    //进程内存占用监听50ms获取一次
+    memoryUtilities = new MemoryUtilities(process->processId(), 50);
+    lastMemory = 0;
 }
 
 void ProcessManager::kill()
@@ -169,15 +181,15 @@ void ProcessManager::kill()
 
         if (proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0) {
             // taskkill 成功执行
-            LogWidget::instance()->appendLog("Process terminated successfully.");
+            LogWidget::instance()->appendLog(curPhase, "Process terminated successfully.");
             qDebug() << outputStr;
         } else {
             // 出现错误
-            LogWidget::instance()->appendLog(QString("taskkill failed. Error output:").arg(errorOutputStr));
+            LogWidget::instance()->appendLog(curPhase,QString("taskkill failed. Error output:").arg(errorOutputStr));
         }
     } else {
         // 等待超时或其他问题
-        LogWidget::instance()->appendLog("Failed to execute taskkill.");
+        LogWidget::instance()->appendLog(curPhase, "Failed to execute taskkill.");
     }
 #else
     process->kill();
@@ -203,4 +215,24 @@ void ProcessManager::initEnvironment() {
 
 void ProcessManager::configDisplay(const QString &partname) {
     this->displayPartName = partname;
+}
+
+QString ProcessManager::getElapsedTime() {
+    std::chrono::system_clock::time_point curTime = TimeUtilities::getCurTime();
+    QString elapsed =  TimeUtilities::calculateTimeDifference(lastTime, curTime);
+    this->lastTime = curTime;
+    return elapsed;
+}
+
+float ProcessManager::getPeak() const{
+    return memoryUtilities->getMaxMemory();
+}
+
+float ProcessManager::getGain() {
+    if(memoryUtilities == nullptr)
+        return 0;
+    float curMemory = memoryUtilities->getCurrentMemory();
+    float gain = curMemory - lastMemory;
+    lastMemory = curMemory;
+    return gain;
 }

@@ -28,7 +28,8 @@ public:
     // 获取分类日志
 //    const std::vector<QString>& getLogs(LogLevel level) const;
     // 添加日志并分发到各个控件
-    void addLog(const LogPipeContent& one_log);
+    void addLog(const LogPipeContent& oneLog);
+    bool firstSubPhaseStatus = true;
 
 private:
     LogManager();
