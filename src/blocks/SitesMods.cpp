@@ -516,7 +516,115 @@ SitesPhaserREF::SitesPhaserREF(const QColor &color, int tile_index_x, int tile_i
     this->setPos(QPointF((3 * SITE_GAP), (3 * SITE_GAP) + 4650*(site_index+2)));
 }
 
+SitesGTP2Cannel::SitesGTP2Cannel(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_SITE_BLOCK_WIDTH,
+        (GLOBAL_TILE_BLOCK_HEIGHT * 11) - 2 * SITE_GAP,
+        tile_index_x, tile_index_y,
+        "GTPE2_CHANNEL", cur_name, site_index
+) {
+    this->setPos(QPointF(SITE_GAP, SITE_GAP));
+}
+SitesIPAD::SitesIPAD(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_SITE_BLOCK_WIDTH,
+        GLOBAL_SITE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "IPAD", cur_name, site_index
+) {
+    this->setPos(
+            (GLOBAL_TILE_BLOCK_WIDTH)/2 + SITE_GAP,
+            ((11*GLOBAL_TILE_BLOCK_HEIGHT - (4*height + 3 * 3*SITE_GAP))/2) + (site_index-1)*height + site_index*3*SITE_GAP
+    );
+}
+SitesOPAD::SitesOPAD(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_SITE_BLOCK_WIDTH,
+        GLOBAL_SITE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "OPAD", cur_name, site_index
+) {
+    this->setPos(
+            (GLOBAL_TILE_BLOCK_WIDTH)/2 + SITE_GAP,
+            ((11*GLOBAL_TILE_BLOCK_HEIGHT - (4*height + 3 * 3*SITE_GAP))/2) + (site_index-1)*height + site_index*3*SITE_GAP
+    );
+}
+SitesGTP2Common::SitesGTP2Common(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_SITE_BLOCK_WIDTH,
+        (GLOBAL_TILE_BLOCK_HEIGHT * 7) - 2 * SITE_GAP,
+        tile_index_x, tile_index_y,
+        "GTPE2_COMMON", cur_name, site_index
+) {
+    this->setPos(QPointF(SITE_GAP*(site_index+1) + GLOBAL_SITE_BLOCK_WIDTH*site_index, SITE_GAP));
+}
+SitesIBufsGTE2::SitesIBufsGTE2(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+: SitesBlock(
+        color,
+        GLOBAL_SITE_BLOCK_WIDTH,
+        GLOBAL_SITE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "IBUFDS_GTE2", cur_name, site_index
+) {
+
+}
+SitesBUFGCTRL::SitesBUFGCTRL(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH/5,
+        (4*GLOBAL_TILE_BLOCK_HEIGHT-SITE_GAP/2)/16-SITE_GAP/2,
+        tile_index_x, tile_index_y,
+        "BUFGCTRL", cur_name, site_index
+) {
+    this->setPos((GLOBAL_TILE_BLOCK_WIDTH-width)/2, (site_index + 1) * SITE_GAP/2 + site_index * height);
+}
+
+SitesBUFHCE::SitesBUFHCE(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        (GLOBAL_TILE_BLOCK_WIDTH - 3*SITE_GAP)/2 - 3*SITE_GAP,
+        (8*GLOBAL_TILE_BLOCK_HEIGHT-3*SITE_GAP)/12 - 3*SITE_GAP,
+        tile_index_x, tile_index_y,
+        "SitesBUFHCE", cur_name, site_index
+) {
+    this->setPos(
+            (site_index/12 + 1) * 3*SITE_GAP + (site_index/12) * width,
+            (site_index%12 + 1) * 3*SITE_GAP + site_index%12 * height
+    );
+}
+
+SitesPCIE2_1::SitesPCIE2_1(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        (3*GLOBAL_TILE_BLOCK_WIDTH - 2 * 3*SITE_GAP),
+        (20*GLOBAL_TILE_BLOCK_HEIGHT - 2*SITE_GAP),
+        tile_index_x, tile_index_y,
+        "PCIE_2_1", cur_name, site_index
+) {
+    this->setPos(
+        3*SITE_GAP,
+        SITE_GAP
+    );
+}
+
+SitesBUFMRCE::SitesBUFMRCE(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        (GLOBAL_TILE_BLOCK_WIDTH - 2*SITE_GAP),
+        (GLOBAL_TILE_BLOCK_HEIGHT - SITE_GAP)/2 - SITE_GAP,
+        tile_index_x, tile_index_y,
+        "PCIE_2_1", cur_name, site_index
+) {
+    this->setPos(
+        SITE_GAP,
+        site_index*height + (site_index+1)*SITE_GAP
+    );
+}
 Sites::Sites(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index)
         :SitesBlock(color, GLOBAL_SITE_BLOCK_WIDTH, GLOBAL_SITE_BLOCK_HEIGHT, tile_index_x, tile_index_y, "SITES", cur_name, site_index) {
-    this->setPos(QPointF(SITE_GAP*(site_index+1) + GLOBAL_SITE_BLOCK_WIDTH*site_index, SITE_GAP));
+    this->setPos(QPointF(SITE_GAP, SITE_GAP));
 }

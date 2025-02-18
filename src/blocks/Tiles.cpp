@@ -34,8 +34,9 @@ QPainterPath Tiles::shape() const
 
 void Tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    if(tile_type == "NULL")
+        return;
     Q_UNUSED(widget);
-
     // 控件当前是否被选中：QStyle::State_Selected，依赖 setFlags(ItemIsSelectable);
     // 选中则加深，否则为初始化时的颜色
     QColor fillColor = (option->state & QStyle::State_Selected) ? tile_color.darker(150) : tile_color;
@@ -49,6 +50,12 @@ void Tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
 
     painter->fillRect(QRectF(0, 0, tile_width, tile_height), fillColor);
+
+//    if(!child_items.isEmpty())
+//        if(lod > 0.01)
+//            child_items[0]->updateVisibleStatus(false);
+//        else
+//            child_items[0]->updateVisibleStatus(true);
 
     QPen oldPen = painter->pen();
     QPen pen = oldPen;
@@ -84,6 +91,8 @@ void Tiles::setColor(const QColor &color){
 }
 void Tiles::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    if(tile_type == "NULL")
+        return;
     // 发出信号，告知是哪tile被点击了
     emit BlockClicked(index_x, index_y);
     QGraphicsItem::mousePressEvent(event);
@@ -92,6 +101,8 @@ void Tiles::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void Tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    if(tile_type == "NULL")
+        return;
     if (event->modifiers() & Qt::ShiftModifier) {
         update();
         return;
@@ -101,6 +112,8 @@ void Tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void Tiles::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    if(tile_type == "NULL")
+        return;
     QGraphicsItem::mouseReleaseEvent(event);
     update();
 }

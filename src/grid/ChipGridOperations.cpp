@@ -10,6 +10,65 @@
 #include <QDebug>
 #include "utils/ProjectManager.h"
 // 处理tile颜色、width、height
+
+const std::unordered_set<std::basic_string<char>> SHOW_TILE = {
+    "LIOB33",
+    "LIOB33_SING",
+    "RIOB33",
+    "RIOB33_SING",
+    "HCLK_IOB",
+    "LIOI3",
+    "LIOI3_SING",
+    "LIOI3_TBYTESRC",
+    "LIOI3_TBYTETERM",
+    "RIOI3",
+    "RIOI3_SING",
+    "RIOI3_TBYTESRC",
+    "RIOI3_TBYTETERM",
+    "HCLK_IOI3",
+    "CMT_FIFO_R",
+    "CMT_FIFO_L",
+    "HCLK_FIFO_L",
+    "CMT_TOP_R_UPPER_T",
+    "CMT_TOP_R_UPPER_B",
+    "CMT_TOP_L_UPPER_T",
+    "CMT_TOP_L_UPPER_B",
+    "HCLK_CMT",
+    "CMT_TOP_R_LOWER_T",
+    "CMT_TOP_R_LOWER_B",
+    "CMT_TOP_L_LOWER_T",
+    "CMT_TOP_L_LOWER_B",
+    "CLBLL_L",
+    "CLBLL_R",
+    "CLBLM_L",
+    "CLBLM_R",
+    "HCLK_CLB",
+    "BRAM_L",
+    "BRAM_R",
+    "HCLK_BARM",
+    "DSP_R",
+    "DSP_L",
+    "HCLK_DSP_R",
+    "MONTOR_TOP",
+    "MONTOR_MID",
+    "MONTOR_BOT",
+    "CFG_CENTER_TOP",
+    "CFG_CENTER_MID",
+//    "CFG_CENTER_BOT",
+//    "R_TERM_INT_GTX",
+    "GTP_CHANNEL_3",
+    "GTP_CHANNEL_2",
+    "GTP_CHANNEL_1",
+    "GTP_CHANNEL_0",
+    "GTP_CHANNEL_0",
+    "GTP_COMMON",
+    "PCIE_BOT",
+    "CLK_HROW_TOP_R",
+    "CLK_HROW_BOT_R",
+    "CLK_BUFG_TOP_R",
+    "CLK_BUFG_BOT_R"
+};
+
 std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGridOperations::buildTileInfoMap(const nlohmann::basic_json<>& colorJson){
     std::map<std::string, std::map<std::string, std::map<std::string, int>>> tile_info_map;
     try {
@@ -162,15 +221,34 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
             {"LIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
             {"RIOB33", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
             {"RIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"RIOI3_TBYTESRC", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"RIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
             {"LIOI3_TBYTESRC", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"LIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}}
+            {"LIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"GTP_CHANNEL_3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_CHANNEL_2", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_CHANNEL_1", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_CHANNEL_0", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_COMMON", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 7}, {"Y_GAP", -6}}},
+            {"PCIE_BOT", {{"WIDTH_FACTOR", 3}, {"HEIGHT_FACTOR", 20}, {"Y_GAP", -9}}},
+            {"CFG_CENTER_TOP", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 10}, {"Y_GAP", -9}}},
+            {"CFG_CENTER_MID", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 21}, {"Y_GAP", -9}}},
+            {"CMT_TOP_L_UPPER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 13}, {"Y_GAP", -7}}},
+            {"CMT_TOP_L_UPPER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -7}}},
+            {"CLK_HROW_TOP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 8}, {"Y_GAP", -4}}},
+            {"CLK_HROW_BOT_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 8}, {"Y_GAP", -4}}},
+            {"CLK_BUFG_TOP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 4}, {"Y_GAP", -3}}},
+            {"CLK_BUFG_BOT_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 4}, {"Y_GAP", -3}}},
     };
 
+    std::string debugTypes;
     //  ================ 处理grid跨行  ================
     for (int i = 0; i < totalSize.width; ++i) {
         for (int j = 0; j < totalSize.height; ++j) {
             // 获取当前 tile 的 type
             std::string types = gridTypeMatrix[i][j].types;
+            if (types == "PCIE_BOT" || (j == 32 && i == 104))
+                qDebug() << QString::fromStdString(types);
             auto it = TYPE_TO_SIZE_FACTORS.find(types);
             std::map<std::string,int> cur_factors;
             if (it != TYPE_TO_SIZE_FACTORS.end()) {
@@ -180,7 +258,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 // 普通tile
                 cur_factors = {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 1}, {"Y_GAP", 0}};
             }
-
+            debugTypes = gridTypeMatrix[104][32].types;
             auto it2 = tile_info_map.find(types);
             if (it2 == tile_info_map.end()) {
                 gridTypeMatrix[i][j].height = GLOBAL_TILE_BLOCK_HEIGHT;
@@ -191,7 +269,8 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 gridTypeMatrix[i][j].width = tile_info_map[types]["size"]["width"] * GLOBAL_TILE_BLOCK_WIDTH;
             }
 
-            // 计算其放置在画布上的x,y坐标
+                // 计算其放置在画布上的x,y坐标
+            debugTypes = gridTypeMatrix[104][32].types;
             if (j > 0) {  // 如果不是列首的tile
                 gridTypeMatrix[i][j].x_coordinate = gridTypeMatrix[i][j - 1].x_coordinate;
                 // 当前tile的坐标是该列上一个y坐标+上一个tile的高度
@@ -201,55 +280,79 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 gridTypeMatrix[i][j].y_coordinate = 0;
             }
             // 处理跨行tile涉及的tile，由于跨行tile在tilegrid中其grid_x，grid_y描述的不是他起始位置，所以需要做处理
+            debugTypes = gridTypeMatrix[104][32].types;
             if (it != TYPE_TO_SIZE_FACTORS.end()) {
                 int start_y = j + cur_factors["Y_GAP"]; // 计算其真正的起始y
                 // grid_type_matrix[i][start_y]位置一定为null，用当前tile将其覆盖
                 gridTypeMatrix[i][start_y] = gridTypeMatrix[i][j];
+                gridTypeMatrix[i][j].types="NULL";
                 // 跨行flag
                 gridTypeMatrix[i][start_y].is_multi_rows = true;
-                if (start_y>=1){
+                if (start_y >= 1) {
                     // 如果该列存在上一个tile
-                    gridTypeMatrix[i][start_y].y_coordinate = gridTypeMatrix[i][start_y - 1].y_coordinate + gridTypeMatrix[i][start_y - 1].height;
+                    gridTypeMatrix[i][start_y].y_coordinate =
+                            gridTypeMatrix[i][start_y - 1].y_coordinate + gridTypeMatrix[i][start_y - 1].height;
                 } else {
                     gridTypeMatrix[i][start_y].y_coordinate = 0;
                 }
 
-
                 setSkipTile(i,start_y,cur_factors["HEIGHT_FACTOR"]);
+            }
+            if(gridTypeMatrix[104][32].types != "PCIE_NULL") {
+                debugTypes = gridTypeMatrix[104][32].types;
+                qDebug() << QString::fromStdString(types);
             }
         }
     }
     gridMatrix.resize(totalSize.width, std::vector<Blocks*>(totalSize.height, nullptr));
+    bool lastCowShow = true;
+    int widthCount = 0;
     for(int i = 0; i < totalSize.width; ++i)
     {
+        if(!lastCowShow)
+            widthCount += GLOBAL_TILE_BLOCK_WIDTH;
         for(int j = 0; j < totalSize.height; ++j)
         {
-            const std::unordered_set<std::basic_string<char>> DISABLE_SHOW_TILE = {
-                    "SKIP"
-//                    "L_TEEM_INR",
-//                    "IO_INT_INTERFACE_L",
-//                    "INT_L",
-//                    "INT_R",
-//                    "INT_INTERFACE_R",
-//                    "NULL"
-            };
-            std::string type = gridTypeMatrix[i][j].types;
-            auto it = DISABLE_SHOW_TILE.find(type);
             // 遇到skip跳过
-            if(it != DISABLE_SHOW_TILE.end()){
+            if(gridTypeMatrix[i][j].types == "SKIP")
                 continue;
+
+            //设置为空类型(不显示)的map
+            std::string type = gridTypeMatrix[i][j].types;
+            if (type == "PCIE_BOT" || (j == 32 && i == 104))
+                qDebug() << QString::fromStdString(type);
+            auto it = SHOW_TILE.find(type);
+            if(it == SHOW_TILE.end()) {
+                std::string nullType = "NULL";
+                gridMatrix[i][j] = new Tiles(
+                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+                        gridTypeMatrix[i][j].loc_x,
+                        gridTypeMatrix[i][j].loc_y,
+                        i,
+                        j,
+                        gridTypeMatrix[i][j].width,
+                        gridTypeMatrix[i][j].height,
+                        nullType
+                );
+                if(j == 1)
+                    lastCowShow = false;
+                continue;
+            } else {
+                gridMatrix[i][j] = new Tiles(
+                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+                        gridTypeMatrix[i][j].loc_x,
+                        gridTypeMatrix[i][j].loc_y,
+                        i,
+                        j,
+                        gridTypeMatrix[i][j].width,
+                        gridTypeMatrix[i][j].height,
+                        gridTypeMatrix[i][j].types
+                );
+                gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate - widthCount, gridTypeMatrix[i][j].y_coordinate));
+//                gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate, gridTypeMatrix[i][j].y_coordinate));
+                lastCowShow = true;
             }
-            gridMatrix[i][j] = new Tiles(
-                    QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
-                    gridTypeMatrix[i][j].loc_x,
-                    gridTypeMatrix[i][j].loc_y,
-                    i,
-                    j,
-                    gridTypeMatrix[i][j].width,
-                    gridTypeMatrix[i][j].height,
-                    gridTypeMatrix[i][j].types
-            );
-            gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate, gridTypeMatrix[i][j].y_coordinate));
+
             if (!gridTypeMatrix[i][j].is_multi_rows){
                 // 非跨行的tile增加site
                 for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
@@ -375,7 +478,6 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                     // ------------------------------
                 }
             } else {
-                const int GAP = 3 * SITE_GAP;
                 for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
                     NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
                     if (site.type == "IOB33M") {
@@ -585,7 +687,87 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                                 SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
                                 SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
                         ));//由于这里是跨行，所以位置需要重新设置一次
+                    } else if (site.type == "GTPE2_CHANNEL") {
+                        SitesBlock* site_block = new SitesGTP2Cannel(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        size_t pos = site.name.find("_X");
+                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
 
+                    } else if (site.type == "GTPE2_COMMON") {
+                        SitesBlock* site_block = new SitesGTP2Common(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        size_t pos = site.name.find("_X");
+                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
+                    } else if (site.type == "IPAD") {
+                        SitesBlock* site_block = new SitesIPAD(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        size_t pos = site.name.find("_X");
+                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
+                    } else if (site.type == "OPAD") {
+                        SitesBlock* site_block = new SitesOPAD(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        size_t pos = site.name.find("_X");
+                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
+
+                    } else if (site.type == "BUFGCTRL") {
+                        SitesBlock* site_block = new SitesBUFGCTRL(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        size_t pos = site.name.find("_X");
+                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
+
+                    } else if (site.type == "BUFHCE") {
+                        SitesBlock* site_block = new SitesBUFHCE(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        size_t pos = site.name.find("_X");
+                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
+
+                    } else if (site.type == "PCIE_2_1") {
+                        SitesBlock* site_block = new SitesPCIE2_1(
+                                Qt::white,
+                                i,
+                                j,
+                                site.name,
+                                site.index
+                        );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        size_t pos = site.name.find("_X");
+                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
                     }
                     site_type_set.insert(site.type);
                 }

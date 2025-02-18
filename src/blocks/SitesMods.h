@@ -138,4 +138,49 @@ class SitesPhaserREF : public SitesBlock {
 public:
     SitesPhaserREF(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
 };
+
+class SitesGTP2Cannel : public SitesBlock {
+public:
+    SitesGTP2Cannel(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesIPAD : public SitesBlock {
+public:
+    SitesIPAD(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesOPAD : public SitesBlock {
+public:
+    SitesOPAD(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesGTP2Common : public SitesBlock {
+public:
+    SitesGTP2Common(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesIBufsGTE2 : public SitesBlock {
+public:
+    SitesIBufsGTE2(const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesBUFHCE : public SitesBlock {
+public:
+    SitesBUFHCE (const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesBUFGCTRL : public SitesBlock {
+public:
+    SitesBUFGCTRL (const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesPCIE2_1 : public SitesBlock {
+public:
+    SitesPCIE2_1 (const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
+
+class SitesBUFMRCE : public SitesBlock {
+public:
+    SitesBUFMRCE  (const QColor &color, int tile_index_x, int tile_index_y, std::string &cur_name, int site_index);
+};
 #endif //HYBRDLINK_SITESMODS_H
