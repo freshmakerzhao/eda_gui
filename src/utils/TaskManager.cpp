@@ -44,25 +44,17 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     if (mode == 0) {
         // 综合
         flowTaskController(0);
-        InfoWidget::instance()->setCurrentPage(2);
-        LogWidget::instance()->switchSynLog(); //使log选中synthesis选项
     } else if (mode == 1) {
         // synthReport();
     } else if (mode == 2) {
         // pack place route全流程
         flowTaskController(2);
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
-        LogWidget::instance()->switchImpLog(); //使log选中implmentation选项
     } else if (mode == 3) {
 //        buildPack();
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 6) {
         // impReport();
     } else if (mode == 8) {
         flowTaskController(8);
-        InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 9) {
         qDebug() << "[TaskManager] arch " << this->arch;
         std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
@@ -195,6 +187,9 @@ void TaskManager::flowTaskController(const int &mode) {
         qDebug("\033[32m[Click Cancel on any MessageBox.]\033[0m");
         return;
     }
+
+    InfoWidget::instance()->setCurrentPage(2);
+
     qDebug("\033[32m[Run the first task in the task queue.]\033[0m");
     handleFlowTaskQueue();
 }
@@ -411,8 +406,8 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
             msg.phase,
             msg.phase + "_design:" +
             " Time (s): elapsed = " + msg.elapsedTime +
-            " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
-            " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
+                " Memory (MB): peak = " + QString::number(MemoryUtilities::instance()->getPeakMemory(), 'f', 2) +
+                " gain = " + QString::number(MemoryUtilities::instance()->getGainMemory(), 'f', 2)
             );
         LogWidget::instance()->appendLog(msg.phase, QString("-").repeated(100));
         LogManager::instance().firstSubPhaseStatus = true;
@@ -454,9 +449,11 @@ void TaskManager::handleFlowTaskQueue()
         switch (task) {
         case FlowTask::Synthesis:
             TclConsole::instance()->executeTclCommand(buildSynthScript());
+            LogWidget::instance()->switchSynLog();
             break;
         case FlowTask::Implementation:
             TclConsole::instance()->executeTclCommand(buildImpScript());
+            LogWidget::instance()->switchImpLog();
             break;
         case FlowTask::WriteBitstream:
             TclConsole::instance()->executeTclCommand(buildBitScript());

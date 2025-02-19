@@ -44,8 +44,6 @@ public:
     std::chrono::system_clock::time_point  endTimeForCal;
     // 执行总用时（用于显示）
     QString elapsedTime;
-    // 上个子阶段的内存占用
-    float lastMemory;
     // partName
     QString partName;
     // displayPart
@@ -75,10 +73,7 @@ public:
 
     //获取时间间隔
     QString getElapsedTime();
-    //获取进程占用内存峰值
-    float getPeak() const;
-    //获取进程占用内存增加量
-    float getGain();
+
 private:
     ProcessManager();
     ~ProcessManager();
@@ -89,7 +84,6 @@ private:
 
     bool isCancel = false;
 
-    MemoryUtilities *memoryUtilities;
 private slots:
     void handleFinished(int exitCode,QProcess::ExitStatus exitStatus);
     void handleChannelReadyReadOutput();

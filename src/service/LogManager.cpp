@@ -56,8 +56,8 @@ void LogManager::addLog(const LogPipeContent& oneLog) {
                     lastPhase,
                     "Finished " + lastSubPhase +
                     ": Time (s): elapsed = " + ProcessManager::instance().getElapsedTime() +
-                    " Memory (MB): peak = " + QString::number(ProcessManager::instance().getPeak(), 'f', 2) +
-                    " gain = " + QString::number(ProcessManager::instance().getGain(), 'f', 2)
+                    " Memory (MB): peak = " + QString::number(MemoryUtilities::instance()->getPeakMemory(), 'f', 2) +
+                    " gain = " + QString::number(MemoryUtilities::instance()->getGainMemory(), 'f', 2)
             );
             LogWidget::instance()->appendLog(lastPhase, QString("-").repeated(100));
         }
