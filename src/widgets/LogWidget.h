@@ -39,6 +39,7 @@ public:
 
     void appendLog(const QString &phaseType, const QString& str);
     void appendLog(const LogPipeContent& one_log);
+    void appendDebugLog(const QString& str);
     void switchSynLog();
     void switchImpLog();
     void switchSimLog();
@@ -52,6 +53,7 @@ private:
     SingleLogWidget* synthesisLogWidget;
     SingleLogWidget* implementationLogWidget;
     SingleLogWidget* simulationLogWidget;
+    SingleLogWidget* debugLogWidget;
 };
 
 

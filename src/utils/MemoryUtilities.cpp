@@ -51,11 +51,50 @@ void MemoryUtilities::checkMemoryUsage() {
         // Unable to open process with ID
         return;
     }
+    SIZE_T curMemory = 0;
+    // 得到进程占用
+    GetProcessMemoryUsage(_pid, curMemory);
+    // 得到其子进程占用
+    ListProcessChildren(_pid, curMemory);
+    _curMemory = curMemory / 1024.0 / 1024.0;
+    _peakMemory = std::max(_curMemory, _peakMemory);
+}
+
+void MemoryUtilities::GetProcessMemoryUsage(DWORD processID, SIZE_T &totalMemoryUsage) {
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+    if (hProcess == NULL) {
+        qDebug() << "Unable to open process with ID " << processID;
+        return;
+    }
 
     PROCESS_MEMORY_COUNTERS pmc;
     if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
-        _curMemory = pmc.WorkingSetSize / 1024.0 / 1024.0;
-        _peakMemory = std::max(_curMemory, _curMemory);
+        totalMemoryUsage += pmc.WorkingSetSize; // 累加内存使用量
+    } else {
+        qDebug() << "Failed to get memory information for process " << processID;
     }
+
     CloseHandle(hProcess);
+}
+
+void MemoryUtilities::ListProcessChildren(DWORD parentPID, SIZE_T &totalMemoryUsage) {
+    PROCESSENTRY32 pe32;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+        qDebug() << "Failed to create snapshot";
+        return;
+    }
+
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+    if (Process32First(hSnapshot, &pe32)) {
+        do {
+            if (pe32.th32ParentProcessID == parentPID) {
+                // 发现子进程，监控它的内存使用
+                GetProcessMemoryUsage(pe32.th32ProcessID, totalMemoryUsage);
+            }
+        } while (Process32Next(hSnapshot, &pe32));
+    }
+
+    CloseHandle(hSnapshot);
 }

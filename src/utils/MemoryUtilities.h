@@ -37,9 +37,8 @@ private:
 
     Q_DISABLE_COPY(MemoryUtilities);
 
-    void ListProcessChildren();
-
-    void GetProcessMemoryUsage(DWORD processID);
+    void ListProcessChildren(DWORD processID, SIZE_T &totalMemoryUsage);
+    void GetProcessMemoryUsage(DWORD processID, SIZE_T &totalMemoryUsage);
 
     QTimer *timer;
 
