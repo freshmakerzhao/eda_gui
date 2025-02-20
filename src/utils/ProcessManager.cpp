@@ -95,10 +95,9 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     msg.workPath = curProjectPath;
     msg.isCancel = this->isCancel;
 
+    MemoryUtilities::instance()->stopWatch();
     // 回传给taskmanager
     emit finishMessage(msg);
-
-    MemoryUtilities::instance()->stopWatch();
 }
 
 ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(LogManager::instance())
