@@ -118,12 +118,15 @@ void LogWidget::appendLog(const QString &phaseType, const QString &str) {
         implementationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
     else if(!phaseType.compare("simulation", Qt::CaseInsensitive) && !simulationLogWidget->pauseStatus)
         simulationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
+    else if(!debugLogWidget->pauseStatus)
+        debugLogWidget->logTextEdit->appendPlainText(str.chopped(1));
 
 //    logTextEdit->appendPlainText(str);
 }
 
 void LogWidget::appendDebugLog(const QString &str) {
-    debugLogWidget->logTextEdit->appendPlainText(str.chopped(1));
+    if(!debugLogWidget->pauseStatus)
+        debugLogWidget->logTextEdit->appendPlainText(str.chopped(1));
 }
 
 void LogWidget::appendLog(const LogPipeContent &one_log) {
