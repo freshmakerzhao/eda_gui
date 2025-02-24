@@ -95,11 +95,9 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     msg.workPath = curProjectPath;
     msg.isCancel = this->isCancel;
 
+    MemoryUtilities::instance()->stopWatch();
     // 回传给taskmanager
     emit finishMessage(msg);
-
-    delete memoryUtilities;
-    lastMemory = 0;
 }
 
 ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(LogManager::instance())
@@ -109,7 +107,7 @@ ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(
     pipeServer.start(); // 启动管道监听
     // ============== 启动管道监听 ==============
 
-
+    MemoryUtilities::instance();
 //    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
     // finished 信号，process执行完毕后触发
     connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
@@ -117,7 +115,6 @@ ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(
 
 ProcessManager::~ProcessManager()
 {
-    delete memoryUtilities;
     delete process;
 }
 
@@ -160,8 +157,7 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
     }
 
     //进程内存占用监听50ms获取一次
-    memoryUtilities = new MemoryUtilities(process->processId(), 50);
-    lastMemory = 0;
+    MemoryUtilities::instance()->setWatchMemory(process->processId(), 50);
 }
 
 void ProcessManager::kill()
@@ -222,17 +218,4 @@ QString ProcessManager::getElapsedTime() {
     QString elapsed =  TimeUtilities::calculateTimeDifference(lastTime, curTime);
     this->lastTime = curTime;
     return elapsed;
-}
-
-float ProcessManager::getPeak() const{
-    return memoryUtilities->getMaxMemory();
-}
-
-float ProcessManager::getGain() {
-    if(memoryUtilities == nullptr)
-        return 0;
-    float curMemory = memoryUtilities->getCurrentMemory();
-    float gain = curMemory - lastMemory;
-    lastMemory = curMemory;
-    return gain;
 }

@@ -118,8 +118,15 @@ void LogWidget::appendLog(const QString &phaseType, const QString &str) {
         implementationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
     else if(!phaseType.compare("simulation", Qt::CaseInsensitive) && !simulationLogWidget->pauseStatus)
         simulationLogWidget->logTextEdit->appendPlainText(str.chopped(1));
+    else if(!debugLogWidget->pauseStatus)
+        debugLogWidget->logTextEdit->appendPlainText(str.chopped(1));
 
 //    logTextEdit->appendPlainText(str);
+}
+
+void LogWidget::appendDebugLog(const QString &str) {
+    if(!debugLogWidget->pauseStatus)
+        debugLogWidget->logTextEdit->appendPlainText(str.chopped(1));
 }
 
 void LogWidget::appendLog(const LogPipeContent &one_log) {
@@ -142,10 +149,12 @@ LogWidget::LogWidget(QWidget* parent)
     synthesisLogWidget = new SingleLogWidget("synthesis");
     implementationLogWidget = new SingleLogWidget("implementation");
     simulationLogWidget = new SingleLogWidget("simulation");
+    debugLogWidget = new SingleLogWidget("debug");
 
     phaseTabWidget->addTab(synthesisLogWidget, "Synthesis");
     phaseTabWidget->addTab(implementationLogWidget, "Implementation");
     phaseTabWidget->addTab(simulationLogWidget, "Simulation");
+    phaseTabWidget->addTab(debugLogWidget, "Program And Debug");
 
     QVBoxLayout* vlayout = new QVBoxLayout(this);
     vlayout->setMargin(0);

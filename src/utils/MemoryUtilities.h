@@ -8,6 +8,7 @@
 #ifdef WIN32
 #include <windows.h>
 #include <psapi.h>
+#include <tlhelp32.h>
 #else
 
 #endif
@@ -19,15 +20,32 @@ class MemoryUtilities : public QObject {
     Q_OBJECT
 
 public:
-    MemoryUtilities(DWORD pid, int cycle);
-    float getCurrentMemory();
-    float getMaxMemory();
+    static MemoryUtilities *instance();
+
+    void setWatchMemory(DWORD pid, int cycle);
+
+    void stopWatch();
+
+    float getPeakMemory();
+
+    float getGainMemory();
 
 private:
+    MemoryUtilities();
+
+    ~MemoryUtilities();
+
+    Q_DISABLE_COPY(MemoryUtilities);
+
+    void ListProcessChildren(DWORD processID, SIZE_T &totalMemoryUsage);
+    void GetProcessMemoryUsage(DWORD processID, SIZE_T &totalMemoryUsage);
+
     QTimer *timer;
-    float curMemory;
-    float maxMemory;
-    DWORD pid;
+
+    float _lastMemory;
+    float _curMemory;
+    float _peakMemory;
+    DWORD _pid;
 
 public slots:
     void checkMemoryUsage();
