@@ -225,12 +225,13 @@ QGraphicsView *View::view() const
 
 void View::resetView()
 {
-    zoomSlider->setValue(250);
+//    zoomSlider->setValue(250);
     rotateSlider->setValue(0);
-    setupMatrix();
-    graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
-
-    resetButton->setEnabled(false);
+    graphicsView->fitInView(graphicsView->sceneRect(), Qt::KeepAspectRatio);
+//    setupMatrix();
+//    graphicsView->ensureVisible(QRectF(100, 0, 0, 0));
+//
+//    resetButton->setEnabled(false);
 }
 
 void View::cellLocationShow(Block* cell) {

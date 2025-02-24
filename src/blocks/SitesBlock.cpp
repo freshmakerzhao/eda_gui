@@ -34,6 +34,8 @@ SitesBlock::SitesBlock(
 
 
 bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(site_type == "SITESNULL")
+        return true;
     if(lod >= 0.01) return false;
     if(used_status) {
         painter->fillRect(QRectF(0, 0, width, height), QColor(Qt::green));
@@ -43,6 +45,8 @@ bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillC
 }
 
 void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(site_type == "SITESNULL")
+        return;
     if(!getVisibleStatus())
         return;
 
