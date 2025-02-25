@@ -146,12 +146,18 @@ public:
 
 class SitesIPAD : public SitesBlock {
 public:
-    SitesIPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+    SitesIPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index, std::string &pin_name);
+private:
+    void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
+    std::string pin_name;
 };
 
 class SitesOPAD : public SitesBlock {
 public:
-    SitesOPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+    SitesOPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index, std::string &pin_name);
+private:
+    void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
+    std::string pin_name;
 };
 
 class SitesGTP2Common : public SitesBlock {
@@ -182,5 +188,44 @@ public:
 class SitesBUFMRCE : public SitesBlock {
 public:
     SitesBUFMRCE  (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+
+class SitesDNAPort : public SitesBlock {
+public:
+    SitesDNAPort (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+
+class SitesEFUSEUSR : public SitesBlock {
+public:
+    SitesEFUSEUSR (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+
+class SitesICAP : public SitesBlock {
+public:
+    SitesICAP (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+class SitesBSCAN : public SitesBlock {
+public:
+    SitesBSCAN (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+class SitesDCIRESET : public SitesBlock {
+public:
+    SitesDCIRESET (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+class SitesCAPTURE : public SitesBlock {
+public:
+    SitesCAPTURE (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+class SitesSTARTUP : public SitesBlock {
+public:
+    SitesSTARTUP  (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+class SitesFRAMEECC : public SitesBlock {
+public:
+    SitesFRAMEECC (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
+};
+class SitesUSRACCESS : public SitesBlock {
+public:
+    SitesUSRACCESS (const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index);
 };
 #endif //HYBRDLINK_SITESMODS_H

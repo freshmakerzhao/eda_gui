@@ -546,31 +546,142 @@ SitesGTP2Cannel::SitesGTP2Cannel(const QColor &color, int tile_index_x, int tile
 ) {
     this->setPos(QPointF(SITE_GAP, SITE_GAP));
 }
-SitesIPAD::SitesIPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+SitesIPAD::SitesIPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index, std::string &pin)
         : SitesBlock(
         color,
         GLOBAL_SITE_BLOCK_WIDTH,
         GLOBAL_SITE_BLOCK_HEIGHT,
         tile_index_x, tile_index_y,
         "IPAD", cur_name, site_index
-) {
-    this->setPos(
+), pin_name(pin) {
+    if(tile.types == "GTP_COMMON") {
+        this->setPos(
+            (GLOBAL_TILE_BLOCK_WIDTH)/2 + SITE_GAP,
+            (site_index-2) * SITE_GAP + (site_index-3) * height + 3*GLOBAL_TILE_BLOCK_HEIGHT
+        );
+    } else {
+        this->setPos(
             (GLOBAL_TILE_BLOCK_WIDTH)/2 + SITE_GAP,
             ((11*GLOBAL_TILE_BLOCK_HEIGHT - (4*height + 3 * 3*SITE_GAP))/2) + (site_index-1)*height + site_index*3*SITE_GAP
-    );
+        );
+    }
 }
-SitesOPAD::SitesOPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+void SitesIPAD::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(!getVisibleStatus())
+        return;
+
+    QPen oldPen = painter->pen();
+    QPen pen = oldPen;
+    pen.setWidth(1);
+    pen.setCosmetic(true);
+    painter->setPen(pen);
+
+    if (lod >= 0.05 && !child_bel_items.isEmpty()) {
+        setBelShow(true);
+        painter->setBrush(Qt::NoBrush);
+    } else {
+        setBelShow(false);
+    }
+
+    painter->drawRect(QRect(0, 0, width, height));
+
+    //获取当前视图的缩放比例
+    QGraphicsView *view = scene()->views().first();
+    qreal scaleFactor = view->transform().m11();
+
+    //保存当前的变换状态
+    QTransform originalTransform = painter->transform();
+
+    // 使用反向缩放因子，确保文本大小不受缩放影响
+    painter->scale(1 / scaleFactor, 1 / scaleFactor);
+    QFont font("Times");
+    font.setPointSize(type_font_size);
+    painter->setFont(font);
+
+    QString text = QString::fromStdString(this->name + " (" + site_type + ")");
+    int text_len = text.size() * type_font_size;
+    if (text_len <= width * scaleFactor) {
+        QRectF text_rect = QRect(2, height * scaleFactor - type_font_size - 6, width, 20);
+        painter->drawText(
+                text_rect,
+                Qt::AlignLeft | Qt::AlignTop,
+                text
+        );
+    }
+    int pin_name_len = pin_name.size() * type_font_size;
+    if (pin_name_len <= width / 2 * scaleFactor) {
+        QRectF pin_rect = QRect(2, 2, width, 20);
+        painter->drawText (
+                pin_rect,
+                Qt::AlignLeft | Qt::AlignTop,
+                QString::fromStdString(pin_name)
+        );
+    }
+}
+SitesOPAD::SitesOPAD(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index, std::string &pin)
         : SitesBlock(
         color,
         GLOBAL_SITE_BLOCK_WIDTH,
         GLOBAL_SITE_BLOCK_HEIGHT,
         tile_index_x, tile_index_y,
         "OPAD", cur_name, site_index
-) {
+), pin_name(pin) {
     this->setPos(
             (GLOBAL_TILE_BLOCK_WIDTH)/2 + SITE_GAP,
             ((11*GLOBAL_TILE_BLOCK_HEIGHT - (4*height + 3 * 3*SITE_GAP))/2) + (site_index-1)*height + site_index*3*SITE_GAP
     );
+}
+void SitesOPAD::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(!getVisibleStatus())
+        return;
+
+    QPen oldPen = painter->pen();
+    QPen pen = oldPen;
+    pen.setWidth(1);
+    pen.setCosmetic(true);
+    painter->setPen(pen);
+
+    if (lod >= 0.05 && !child_bel_items.isEmpty()) {
+        setBelShow(true);
+        painter->setBrush(Qt::NoBrush);
+    } else {
+        setBelShow(false);
+    }
+
+    painter->drawRect(QRect(0, 0, width, height));
+
+    //获取当前视图的缩放比例
+    QGraphicsView *view = scene()->views().first();
+    qreal scaleFactor = view->transform().m11();
+
+    //保存当前的变换状态
+    QTransform originalTransform = painter->transform();
+
+    // 使用反向缩放因子，确保文本大小不受缩放影响
+    painter->scale(1 / scaleFactor, 1 / scaleFactor);
+    QFont font("Times");
+    font.setPointSize(type_font_size);
+    painter->setFont(font);
+
+    QString text = QString::fromStdString(this->name + " (" + site_type + ")");
+    int text_len = text.size() * type_font_size;
+    if (text_len <= width * scaleFactor) {
+        QRectF text_rect = QRect(2, height * scaleFactor - type_font_size - 6, width, 20);
+        painter->drawText(
+                text_rect,
+                Qt::AlignLeft | Qt::AlignTop,
+                text
+        );
+    }
+    int pin_name_len = pin_name.size() * type_font_size;
+    if (pin_name_len <= width / 2 * scaleFactor) {
+        QRectF pin_rect = QRect(2, 2, width, 20);
+        painter->drawText (
+                pin_rect,
+                Qt::AlignLeft | Qt::AlignTop,
+                QString::fromStdString(pin_name)
+        );
+    }
 }
 SitesGTP2Common::SitesGTP2Common(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
         : SitesBlock(
@@ -586,11 +697,14 @@ SitesIBufsGTE2::SitesIBufsGTE2(const QColor &color, int tile_index_x, int tile_i
 : SitesBlock(
         color,
         GLOBAL_SITE_BLOCK_WIDTH,
-        GLOBAL_SITE_BLOCK_HEIGHT,
+        (3 * GLOBAL_TILE_BLOCK_HEIGHT - SITE_GAP)/2 - SITE_GAP ,
         tile_index_x, tile_index_y,
         "IBUFDS_GTE2", cur_name, site_index
 ) {
-
+    this->setPos(
+            (GLOBAL_TILE_BLOCK_WIDTH)/2 + SITE_GAP,
+            site_index * SITE_GAP + (site_index-1) * height
+    );
 }
 SitesBUFGCTRL::SitesBUFGCTRL(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
         : SitesBlock(
@@ -645,6 +759,134 @@ SitesBUFMRCE::SitesBUFMRCE(const QColor &color, int tile_index_x, int tile_index
     );
 }
 
+SitesEFUSEUSR::SitesEFUSEUSR(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        3*GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "EFUSE_USR", cur_name, site_index
+) {
+    const int gap = 4*GLOBAL_TILE_BLOCK_HEIGHT/3;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap
+    );
+}
+
+SitesDNAPort::SitesDNAPort(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        3*GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "DNA_PORT", cur_name, site_index
+) {
+    const int gap = 4*GLOBAL_TILE_BLOCK_HEIGHT/3;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap
+    );
+}
+
+SitesICAP::SitesICAP(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "ICAP", cur_name, site_index
+) {
+    const int gap = 3*SITE_GAP;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap + GLOBAL_TILE_BLOCK_HEIGHT
+    );
+}
+SitesBSCAN::SitesBSCAN(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "BSCAN", cur_name, site_index
+) {
+    const int gap = 3*SITE_GAP;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap + GLOBAL_TILE_BLOCK_HEIGHT
+    );
+}
+SitesDCIRESET::SitesDCIRESET(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "DCIRESET", cur_name, site_index
+) {
+    const int gap = 3*SITE_GAP;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap + GLOBAL_TILE_BLOCK_HEIGHT
+    );
+}
+SitesCAPTURE::SitesCAPTURE(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "CAPTURE", cur_name, site_index
+) {
+    const int gap = 3*SITE_GAP;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap + GLOBAL_TILE_BLOCK_HEIGHT
+    );
+}
+SitesSTARTUP::SitesSTARTUP(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "STARTUP", cur_name, site_index
+) {
+    const int gap = 3*SITE_GAP;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap + GLOBAL_TILE_BLOCK_HEIGHT
+    );
+}
+SitesFRAMEECC::SitesFRAMEECC(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "FRAME_ECC", cur_name, site_index
+) {
+    const int gap = 3*SITE_GAP;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap + GLOBAL_TILE_BLOCK_HEIGHT
+    );
+}
+SitesUSRACCESS::SitesUSRACCESS(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
+        : SitesBlock(
+        color,
+        GLOBAL_TILE_BLOCK_WIDTH - 2 * (3 * SITE_GAP),
+        GLOBAL_TILE_BLOCK_HEIGHT,
+        tile_index_x, tile_index_y,
+        "USR_ACCESS", cur_name, site_index
+) {
+    const int gap = 3*SITE_GAP;
+    this->setPos(
+            3*SITE_GAP,
+            site_index*height + (site_index+1)*gap + GLOBAL_TILE_BLOCK_HEIGHT
+    );
+}
 SitesNull::SitesNull(const QColor &color, int tile_index_x, int tile_index_y, NormalTile tile, std::string &cur_name, int site_index)
         :SitesBlock(color, GLOBAL_SITE_BLOCK_WIDTH, GLOBAL_SITE_BLOCK_HEIGHT, tile_index_x, tile_index_y, "SITESNULL", cur_name, site_index) {
     //不显示

@@ -138,7 +138,7 @@ struct NormalTile {
             std::string name = it.key();
             std::string type = it.value();
             std::string pin = "";
-            if(type == "IOB33" || type == "IOB33M" || type == "IOB33S")
+            if(type == "IOB33" || type == "IOB33M" || type == "IOB33S" || type == "IPAD" || type == "OPAD")
                 if(pins.contains(name))
                     pin = pins[name]["pin_name"];
             NormalSite site(name, type, pin, index);

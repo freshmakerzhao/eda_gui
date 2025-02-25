@@ -107,10 +107,10 @@ SitesBlockFactory::SitesBlockFactory() {
         return new SitesGTP2Common(color, i, j, tile, name, index);
     });
     registerType("IPAD",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
-        return new SitesIPAD(color, i, j, tile, name, index);
+        return new SitesIPAD(color, i, j, tile, name, index, pin);
     });
     registerType("OPAD",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
-        return new SitesOPAD(color, i, j, tile, name, index);
+        return new SitesOPAD(color, i, j, tile, name, index, pin);
     });
     registerType("BUFGCTRL",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
         return new SitesBUFGCTRL(color, i, j, tile, name, index);
@@ -123,6 +123,36 @@ SitesBlockFactory::SitesBlockFactory() {
     });
     registerType("BUFMRCE",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
         return new SitesBUFMRCE(color, i, j, tile, name, index);
+    });
+    registerType("IBUFDS_GTE2",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesIBufsGTE2(color, i, j, tile, name, index);
+    });
+    registerType("DNA_PORT",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesDNAPort(color, i, j, tile, name, index);
+    });
+    registerType("EFUSE_USR",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesEFUSEUSR(color, i, j, tile, name, index);
+    });
+    registerType("ICAP",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesICAP(color, i, j, tile, name, index);
+    });
+    registerType("BSCAN",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesBSCAN(color, i, j, tile, name, index);
+    });
+    registerType("DCIRESET",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesDCIRESET(color, i, j, tile, name, index);
+    });
+    registerType("CAPTURE",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesCAPTURE(color, i, j, tile, name, index);
+    });
+    registerType("STARTUP",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesSTARTUP(color, i, j, tile, name, index);
+    });
+    registerType("FRAME_ECC",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesFRAMEECC(color, i, j, tile, name, index);
+    });
+    registerType("USR_ACCESS",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+        return new SitesUSRACCESS(color, i, j, tile, name, index);
     });
 }
 

@@ -317,8 +317,6 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
 
             //设置为空类型(不显示)的map
             std::string type = gridTypeMatrix[i][j].types;
-            if (type == "PCIE_BOT" || (j == 32 && i == 104))
-                qDebug() << QString::fromStdString(type);
             auto it = SHOW_TILE.find(type);
             if(it == SHOW_TILE.end()) {
                 std::string nullType = "NULL";
