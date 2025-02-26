@@ -90,6 +90,7 @@ View::View(const QString &name, QWidget *parent)
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState); // 设置GraphicsView的优化标记为不保存Painter的状态
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate); // 设置GraphicsView的视口更新模式为智能视口更新
     graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse); // 设置GraphicsView的变换锚点为鼠标下方
+    graphicsView->setBackgroundBrush(Qt::black);//设置GraphicsView背景颜色为黑色
 
     int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize); // 获取工具栏图标的尺寸
     QSize iconSize(size, size); // 创建一个新的QSize对象，设置其宽度和高度为工具栏图标的尺寸

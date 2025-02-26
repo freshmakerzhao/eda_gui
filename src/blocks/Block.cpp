@@ -54,8 +54,11 @@ void Block::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 
     painter->save();
 
+    pen.setColor(block_color);
+    painter->setPen(pen);
+
     if(used_status)
-        painter->setBrush(QColor(QColor(0, 255, 0, 127)));
+        painter->setBrush(QColor(QColor(0, 255, 0, 127))); //若资源使用，标记为绿色
 
     painter->save();
 
@@ -66,6 +69,7 @@ void Block::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     //点击选中显示
     if (option->state & QStyle::State_Selected) {
         pen.setWidth(4);
+        pen.setColor(Qt::white);
         painter->setPen(pen);
         painter->setBrush(QColor(100, 100, 100, 127));
         painter->drawRect(QRect(0, 0, width, height));

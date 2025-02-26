@@ -78,6 +78,8 @@ void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillCo
     QFont font("Times");
     font.setPointSize(type_font_size);
     painter->setFont(font);
+    pen.setColor(Qt::gray);
+    painter->setPen(pen);
 
     QString text = QString::fromStdString(this->name + " (" + site_type + ")");
     int text_len = text.size() * type_font_size;

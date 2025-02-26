@@ -328,31 +328,33 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                         j,
                         gridTypeMatrix[i][j].width,
                         gridTypeMatrix[i][j].height,
-                        nullType
+                        nullType,
+                        gridTypeMatrix[i][j].tile_name
                 );
                 if(j == 1)
                     lastCowShow = false;
                 continue;
             } else {
                 gridMatrix[i][j] = new Tiles(
-                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+//                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+                        Qt::darkBlue,
                         gridTypeMatrix[i][j].loc_x,
                         gridTypeMatrix[i][j].loc_y,
                         i,
                         j,
                         gridTypeMatrix[i][j].width,
                         gridTypeMatrix[i][j].height,
-                        gridTypeMatrix[i][j].types
+                        gridTypeMatrix[i][j].types,
+                        gridTypeMatrix[i][j].tile_name
                 );
                 gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate - widthCount, gridTypeMatrix[i][j].y_coordinate));
-//                gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate, gridTypeMatrix[i][j].y_coordinate));
                 lastCowShow = true;
             }
-
+            //例化siteBlcok
             for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
                 NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
                 SitesBlock* site_block = SitesBlockFactory::Instance().create(
-                        site.type, Qt::white, i, j, gridTypeMatrix[i][j], site.name, site.index, site.pin
+                        site.type, Qt::gray, i, j, gridTypeMatrix[i][j], site.name, site.index, site.pin
                 );
                 gridMatrix[i][j]->addSubBlock(site_block);
                 size_t pos = site.name.find("_X");
@@ -488,7 +490,7 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
         colorIndex = (colorIndex + 1) % colors.size();
 
         QGraphicsRectItem *rectItem = scene->addRect(rect, pen);
-        rectItem->setVisible(false);
+        rectItem->setVisible(true);
         clock_region_rects.insert(rectItem);
     }
 
