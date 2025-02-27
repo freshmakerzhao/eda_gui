@@ -1,7 +1,8 @@
 #ifndef NormalBlock_H
 #define NormalBlock_H
 
-#include "Blocks.h"
+#include "SitesBlock.h"
+#include "Block.h"
 #include <QColor>
 #include <QGraphicsItem>
 
