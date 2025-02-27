@@ -9,7 +9,6 @@
 #include <QGraphicsScene>
 #include "utils/json.hpp"
 #include "entity/TileGridDataMap.h"
-#include "blocks/Blocks.h"
 #include <QCoreApplication>
 #include <fstream>
 #include <unordered_set>
