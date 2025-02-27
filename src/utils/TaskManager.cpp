@@ -1,4 +1,12 @@
-#include <QMessageBox>
+/**
+  ******************************************************************************
+  * @file           : TaskManager.cpp
+  * @author         : ksy
+  * @description    : None
+  * @attention      : None
+  * @date           : 2024/3/4
+  ******************************************************************************
+  */
 #include "TaskManager.h"
 #include "utils/ProcessManager.h"
 #include "utils/StringUtilities.h"
@@ -10,7 +18,10 @@
 #include "FileHelper.h"
 #include "service/HardWareManager.h"
 #include "dialog/AdvancedFileDialog.h"
+#include "dialog/CustomMessageBox.h"
+#include "settings/SettingsDialog.h"
 #include "base/Globals.h"
+#include "widgets/LogWidget.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -32,33 +43,18 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     // 双击触发
     if (mode == 0) {
         // 综合
-        taskController(0);
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
+        flowTaskController(0);
     } else if (mode == 1) {
         // synthReport();
     } else if (mode == 2) {
         // pack place route全流程
-        taskController(2);
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
+        flowTaskController(2);
     } else if (mode == 3) {
 //        buildPack();
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 6) {
         // impReport();
-    } else if (mode == 4) {
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
-    } else if (mode == 5) {
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 8) {
-        QString arguments = buildBitScript();
-        publishScript(projectSynthPath,arguments);
-        // 激活 log 窗口
-        InfoWidget::instance()->setCurrentPage(2);
+        flowTaskController(8);
     } else if (mode == 9) {
         qDebug() << "[TaskManager] arch " << this->arch;
         std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
@@ -92,12 +88,6 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     } else if (mode == 13) {
         SettingsDialog dialog;
         dialog.exec();
-        // if (settingDialog) {
-        //     delete settingDialog;
-        //     settingDialog = nullptr;
-        // }
-        // settingDialog = new SettingsDialog;
-        // settingDialog->show();
     } else if (mode == 14) {
         MainWindow::instance()->showPrjSummary();
     } else if (mode == 15) {
@@ -155,191 +145,53 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         InfoWidget::instance()->setCurrentPage(2);
     } else if (mode == 18) {
         // simulation
-        publishScript(projectSimPath,buildSimScript());
+        TclConsole::instance()->executeTclCommand(buildSimScript());
     }
 }
-/**
- * 任务分配器
- * @param mode 待执行任务
- */
-void TaskManager::taskController(const int mode) {
+
+void TaskManager::flowTaskController(const int &mode) {
     const bool sourceModified = fileChanged;
     std::string netlistPath = StringUtilities::concatPath({projectSynthPath.toStdString(), (topName + netlistType).toStdString()});
     const bool netlistExist = FileHelper::fileExists(netlistPath);
-    this->initMessageStatus();
-    if (mode == 0){
-        // 综合操作
-        if (netlistExist){
-            if (sourceModified){
-                // 有网表且文件有改动
-                if(twoOptionMsg(
-                        "Run Synthesis",
-                        "Re-running synthesis will result in resetting implementation and removing all results files. OK to proceed?",
-                        QMessageBox::Ok,
-                        QMessageBox::Cancel
-                )){
-                    // 用户点击OK
-                    this->setSynthSuccessMsgStatus(true);
-                    this->setNextImplementProcessStatus(false);
-                    // 执行综合
-                    QString arguments = buildSynthScript();
-                    publishScript(projectSynthPath,arguments);
-                    fileChanged = false;
-                    return;
-                } else {
-                    // 取消操作
-                    return;
-                }
-            } else {
-                // 有网表且文件没有改动
-                if(twoOptionMsg(
-                        "Run Synthesis",
-                        "Synthesis has already completed and is up to date. Re-run anyway?",
-                        QMessageBox::Ok,
-                        QMessageBox::Cancel
-                )){
-                    // 用户点击OK
-                    this->setSynthSuccessMsgStatus(true);
-                    this->setNextImplementProcessStatus(false);
-                    // 执行综合
-                    QString arguments = buildSynthScript();
-                    publishScript(projectSynthPath,arguments);
-                    fileChanged = false;
-                    return;
-                } else {
-                    // 取消操作
-                    return;
-                }
-            }
-        } else {
-            // 如果网表不存在
-            this->setSynthSuccessMsgStatus(true);
-            this->setNextImplementProcessStatus(false);
-            // 直接执行
-            QString arguments = buildSynthScript();
-            publishScript(projectSynthPath,arguments);
-            fileChanged = false;
-            return;
-        }
-    } else if (mode == 2){
-        // implement
-        std::string implResultPath = StringUtilities::concatPath({projectImplPath.toStdString(), (topName + implResultType).toStdString()});
-        bool implementExist = FileHelper::fileExists(implResultPath);
-        if (netlistExist){
-            if (implementExist){
-                // 存在
-                if (sourceModified){
-                    // 设计文件有改动
-                    if(twoOptionMsg(
-                            "Synthesis is Out-of-date",
-                            "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
-                            QMessageBox::Ok,
-                            QMessageBox::Cancel
-                    )){
-                        // 重新综合
-                        // 综合命令
-                        QString synthScript = buildSynthScript();
-                        // implement命令
-                        QString implScript = buildImpScript();
+    std::string implResultPath = StringUtilities::concatPath({projectImplPath.toStdString(), (topName + implResultType).toStdString()});
+    const bool implementExist = FileHelper::fileExists(implResultPath);
 
-                        this->setSynthSuccessMsgStatus(false);
-                        this->setNextImplementProcessStatus(true);
-
-                        setNextPhaseParam("implementation", projectImplPath, implScript);
-                        publishScript(projectSynthPath,synthScript);
-                        fileChanged = false;
-                        return;
-                    } else {
-                        // 不操作
-                        return;
-                    }
-                } else {
-                    // 设计文件没有改动
-                    if(twoOptionMsg(
-                            "Run Implement",
-                            "A completed implementation run exists. Re-run anyway?",
-                            QMessageBox::Ok,
-                            QMessageBox::Cancel
-                    )){
-                        // 重新implement
-                        this->setSynthSuccessMsgStatus(false);
-                        this->setNextImplementProcessStatus(true);
-                        QString implScript = buildImpScript();
-                        publishScript(projectImplPath,implScript);
-                        fileChanged = false;
-                        return;
-                    } else {
-                        // 不操作
-                        return;
-                    }
-                }
-            } else {
-                // 没有net、place、route文件
-                if (sourceModified){
-                    // 设计文件有改动
-                    if(twoOptionMsg(
-                            "Synthesis is Out-of-date",
-                            "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
-                            QMessageBox::Ok,
-                            QMessageBox::Cancel
-                    )){
-                        // 重新综合
-                        // 综合命令
-                        QString synthScript = buildSynthScript();
-                        // implement命令
-                        QString implScript = buildImpScript();
-                        // 不显示综合成功弹窗
-                        this->setSynthSuccessMsgStatus(false);
-                        this->setNextImplementProcessStatus(true);
-
-                        // 定义综合后执行的命令
-                        this->setNextPhaseParam("implementation", projectImplPath, implScript);
-                        // 执行综合
-                        publishScript(projectSynthPath,synthScript);
-                        fileChanged = false;
-                        return;
-                    } else {
-                        // 不操作
-                        return;
-                    }
-                } else {
-                    // 设计文件没有改动
-                    // 直接执行implement
-                    this->setSynthSuccessMsgStatus(false);
-                    this->setNextImplementProcessStatus(true);
-                    QString implScript = buildImpScript();
-                    publishScript(projectImplPath,implScript);
-                    fileChanged = false;
-                    return;
-                }
-            }
-        } else {
-            // 网表不存在
-            if(twoOptionMsg(
-                    "Missing Syntheis Results",
-                    "There is no netlist available. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
-                    QMessageBox::Ok,
-                    QMessageBox::Cancel
-            )){
-                // 综合
-                // 综合命令
-                QString synthScript = buildSynthScript();
-                // implement命令
-                QString implScript = buildImpScript();
-                // 不显示综合成功弹窗
-                this->setSynthSuccessMsgStatus(false);
-                this->setNextImplementProcessStatus(true);
-                // 定义综合后执行的命令
-                setNextPhaseParam("implementation", projectImplPath, implScript);
-                publishScript(projectSynthPath,synthScript);
-                fileChanged = false;
-                return;
-            } else {
-                // 取消操作
-                return;
-            }
-        }
+    QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+    if (!netlistExist) {
+        settings.setValue(FlowPhase::Synthsis, FlowState::NoStarted);
     }
+    if (!implementExist) {
+        settings.setValue(FlowPhase::Implementation, FlowState::NoStarted);
+        settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+    }
+    settings.sync();
+
+    //! Clear the task queue before each start.
+    flowTaskQueue.clear();
+
+    switch (mode) {
+    case 0:
+        handleSynthClick();
+        break;
+    case 2:
+        handleImplClick();
+        break;
+    case 8:
+        handleGenBitClick();
+        break;
+    default:
+        break;
+    }
+
+    if (flowTaskQueue.empty()) {
+        qDebug("\033[32m[Click Cancel on any MessageBox.]\033[0m");
+        return;
+    }
+
+    InfoWidget::instance()->setCurrentPage(2);
+
+    qDebug("\033[32m[Run the first task in the task queue.]\033[0m");
+    handleFlowTaskQueue();
 }
 
 /**
@@ -359,6 +211,21 @@ void TaskManager::setParams(const QMap<Project::ParamKey, QString> &params)
     displayPartName = params[Project::DisplayPart];
     archName = params[Project::ArchName];
     arch = params[Project::Arch];
+}
+
+void TaskManager::initStateMachine()
+{
+    //! Create .state if it does not exist.
+    QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+    if (!settings.contains(FlowPhase::Synthsis)) {
+        settings.setValue(FlowPhase::Synthsis, FlowState::NoStarted);
+    }
+    if (!settings.contains(FlowPhase::Implementation)) {
+        settings.setValue(FlowPhase::Implementation, FlowState::NoStarted);
+    }
+    if (!settings.contains(FlowPhase::GenerateBitstream)) {
+        settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoStarted);
+    }
 }
 
 /**
@@ -449,6 +316,17 @@ QString TaskManager::buildSimScript() {
 void TaskManager::onFileChanged() {
     fileChanged = true;
     qDebug("\033[43m[FileWatcher]\033[0m File Changed");
+
+    QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+    if (settings.value(FlowPhase::Synthsis) != FlowState::NoStarted) {
+        settings.setValue(FlowPhase::Synthsis, FlowState::OutOfDate);
+    }
+    if (settings.value(FlowPhase::Implementation) != FlowState::NoStarted) {
+        settings.setValue(FlowPhase::Implementation, FlowState::NoAvailable);
+    }
+    if (settings.value(FlowPhase::GenerateBitstream) != FlowState::NoStarted) {
+        settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+    }
 }
 
 // 烧写位流
@@ -478,30 +356,14 @@ void TaskManager::downloadFlash(const QString &projectImplPath1, const QString &
 //    }
 }
 
-// 两个选项的弹窗，true 左侧，false 右侧
-bool TaskManager::twoOptionMsg(const QString &title, const QString &text, QMessageBox::StandardButton buttonLeft, QMessageBox::StandardButton buttonRight) {
-    // 等待用户响应
-    int msg = CustomMessageBox::question(
-            MainWindow::instance(),
-            title,
-            text,
-            buttonLeft | buttonRight
-        );
-    // 根据用户选择做出响应
-    if (msg == buttonLeft) {
-        return true;
-    } else if (msg == buttonRight) {
-        return false;
-    }
-    return false;
-}
-
 void TaskManager::handleMessage(ProcessMessage &msg) {
     // 如果当前执行完毕
     // exitCode 为0表示正常执行并成功退出
     if (msg.exitCode == 0) {
         MainWindow::instance()->setRunState(msg.phase + " Complete!", false);
         if (msg.phase == "Synthesis"){
+            QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+            settings.setValue(FlowPhase::Synthsis, FlowState::Complete);
             // 综合结束后，读取资源统计信息
             InfoWidget::instance()->updateSynthItem(
                     msg.workPath,
@@ -509,78 +371,286 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
                     msg.startTime,
                     msg.elapsedTime,
                     msg.displayPartName);
-            if(this->_showSynthSuccessMsg){
+            if(this->_isShowSuccessMessage) {
                 // 只有接下来不做操作时，才弹出窗口
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
                 // 需要弹窗则弹窗
                 CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
             }
-            if(this->_hasNextImplementProcess){
-                // 如果需要做
-                this->publishScript(this->_nextWorkPath, this->_nextTclCommand);
-            }
         } else if (msg.phase == "Implementation"){
+            QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+            settings.setValue(FlowPhase::Implementation, FlowState::Complete);
             InfoWidget::instance()->updateImplItem(
                     msg.workPath,
                     msg.phase + " Complete!",
                     msg.startTime,
                     msg.elapsedTime,
                     msg.displayPartName);
-            if(this->_showImplementSuccessMsg){
+            if(this->_isShowSuccessMessage){
                 // 只有接下来不做操作时，才弹出窗口
                 // Implementation结束后，读取资源统计信息
                 // 跳转到资源展示窗口
                 InfoWidget::instance()->setCurrentPage(4);
                 CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
             }
-        } else {
-            // 生成码流结束提示，后续在此扩展
+        } else if (msg.phase == "Generate Bitstream"){
+            QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+            settings.setValue(FlowPhase::GenerateBitstream, FlowState::Complete);
+            // 生成码流结束提示
             CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
+
+        //输出阶段耗时，内存占用
+        LogWidget::instance()->appendLog(
+            msg.phase,
+            msg.phase + "_design:" +
+            " Time (s): elapsed = " + msg.elapsedTime +
+                " Memory (MB): peak = " + QString::number(MemoryUtilities::instance()->getPeakMemory(), 'f', 2) +
+                " gain = " + QString::number(MemoryUtilities::instance()->getGainMemory(), 'f', 2)
+            );
+        LogWidget::instance()->appendLog(msg.phase, QString("-").repeated(100));
+        LogManager::instance().firstSubPhaseStatus = true;
+        
+        qDebug("\033[32m[Run the next task.]\033[0m");
+        handleFlowTaskQueue();
+
         return;
     }
 
+    LogManager::instance().firstSubPhaseStatus = true;
+
     // Terminate or Fail
+    QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
     if (msg.isCancel) {
+        if (msg.phase == "Synthesis")          settings.setValue(FlowPhase::Synthsis, FlowState::NoAvailable);
+        if (msg.phase == "Implementation")     settings.setValue(FlowPhase::Implementation, FlowState::NoAvailable);
+        if (msg.phase == "Generate Bitstream") settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+
         MainWindow::instance()->resetRunState();
     } else {
+        if (msg.phase == "Synthesis")          settings.setValue(FlowPhase::Synthsis, FlowState::Fail);
+        if (msg.phase == "Implementation")     settings.setValue(FlowPhase::Implementation, FlowState::Fail);
+        if (msg.phase == "Generate Bitstream") settings.setValue(FlowPhase::GenerateBitstream, FlowState::Fail);
+
         MainWindow::instance()->setRunState(msg.phase + " failed.", false);
         CustomMessageBox::critical(MainWindow::instance(), msg.phase + " Failed", msg.phase + " failed.");
     }
-
-
 }
 
-// 将命令提交给tcl console
-void TaskManager::publishScript(const QString &workPath, const QString &tclCommand) {
-    Q_UNUSED(workPath); // 在TclConsole设置路径
-    TclConsole::instance()->executeTclCommand(tclCommand);
+void TaskManager::handleFlowTaskQueue()
+{
+    if (!flowTaskQueue.empty()) {
+        //! Show MessageBox after executing the last task.
+        _isShowSuccessMessage = (flowTaskQueue.size() == 1) ? true : false;
+
+        //! Execute task.
+        FlowTask &task = flowTaskQueue.front();
+        switch (task) {
+        case FlowTask::Synthesis:
+            TclConsole::instance()->executeTclCommand(buildSynthScript());
+            LogWidget::instance()->switchSynLog();
+            break;
+        case FlowTask::Implementation:
+            TclConsole::instance()->executeTclCommand(buildImpScript());
+            LogWidget::instance()->switchImpLog();
+            break;
+        case FlowTask::WriteBitstream:
+            TclConsole::instance()->executeTclCommand(buildBitScript());
+            break;
+        default:
+            break;
+        }
+
+        flowTaskQueue.dequeue();
+        qDebug() << "\033[32mRemaining tasks:" << flowTaskQueue.size() << "\033[0m";
+        return;
+    }
+
+    qDebug("\033[32m[Task queue completed.]\033[0m");
 }
 
-void TaskManager::setNextPhaseParam(const QString &nextPhase, const QString &nextWorkPath, const QString &nextTclCommand) {
-    this->_nextPhase = nextPhase;
-    this->_nextWorkPath = nextWorkPath;
-    this->_nextTclCommand = nextTclCommand;
+void TaskManager::handleSynthClick()
+{
+    QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+
+    if (settings.value(FlowPhase::Synthsis) == FlowState::Complete) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+            MainWindow::instance(),
+            "Run Synthesis",
+            "Synthesis has already completed and is up to date. Re-run anyway?",
+            QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        if (settings.value(FlowPhase::Implementation) != FlowState::NoStarted) {
+            if (QMessageBox::Cancel == CustomMessageBox::question(
+                MainWindow::instance(),
+                "Run Synthesis",
+                "Re-running synthesis will result in resetting implementation and removing all results files. OK to proceed?",
+                QMessageBox::Ok | QMessageBox::Cancel)) {
+                return;
+            }
+            settings.setValue(FlowPhase::Implementation, FlowState::NoAvailable);
+        }
+        if (settings.value(FlowPhase::GenerateBitstream) != FlowState::NoStarted) {
+            settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+        }
+        flowTaskQueue.enqueue(FlowTask::Synthesis);
+        fileChanged = false;
+        return;
+    }
+
+    if (settings.value(FlowPhase::Synthsis) == FlowState::OutOfDate) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+            MainWindow::instance(),
+            "Run Synthesis",
+            "Re-running synthesis will result in resetting implementation and removing all results files. OK to proceed?",
+            QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        if (settings.value(FlowPhase::Implementation) != FlowState::NoStarted) {
+            settings.setValue(FlowPhase::Implementation, FlowState::NoAvailable);
+        }
+        if (settings.value(FlowPhase::GenerateBitstream) != FlowState::NoStarted) {
+            settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+        }
+        flowTaskQueue.enqueue(FlowTask::Synthesis);
+        fileChanged = false;
+        return;
+    }
+
+    // No MessageBox needed.
+    flowTaskQueue.enqueue(FlowTask::Synthesis);
+    fileChanged = false;
 }
 
-void TaskManager::setSynthSuccessMsgStatus(bool status) {
-    this->_showSynthSuccessMsg = status;
+void TaskManager::handleImplClick()
+{
+    QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
+
+    if (settings.value(FlowPhase::Synthsis) == FlowState::OutOfDate) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+                MainWindow::instance(),
+                "Synthesis is Out-of-date",
+                "Synthesis is out-of-date. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
+                QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        if (settings.value(FlowPhase::GenerateBitstream) != FlowState::NoStarted) {
+            settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+        }
+        flowTaskQueue.enqueue(FlowTask::Synthesis);
+        flowTaskQueue.enqueue(FlowTask::Implementation);
+        fileChanged = false;
+        return;
+    }
+
+    //! Includes NoStarted, NoAvailable, Fail, except for OutOfDate status.
+    if (settings.value(FlowPhase::Synthsis) != FlowState::Complete) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+            MainWindow::instance(),
+            "Missing Synthesis Results",
+            "There is no netlist available. OK to launch synthesis first? Implementation will automatically start when synthesis completes.",
+            QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        if (settings.value(FlowPhase::GenerateBitstream) != FlowState::NoStarted) {
+            settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+        }
+        flowTaskQueue.enqueue(FlowTask::Synthesis);
+        flowTaskQueue.enqueue(FlowTask::Implementation);
+        fileChanged = false;
+        return;
+    }
+
+    if (settings.value(FlowPhase::Implementation) == FlowState::Complete) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+            MainWindow::instance(),
+            "Run Implement",
+            "A completed implementation run exists. Re-run anyway?",
+            QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        if (settings.value(FlowPhase::GenerateBitstream) != FlowState::NoStarted) {
+            settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+        }
+        flowTaskQueue.enqueue(FlowTask::Implementation);
+        fileChanged = false;
+        return;
+    }
+
+    // No MessageBox needed.
+    if (settings.value(FlowPhase::GenerateBitstream) != FlowState::NoStarted) {
+        settings.setValue(FlowPhase::GenerateBitstream, FlowState::NoAvailable);
+    }
+    flowTaskQueue.enqueue(FlowTask::Implementation);
+    fileChanged = false;
+    return;
 }
 
-void TaskManager::setImplementSuccessMsgStatus(bool status) {
-    this->_showImplementSuccessMsg = status;
-}
+void TaskManager::handleGenBitClick()
+{
+    QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
 
-void TaskManager::setNextImplementProcessStatus(bool status) {
-    this->_hasNextImplementProcess = status;
-}
+    if (settings.value(FlowPhase::Synthsis) == FlowState::OutOfDate) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+                MainWindow::instance(),
+                "Synthesis is Out-of-date",
+                "Synthesis is out-of-date. OK to launch synthesis and implementation first? 'Generate Bitstream' will automatically start when synthesis and implementation completes.",
+                QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        flowTaskQueue.enqueue(FlowTask::Synthesis);
+        flowTaskQueue.enqueue(FlowTask::Implementation);
+        flowTaskQueue.enqueue(FlowTask::WriteBitstream);
+        fileChanged = false;
+        return;
+    }
 
-void TaskManager::initMessageStatus() {
-    this->_showSynthSuccessMsg = true;
-    this->_showImplementSuccessMsg = true;
-    this->_hasNextImplementProcess = false;
-    this->_nextPhase = nullptr;
-    this->_nextWorkPath = nullptr;
-    this->_nextTclCommand = nullptr;
+    //! Includes NoStarted, NoAvailable, Fail, except for OutOfDate status.
+    if (settings.value(FlowPhase::Synthsis) != FlowState::Complete) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+            MainWindow::instance(),
+            "No implementation Results Available",
+            "There are no implementation results available. OK to launch synthesis and implementation? 'Generate Bitstream' will automatically start when synthesis and implementation completes.",
+            QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        flowTaskQueue.enqueue(FlowTask::Synthesis);
+        flowTaskQueue.enqueue(FlowTask::Implementation);
+        flowTaskQueue.enqueue(FlowTask::WriteBitstream);
+        fileChanged = false;
+        return;
+    }
+
+    if ((settings.value(FlowPhase::Synthsis) == FlowState::Complete) && ((settings.value(FlowPhase::Implementation) != FlowState::Complete))) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+            MainWindow::instance(),
+            "No implementation Results Available",
+            "There are no implementation results available. OK to launch implementation? 'Generate Bitstream' will automatically start when implementation completes.",
+            QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        flowTaskQueue.enqueue(FlowTask::Implementation);
+        flowTaskQueue.enqueue(FlowTask::WriteBitstream);
+        fileChanged = false;
+        return;
+    }
+
+    if (settings.value(FlowPhase::GenerateBitstream) == FlowState::Complete) {
+        if (QMessageBox::Cancel == CustomMessageBox::question(
+            MainWindow::instance(),
+            "Generate Bitstream",
+            "Bitstream generation has already completed and is up-to-date. Re-run anyway?",
+            QMessageBox::Ok | QMessageBox::Cancel)) {
+            return;
+        }
+        flowTaskQueue.enqueue(FlowTask::WriteBitstream);
+        fileChanged = false;
+        return;
+    }
+
+    // No MessageBox needed.
+    flowTaskQueue.enqueue(FlowTask::WriteBitstream);
+    fileChanged = false;
 }

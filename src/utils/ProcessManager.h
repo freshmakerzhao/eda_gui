@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "service/PipeServer.h"
 #include "service/LogManager.h"
+#include "utils/MemoryUtilities.h"
 
 struct ProcessMessage {
     QString phase;
@@ -35,6 +36,8 @@ public:
     QString curProjectPath;
     // 开始执行的时间（用于显示）
     QString startTime;
+    // 上个子阶段开始的时间 (用于计算)
+    std::chrono::system_clock::time_point lastTime;
     // 开始执行的时间（用于计算）
     std::chrono::system_clock::time_point startTimeForCal;
     // 结束执行的时间（用于计算）
@@ -67,6 +70,9 @@ public:
      * @return
      */
     std::string getProperty(const std::string& key);
+
+    //获取时间间隔
+    QString getElapsedTime();
 
 private:
     ProcessManager();

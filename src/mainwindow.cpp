@@ -171,7 +171,7 @@ void MainWindow::resizeUi()
     // qDebug() << leftwidth << " " << rightwidth;
     // int leftwidth = int(this->width() * 0.18);//左边的停靠窗宽是主界面的0.18倍
     // int rightwidth = int(this->width() * 0.82);//右边的停靠窗宽是主界面的0.82倍
-    resizeDocks({ManagerDock, BottomDock}, {42, 18}, Qt::Vertical);//右侧上下布局42 : 18
+    resizeDocks({ManagerDock, BottomDock}, {42, 22}, Qt::Vertical);//右侧上下布局42 : 22
     resizeDocks({NavigationBar, BottomDock, ManagerDock},{leftwidth, rightwidth, rightwidth}, Qt::Horizontal);//左右水平布局0.18 : 0.82
 }
 
