@@ -34,7 +34,6 @@ void Tiles::addSubBlock(SitesBlock *subBlock) {
 }
 
 bool Tiles::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
-    painter->drawRect(QRect(0, 0, width, height));
     return false;
 }
 
@@ -51,6 +50,7 @@ void Tiles::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) 
     painter->setPen(pen);
 
 
+    painter->drawRect(QRect(0, 0, width, height));
     //获取当前视图的缩放比例
     QGraphicsView *view = scene()->views().first();
     qreal scaleFactor = view->transform().m11();
