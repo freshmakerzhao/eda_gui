@@ -10,12 +10,20 @@ class Tiles : public Block
 {
     Q_OBJECT
 public:
-    Tiles(const QColor &color, int loc_x, int loc_y, int index_x, int index_y, int cur_width, int cur_height, std::string &cur_type, std::string &name);
+    Tiles(
+        const QColor &color,
+        int index_x, int index_y,
+        bool show,
+        NormalTile& info
+    );
 
     void addSubBlock(SitesBlock *subBlock);
     void updateTilesNameVisibleStatus(bool status);
     void updateVisibleStatus(bool status) override;
+    bool isShow() const;
+    std::string getType() const;
     QVector<SitesBlock*> child_items;
+    NormalTile& info;
 signals:
     void BlockClicked(int tile_index_x, int tile_index_y);
 protected:
@@ -27,12 +35,9 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    std::string tile_type;
-    int loc_x;
-    int loc_y;
     int index_x;
     int index_y;
-    QColor tile_color;
+    bool show;
     bool tiles_name_visible_status = false;
 
 };

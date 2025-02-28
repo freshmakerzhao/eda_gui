@@ -311,25 +311,20 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
             widthCount += GLOBAL_TILE_BLOCK_WIDTH;
         for(int j = 0; j < totalSize.height; ++j)
         {
-            // 遇到skip跳过
-            if(gridTypeMatrix[i][j].types == "SKIP")
-                continue;
+//            // 遇到skip跳过
+//            if(gridTypeMatrix[i][j].types == "SKIP")
+//                continue;
 
             //设置为空类型(不显示)的map
             std::string type = gridTypeMatrix[i][j].types;
             auto it = SHOW_TILE.find(type);
             if(it == SHOW_TILE.end()) {
-                std::string nullType = "NULL";
                 gridMatrix[i][j] = new Tiles(
                         QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
-                        gridTypeMatrix[i][j].loc_x,
-                        gridTypeMatrix[i][j].loc_y,
                         i,
                         j,
-                        gridTypeMatrix[i][j].width,
-                        gridTypeMatrix[i][j].height,
-                        nullType,
-                        gridTypeMatrix[i][j].tile_name
+                        false,
+                        gridTypeMatrix[i][j]
                 );
                 if(j == 1)
                     lastCowShow = false;
@@ -338,14 +333,10 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 gridMatrix[i][j] = new Tiles(
 //                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
                         Qt::darkBlue,
-                        gridTypeMatrix[i][j].loc_x,
-                        gridTypeMatrix[i][j].loc_y,
                         i,
                         j,
-                        gridTypeMatrix[i][j].width,
-                        gridTypeMatrix[i][j].height,
-                        gridTypeMatrix[i][j].types,
-                        gridTypeMatrix[i][j].tile_name
+                        true,
+                        gridTypeMatrix[i][j]
                 );
                 gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate - widthCount, gridTypeMatrix[i][j].y_coordinate));
                 lastCowShow = true;
@@ -374,57 +365,29 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
 
     // --------------------- Clock Region ----------------------------
     // Iterate over JSON object
-    for (auto& [tile, tiledata] : tile_json_data.items()) {
-        int x = tiledata["grid_x"];
-        int y = tiledata["grid_y"];
-
-        // Read tile clock region info
-        std::string clock_region = tiledata.contains("clock_region") && !tiledata["clock_region"].get<std::string>().empty()
-                                       ? tiledata["clock_region"].get<std::string>()
-                                       : "NULL";
-
-        // Update clock region bounding box
-        if (clock_region != "NULL") {
-            if (clock_region_bounding_boxes.find(clock_region) == clock_region_bounding_boxes.end()) {
-                // Initialize new clock region bounding box
-                clock_region_bounding_boxes[clock_region] = BoundingBox();
-            }
-
-            // Update bounding box with min/max values
-            clock_region_bounding_boxes[clock_region].x0 = std::min(clock_region_bounding_boxes[clock_region].x0, static_cast<double>(x));
-            clock_region_bounding_boxes[clock_region].y0 = std::min(clock_region_bounding_boxes[clock_region].y0, static_cast<double>(y));
-            clock_region_bounding_boxes[clock_region].x1 = std::max(clock_region_bounding_boxes[clock_region].x1, static_cast<double>(x));
-            clock_region_bounding_boxes[clock_region].y1 = std::max(clock_region_bounding_boxes[clock_region].y1, static_cast<double>(y));
-        }
-    }
-    //计算去掉不显示的tile后clock region范围
-    std::unordered_map<std::string, std::unordered_set<int>> dontShowTilesMap;
-    for (auto& [tile, tiledata] : tile_json_data.items()) {
-        auto it = SHOW_TILE.find(tiledata["type"]);
-        int y = tiledata["grid_y"];
-        if(it == SHOW_TILE.end() && y == 0) {
-            int x = tiledata["grid_x"];
-            for(auto& region : clock_region_bounding_boxes) {
-                if(dontShowTilesMap[region.first].find(x) == dontShowTilesMap[region.first].end()) {
-                    dontShowTilesMap[region.first].insert(x);
-                    if(region.second.x0 > x)
-                        region.second.x0--;
-                    if(region.second.x1 > x)
-                        region.second.x1--;
-                }
-            }
-        }
-    }
-    for(auto& region : clock_region_bounding_boxes) {
-        if (region.first == "X0Y3" || region.first == "X0Y0" || region.first == "X0Y2") {
-            region.second.x1 -= 2;
-        } else if (region.first == "X1Y3" || region.first == "X1Y0") {
-            region.second.x0 -= 1;
-        } else if(region.first == "X0Y1") {
-            region.second.x1 -= 3;
-        } else if(region.first == "X1Y2" || region.first == "X1Y1") {
-            region.second.x1 += 3;
-            region.second.x0 -= 1;
+    for (auto& col : gridMatrix) {
+        for (auto& tile : col) {
+           if (!tile->isShow())
+               continue;
+           if (tile->info.clock_region != "NULL") {
+               std::string clockRegion = tile->info.clock_region;
+               if(clock_region_bounding_boxes.find(clockRegion) == clock_region_bounding_boxes.end()) {
+                   clock_region_bounding_boxes[clockRegion] = BoundingBox();
+               }
+               const std::unordered_set<std::string> edgesType = {
+                   "CLK_HROW_TOP_R",
+                   "CLK_HROW_BOT_R",
+                   "CLK_BUFG_TOP_R",
+                   "CLK_BUFG_BOT_R",
+               };
+               qreal x = edgesType.find(tile->getType()) != edgesType.end()
+                       ? tile->x() + tile->getWidth()
+                       : tile->x();
+               clock_region_bounding_boxes[clockRegion].x0 = std::min(clock_region_bounding_boxes[clockRegion].x0, x);
+               clock_region_bounding_boxes[clockRegion].y0 = std::min(clock_region_bounding_boxes[clockRegion].y0, tile->y());
+               clock_region_bounding_boxes[clockRegion].x1 = std::max(clock_region_bounding_boxes[clockRegion].x1, x);
+               clock_region_bounding_boxes[clockRegion].y1 = std::max(clock_region_bounding_boxes[clockRegion].y1, tile->y());
+           }
         }
     }
     // Print the clock region bounding boxes
@@ -477,11 +440,10 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
     pen.setCosmetic(true);
 
     for (const auto& region : clock_region_bounding_boxes) {
-        int x0 = region.second.x0 * GLOBAL_TILE_BLOCK_WIDTH;
-        int y0 = region.second.y0 * GLOBAL_TILE_BLOCK_HEIGHT;
-        int x1 = region.second.x1 * GLOBAL_TILE_BLOCK_WIDTH;
-        int y1 = region.second.y1 * GLOBAL_TILE_BLOCK_HEIGHT;
-
+        int x0 = region.second.x0;
+        int y0 = region.second.y0;
+        int x1 = region.second.x1;
+        int y1 = region.second.y1;
 
         QRect rect(x0, y0, x1 - x0 + GLOBAL_TILE_BLOCK_WIDTH, y1 - y0 + GLOBAL_TILE_BLOCK_HEIGHT);
 

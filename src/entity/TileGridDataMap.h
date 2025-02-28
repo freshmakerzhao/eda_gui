@@ -118,6 +118,9 @@ struct NormalTile {
         grid_y = value["grid_y"];
         types = value["type"];
         tile_name = key;
+        clock_region = value.contains("clock_region") && !value["clock_region"].get<std::string>().empty()
+                ? value["clock_region"].get<std::string>()
+                : "NULL";
         std::size_t pos = key.rfind('_');  // 查找最后一个 "_" 的位置
         if (pos != std::string::npos && pos + 1 < key.length()) {
             std::string num_str = key.substr(pos + 1);  // 提取最后一个 "_" 后面的子字符串

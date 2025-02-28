@@ -5,26 +5,26 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <utility>
+#include "blocks/SitesBlockFactory.h"
 
 Tiles::Tiles(
         const QColor &color,
-        int loc_x,
-        int loc_y,
         int index_x,
         int index_y,
-        int cur_width,
-        int cur_height,
-        std::string &cur_type,
-        std::string &name
-) : Block(cur_width, cur_height, name, color),
-    loc_x(loc_x),
-    loc_y(loc_y),
+        bool show,
+        NormalTile &info
+) : Block(info.width, info.height, info.tile_name, color),
     index_x(index_x),
     index_y(index_y),
-    tile_type(cur_type){
+    show(show),
+    info(info){
     setFlags(ItemIsSelectable);
     // 开启悬浮操作
     setAcceptHoverEvents(true);
+}
+
+std::string Tiles::getType() const {
+    return info.types;
 }
 
 // 添加子模块
@@ -38,7 +38,7 @@ bool Tiles::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor)
 }
 
 void Tiles::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
-    if(tile_type == "NULL")
+    if(!show)
         return;
     if(!getVisibleStatus())
         return;
@@ -63,13 +63,13 @@ void Tiles::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) 
     QFont font("Times");
     font.setPointSize(type_font_size);
     painter->setFont(font);
-    pen.setColor(Qt::gray);
-    painter->setPen(pen);
 
-    QString text = QString::fromStdString(this->name + " (" + tile_type + ")");
+    pen.setColor(Qt::blue);
+    painter->setPen(pen);
+    QString text = QString::fromStdString(this->name + " (" + info.types + ")");
     int text_len = text.size() * type_font_size;
     if (text_len <= width * scaleFactor) {
-        QRectF text_rect = QRect(2, height * scaleFactor - type_font_size - 6, width, 20);
+        QRectF text_rect = QRect(2, 2, width, 20);
         painter->drawText(
                 text_rect,
                 Qt::AlignLeft | Qt::AlignTop,
@@ -80,7 +80,7 @@ void Tiles::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) 
 
 void Tiles::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(tile_type == "NULL")
+    if(info.types == "NULL")
         return;
     // 发出信号，告知是哪tile被点击了
     emit BlockClicked(index_x, index_y);
@@ -90,7 +90,7 @@ void Tiles::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void Tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(tile_type == "NULL")
+    if(info.types == "NULL")
         return;
     if (event->modifiers() & Qt::ShiftModifier) {
         update();
@@ -101,7 +101,7 @@ void Tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void Tiles::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(tile_type == "NULL")
+    if(info.types == "NULL")
         return;
     QGraphicsItem::mouseReleaseEvent(event);
     update();
@@ -118,4 +118,8 @@ bool Tiles::getVisibleStatus() {
 
 void Tiles::updateVisibleStatus(bool status) {
 
+}
+
+bool Tiles::isShow() const {
+    return show;
 }
