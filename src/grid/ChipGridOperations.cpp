@@ -9,7 +9,74 @@
 #include <algorithm>
 #include <QDebug>
 #include "utils/ProjectManager.h"
+#include "blocks/SitesBlockFactory.h"
 // 处理tile颜色、width、height
+
+const std::unordered_set<std::basic_string<char>> SHOW_TILE = {
+    "LIOB33",
+    "LIOB33_SING",
+    "RIOB33",
+    "RIOB33_SING",
+//    "HCLK_IOB",
+    "LIOI3",
+    "LIOI3_SING",
+    "LIOI3_TBYTESRC",
+    "LIOI3_TBYTETERM",
+    "RIOI3",
+    "RIOI3_SING",
+    "RIOI3_TBYTESRC",
+    "RIOI3_TBYTETERM",
+    "HCLK_IOI3",
+    "CMT_FIFO_R",
+    "CMT_FIFO_L",
+//    "HCLK_FIFO_L",
+    "CMT_TOP_R_UPPER_T",
+    "CMT_TOP_R_UPPER_B",
+    "CMT_TOP_L_UPPER_T",
+    "CMT_TOP_L_UPPER_B",
+    "HCLK_CMT",
+    "CMT_TOP_R_LOWER_T",
+    "CMT_TOP_R_LOWER_B",
+    "CMT_TOP_L_LOWER_T",
+    "CMT_TOP_L_LOWER_B",
+    "CLBLL_L",
+    "CLBLL_R",
+    "CLBLM_L",
+    "CLBLM_R",
+//    "HCLK_CLB",
+    "BRAM_L",
+    "BRAM_R",
+//    "HCLK_BARM",
+    "DSP_R",
+    "DSP_L",
+//    "HCLK_DSP_R",
+    "MONTOR_TOP",
+    "MONTOR_MID",
+    "MONTOR_BOT",
+    "CFG_CENTER_TOP",
+    "CFG_CENTER_MID",
+//    "CFG_CENTER_BOT",
+//    "R_TERM_INT_GTX",
+    "GTP_CHANNEL_3",
+    "GTP_CHANNEL_3_MID_RIGHT",
+    "GTP_CHANNEL_3_MID_LEFT",
+    "GTP_CHANNEL_2",
+    "GTP_CHANNEL_2_MID_RIGHT",
+    "GTP_CHANNEL_3_MID_LEFT",
+    "GTP_CHANNEL_1",
+    "GTP_CHANNEL_1_MID_RIGHT",
+    "GTP_CHANNEL_3_MID_LEFT",
+    "GTP_CHANNEL_0",
+    "GTP_CHANNEL_0_MID_RIGHT",
+    "GTP_CHANNEL_3_MID_LEFT",
+    "GTP_COMMON",
+    "PCIE_BOT",
+    "CLK_HROW_TOP_R",
+    "CLK_HROW_BOT_R",
+    "CLK_BUFG_TOP_R",
+    "CLK_BUFG_BOT_R"
+};
+
 std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGridOperations::buildTileInfoMap(const nlohmann::basic_json<>& colorJson){
     std::map<std::string, std::map<std::string, std::map<std::string, int>>> tile_info_map;
     try {
@@ -162,8 +229,24 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
             {"LIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
             {"RIOB33", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
             {"RIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"RIOI3_TBYTESRC", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"RIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
             {"LIOI3_TBYTESRC", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"LIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}}
+            {"LIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"GTP_CHANNEL_3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_CHANNEL_2", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_CHANNEL_1", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_CHANNEL_0", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
+            {"GTP_COMMON", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 7}, {"Y_GAP", -6}}},
+            {"PCIE_BOT", {{"WIDTH_FACTOR", 3}, {"HEIGHT_FACTOR", 20}, {"Y_GAP", -9}}},
+            {"CFG_CENTER_TOP", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 10}, {"Y_GAP", -9}}},
+            {"CFG_CENTER_MID", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 21}, {"Y_GAP", -9}}},
+            {"CMT_TOP_L_UPPER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 13}, {"Y_GAP", -7}}},
+            {"CMT_TOP_L_UPPER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -7}}},
+            {"CLK_HROW_TOP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 8}, {"Y_GAP", -4}}},
+            {"CLK_HROW_BOT_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 8}, {"Y_GAP", -4}}},
+            {"CLK_BUFG_TOP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 4}, {"Y_GAP", -3}}},
+            {"CLK_BUFG_BOT_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 4}, {"Y_GAP", -3}}},
     };
 
     //  ================ 处理grid跨行  ================
@@ -180,7 +263,6 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 // 普通tile
                 cur_factors = {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 1}, {"Y_GAP", 0}};
             }
-
             auto it2 = tile_info_map.find(types);
             if (it2 == tile_info_map.end()) {
                 gridTypeMatrix[i][j].height = GLOBAL_TILE_BLOCK_HEIGHT;
@@ -191,7 +273,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 gridTypeMatrix[i][j].width = tile_info_map[types]["size"]["width"] * GLOBAL_TILE_BLOCK_WIDTH;
             }
 
-            // 计算其放置在画布上的x,y坐标
+                // 计算其放置在画布上的x,y坐标
             if (j > 0) {  // 如果不是列首的tile
                 gridTypeMatrix[i][j].x_coordinate = gridTypeMatrix[i][j - 1].x_coordinate;
                 // 当前tile的坐标是该列上一个y坐标+上一个tile的高度
@@ -205,390 +287,72 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 int start_y = j + cur_factors["Y_GAP"]; // 计算其真正的起始y
                 // grid_type_matrix[i][start_y]位置一定为null，用当前tile将其覆盖
                 gridTypeMatrix[i][start_y] = gridTypeMatrix[i][j];
+                gridTypeMatrix[i][j].types="NULL";
                 // 跨行flag
                 gridTypeMatrix[i][start_y].is_multi_rows = true;
-                if (start_y>=1){
+                if (start_y >= 1) {
                     // 如果该列存在上一个tile
-                    gridTypeMatrix[i][start_y].y_coordinate = gridTypeMatrix[i][start_y - 1].y_coordinate + gridTypeMatrix[i][start_y - 1].height;
+                    gridTypeMatrix[i][start_y].y_coordinate =
+                            gridTypeMatrix[i][start_y - 1].y_coordinate + gridTypeMatrix[i][start_y - 1].height;
                 } else {
                     gridTypeMatrix[i][start_y].y_coordinate = 0;
                 }
-
 
                 setSkipTile(i,start_y,cur_factors["HEIGHT_FACTOR"]);
             }
         }
     }
-    gridMatrix.resize(totalSize.width, std::vector<Blocks*>(totalSize.height, nullptr));
+    gridMatrix.resize(totalSize.width, std::vector<Tiles*>(totalSize.height, nullptr));
+    bool lastCowShow = true;
+    int widthCount = 0;
     for(int i = 0; i < totalSize.width; ++i)
     {
+        if(!lastCowShow)
+            widthCount += GLOBAL_TILE_BLOCK_WIDTH;
         for(int j = 0; j < totalSize.height; ++j)
         {
-            const std::unordered_set<std::basic_string<char>> DISABLE_SHOW_TILE = {
-                    "SKIP"
-//                    "L_TEEM_INR",
-//                    "IO_INT_INTERFACE_L",
-//                    "INT_L",
-//                    "INT_R",
-//                    "INT_INTERFACE_R",
-//                    "NULL"
-            };
+//            // 遇到skip跳过
+//            if(gridTypeMatrix[i][j].types == "SKIP")
+//                continue;
+
+            //设置为空类型(不显示)的map
             std::string type = gridTypeMatrix[i][j].types;
-            auto it = DISABLE_SHOW_TILE.find(type);
-            // 遇到skip跳过
-            if(it != DISABLE_SHOW_TILE.end()){
+            auto it = SHOW_TILE.find(type);
+            if(it == SHOW_TILE.end()) {
+                gridMatrix[i][j] = new Tiles(
+                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+                        i,
+                        j,
+                        false,
+                        gridTypeMatrix[i][j]
+                );
+                if(j == 1)
+                    lastCowShow = false;
                 continue;
-            }
-            gridMatrix[i][j] = new Tiles(
-                    QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
-                    gridTypeMatrix[i][j].loc_x,
-                    gridTypeMatrix[i][j].loc_y,
-                    i,
-                    j,
-                    gridTypeMatrix[i][j].width,
-                    gridTypeMatrix[i][j].height,
-                    gridTypeMatrix[i][j].types
-            );
-            gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate, gridTypeMatrix[i][j].y_coordinate));
-            if (!gridTypeMatrix[i][j].is_multi_rows){
-                // 非跨行的tile增加site
-                for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
-                    NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
-                    if (site.type == "SLICEL") {
-                        SitesBlock* site_block = new SitesSliceL(
-                            Qt::white,
-                            i,
-                            j,
-                            site.name,
-                            site.index
-                            );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "SLICEM") {
-                        SitesBlock* site_block = new SitesSliceM(
-                            Qt::white,
-                            i,
-                            j,
-                            site.name,
-                            site.index
-                            );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "IOB33") {
-                        SitesBlock* site_block = new SitesIOB33(
-                            Qt::white,
-                            i,
-                            j,
-                            site.name,
-                            site.index,
-                            site.pin
-                            );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "BUFR") {
-                        SitesBlock* site_block = new SitesBUFR(
-                            Qt::white,
-                            i,
-                            j,
-                            site.name,
-                            site.index
-                            );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "BUFIO") {
-                        SitesBlock* site_block = new SitesBUFIO(
-                            Qt::white,
-                            i,
-                            j,
-                            site.name,
-                            site.index
-                            );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "IDELAYCTRL") {
-                        SitesBlock* site_block = new SitesIDELAYCTRL(
-                            Qt::white,
-                            i,
-                            j,
-                            site.name,
-                            site.index
-                            );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "OLOGICE3") {
-                        SitesBlock* site_block = new SitesOLOGICE3(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "ILOGICE3") {
-                        SitesBlock* site_block = new SitesILOGICE3(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "IDELAYE2") {
-                        SitesBlock* site_block = new SitesIDELAYE2(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else {
-                            SitesBlock* site_block = new Sites(
-                                    Qt::white,
-                                    i,
-                                    j,
-                                    site.name,
-                                    site.index
-                                    );
-                            gridMatrix[i][j]->addSubBlock(site_block);
-                            size_t pos = site.name.find("_X");
-                            siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    }
-                    // ------------------------------
-                    site_type_set.insert(site.type);
-                    // ------------------------------
-                }
             } else {
-                const int GAP = 3 * SITE_GAP;
-                for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
-                    NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
-                    if (site.type == "IOB33M") {
-                        SitesBlock *site_block = new SitesIOB33M(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index,
-                                site.pin
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0, pos)][site.name] = site_block;
-                    } else if (site.type == "IOB33S") {
-                            SitesBlock* site_block = new SitesIOB33S(
-                                    Qt::white,
-                                    i,
-                                    j,
-                                    site.name,
-                                    site.index,
-                                    site.pin
-                            );
-                            gridMatrix[i][j]->addSubBlock(site_block);
-                            size_t pos = site.name.find("_X");
-                            siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "FIFO18E1") {
-                        size_t pos = site.name.find("_X");
-                        std::string RAMB36_name = "RAMB36" + site.name.substr(pos, site.name.size()-1);
-                        SitesBlock* site_block_0 = new SitesRAMB36E1(
-                                Qt::white,
-                                i,
-                                j,
-                                RAMB36_name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block_0);
-                        siteBlockMap["RAMB36"][RAMB36_name] = site_block_0;
-                        site_type_set.insert("RAMB38E1");
-
-                        SitesBlock* site_block = new SitesFIFO18E1(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "RAMB18E1") {
-                        SitesBlock* site_block = new SitesRAMB18E1(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "DSP48E1") {
-                        SitesBlock* site_block = new SitesDSP48E1(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "OUT_FIFO") {
-                        SitesBlock* site_block = new SitesOUTFIFO(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "IN_FIFO") {
-                        SitesBlock* site_block = new SitesINFIFO(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "MMCME2_ADV") {
-                        SitesBlock* site_block = new SitesMMCME2ADV(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "PLLE2_ADV") {
-                        SitesBlock* site_block = new SitesPLLE2ADV(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "PHASER_OUT_PHY") {
-                        SitesBlock* site_block = new SitesPhaserOUTPHY(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "PHASER_IN_PHY") {
-                        SitesBlock* site_block = new SitesPhaserINPHY(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "PHY_CONTROL") {
-                        SitesBlock* site_block = new SitesPHYControl(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                    } else if (site.type == "PHASER_REF") {
-                        SitesBlock* site_block = new SitesPhaserREF(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-
-                    } else if (site.type == "OLOGICE3") {
-                        SitesBlock* site_block = new SitesOLOGICE3(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                        site_block->setPos(QPointF (
-                                SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
-                                SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
-                        )); //由于这里是跨行，所以位置需要重新设置一次
-                    } else if (site.type == "ILOGICE3") {
-                        SitesBlock* site_block = new SitesILOGICE3(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                        site_block->setPos ( QPointF(
-                                SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
-                                SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
-                        ));//由于这里是跨行，所以位置需要重新设置一次
-                    } else if (site.type == "IDELAYE2") {
-                        SitesBlock* site_block = new SitesIDELAYE2(
-                                Qt::white,
-                                i,
-                                j,
-                                site.name,
-                                site.index
-                        );
-                        gridMatrix[i][j]->addSubBlock(site_block);
-                        size_t pos = site.name.find("_X");
-                        siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                        site_block->setPos ( QPointF(
-                                SITE_GAP*(index/4+1) + site_block->getWidth()*(index/4),
-                                SITE_GAP*(index%4+1) + site_block->getHeight()*(index%4)
-                        ));//由于这里是跨行，所以位置需要重新设置一次
-
-                    }
-                    site_type_set.insert(site.type);
-                }
+                gridMatrix[i][j] = new Tiles(
+//                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+                        Qt::darkBlue,
+                        i,
+                        j,
+                        true,
+                        gridTypeMatrix[i][j]
+                );
+                gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate - widthCount, gridTypeMatrix[i][j].y_coordinate));
+                lastCowShow = true;
+            }
+            //例化siteBlcok
+            for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
+                NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
+                SitesBlock* site_block = SitesBlockFactory::Instance().create(
+                        site.type, Qt::gray, i, j, gridTypeMatrix[i][j], site.name, site.index, site.pin
+                );
+                gridMatrix[i][j]->addSubBlock(site_block);
+                size_t pos = site.name.find("_X");
+                siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
+                // ------------------------------
+                site_type_set.insert(site.type);
+                // ------------------------------
             }
         }
     }
@@ -601,30 +365,31 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
 
     // --------------------- Clock Region ----------------------------
     // Iterate over JSON object
-    for (auto& [tile, tiledata] : tile_json_data.items()) {
-        int x = tiledata["grid_x"];
-        int y = tiledata["grid_y"];
-
-        // Read tile clock region info
-        std::string clock_region = tiledata.contains("clock_region") && !tiledata["clock_region"].get<std::string>().empty()
-                                       ? tiledata["clock_region"].get<std::string>()
-                                       : "NULL";
-
-        // Update clock region bounding box
-        if (clock_region != "NULL") {
-            if (clock_region_bounding_boxes.find(clock_region) == clock_region_bounding_boxes.end()) {
-                // Initialize new clock region bounding box
-                clock_region_bounding_boxes[clock_region] = BoundingBox();
-            }
-
-            // Update bounding box with min/max values
-            clock_region_bounding_boxes[clock_region].x0 = std::min(clock_region_bounding_boxes[clock_region].x0, static_cast<double>(x));
-            clock_region_bounding_boxes[clock_region].y0 = std::min(clock_region_bounding_boxes[clock_region].y0, static_cast<double>(y));
-            clock_region_bounding_boxes[clock_region].x1 = std::max(clock_region_bounding_boxes[clock_region].x1, static_cast<double>(x));
-            clock_region_bounding_boxes[clock_region].y1 = std::max(clock_region_bounding_boxes[clock_region].y1, static_cast<double>(y));
+    for (auto& col : gridMatrix) {
+        for (auto& tile : col) {
+           if (!tile->isShow())
+               continue;
+           if (tile->info.clock_region != "NULL") {
+               std::string clockRegion = tile->info.clock_region;
+               if(clock_region_bounding_boxes.find(clockRegion) == clock_region_bounding_boxes.end()) {
+                   clock_region_bounding_boxes[clockRegion] = BoundingBox();
+               }
+               const std::unordered_set<std::string> edgesType = {
+                   "CLK_HROW_TOP_R",
+                   "CLK_HROW_BOT_R",
+                   "CLK_BUFG_TOP_R",
+                   "CLK_BUFG_BOT_R",
+               };
+               qreal x = edgesType.find(tile->getType()) != edgesType.end()
+                       ? tile->x() + tile->getWidth()
+                       : tile->x();
+               clock_region_bounding_boxes[clockRegion].x0 = std::min(clock_region_bounding_boxes[clockRegion].x0, x);
+               clock_region_bounding_boxes[clockRegion].y0 = std::min(clock_region_bounding_boxes[clockRegion].y0, tile->y());
+               clock_region_bounding_boxes[clockRegion].x1 = std::max(clock_region_bounding_boxes[clockRegion].x1, x);
+               clock_region_bounding_boxes[clockRegion].y1 = std::max(clock_region_bounding_boxes[clockRegion].y1, tile->y());
+           }
         }
     }
-
     // Print the clock region bounding boxes
     // for (const auto& region : clock_region_bounding_boxes) {
     //     std::cout << "Clock region: " << region.first
@@ -675,10 +440,10 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
     pen.setCosmetic(true);
 
     for (const auto& region : clock_region_bounding_boxes) {
-        int x0 = region.second.x0 * GLOBAL_TILE_BLOCK_WIDTH;
-        int y0 = region.second.y0 * GLOBAL_TILE_BLOCK_HEIGHT ;
-        int x1 = region.second.x1 * GLOBAL_TILE_BLOCK_WIDTH;
-        int y1 = region.second.y1 * GLOBAL_TILE_BLOCK_HEIGHT;
+        int x0 = region.second.x0;
+        int y0 = region.second.y0;
+        int x1 = region.second.x1;
+        int y1 = region.second.y1;
 
         QRect rect(x0, y0, x1 - x0 + GLOBAL_TILE_BLOCK_WIDTH, y1 - y0 + GLOBAL_TILE_BLOCK_HEIGHT);
 
@@ -687,7 +452,7 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
         colorIndex = (colorIndex + 1) % colors.size();
 
         QGraphicsRectItem *rectItem = scene->addRect(rect, pen);
-        rectItem->setVisible(false);
+        rectItem->setVisible(true);
         clock_region_rects.insert(rectItem);
     }
 
@@ -808,7 +573,7 @@ void ChipGridOperations::clearVector() {
     // 清空 grid_matrix
     for (auto& row : gridMatrix) {
         row.clear();
-        std::vector<Blocks*>().swap(row); // 释放内存
+        std::vector<Tiles*>().swap(row); // 释放内存
     }
     gridMatrix.clear();
 }

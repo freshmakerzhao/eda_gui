@@ -155,7 +155,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     usageJsonPath = dir.filePath("route.json");
 #endif
         if (QFile(usageJsonPath).exists()) {
-            viewer.setAllTileWhite(scene);
+//            viewer.setAllTileWhite(scene);
             viewer.updateSitesVisibleStatus(true);
             viewer.updateTilesNameVisibleStatus(false);
             showTilesName = false;

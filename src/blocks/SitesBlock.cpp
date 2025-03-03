@@ -16,10 +16,26 @@
 
 bool SitesBlock::site_visible_status = true;
 
-SitesBlock::SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, const std::string &cur_name, int site_index)
-: Block(cur_width, cur_height, cur_name, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y),  site_type(site_type),  site_index(site_index) {}
+SitesBlock::SitesBlock(
+        const QColor &color,
+        int cur_width,
+        int cur_height,
+        int tile_index_x,
+        int tile_index_y,
+        const std::string &site_type,
+        const std::string &cur_name,
+        int site_index
+) : Block(cur_width, cur_height, cur_name, color),
+    tile_index_x(tile_index_x),
+    tile_index_y(tile_index_y),
+    site_type(site_type),
+    site_index(site_index){
+}
+
 
 bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(site_type == "SITESNULL")
+        return true;
     if(lod >= 0.01) return false;
     if(used_status) {
         painter->fillRect(QRectF(0, 0, width, height), QColor(Qt::green));
@@ -29,6 +45,8 @@ bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillC
 }
 
 void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(site_type == "SITESNULL")
+        return;
     if(!getVisibleStatus())
         return;
 
@@ -60,6 +78,8 @@ void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillCo
     QFont font("Times");
     font.setPointSize(type_font_size);
     painter->setFont(font);
+    pen.setColor(Qt::gray);
+    painter->setPen(pen);
 
     QString text = QString::fromStdString(this->name + " (" + site_type + ")");
     int text_len = text.size() * type_font_size;
@@ -117,6 +137,7 @@ void SitesBlock::updateVisibleStatus(bool status) {
     if(!status) {
         setBelShow(false);
     }
+    this->setVisible(status);
     update();
 }
 

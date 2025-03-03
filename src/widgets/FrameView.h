@@ -37,7 +37,7 @@ private:
     void populateScene();
     bool showTilesName = false;
     bool showSites = true;
-    bool showClockRegion = false;
+    bool showClockRegion = true;
     QString tileJsonPath = "";
     QString usageJsonPath = "";
     ChipGridOperations viewer;
