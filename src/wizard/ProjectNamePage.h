@@ -27,7 +27,7 @@ private:
 
     QLineEdit *nameLineEdit;
     QLineEdit *pathLineEdit;
-    QLabel *warningLabel;
+    QLabel *hintLabel;
 
     bool enableAutoSetName = true;
 };
