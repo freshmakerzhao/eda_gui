@@ -23,6 +23,9 @@ public:
 private slots:
     void onCommandEnter(QString text);
 
+signals:
+    void simFinish(const QString &VCDJsonFilePath);
+
 private:
     TclConsole(QWidget *parent = nullptr);
     ~TclConsole();
@@ -35,7 +38,9 @@ private:
     Tcl_ChannelType *channelType;
     OutputEditor *output;
     LineEditor *input;
-
+    static QString mVCD2JsonNamePath;
+    static const QString mWaveFileName;
+    static const QString mVCD2JsonFileName;
     // static QProcess *process;
 
     // 自定义输出函数

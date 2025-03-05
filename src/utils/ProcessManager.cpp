@@ -98,6 +98,11 @@ void ProcessManager::handleFinished(int exitCode,QProcess::ExitStatus exitStatus
     MemoryUtilities::instance()->stopWatch();
     // 回传给taskmanager
     emit finishMessage(msg);
+
+    // 仿真完成，发送信号，为了展示波形
+    if(curPhase == "Simulation Run" && exitCode == QProcess::NormalExit ){
+        emit  simulationFinish();
+    }
 }
 
 ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(LogManager::instance())
@@ -207,6 +212,7 @@ void ProcessManager::initEnvironment() {
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
     env.insert("SIMULATION_COMPILER_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\iverilog.exe)" );
     env.insert("SIMULATION_RUN_PATH",GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\vvp.exe)");
+    env.insert("PARSER_VCD_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\parserVCD\parserVCD.exe)");
 }
 
 void ProcessManager::configDisplay(const QString &partname) {
