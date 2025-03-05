@@ -12,11 +12,11 @@
 
 class SitesBlockFactory {
 public:
-    using CreateFunction = std::function<SitesBlock*(const QColor&, int, int, NormalTile, std::string&, int, std::string&)>;
+    using CreateFunction = std::function<SitesBlock*(const QColor&, int, int, NormalTile&, std::string&, int, std::string&)>;
 
     static SitesBlockFactory& Instance();
     void registerType(const std::string& type, CreateFunction createFunction);
-    SitesBlock* create(const std::string& type, const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin);
+    SitesBlock* create(const std::string& type, const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin);
 
 private:
     SitesBlockFactory();

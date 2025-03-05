@@ -1,4 +1,4 @@
-#include "Tiles.h"
+#include "TilesBlock.h"
 #include <QGraphicsView>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
@@ -7,7 +7,7 @@
 #include <utility>
 #include "blocks/SitesBlockFactory.h"
 
-Tiles::Tiles(
+TilesBlock::TilesBlock(
         const QColor &color,
         int index_x,
         int index_y,
@@ -23,21 +23,21 @@ Tiles::Tiles(
     setAcceptHoverEvents(true);
 }
 
-std::string Tiles::getType() const {
+std::string TilesBlock::getType() const {
     return info.types;
 }
 
 // 添加子模块
-void Tiles::addSubBlock(SitesBlock *subBlock) {
+void TilesBlock::addSubBlock(SitesBlock *subBlock) {
     subBlock->setParentItem(this);
     child_items.append(subBlock);
 }
 
-bool Tiles::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
+bool TilesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
     return false;
 }
 
-void Tiles::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
+void TilesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
     if(!show)
         return;
     if(!getVisibleStatus())
@@ -78,7 +78,7 @@ void Tiles::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) 
     }
 }
 
-void Tiles::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void TilesBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if(info.types == "NULL")
         return;
@@ -88,7 +88,7 @@ void Tiles::mousePressEvent(QGraphicsSceneMouseEvent *event)
     update();
 }
 
-void Tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void TilesBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if(info.types == "NULL")
         return;
@@ -99,7 +99,7 @@ void Tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void Tiles::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void TilesBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if(info.types == "NULL")
         return;
@@ -107,19 +107,12 @@ void Tiles::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     update();
 }
 
-void Tiles::updateTilesNameVisibleStatus(bool status) {
-    tiles_name_visible_status = status;
-    update();
-}
-
-bool Tiles::getVisibleStatus() {
+bool TilesBlock::getVisibleStatus() {
     return true;
 }
 
-void Tiles::updateVisibleStatus(bool status) {
-
+void TilesBlock::updateVisibleStatus(bool status) {
 }
-
-bool Tiles::isShow() const {
+bool TilesBlock::isShow() const {
     return show;
 }

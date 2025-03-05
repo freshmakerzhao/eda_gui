@@ -74,8 +74,16 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
         else
             view->zoomOut(40);
         e->accept();
+    } else if (e->modifiers() & Qt::ShiftModifier) {
+        // 获取当前视图的水平滚动距离
+        int delta = e->angleDelta().y();
+        // 使用滚轮水平滚动来调整视图范围
+        if (delta != 0) {
+            // 水平移动视图，delta/120 是标准滚轮的移动步长
+            this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta);
+        }
     } else {
-        QGraphicsView::wheelEvent(e);
+            QGraphicsView::wheelEvent(e);
     }
 }
 #endif

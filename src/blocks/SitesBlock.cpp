@@ -116,14 +116,16 @@ void SitesBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     update();
 }
 
-void SitesBlock::setUsed(std::unordered_set<std::string> bels) {
+void SitesBlock::setUsed(std::set<std::array<std::string, 2>> bels) {
     used_status = true;
     for(auto bel_name : bels){
         for(auto bel : this->child_bel_items) {
             if(bel->isUsed())
                 continue;
-            if(bel->isMatches(bel_name))
+            if(bel->isMatches(bel_name[0])){
                 bel->setUsed();
+                bel->setCellName(bel_name[1]);
+            }
         }
     }
 }
@@ -145,3 +147,4 @@ void SitesBlock::setBelShow(bool option) {
     if(!child_bel_items.isEmpty())
         child_bel_items[0]->updateVisibleStatus(option);
 }
+

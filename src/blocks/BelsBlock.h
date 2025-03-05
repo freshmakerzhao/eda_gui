@@ -17,8 +17,9 @@ public:
     void updateVisibleStatus(bool option) override;
     void launchClicked();
     bool isUsed();
+    void setCellName(const std::string &cellName);
 signals:
-    void BelClicked(int tile_index_x, int tile_index_y, int site_index, bool bel_visible_status, int bel_index, const std::string &bel_type, const std::string &name);
+    void BelClicked(int tile_index_x, int tile_index_y, int site_index, bool bel_visible_status, int bel_index, const std::string &bel_type, const std::string &name, const std::string &cellName);
 private:
     bool showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) override;
     void showComplete(QPainter *painter, const qreal lod, QColor &fillColor) override;
@@ -33,6 +34,7 @@ protected:
     int index;
     static bool bel_visible_status;
     std::string bel_type;
+    std::string cell_name;
 };
 
 

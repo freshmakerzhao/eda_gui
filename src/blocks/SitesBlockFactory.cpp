@@ -12,7 +12,7 @@ void SitesBlockFactory::registerType(const std::string &type, SitesBlockFactory:
     creators[type] = createFunction;
 }
 
-SitesBlock* SitesBlockFactory::create(const std::string& type, const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+SitesBlock* SitesBlockFactory::create(const std::string& type, const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
     auto it = creators.find(type);
     if(it != creators.end()) {
         return it->second(color, i, j, tile, name, index, pin);
@@ -22,136 +22,136 @@ SitesBlock* SitesBlockFactory::create(const std::string& type, const QColor &col
 
 SitesBlockFactory::SitesBlockFactory() {
     //注册site类型
-    registerType("SLICEL",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("SLICEL",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesSliceL(color, i, j, tile, name, index);
     });
-    registerType("SLICEM",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("SLICEM",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesSliceM(color, i, j, tile, name, index);
     });
-    registerType("IOB33",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("IOB33",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesIOB33(color, i, j, tile, name, index, pin);
     });
-    registerType("BUFR",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("BUFR",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesBUFR(color, i, j, tile, name, index);
     });
-    registerType("BUFIO",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("BUFIO",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesBUFIO(color, i, j, tile, name, index);
     });
-    registerType("IDELAYCTRL",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("IDELAYCTRL",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesIDELAYCTRL(color, i, j, tile, name, index);
     });
-    registerType("OLOGICE3",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("OLOGICE3",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesOLOGICE3(color, i, j, tile, name, index);
     });
-    registerType("ILOGICE3",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("ILOGICE3",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesILOGICE3(color, i, j, tile, name, index);
     });
-    registerType("IDELAYE2",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string&) {
+    registerType("IDELAYE2",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string&) {
         return new SitesIDELAYE2(color, i, j, tile, name, index);
     });
-    registerType("IOB33M",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("IOB33M",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesIOB33M(color, i, j, tile, name, index, pin);
     });
-    registerType("IOB33S",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("IOB33S",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesIOB33S(color, i, j, tile, name, index, pin);
     });
-    registerType("FIFO18E1",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("FIFO18E1",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesFIFO18E1(color, i, j, tile, name, index);
     });
-    registerType("RAMBFIFO36E1",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("RAMBFIFO36E1",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesRAMB36E1(color, i, j, tile, name, index);
     });
-    registerType("RAMB18E1",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("RAMB18E1",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesRAMB18E1(color, i, j, tile, name, index);
     });
-    registerType("DSP48E1",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("DSP48E1",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesDSP48E1(color, i, j, tile, name, index);
     });
-    registerType("OUT_FIFO",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("OUT_FIFO",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesOUTFIFO(color, i, j, tile, name, index);
     });
-    registerType("IN_FIFO",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("IN_FIFO",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesINFIFO(color, i, j, tile, name, index);
     });
-    registerType("MMCME2_ADV",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("MMCME2_ADV",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesMMCME2ADV(color, i, j, tile, name, index);
     });
-    registerType("PLLE2_ADV",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("PLLE2_ADV",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesPLLE2ADV(color, i, j, tile, name, index);
     });
-    registerType("PHASER_OUT_PHY",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("PHASER_OUT_PHY",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesPhaserOUTPHY(color, i, j, tile, name, index);
     });
-    registerType("PHASER_IN_PHY",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("PHASER_IN_PHY",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesPhaserINPHY(color, i, j, tile, name, index);
     });
-    registerType("PHY_CONTROL",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("PHY_CONTROL",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesPHYControl(color, i, j, tile, name, index);
     });
-    registerType("PHASER_REF",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("PHASER_REF",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesPhaserREF(color, i, j, tile, name, index);
     });
-    registerType("OLOGICE3",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("OLOGICE3",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesOLOGICE3(color, i, j, tile, name, index);
     });
-    registerType("ILOGICE3",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("ILOGICE3",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesILOGICE3(color, i, j, tile, name, index);
     });
-    registerType("IDELAYE2",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("IDELAYE2",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesIDELAYE2(color, i, j, tile, name, index);
     });
-    registerType("GTPE2_CHANNEL",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("GTPE2_CHANNEL",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesGTP2Cannel(color, i, j, tile, name, index);
     });
-    registerType("GTPE2_COMMON",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("GTPE2_COMMON",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesGTP2Common(color, i, j, tile, name, index);
     });
-    registerType("IPAD",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("IPAD",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesIPAD(color, i, j, tile, name, index, pin);
     });
-    registerType("OPAD",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("OPAD",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesOPAD(color, i, j, tile, name, index, pin);
     });
-    registerType("BUFGCTRL",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("BUFGCTRL",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesBUFGCTRL(color, i, j, tile, name, index);
     });
-    registerType("BUFHCE",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("BUFHCE",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesBUFHCE(color, i, j, tile, name, index);
     });
-    registerType("PCIE_2_1",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("PCIE_2_1",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesPCIE2_1(color, i, j, tile, name, index);
     });
-    registerType("BUFMRCE",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("BUFMRCE",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesBUFMRCE(color, i, j, tile, name, index);
     });
-    registerType("IBUFDS_GTE2",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("IBUFDS_GTE2",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesIBufsGTE2(color, i, j, tile, name, index);
     });
-    registerType("DNA_PORT",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("DNA_PORT",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesDNAPort(color, i, j, tile, name, index);
     });
-    registerType("EFUSE_USR",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("EFUSE_USR",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesEFUSEUSR(color, i, j, tile, name, index);
     });
-    registerType("ICAP",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("ICAP",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesICAP(color, i, j, tile, name, index);
     });
-    registerType("BSCAN",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("BSCAN",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesBSCAN(color, i, j, tile, name, index);
     });
-    registerType("DCIRESET",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("DCIRESET",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesDCIRESET(color, i, j, tile, name, index);
     });
-    registerType("CAPTURE",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("CAPTURE",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesCAPTURE(color, i, j, tile, name, index);
     });
-    registerType("STARTUP",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("STARTUP",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesSTARTUP(color, i, j, tile, name, index);
     });
-    registerType("FRAME_ECC",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("FRAME_ECC",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesFRAMEECC(color, i, j, tile, name, index);
     });
-    registerType("USR_ACCESS",[](const QColor &color, int i, int j, NormalTile tile, std::string& name, int index, std::string& pin) {
+    registerType("USR_ACCESS",[](const QColor &color, int i, int j, NormalTile& tile, std::string& name, int index, std::string& pin) {
         return new SitesUSRACCESS(color, i, j, tile, name, index);
     });
 }
