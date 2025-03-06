@@ -39,7 +39,7 @@ set(PYTHON_SCRIPT "${PROJECT_SOURCE_DIR}/scripts/parserVCD.py")
 set(PYINSTALLER_COMMAND "pyinstaller")
 
 #  自定义输出目录
-set(CUSTOM_DIST_DIR "${CMAKE_SOURCE_DIR}/build/Desktop_Qt_5_15_2_MinGW_64_bit-Debug/resource_win/parserVCD")
+set(CUSTOM_DIST_DIR "${CMAKE_BINARY_DIR}")
 
 # 添加自定义目标来构建 Python 脚本为可执行文件
 add_custom_target(

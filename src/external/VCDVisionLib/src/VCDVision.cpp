@@ -186,7 +186,7 @@ int VCDVision::processVCDJsonFile(const  QString &jsonFilePath){
 }
 
 void VCDVision::setButton(QWidget *parent) {
-    mButtonReset = new QPushButton ("重置",parent);
+    mButtonReset = new QPushButton ("Reset",parent);
     mButtonReset->setStyleSheet("QPushButton {"
                                 "border: 2px solid #E0E0E0; "
                                 "border-radius: 0px; "
@@ -997,16 +997,16 @@ void VCDVision::refreshWaveValue(){
             if(realndex >= mNameValueTableBeginIndex && realndex < mNameValueTableBeginIndex + mNameValueTableSize){
 
                 PlotOneBitValueTimes *plotOneBitValueTimes = nullptr ;
-                if(oneBitIndex <= oneBitSize){
-                    plotOneBitValueTimes = new PlotOneBitValueTimes ;
-                    mVecOneBitvalueTime.push_back(plotOneBitValueTimes);
-                }else{
+                if(oneBitIndex < oneBitSize){
                     plotOneBitValueTimes = mVecOneBitvalueTime.at(oneBitIndex);
                     plotOneBitValueTimes->clear();
                     oneBitIndex++;
+                }else{
+                    plotOneBitValueTimes = new PlotOneBitValueTimes ;
+                    mVecOneBitvalueTime.push_back(plotOneBitValueTimes);
+                    plotOneBitValueTimes->plotValueType = oneBit;
                 }
 
-                plotOneBitValueTimes->plotValueType = oneBit;
                 // 不支持的数据，或异常数据。
                 auto it = mHashSignalValue->find(mVecSignalOrder[i]->idCode);
                 if(it == mHashSignalValue->end()){
@@ -1021,17 +1021,16 @@ void VCDVision::refreshWaveValue(){
             if(realndex >= mNameValueTableBeginIndex && realndex < mNameValueTableBeginIndex + mNameValueTableSize){
 
                 PlotMoreOneBitValueTimes *plotMoreOneBitValueTimes = nullptr;
-                if(moreOneBitIndex <= moreOneBitSize){
-                    plotMoreOneBitValueTimes = new PlotMoreOneBitValueTimes ;
-                    mVecMoreOneBitValueTime.push_back(plotMoreOneBitValueTimes);
-                }else{
+                if(moreOneBitIndex < moreOneBitSize){
                     plotMoreOneBitValueTimes = mVecMoreOneBitValueTime.at(moreOneBitIndex);
                     plotMoreOneBitValueTimes->clear();
                     moreOneBitIndex++;
+                }else{
+                    plotMoreOneBitValueTimes = new PlotMoreOneBitValueTimes ;
+                    mVecMoreOneBitValueTime.push_back(plotMoreOneBitValueTimes);
+                    plotMoreOneBitValueTimes->plotValueType = moreOneBit;
                 }
 
-
-                plotMoreOneBitValueTimes->plotValueType = moreOneBit;
                 refreshMoreOneBitValueTime(maxAxisRealTimeLen, mVecSignalOrder[i], mVecPlotValueTime, plotMoreOneBitValueTimes );
             }
             realndex++;
@@ -1050,13 +1049,16 @@ void VCDVision::refreshWaveValue(){
                         // 池。
                         PlotOneBitValueTimes *plotOneBitValueTimes = nullptr ;
                         if(oneBitIndex < oneBitSize){
+                            plotOneBitValueTimes = mVecOneBitvalueTime.at(oneBitIndex);
+                            plotOneBitValueTimes->clear();
+                            oneBitIndex++;
+                        }else{
                             plotOneBitValueTimes = new PlotOneBitValueTimes ;
                             mVecOneBitvalueTime.push_back(plotOneBitValueTimes);
-                        }else{
-                            plotOneBitValueTimes = mVecOneBitvalueTime.at(oneBitIndex);
+                            plotOneBitValueTimes->plotValueType = oneBit;
                         }
 
-                        plotOneBitValueTimes->plotValueType = oneBit;
+
                         refreshOneBitValueTime(maxAxisRealTimeLen, signalValueTime, mVecPlotValueTime, plotOneBitValueTimes, j);
                     }
                     realndex++;

@@ -116,6 +116,14 @@ ProcessManager::ProcessManager(): pipeServer(PipeServer::instance()),logManager(
 //    connect(process,&QProcess::channelReadyRead,this,&ProcessManager::handleChannelReadyReadOutput);
     // finished 信号，process执行完毕后触发
     connect(process,SIGNAL(finished(int,QProcess::ExitStatus)),this, SLOT(handleFinished(int,QProcess::ExitStatus)));
+
+    // 仿真的错误输出
+    connect(process, &QProcess::readyReadStandardError, [this](){
+        if(curPhase == "Simulation Run"){
+            QByteArray errorOutput = process->readAllStandardError();
+            qDebug() << "Error output from the process:" << QString::fromUtf8(errorOutput);
+        }
+    });
 }
 
 ProcessManager::~ProcessManager()
@@ -212,7 +220,7 @@ void ProcessManager::initEnvironment() {
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
     env.insert("SIMULATION_COMPILER_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\iverilog.exe)" );
     env.insert("SIMULATION_RUN_PATH",GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\vvp.exe)");
-    env.insert("PARSER_VCD_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\parserVCD\parserVCD.exe)");
+    env.insert("PARSER_VCD_PATH", QCoreApplication::applicationDirPath() + R"(\parserVCD.exe)");
 }
 
 void ProcessManager::configDisplay(const QString &partname) {
