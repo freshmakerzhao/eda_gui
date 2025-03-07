@@ -59,6 +59,8 @@ private:
     // =========== Implementation ==============
     //! pack_place_route
     QTreeWidgetItem *impAllItem;
+    //! timing report
+    QTreeWidgetItem *reportTiming;
     //! impl report
     QTreeWidgetItem *impPackReportItem;
     // ========== PROGRAM AND DEBUG ============

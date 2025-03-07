@@ -11,6 +11,7 @@
 #include "LogWidget.h"
 #include "utils/json.hpp"
 #include "MessageWidget.h"
+#include "component/timing/TimingWidget.h"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
@@ -224,6 +225,8 @@ InfoWidget::InfoWidget(QWidget *parent)
 {
     qDebug() << "[InfoWidget] Constructing...";
     tabWidget = new QTabWidget;
+    tabWidget->setTabsClosable(true);
+    QTabBar *tabBar = tabWidget->tabBar();
     QGridLayout *layout = new QGridLayout(this);
     layout->setMargin(0);
     layout->addWidget(tabWidget);
@@ -263,6 +266,15 @@ InfoWidget::InfoWidget(QWidget *parent)
     runsView->setColumnWidth(1, 240);
     runsView->setColumnWidth(7, 200);
     runsView->setColumnWidth(9, 200);
+
+    // -------------------------------------------------------
+    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &InfoWidget::onTabWidgetTabCloseRequested);
+    tabBar->setTabButton(0, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(1, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(2, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(3, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(4, QTabBar::RightSide, nullptr);
+
 }
 
 InfoWidget::~InfoWidget()
@@ -278,6 +290,23 @@ void InfoWidget::initSummary(const QString phase) {
         // 初始化布局布线阶段资源统计数据
         lut6NumImpl = 0 , lutNumImpl = 0, muxf6NumImpl = 0 , ffNumImpl = 0 , bramNumImpl = 0 , fifo18NumImpl = 0 , ranb18NumImpl = 0 , ranb36NumImpl = 0 , dspNumImpl = 0 ,carry4NumImpl = 0;
     }
+}
+
+void InfoWidget::generateTimingSummary()
+{
+    onTabWidgetTabCloseRequested(5);
+    tabWidget->insertTab(5, new TimingWidget, "Timing");
+    tabWidget->setCurrentIndex(5);
+}
+
+void InfoWidget::onTabWidgetTabCloseRequested(int index)
+{
+    auto *widget = tabWidget->widget(index);
+    if (!widget)
+        return;
+
+    tabWidget->removeTab(index);
+    delete widget;
 }
 
 

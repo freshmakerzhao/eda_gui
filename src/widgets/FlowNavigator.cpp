@@ -83,6 +83,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     // pack_place_route
     impAllItem = new QTreeWidgetItem(impItem, QStringList() << "Run Implementation");
     impAllItem->setIcon(0, QIcon(":/icons/resource/icons/1-icon_start_process.png"));
+    reportTiming = new QTreeWidgetItem(impItem, QStringList() << "Report Timing");
+    reportTiming->setIcon(0, QIcon(":/icons/resource/icons/8-icon_timing.png"));
     impPackReportItem = new QTreeWidgetItem(impItem, QStringList() << "Report");
     // 查看 Pack 日志
     impPackReportItem->setIcon(0, QIcon(":/icons/resource/icons/6-icon_report.png"));
@@ -195,8 +197,10 @@ FlowNavigator::FlowNavigator(QWidget *parent)
         } else if (item == readBackMemoryItem) {
             TaskManager::instance().handleTreeItemActivation(17);
         }*/
-         else if (item == simRunItem) {
+          else if (item == simRunItem) {
             TaskManager::instance().handleTreeItemActivation(18);
+        } else if (item == reportTiming) {
+            TaskManager::instance().handleTreeItemActivation(19);
         }
         clearSelection(); // 清除选中状态
     });
