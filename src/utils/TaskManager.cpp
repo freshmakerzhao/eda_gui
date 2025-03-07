@@ -397,6 +397,12 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
         } else if (msg.phase == "Generate Bitstream"){
             QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
             settings.setValue(FlowPhase::GenerateBitstream, FlowState::Complete);
+            InfoWidget::instance()->updateImplItem(
+                msg.workPath,
+                msg.phase + " Complete!",
+                msg.startTime,
+                msg.elapsedTime,
+                msg.displayPartName);
             // 生成码流结束提示
             CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }
