@@ -16,6 +16,7 @@
 #include "BelsBlock.h"
 #include "Block.h"
 #include "entity/TileGridDataMap.h"
+#include <set>
 
 class SitesBlock : public Block {
 Q_OBJECT
@@ -33,7 +34,7 @@ public:
     QVector<BelsBlock*> child_bel_items;
     void updateVisibleStatus(bool status) override;
     void launchClicked();
-    void setUsed(std::unordered_set<std::string> bels);
+    void setUsed(std::set<std::array<std::string, 2>> bels);
 signals:
     void SiteClicked(int tile_index_x, int tile_index_y,bool sites_visible_status,int index);
 private:

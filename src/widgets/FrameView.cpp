@@ -7,7 +7,7 @@
   ******************************************************************************
   */
 #include "FrameView.h"
-#include "blocks/Tiles.h"
+#include "blocks/TilesBlock.h"
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QComboBox>
@@ -66,9 +66,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     QWidget *rightTopWidget = new QWidget(splitterRight);
     QVBoxLayout *rightTopLayout = new QVBoxLayout(rightTopWidget);
     // QPushButton* right_top_load_arch = new QPushButton("加载架构信息");
-    QPushButton* rightTopBlockName = new QPushButton("Tile Name Off");
-    QPushButton* rightTopSites = new QPushButton("Show Module Details");
-    QPushButton* rightTopClockRegion = new QPushButton("Show Clock Region");
     QPushButton* rightTopUsage = new QPushButton("Resource Usage(no arch)");
 //    QPushButton* right_top_four = new QPushButton("清空视图");
 //    right_top_four->setEnabled(false); // 默认禁止
@@ -77,75 +74,17 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 
     // 设置按钮大小不变
     QSize buttonSize = QSize(rightTopUsage->sizeHint().width(), rightTopUsage->sizeHint().height());
-    rightTopBlockName->setFixedSize(buttonSize);
-    rightTopSites->setFixedSize(buttonSize);
-    rightTopClockRegion->setFixedSize(buttonSize);
     rightTopUsage->setFixedSize(buttonSize);
 
     // 默认禁止
-    rightTopBlockName->setEnabled(false);
-    rightTopSites->setEnabled(false);
     rightTopUsage->setEnabled(false);
 
-    rightTopLayout->addWidget(rightTopBlockName, 0, Qt::AlignHCenter);
-    rightTopLayout->addWidget(rightTopSites, 0, Qt::AlignHCenter);
-    rightTopLayout->addWidget(rightTopClockRegion, 0, Qt::AlignHCenter);
     rightTopLayout->addWidget(rightTopUsage, 0, Qt::AlignHCenter);
 
     QWidget *rightBottomWidget = new QWidget(splitterRight);
 
-    // 显示、隐藏模块名称
-    connect(rightTopBlockName, &QPushButton::clicked, [this,rightTopSites,rightTopBlockName]() {
-        viewer.updateTilesNameVisibleStatus(!showTilesName);
-
-        // 如果此时显示了site，则隐藏
-        if(showSites) {
-            viewer.updateSitesVisibleStatus(false);
-            rightTopSites->setText("Show Module Details");
-        }
-
-        if(showTilesName){
-            // 触发信号后，设置tile_name隐藏
-            rightTopBlockName->setText("Tile Name On");
-        }else{
-            // 触发信号后，设置tile_name显示
-            rightTopBlockName->setText("Tile Name Off");
-        }
-        showSites = false;
-        showTilesName = !showTilesName;
-    });
-
-    // 显示、隐藏内部模块
-    connect(rightTopSites, &QPushButton::clicked, [this,rightTopSites,rightTopBlockName]() {
-        viewer.updateSitesVisibleStatus(!showSites);
-        // 如果此时显示了tile_name，则隐藏
-        if(showTilesName) {
-            viewer.updateTilesNameVisibleStatus(false);
-            rightTopBlockName->setText("Tile Name On");
-        }
-
-        if(showSites){
-            rightTopSites->setText("Show Module Details");
-        }else{
-            rightTopSites->setText("Hide Module Details");
-        }
-        showTilesName = false;
-        showSites = !showSites;
-    });
-
-    // 显示、隐藏 Clock Region
-    connect(rightTopClockRegion, &QPushButton::clicked, [this,rightTopClockRegion]() {
-        viewer.updateClockRegionVisibleStatus(!showClockRegion);
-        if(showClockRegion){
-            rightTopClockRegion->setText("Show Clock Region");
-        }else{
-            rightTopClockRegion->setText("Hide Clock Region");
-        }
-        showClockRegion = !showClockRegion;
-    });
-
     // 资源占用
-    connect(rightTopUsage, &QPushButton::clicked, [this,rightTopSites,rightTopBlockName,projectImplPath]() {
+    connect(rightTopUsage, &QPushButton::clicked, [this,projectImplPath]() {
 #if ONLY_COMPILE_GRIDVIEW
         // -------------------- 手动选择资源占用文件，方便测试 -----------------------------------
         usageJsonPath = FileHelper::addJsonFile();
@@ -156,12 +95,6 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
 #endif
         if (QFile(usageJsonPath).exists()) {
 //            viewer.setAllTileWhite(scene);
-            viewer.updateSitesVisibleStatus(true);
-            viewer.updateTilesNameVisibleStatus(false);
-            showTilesName = false;
-            showSites = true;
-            rightTopSites->setText("Hide Module Details");
-            rightTopBlockName->setText("Tile Name On");
             viewer.buildPlaceUsageGrid(usageJsonPath.toStdString());
             if (viewer.showPlaceUsageGrid(scene)){
             } else {
@@ -183,6 +116,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     QLabel* siteTypeLabel = new QLabel("Site type:");
     QLabel* NameLabel = new QLabel("Name:");
     QLabel* TypeLabel = new QLabel("Type:");
+    QLabel* cellNameLabel = new QLabel("Cell Name:");
     tileTypeValue = new QLabel;
     rowNumValue = new QLabel;
     colNumValue = new QLabel;
@@ -190,6 +124,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     siteTypeValue = new QLabel;
     NameValue = new QLabel;
     TypeValue = new QLabel;
+    cellNameValue = new QLabel;
 
     tileTypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     rowNumLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -198,6 +133,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     siteTypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     NameLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     TypeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    cellNameLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     tileTypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     rowNumValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -206,6 +142,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     siteTypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     NameValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     TypeValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    cellNameValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     formLayout->addRow(tileTypeLabel, tileTypeValue);
     formLayout->addRow(rowNumLabel, rowNumValue);
@@ -214,6 +151,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     formLayout->addRow(siteTypeLabel, siteTypeValue);
     formLayout->addRow(NameLabel, NameValue);
     formLayout->addRow(TypeLabel, TypeValue);
+    formLayout->addRow(cellNameLabel, cellNameValue);
 
     // 创建一个包含表单的widget
     QWidget *formWidget = new QWidget();
@@ -245,9 +183,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
     if (!tileGridPath.empty()){
         viewer.buildTileGridAndCellsMatrix(tileGridPath, tileColorPathLocal, pinsInfoPathLocal);
         if (viewer.showGridView(scene)) {
-            rightTopBlockName->setEnabled(true);
             rightTopUsage->setEnabled(true);
-            rightTopSites->setEnabled(true);
             rightTopUsage->setText("Resource Usage");
         }
 
@@ -259,7 +195,7 @@ FrameView::FrameView(const std::string& tileGridPath, const std::string& tileCol
        for (auto& item : cols) {
            if (item == nullptr) continue;
            // 先断开再链接，避免多次链接
-           connect(item, &Tiles::BlockClicked, this, &FrameView::showTileInfo);
+           connect(item, &TilesBlock::BlockClicked, this, &FrameView::showTileInfo);
            for (SitesBlock* site:item->child_items) {
                connect(site, &SitesBlock::SiteClicked, this, &FrameView::showSiteInfo);
                for (BelsBlock* bel: site->child_bel_items) {
@@ -302,7 +238,7 @@ void FrameView::showSiteInfo(int col, int row,bool sites_visible_status,int inde
     TypeValue->setText("");
 }
 
-void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name) {
+void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name, const std::string& cell_name) {
     NormalTile one = viewer.getTileInfo(col,row);
     // 更新标签文本
     tileTypeValue->setText(QString::fromStdString(one.types));
@@ -313,6 +249,7 @@ void FrameView::showBelInfo(int col, int row, int site_index, bool bel_visible_s
         siteTypeValue->setText(QString::fromStdString(one.cur_sites[site_index].type));
         NameValue->setText(QString::fromStdString(name));
         TypeValue->setText(QString::fromStdString(bel_type));
+        cellNameValue->setText(QString::fromStdString(cell_name));
     } else {
         siteNameValue->setText("");
         siteTypeValue->setText("");

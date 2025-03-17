@@ -24,7 +24,7 @@ bool BelsBlock::isMatches(const std::string &bel_name) {
         if(bel_name[i] != name[i])
             count++;
     }
-    return count <= 1;
+    return count <= 0;
 }
 
 bool BelsBlock::isUsed() {
@@ -81,11 +81,11 @@ void BelsBlock::updateVisibleStatus(bool option) {
 }
 
 void BelsBlock::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    emit BelClicked(tile_index_x, tile_index_y, site_index, getVisibleStatus(), index, bel_type, this->name);
+    emit BelClicked(tile_index_x, tile_index_y, site_index, getVisibleStatus(), index, bel_type, this->name, cell_name);
 }
 
 void BelsBlock::launchClicked() {
-    emit BelClicked(tile_index_x, tile_index_y, site_index, getVisibleStatus(), index, bel_type, this->name);
+    emit BelClicked(tile_index_x, tile_index_y, site_index, getVisibleStatus(), index, bel_type, this->name, cell_name);
 }
 
 void BelsBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
@@ -99,4 +99,7 @@ void BelsBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 void BelsBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mouseReleaseEvent(event);
     update();
+}
+void BelsBlock::setCellName(const std::string &cellName) {
+    cell_name = cellName;
 }

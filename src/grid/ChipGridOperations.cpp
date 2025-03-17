@@ -1,7 +1,7 @@
 
 #include "ChipGridOperations.h"
 #include "view.h"
-#include "blocks/Tiles.h"
+#include "blocks/TilesBlock.h"
 #include "base/Globals.h"
 #include <iostream>
 #include <regex>
@@ -62,14 +62,16 @@ const std::unordered_set<std::basic_string<char>> SHOW_TILE = {
     "GTP_CHANNEL_3_MID_LEFT",
     "GTP_CHANNEL_2",
     "GTP_CHANNEL_2_MID_RIGHT",
-    "GTP_CHANNEL_3_MID_LEFT",
+    "GTP_CHANNEL_2_MID_LEFT",
     "GTP_CHANNEL_1",
     "GTP_CHANNEL_1_MID_RIGHT",
-    "GTP_CHANNEL_3_MID_LEFT",
+    "GTP_CHANNEL_1_MID_LEFT",
     "GTP_CHANNEL_0",
     "GTP_CHANNEL_0_MID_RIGHT",
-    "GTP_CHANNEL_3_MID_LEFT",
+    "GTP_CHANNEL_0_MID_LEFT",
     "GTP_COMMON",
+    "GTP_COMMON_MID_RIGHT",
+    "GTP_COMMON_MID_LEFT",
     "PCIE_BOT",
     "CLK_HROW_TOP_R",
     "CLK_HROW_BOT_R",
@@ -99,6 +101,15 @@ std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGri
                 const std::string& inner_key = inner_it.key();  // width height
                 const int& inner_value = inner_it.value();  // 内层值
                 inner_map["size"][inner_key] = inner_value;
+            }
+
+            if(it.value().contains("offset")) {
+                const nlohmann::json& offset_content = it.value()["offset"];
+                for (auto inner_it = offset_content.begin(); inner_it != offset_content.end(); ++inner_it) {
+                    const std::string& inner_key = inner_it.key(); // x/y
+                    const int& inner_value = inner_it.value(); // 内层值
+                    inner_map["offset"][inner_key] = inner_value;
+                }
             }
 
             // 存储到外层 map
@@ -211,54 +222,21 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
         setColorsToTiles(item,tile_info_map);
         gridTypeMatrix[item.grid_x][item.grid_y] = item; // 位置信息与tilegrid中x,y相同
     }
-    //  ================ 跨行类型 ================
-    TYPE_TO_SIZE_FACTORS = {
-            {"CMT_FIFO_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -5}}},
-            {"CMT_FIFO_L", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -5}}},
-            {"CMT_TOP_R_UPPER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 13}, {"Y_GAP", -7}}},
-            {"CMT_TOP_R_UPPER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -7}}},
-            {"CMT_TOP_R_LOWER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 9}, {"Y_GAP", -7}}},
-            {"CMT_TOP_L_LOWER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 9}, {"Y_GAP", -7}}},
-            {"CMT_TOP_R_LOWER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 16}, {"Y_GAP", -7}}},
-            {"CMT_TOP_L_LOWER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 16}, {"Y_GAP", -7}}},
-            {"BRAM_L", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
-            {"BRAM_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
-            {"DSP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
-            {"DSP_L", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
-            {"LIOB33", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"LIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"RIOB33", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"RIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"RIOI3_TBYTESRC", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"RIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"LIOI3_TBYTESRC", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"LIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
-            {"GTP_CHANNEL_3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
-            {"GTP_CHANNEL_2", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
-            {"GTP_CHANNEL_1", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
-            {"GTP_CHANNEL_0", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 11}, {"Y_GAP", -5}}},
-            {"GTP_COMMON", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 7}, {"Y_GAP", -6}}},
-            {"PCIE_BOT", {{"WIDTH_FACTOR", 3}, {"HEIGHT_FACTOR", 20}, {"Y_GAP", -9}}},
-            {"CFG_CENTER_TOP", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 10}, {"Y_GAP", -9}}},
-            {"CFG_CENTER_MID", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 21}, {"Y_GAP", -9}}},
-            {"CMT_TOP_L_UPPER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 13}, {"Y_GAP", -7}}},
-            {"CMT_TOP_L_UPPER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -7}}},
-            {"CLK_HROW_TOP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 8}, {"Y_GAP", -4}}},
-            {"CLK_HROW_BOT_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 8}, {"Y_GAP", -4}}},
-            {"CLK_BUFG_TOP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 4}, {"Y_GAP", -3}}},
-            {"CLK_BUFG_BOT_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 4}, {"Y_GAP", -3}}},
-    };
-
     //  ================ 处理grid跨行  ================
     for (int i = 0; i < totalSize.width; ++i) {
         for (int j = 0; j < totalSize.height; ++j) {
             // 获取当前 tile 的 type
             std::string types = gridTypeMatrix[i][j].types;
-            auto it = TYPE_TO_SIZE_FACTORS.find(types);
+            bool isMultiRows = tile_info_map.find(types) != tile_info_map.end() &&
+                               tile_info_map[types].find("offset") != tile_info_map[types].end();
             std::map<std::string,int> cur_factors;
-            if (it != TYPE_TO_SIZE_FACTORS.end()) {
+            if (isMultiRows) {
                 // 跨行的tile
-                cur_factors = TYPE_TO_SIZE_FACTORS[types];
+                cur_factors = {
+                    {"WIDTH_FACTOR", tile_info_map[types]["size"]["width"]},
+                    {"HEIGHT_FACTOR", tile_info_map[types]["size"]["height"]},
+                    {"Y_GAP", tile_info_map[types]["offset"]["y"]}
+                };
             } else {
                 // 普通tile
                 cur_factors = {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 1}, {"Y_GAP", 0}};
@@ -283,7 +261,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 gridTypeMatrix[i][j].y_coordinate = 0;
             }
             // 处理跨行tile涉及的tile，由于跨行tile在tilegrid中其grid_x，grid_y描述的不是他起始位置，所以需要做处理
-            if (it != TYPE_TO_SIZE_FACTORS.end()) {
+            if (isMultiRows) {
                 int start_y = j + cur_factors["Y_GAP"]; // 计算其真正的起始y
                 // grid_type_matrix[i][start_y]位置一定为null，用当前tile将其覆盖
                 gridTypeMatrix[i][start_y] = gridTypeMatrix[i][j];
@@ -302,7 +280,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
             }
         }
     }
-    gridMatrix.resize(totalSize.width, std::vector<Tiles*>(totalSize.height, nullptr));
+    gridMatrix.resize(totalSize.width, std::vector<TilesBlock*>(totalSize.height, nullptr));
     bool lastCowShow = true;
     int widthCount = 0;
     for(int i = 0; i < totalSize.width; ++i)
@@ -319,7 +297,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
             std::string type = gridTypeMatrix[i][j].types;
             auto it = SHOW_TILE.find(type);
             if(it == SHOW_TILE.end()) {
-                gridMatrix[i][j] = new Tiles(
+                gridMatrix[i][j] = new TilesBlock(
                         QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
                         i,
                         j,
@@ -330,7 +308,7 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                     lastCowShow = false;
                 continue;
             } else {
-                gridMatrix[i][j] = new Tiles(
+                gridMatrix[i][j] = new TilesBlock(
 //                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
                         Qt::darkBlue,
                         i,
@@ -463,23 +441,6 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
 ChipGridOperations::ChipGridOperations(){
 }
 
-void ChipGridOperations::setAllTileWhite(QGraphicsScene *scene) {
-    for(int i = 0; i < totalSize.width; ++i)
-    {
-        for(int j = 0; j < totalSize.height; ++j)
-        {
-            if (gridMatrix[i][j] == nullptr) {
-                continue;
-            }
-            for (SitesBlock* item : gridMatrix[i][j]->child_items) {
-                item->setColor(QColor(Qt::white));
-            }
-            gridMatrix[i][j]->setColor(QColor(Qt::white));
-        }
-    }
-    scene->update();
-}
-
 void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     std::ifstream file(QString::fromStdString(usageJsonPath).toLocal8Bit().constData());
     if (!file) {
@@ -508,13 +469,24 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
         const auto& cells = module["cells"];
         for (const auto& cell : cells) {
             if (!cell.contains("attributes") || !cell["attributes"].contains("NEXTPNR_BEL")) continue;
-            const auto& bells = cell["attributes"]["NEXTPNR_BEL"];
-            for (const auto& bell : bells) {
-                const std::string &value = bell.get_ref<const std::string&>();
+            const auto& bels = cell["attributes"]["NEXTPNR_BEL"];
+            for (const auto& bel : bels) {
+                const std::string &value = bel.get_ref<const std::string&>();
                 size_t pos = value.find('/');
                 if (pos != std::string::npos) {
                     const std::string site = value.substr(0, pos);
-                    used_site[site].insert(value);
+                    std::array<std::string , 2> belNames;
+                    belNames[0] = value;
+                    belNames[1] = "nothing";
+                    for(const auto& [key, value] : cells.items()) {
+                       if(&value == &cell) {
+                           belNames[1] = key;
+                           break;
+                       }
+                    }
+                    qDebug() << "bel name:" << QString::fromStdString(belNames[0])
+                             << "| cell name: " << QString::fromStdString(belNames[1]);
+                    used_site[site].insert(belNames);
 //                } else {
 //                    used_site.insert.;
                 }
@@ -573,45 +545,7 @@ void ChipGridOperations::clearVector() {
     // 清空 grid_matrix
     for (auto& row : gridMatrix) {
         row.clear();
-        std::vector<Tiles*>().swap(row); // 释放内存
+        std::vector<TilesBlock*>().swap(row); // 释放内存
     }
     gridMatrix.clear();
-}
-
-void ChipGridOperations::updateTilesNameVisibleStatus(bool status) {
-    for(int i = 0; i < totalSize.width; ++i){
-        for(int j = 0; j < totalSize.height; ++j) {
-            // 遇到skip跳过
-            if (gridTypeMatrix[i][j].types == "SKIP") {
-                continue;
-            }
-            gridMatrix[i][j]->updateTilesNameVisibleStatus(status);
-        }
-    }
-}
-
-void ChipGridOperations::updateClockRegionVisibleStatus(const bool &clockRegionVisibleStatus)
-{
-    for (QGraphicsRectItem *it : clock_region_rects) {
-        it->setVisible(clockRegionVisibleStatus);
-    }
-}
-
-void ChipGridOperations::updateSitesVisibleStatus(bool sitesVisibleStatus) {
-    for(int i = 0; i < totalSize.width; ++i){
-        for(int j = 0; j < totalSize.height; ++j) {
-            // 遇到skip跳过
-            if (gridTypeMatrix[i][j].types == "SKIP") {
-                continue;
-            }
-            // 获取当前位置的子项列表
-            QVector<SitesBlock*> itemList = gridMatrix[i][j]->child_items;
-
-            // 遍历子项列表并调用方法
-            for (SitesBlock* item : itemList) {
-                // 调用子项的方法
-                item->updateVisibleStatus(sitesVisibleStatus);
-            }
-        }
-    }
 }

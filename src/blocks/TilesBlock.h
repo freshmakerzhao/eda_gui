@@ -6,20 +6,19 @@
 #include <QColor>
 #include <QGraphicsItem>
 
-class Tiles : public Block
+class TilesBlock : public Block
 {
     Q_OBJECT
 public:
-    Tiles(
+    TilesBlock(
         const QColor &color,
         int index_x, int index_y,
         bool show,
         NormalTile& info
     );
 
-    void addSubBlock(SitesBlock *subBlock);
-    void updateTilesNameVisibleStatus(bool status);
     void updateVisibleStatus(bool status) override;
+    void addSubBlock(SitesBlock *subBlock);
     bool isShow() const;
     std::string getType() const;
     QVector<SitesBlock*> child_items;
@@ -38,7 +37,6 @@ private:
     int index_x;
     int index_y;
     bool show;
-    bool tiles_name_visible_status = false;
 
 };
 
