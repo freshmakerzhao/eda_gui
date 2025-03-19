@@ -52,7 +52,8 @@ bool ProjectManager::createProject(const QString &name,
                                    const QStringList &constraints,
                                    const QString &displayPart,
                                    const QString &familyName,
-                                   const QString &compatibilityMode)
+                                   const QString &compatibilityMode,
+                                   const QString &series)
 {
     // 此处的project是一个临时对象，生成工程文件后销毁
     Project *project = new Project;
@@ -63,7 +64,8 @@ bool ProjectManager::createProject(const QString &name,
                          archName,
                          displayPart,
                          familyName,
-                         compatibilityMode);
+                         compatibilityMode,
+                         series);
     project->sourceList = designSrcs;
     project->constraintList = constraints;
     project->writeProject();

@@ -37,7 +37,8 @@ void Project::initProject(const QString &name,
                           const QString &archName,
                           const QString &displayPart,
                           const QString &familyName,
-                          const QString &compatibilityMode)
+                          const QString &compatibilityMode,
+                          const QString &series)
 {
     parameters[Project::Name] = name;         // 工程名称
     parameters[Project::Path] = path;         // 工程路径(绝对)
@@ -47,6 +48,8 @@ void Project::initProject(const QString &name,
     parameters[Project::TopModule] = "top";
     parameters[Project::DisplayPart] = displayPart;
     parameters[Project::FamilyName] = familyName;
+    parameters[Project::Series] = series;
+
 
     parameters[Project::CompatibilityMode] = compatibilityMode;
     parameters[Project::BinFile]        = "disable";
@@ -99,6 +102,11 @@ bool Project::writeProject(){
     archNameOption->SetAttribute("Val", parameters[Project::ArchName].toStdString().c_str());
     configuration->InsertEndChild(archNameOption);
 
+    tinyxml2::XMLElement* seriesOption = doc.NewElement("Option");
+    seriesOption->SetAttribute("Name", "Series");
+    seriesOption->SetAttribute("Val", parameters[Project::Series].toStdString().c_str());
+    configuration->InsertEndChild(seriesOption);
+
     tinyxml2::XMLElement* familyNameOption = doc.NewElement("Option");
     familyNameOption->SetAttribute("Name", "FamilyName");
     familyNameOption->SetAttribute("Val", parameters[Project::FamilyName].toStdString().c_str());
@@ -109,10 +117,10 @@ bool Project::writeProject(){
     displayPartOption->SetAttribute("Val", parameters[Project::DisplayPart].toStdString().c_str());
     configuration->InsertEndChild(displayPartOption);
 
-    tinyxml2::XMLElement* CompatibilityModeOption = doc.NewElement("Option");
-    CompatibilityModeOption->SetAttribute("Name", "CompatibilityMode");
-    CompatibilityModeOption->SetAttribute("Val", parameters[Project::CompatibilityMode].toStdString().c_str());
-    configuration->InsertEndChild(CompatibilityModeOption);
+    tinyxml2::XMLElement* compatibilityModeOption = doc.NewElement("Option");
+    compatibilityModeOption->SetAttribute("Name", "CompatibilityMode");
+    compatibilityModeOption->SetAttribute("Val", parameters[Project::CompatibilityMode].toStdString().c_str());
+    configuration->InsertEndChild(compatibilityModeOption);
     // ------------------ Configuration 结束 --------------------
 
     // ------------------ FileSet Design Sources 开始 --------------------
@@ -285,6 +293,8 @@ bool Project::parseProject(const QString &hprPath)
             parameters[Project::DisplayPart] = option->Attribute("Val");
         if (std::string(option->Attribute("Name")) == "CompatibilityMode")
             parameters[Project::CompatibilityMode] = option->Attribute("Val");
+        if (std::string(option->Attribute("Name")) == "Series")
+            parameters[Project::Series] = option->Attribute("Val");
         option = option->NextSiblingElement("Option");
     }
     // ------------------------------ Configuration 结束 --------------------------------
@@ -371,6 +381,7 @@ bool Project::parseProject(const QString &hprPath)
     qDebug() << "DisplayPart         :" << parameters[Project::DisplayPart];
     qDebug() << "TopModule           :" << parameters[Project::TopModule];
     qDebug() << "CompatibilityMode   :" << parameters[Project::CompatibilityMode];
+    qDebug() << "Series              :" << parameters[Project::Series];
     qDebug() << "Design Sources-------------------------------------------------";
     foreach (const QString& source , this->sourceList) {
         qDebug() << " " << source;
@@ -463,6 +474,7 @@ void Project::setDevicePart(const QString &displayPart)
     parameters[Project::ArchName]= info.archName;
     parameters[Project::DisplayPart] = displayPart;
     parameters[Project::FamilyName] = info.family_name;
+    parameters[Project::Series] = info.series;
     writeProject();
 }
 

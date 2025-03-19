@@ -39,6 +39,7 @@ DefaultPartPage::DefaultPartPage(QWidget *parent) : QWizardPage(parent)
     tableView->setColumnHidden(9, true);
     tableView->setColumnHidden(10, true);
     tableView->setColumnHidden(11, true);
+    tableView->setColumnHidden(12, true);
 
     QObject::connect(tableView, &QTableView::clicked, this, &DefaultPartPage::selectPart);
 
@@ -116,8 +117,22 @@ void DefaultPartPage::selectPart(const QModelIndex &index) {
         wizard->arch = idx.siblingAtColumn(9).data(Qt::DisplayRole).toString();     // 获取arch
         wizard->familyName = idx.siblingAtColumn(10).data(Qt::DisplayRole).toString();     // 获取family_name
         wizard->part = idx.siblingAtColumn(11).data(Qt::DisplayRole).toString();     // 获取part
+        wizard->series = idx.siblingAtColumn(12).data(Qt::DisplayRole).toString();     // 获取series
 
-        qDebug() << "[DefaultPartPage] wizard param: "<< wizard->part << wizard->archName << wizard->arch << wizard->familyName << wizard->displayPart;
+        qDebug().noquote() << QString("[DefaultPartPage] wizard param:\n"
+                    "part: %1\n"
+                    "archName: %2\n"
+                    "arch: %3\n"
+                    "familyName: %4\n"
+                    "displayPart: %5\n"
+                    "series: %6")
+            .arg(wizard->part)
+            .arg(wizard->archName)
+            .arg(wizard->arch)
+            .arg(wizard->familyName)
+            .arg(wizard->displayPart)
+            .arg(wizard->series);
+
     }
     emit completeChanged();
 }

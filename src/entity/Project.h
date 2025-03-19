@@ -36,6 +36,7 @@ public:
         TopModule,
         DisplayPart,
         FamilyName,
+        Series,
         BinFile,
         RbtFile,
         CRCOption,
@@ -60,7 +61,8 @@ public:
                      const QString &archName,
                      const QString &displayPart = QString("MC1P110-FC484L-1"),
                      const QString &familyName = QString("MgiCubo"),
-                     const QString &compatibilityMode = QString("enable"));
+                     const QString &compatibilityMode = QString("enable"),
+                     const QString &series = QString("artix7"));
 
     bool writeProject();
     void saveGenerateBitstreamOptions(tinyxml2::XMLElement *stepGenerateBitstreamElement);

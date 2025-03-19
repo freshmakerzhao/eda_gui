@@ -27,6 +27,7 @@ struct DeviceInfo {
     QString dsp_count;
     QString pcie_count;
     QString archName;
+    QString series;
     QString speedgrade;
     QString family_name;
     QString arch;

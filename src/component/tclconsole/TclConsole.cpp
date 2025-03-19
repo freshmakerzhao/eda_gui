@@ -244,7 +244,7 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const QString task = QString(argv[0]);
 
     if (task == "impl_design") {
-        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--U", "--debug", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
+        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--U", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
         info = "Starting Implementation Task";
     } else if (task == "pack_design") {
         addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
@@ -546,6 +546,7 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
 int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
     QStringList script;
     QString part_name = ProjectManager::instance().getParameter(Project::Part);
+    QString series = ProjectManager::instance().getParameter(Project::Series);
 
     bool enableCRC = false;
     bool enableCompress = false;
@@ -592,7 +593,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "--part";
     script << part_name;
     script << "--db-root";
-    script << GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\hybrdlink_db\MC7F)";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series + "/";
     script << "--fn_out";
     script << framesPath;
     script << "--fn_in";
@@ -601,7 +602,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "&&";
     script << "%FRAMES2BIT%";
     script << "--part_file";
-    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + part_name + "/part.yaml";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series + "/" + part_name + "/part.yaml";
     script << "--part_name";
     script << part_name;
     script << "--frm_file";

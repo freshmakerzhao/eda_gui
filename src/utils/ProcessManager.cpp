@@ -140,7 +140,11 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
     }
     
     qDebug() << "------------------------------------------------- ";
+    qDebug() << "Execute QStringList Command : ";
     qDebug() << script;
+    qDebug() << "Execute Command : ";
+    QString fullScript = script.join(" ");
+    qDebug().noquote() << fullScript;
     qDebug() << "------------------------------------------------- ";
 
     // 记录开始执行的时间
