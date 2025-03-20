@@ -89,6 +89,15 @@ set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_BINARY_DIR}/external/QtADS")
 link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/external/QtADS)
 
+# Include the compress_tool
+add_subdirectory(external/compress_tool/)
+# 设置 include 目录，确保主项目可以访问 compress_tool 的头文件
+include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/api)
+include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include)
+include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include/bit7z)
+set(COMPRESS_LIBS "")  # 初始化变量
+list(APPEND COMPRESS_LIBS ${CMAKE_SOURCE_DIR}/external/compress_tool/libs/release/libSecuArcPack.a ${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/lib/win/libSecuArc64.a)
+
 # Include the OpenSSL library
 set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/openssl")
 set(OPENSSL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
@@ -180,6 +189,10 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_RESOURCES}
     win32.rc
 )
+
+add_dependencies(${PROJECT_NAME} create_libSecuArcPack_a create_libSecuArcPack_d_a)
+# 链接 compress_tool
+target_link_libraries(${PROJECT_NAME} ${COMPRESS_LIBS} oleaut32 uuid)
 
 # Link the Qt5 Widgets library and Third-Party library to the executable
 target_link_libraries(${PROJECT_NAME}

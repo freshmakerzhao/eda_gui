@@ -116,7 +116,7 @@ std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGri
             tile_info_map[key] = inner_map;
         }
     } catch (const std::exception& e) {
-        qDebug() << "Failed to parse JSON: " << e.what() ;
+        qDebug() << "[ChipGridOperations] Failed to parse JSON: " << e.what() ;
     }
     return tile_info_map;
 }
@@ -144,7 +144,7 @@ void ChipGridOperations::setColorsToTiles(NormalTile& tile,std::map<std::string,
         tile.B = type_colors.at("B");
     } else {
         // 未找到types,用默认颜色并提示
-//        qDebug() << "Tile type: " << tile.types << " not found in the color map. Using default color." << std::endl;
+//        qDebug() << "[ChipGridOperations] Tile type: " << tile.types << " not found in the color map. Using default color." << std::endl;
     }
 }
 
@@ -158,17 +158,17 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     std::ifstream pins_file(this->pinsInfoPath);
 
     if (!tile_file) {
-        qDebug() << "Could not open tile_file\n";
+        qDebug() << "[ChipGridOperations] Could not open tile_file\n";
         qDebug() << QString::fromStdString(this->tileFilePath);
         return;
     }
     if (!color_file) {
-        qDebug() << "Could not open color_file\n";
+        qDebug() << "[ChipGridOperations] Could not open color_file\n";
         qDebug() << QString::fromStdString(this->tileColorPath);
         return;
     }
     if (!pins_file) {
-        qDebug() << "Could not open pins_file\n";
+        qDebug() << "[ChipGridOperations] Could not open pins_file\n";
         qDebug() << QString::fromStdString(this->pinsInfoPath);
         return;
     }
@@ -336,9 +336,9 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     }
 
     // ----------------------------------------------
-    for (auto item : site_type_set) {
-        qDebug() << QString::fromStdString(item);
-    }
+//    for (auto item : site_type_set) {
+//        qDebug() << "[ChipGridOperations] "<<QString::fromStdString(item);
+//    }
     // ----------------------------------------------
 
     // --------------------- Clock Region ----------------------------
@@ -444,17 +444,24 @@ ChipGridOperations::ChipGridOperations(){
 void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     std::ifstream file(QString::fromStdString(usageJsonPath).toLocal8Bit().constData());
     if (!file) {
-        qDebug() << "Could not open file\n";
+        qDebug() << "[ChipGridOperations] Could not open file\n";
         return;
     }
 
     // 解析 JSON
+    Tool::ArchiveTool tool;
+    std::vector<unsigned char> buffer;
+    tool.extractWithPassword(usageJsonPath, buffer, COMPRESS_TOOL_KEY);
+    std::string buffer_str = tool.byte_to_string(buffer);
     nlohmann::json j;
-    file >> j;
-    file.close();
-    TotalSize usageSize;
-    size_t num_elements = j.size();
+    try {
+        // 解析 JSON
+        j = nlohmann::json::parse(buffer_str);
+    } catch (const nlohmann::json::parse_error &e) {
+        qDebug() << "[ChipGridOperations] JSON Parsing Error: " << e.what();
+    }
 
+    TotalSize usageSize;
     usageSize.width = 210;
     usageSize.height = 456;
 
@@ -484,8 +491,8 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
                            break;
                        }
                     }
-                    qDebug() << "bel name:" << QString::fromStdString(belNames[0])
-                             << "| cell name: " << QString::fromStdString(belNames[1]);
+                    // qDebug() << "[ChipGridOperations] bel name:" << QString::fromStdString(belNames[0])
+                    //          << "| cell name: " << QString::fromStdString(belNames[1]);
                     used_site[site].insert(belNames);
 //                } else {
 //                    used_site.insert.;
