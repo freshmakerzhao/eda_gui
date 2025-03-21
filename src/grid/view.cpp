@@ -326,13 +326,13 @@ void View::zoomIn(int level)
 {
 //    qDebug() << level;
     zoomSlider->setValue(zoomSlider->value() + level);
-    qDebug() << "zoom_size: " << zoomSlider->value();
+    // qDebug() << "[view] zoom_size: " << zoomSlider->value();
 }
 
 void View::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
-    qDebug() << "zoom_size: " << zoomSlider->value();
+    // qDebug() << "[view] zoom_size: " << zoomSlider->value();
 }
 
 void View::rotateLeft()

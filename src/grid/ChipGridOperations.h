@@ -15,6 +15,7 @@
 #include "blocks/Block.h"
 #include "blocks/TilesBlock.h"
 #include <set>
+#include "ArchiveTool.h"
 
 struct BoundingBox {
     double x0 = std::numeric_limits<double>::infinity(); // Minimum x

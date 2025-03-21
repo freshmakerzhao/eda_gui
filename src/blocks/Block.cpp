@@ -82,7 +82,7 @@ void Block::setUsed() {
 }
 
 std::string Block::getName() const {
-//    qDebug() << QString::fromStdString(this->name);
+//    qDebug() << "[Block]" << QString::fromStdString(this->name);
     return this->name;
 }
 
