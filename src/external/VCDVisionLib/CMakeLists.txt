@@ -34,20 +34,3 @@ target_include_directories(QCustomPlot PUBLIC
 )
 
 
-# 设置 Python 脚本和 PyInstaller 命令
-set(PYTHON_SCRIPT "${PROJECT_SOURCE_DIR}/scripts/parserVCD.py")
-set(PYINSTALLER_COMMAND "pyinstaller")
-
-#  自定义输出目录
-set(CUSTOM_DIST_DIR "${CMAKE_BINARY_DIR}")
-
-# 添加自定义目标来构建 Python 脚本为可执行文件
-add_custom_target(
-    build_python_exe
-    COMMAND ${PYINSTALLER_COMMAND} --onefile --distpath ${CUSTOM_DIST_DIR} ${PYTHON_SCRIPT}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Building Python script to executable using PyInstaller"
-    SOURCES ${PYTHON_SCRIPT}
-)
-# 确保在构建 C++ 项目之前先构建 Python 可执行文件
-add_dependencies(${PROJECT_NAME} build_python_exe)

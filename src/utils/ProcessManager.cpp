@@ -220,7 +220,7 @@ void ProcessManager::initEnvironment() {
     projectProperty["synthesizer_path"] = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\synthesizer\bin\synthesizer.exe)";
     env.insert("SIMULATION_COMPILER_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\iverilog.exe)" );
     env.insert("SIMULATION_RUN_PATH",GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\bin\vvp.exe)");
-    env.insert("PARSER_VCD_PATH", QCoreApplication::applicationDirPath() + R"(\parserVCD.exe)");
+    env.insert("PARSER_VCD_PATH", GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\parserVCD\parserVCD.exe)");
 }
 
 void ProcessManager::configDisplay(const QString &partname) {
