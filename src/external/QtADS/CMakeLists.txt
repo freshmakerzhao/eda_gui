@@ -93,6 +93,17 @@ endif()
 
 add_library(ads::${library_name} ALIAS ${library_name})
 
+if(NOT BUILD_STATIC)
+    add_custom_command(
+            TARGET ${library_name}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:${library_name}>"
+            "${CMAKE_BINARY_DIR}"
+            COMMENT "Copying ADS DLL to top-level build directory"
+    )
+endif()
+
 target_link_libraries(${library_name} PUBLIC Qt${QT_VERSION_MAJOR}::Core
                                                Qt${QT_VERSION_MAJOR}::Gui
                                                Qt${QT_VERSION_MAJOR}::Widgets)
