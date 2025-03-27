@@ -236,7 +236,9 @@ void VCDVision:: setWaveSignalName(QWidget *parent){
     //表格
     mTableNameWidget->setColumnCount(1);
     mTableNameWidget->setRowCount(1);
-    mTableNameWidget->setItem(0, 0, new QTableWidgetItem("Name", Qt::AlignLeft ));
+    QTableWidgetItem *item = new QTableWidgetItem("Name", Qt::AlignLeft );
+    item->setFlags(item->flags() & ~Qt::ItemIsEditable); // 禁用编辑
+    mTableNameWidget->setItem(0, 0, item);
     mTableNameWidget->setVCDTableStyle();
 
     // 设置双击单元格展开信号每一位的操作
@@ -326,7 +328,9 @@ void VCDVision::setWaveSignalValue(QWidget *parent){
     mTableValueWidget->setColumnCount(1);
     mTableValueWidget->setRowCount(1);
 
-    mTableValueWidget->setItem(0, 0, new QTableWidgetItem("Value", Qt::AlignLeft ));
+    QTableWidgetItem *item = new QTableWidgetItem("Value", Qt::AlignLeft );
+    item->setFlags(item->flags() & ~Qt::ItemIsEditable); // 禁用编辑
+    mTableValueWidget->setItem(0, 0, item);
     mTableValueWidget->setVCDTableStyle();
 }
 
