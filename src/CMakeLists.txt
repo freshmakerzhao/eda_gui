@@ -109,6 +109,17 @@ link_directories(${OPENSSL_LIBRARY_DIR})
 set(TCL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/tcl")
 set(TCL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/tcl/bin")
 
+# Include the VCDVision. Qcustomlot
+set(VCDVISION_LIBRARY_DIR "${CMAKE_SOURCE_DIR}/external/VCDVisionLib")
+link_directories(${VCDVISION_LIBRARY_DIR})
+add_subdirectory(${VCDVISION_LIBRARY_DIR})
+target_include_directories(VCDVisionLib PUBLIC
+    ${VCDVISION_LIBRARY_DIR}/include
+    ${VCDVISION_LIBRARY_DIR}/lib/QCustomPlot/include
+)
+
+
+
 include_directories(${TCL_INCLUDE_DIR})
 link_directories(${TCL_LIBRARY_DIR})
 
@@ -207,6 +218,7 @@ target_link_libraries(${PROJECT_NAME}
     libssl-1_1-x64
     psapi
     tcl86
+    VCDVisionLib
 )
 
 # Specify installation paths (if required)

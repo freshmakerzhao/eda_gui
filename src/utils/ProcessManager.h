@@ -91,6 +91,7 @@ private slots:
 signals:
 
     void finishMessage(ProcessMessage &msg);
+    void simulationFinish();
 };
 
 

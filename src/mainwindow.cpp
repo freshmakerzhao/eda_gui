@@ -27,6 +27,7 @@
 #include "base/Globals.h"
 #include "service/RecentService.h"
 #include "component/properties/Properties.h"
+#include "VCDVision.h"
 
 MainWindow *MainWindow::instance()
 {
@@ -486,6 +487,8 @@ MainWindow::MainWindow(QWidget *parent)
     SourcesWidget->setMinimumWidth(400);
 
     initCornerWidget();
+
+    connect(TclConsole::instance(), &TclConsole::simFinish, this, &MainWindow::switchSimulationWidget);
 }
 
 MainWindow::~MainWindow()
@@ -557,4 +560,49 @@ void MainWindow::onClearTriggered() {
 
 void MainWindow::onOpenRecentTriggered(std::string path) {
     ProjectManager::instance().openProject(QString::fromStdString(path));
+}
+
+void MainWindow::switchSimulationWidget(const QString& VCDJsonFilePath){
+    VCDVision* VCDVisionInst = VCDVision::getInstance();
+    if(SimulationDock == nullptr){
+        // 报错信息
+        connect(VCDVisionInst, &VCDVision::error, [this](const QString errorInformation){
+            CustomMessageBox::question(this, "Run and display the VCD waveform", errorInformation);
+        } );
+        if(VCDVisionInst->process(VCDJsonFilePath)){
+            return; // error
+        }
+
+        SimulationDock = new QDockWidget(this);
+        SimulationDock->setWidget(VCDVisionInst);
+        SimulationDock->setWindowTitle("SIMULATION");
+        SimulationDock->setFeatures(QDockWidget::DockWidgetClosable);
+        addDockWidget(Qt::TopDockWidgetArea, SimulationDock);
+        //  退出仿真状态界面，回到ManagerDock界面
+        connect(SimulationDock, &QDockWidget::visibilityChanged, [this](bool visible) {
+            if(this->windowState() & Qt::WindowMinimized) {
+                return;  // 最小化时，状态不改变。
+            }
+            if (!visible) {
+                ManagerDock->show();
+                SimulationDock->hide();
+                splitDockWidget(NavigationBar, ManagerDock, Qt::Horizontal);
+                splitDockWidget(ManagerDock, BottomDock, Qt::Vertical);
+                resizeUi();
+            }
+        } );
+    }else{
+        if(VCDVisionInst->process(VCDJsonFilePath)){
+            return; // error
+        }
+    }
+    // 以上数据可能存在反复处理的情况，布局需要判断。
+    // 界面布局
+    if(ManagerDock->isVisible()){  // 用于用户反复点击的情况。
+        splitDockWidget(NavigationBar, SimulationDock, Qt::Horizontal);
+        splitDockWidget(SimulationDock, BottomDock, Qt::Vertical);
+        resizeDocks({SimulationDock, BottomDock}, {42, 22}, Qt::Vertical);//右侧上下布局42 : 22
+        ManagerDock->hide();
+        SimulationDock->show();
+    }
 }

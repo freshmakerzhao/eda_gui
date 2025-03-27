@@ -8,6 +8,9 @@
 const QColor TclConsole::NORMAL_COLOR = QColor::fromRgbF(0, 0, 0);
 const QColor TclConsole::ERROR_COLOR = QColor::fromRgbF(1.0, 0, 0);
 const QColor TclConsole::OUTPUT_COLOR = QColor::fromRgbF(0, 0, 1.0);
+QString TclConsole::mVCD2JsonNamePath = "";
+const QString TclConsole::mWaveFileName = "hybrdLinkWaveFile.vcd";
+const QString TclConsole::mVCD2JsonFileName = "hybrdLinkWaveFile.json";
 
 TclConsole *TclConsole::instance()
 {
@@ -29,6 +32,10 @@ TclConsole::TclConsole(QWidget *parent) : QWidget(parent) {
     layout->addWidget(input);
 
     connect(input, &LineEditor::textLineInserted, this, &TclConsole::onCommandEnter);
+
+    connect(&ProcessManager::instance(), &ProcessManager::simulationFinish, [&](){
+        emit simFinish(mVCD2JsonNamePath);
+    });
 
     interp = Tcl_CreateInterp();
     if (Tcl_Init(interp) == TCL_ERROR) {
@@ -414,10 +421,10 @@ int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, c
     QStringList scriptSimRun;
     scriptSimRun << "%SIMULATION_COMPILER_PATH%";
     //  -y lib
-   const QString designElementPath = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulationer\share\element_design_lib\)";
-    scriptSimRun << QString("-y")<<(designElementPath + R"(retarget\)");
-    scriptSimRun << QString("-y")<<(designElementPath + R"(unisims\)");
-    scriptSimRun << QString("-y")<<(designElementPath + R"(glbl\)");
+   const QString designElementPath = GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\simulator\share\element_design_lib\)";
+   scriptSimRun << QString("-y")<<(designElementPath + R"(retarget\)");
+   scriptSimRun << QString("-y")<<(designElementPath + R"(unisims\)");
+   scriptSimRun << QString("-y")<<(designElementPath + R"(glbl\)");
     //  -o  compile_file
     const  QString compileFile = "tb_run";
     //scriptFirst << QString("-o  %1").arg("tb_run");
@@ -458,9 +465,15 @@ int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, c
     //  设置路径
     ProcessManager::instance().configWorkPath(simPath);
 
-    //  执行仿真:  vvp  compileFile
+     //执行仿真:  vvp  compileFile
     scriptSimRun << "&&";
     scriptSimRun <<"%SIMULATION_RUN_PATH%" << compileFile;
+
+    //  parser VCD.
+    scriptSimRun << "&&" << "%PARSER_VCD_PATH%";
+    scriptSimRun << mWaveFileName << mVCD2JsonFileName;
+    mVCD2JsonNamePath = QDir(simPath).filePath(mVCD2JsonFileName);
+
     ProcessManager::instance().executeCommand(phaseSimulation, scriptSimRun);
 
     return TCL_OK;
@@ -471,7 +484,7 @@ int TclConsole::generateSimWaveConfigFilePath(const QString topName, const QStri
     int error = 0;
     // 默认的波形生成，只生成最上层的信号。
     //  配置信息
-    const QString waveFileName = "hybrdLinkWaveFile.vcd";
+    // VCDfile name waveFileName = "hybrdLinkWaveFile.vcd";
     const QString WaveSignalConfig = "1, " + topName;  // 1:只输出此层的信号，具体使用查询$dumpvars的使用
     const QString moduleName = "hybrdLinkWaveConfigModule";
     // 生成文件
@@ -484,7 +497,7 @@ int TclConsole::generateSimWaveConfigFilePath(const QString topName, const QStri
         QTextStream out(&onfigFile);
         out << QString( "module %1 ();").arg(moduleName) <<Qt:: endl;
         out << "initial begin" << Qt::endl;
-        out << QString( "$dumpfile( \"%1\") ;" ).arg(waveFileName ) <<Qt:: endl;
+        out << QString( "$dumpfile( \"%1\") ;" ).arg(mWaveFileName ) <<Qt:: endl;
         out << QString("$dumpvars( %1 ) ;").arg(WaveSignalConfig) <<Qt:: endl;
         out << "end" << Qt::endl;
         out << "endmodule" << Qt::endl;
@@ -496,6 +509,7 @@ int TclConsole::generateSimWaveConfigFilePath(const QString topName, const QStri
     }
     return error;
 }
+
 
 void TclConsole::getOriginalFile(Tcl_Interp *interp, QStringList& sourceFileList, const char* tclCommand)
 {
