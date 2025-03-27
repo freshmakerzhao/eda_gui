@@ -65,6 +65,7 @@ public:
     QString familyName;
     QString archName;
     QString arch;
+    QString series;
     QString compatibilityMode = "enable"; // 兼容模式 默认开启 与UI对齐
 
     enum {

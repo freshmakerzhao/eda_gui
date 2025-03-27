@@ -16,10 +16,26 @@
 
 bool SitesBlock::site_visible_status = true;
 
-SitesBlock::SitesBlock(const QColor &color, int cur_width, int cur_height, int tile_index_x, int tile_index_y, const std::string &site_type, const std::string &cur_name, int site_index)
-: Block(cur_width, cur_height, cur_name, color), tile_index_x(tile_index_x), tile_index_y(tile_index_y),  site_type(site_type),  site_index(site_index) {}
+SitesBlock::SitesBlock(
+        const QColor &color,
+        int cur_width,
+        int cur_height,
+        int tile_index_x,
+        int tile_index_y,
+        const std::string &site_type,
+        const std::string &cur_name,
+        int site_index
+) : Block(cur_width, cur_height, cur_name, color),
+    tile_index_x(tile_index_x),
+    tile_index_y(tile_index_y),
+    site_type(site_type),
+    site_index(site_index){
+}
+
 
 bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(site_type == "SITESNULL")
+        return true;
     if(lod >= 0.01) return false;
     if(used_status) {
         painter->fillRect(QRectF(0, 0, width, height), QColor(Qt::green));
@@ -29,6 +45,8 @@ bool SitesBlock::showThumbnail(QPainter *painter, const qreal lod, QColor &fillC
 }
 
 void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillColor) {
+    if(site_type == "SITESNULL")
+        return;
     if(!getVisibleStatus())
         return;
 
@@ -60,6 +78,8 @@ void SitesBlock::showComplete(QPainter *painter, const qreal lod, QColor &fillCo
     QFont font("Times");
     font.setPointSize(type_font_size);
     painter->setFont(font);
+    pen.setColor(Qt::gray);
+    painter->setPen(pen);
 
     QString text = QString::fromStdString(this->name + " (" + site_type + ")");
     int text_len = text.size() * type_font_size;
@@ -96,14 +116,16 @@ void SitesBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     update();
 }
 
-void SitesBlock::setUsed(std::unordered_set<std::string> bels) {
+void SitesBlock::setUsed(std::set<std::array<std::string, 2>> bels) {
     used_status = true;
     for(auto bel_name : bels){
         for(auto bel : this->child_bel_items) {
             if(bel->isUsed())
                 continue;
-            if(bel->isMatches(bel_name))
+            if(bel->isMatches(bel_name[0])){
                 bel->setUsed();
+                bel->setCellName(bel_name[1]);
+            }
         }
     }
 }
@@ -117,6 +139,7 @@ void SitesBlock::updateVisibleStatus(bool status) {
     if(!status) {
         setBelShow(false);
     }
+    this->setVisible(status);
     update();
 }
 
@@ -124,3 +147,4 @@ void SitesBlock::setBelShow(bool option) {
     if(!child_bel_items.isEmpty())
         child_bel_items[0]->updateVisibleStatus(option);
 }
+

@@ -37,6 +37,7 @@ DeviceInfoUtils::DeviceInfoUtils() {
                 info.arch = QString::fromStdString(it->second["arch"].as<std::string>());
                 info.family_name = QString::fromStdString(it->second["family_name"].as<std::string>());
                 info.part = QString::fromStdString(it->second["part"].as<std::string>());
+                info.series = QString::fromStdString(it->second["series"].as<std::string>());
 
                 deviceMap[displayPart] = info;
             }
@@ -75,10 +76,11 @@ QStandardItemModel *DeviceInfoUtils::getDeviceModel() const {
         items.append(new QStandardItem(it.value().bram_count));
         items.append(new QStandardItem(it.value().dsp_count));
         items.append(new QStandardItem(it.value().pcie_count));
-        items.append(new QStandardItem(it.value().archName));
+        items.append(new QStandardItem(it.value().archName)); // 这列开始都是隐藏列
         items.append(new QStandardItem(it.value().arch));
         items.append(new QStandardItem(it.value().family_name));
         items.append(new QStandardItem(it.value().part));
+        items.append(new QStandardItem(it.value().series));
 
         model->appendRow(items);
     }

@@ -44,7 +44,8 @@ public:
                        const QStringList &constraints,
                        const QString &displayPart = QString("MC1P110-FC484L-1"),
                        const QString &familyName = QString("MgiCubo"),
-                       const QString &compatibilityMode = QString("enable"));
+                       const QString &compatibilityMode = QString("enable"),
+                       const QString &series = QString("artix7"));
 
     /**
      * Reopen project on startup

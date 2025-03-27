@@ -9,11 +9,13 @@
 #include <QGraphicsScene>
 #include "utils/json.hpp"
 #include "entity/TileGridDataMap.h"
-#include "blocks/Blocks.h"
 #include <QCoreApplication>
 #include <fstream>
 #include <unordered_set>
 #include "blocks/Block.h"
+#include "blocks/TilesBlock.h"
+#include <set>
+#include "ArchiveTool.h"
 
 struct BoundingBox {
     double x0 = std::numeric_limits<double>::infinity(); // Minimum x
@@ -34,12 +36,12 @@ public:
 
     // 架构信息
     std::vector<std::vector<NormalTile>> gridTypeMatrix; // 存储tile_grid
-    std::vector<std::vector<Blocks*>> gridMatrix; // 存储绘图对象 graphicItem
+    std::vector<std::vector<TilesBlock*>> gridMatrix; // 存储绘图对象 graphicItem
     std::unordered_map<std::string, std::unordered_map<std::string, SitesBlock*>> siteBlockMap;
     std::vector<SubItem> usageGrid;
 
     // std::vector<std::string> used_site;
-    std::unordered_map<std::string, std::unordered_set<std::string>> used_site;
+    std::unordered_map<std::string, std::set<std::array<std::string, 2>>> used_site;
 
     std::unordered_set<QGraphicsRectItem *> clock_region_rects;
 
@@ -53,12 +55,8 @@ public:
     void setColorsToTiles(NormalTile& tile,std::map<std::string, std::map<std::string, std::map<std::string, int>>> colorMap);
 
     bool showGridView(QGraphicsScene *scene);
-    void setAllTileWhite(QGraphicsScene *scene);
     void buildPlaceUsageGrid(const std::string& usageJsonPath);
     bool showPlaceUsageGrid(QGraphicsScene *scene);
-    void updateSitesVisibleStatus(bool sitesVisibleStatus);
-    void updateTilesNameVisibleStatus(bool status);
-    void updateClockRegionVisibleStatus(const bool &clockRegionVisibleStatus);
     NormalTile getTileInfo(int col,int row);
 private:
     std::map<std::string, std::map<std::string, std::map<std::string, int>>> buildTileInfoMap(const nlohmann::basic_json<>& colorJson);

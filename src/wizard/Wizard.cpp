@@ -82,6 +82,10 @@ void Wizard::onNewFinish()
 
     // 创建项目文件夹
     QDir dir(projectPath);
+    if (!dir.exists()) {
+        dir.mkpath(projectPath);
+    }
+
     if (dir.mkdir(projectName)) {
         dir.cd(projectName);
         dir.mkdir("sources");
@@ -141,7 +145,8 @@ void Wizard::onNewFinish()
                                              constrainttmp,
                                              displayPart,
                                              familyName,
-                                             compatibilityMode);
+                                             compatibilityMode,
+                                             series);
     // ============================= 清除缓存 =================================
     QDir dircache("Cache");
     if (!dircache.isEmpty()) {

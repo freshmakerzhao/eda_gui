@@ -35,9 +35,6 @@ public:
 private:
     void setupMatrix();
     void populateScene();
-    bool showTilesName = false;
-    bool showSites = true;
-    bool showClockRegion = false;
     QString tileJsonPath = "";
     QString usageJsonPath = "";
     ChipGridOperations viewer;
@@ -54,11 +51,12 @@ private:
     QLabel *siteTypeValue;
     QLabel *NameValue;
     QLabel *TypeValue;
+    QLabel *cellNameValue;
 
 public slots:
     void showTileInfo(int x,int y);
     void showSiteInfo(int x,int y,bool sites_visible_status,int index);
-    void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name);
+    void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name, const std::string &cell_name);
     void showCell();
 };
 

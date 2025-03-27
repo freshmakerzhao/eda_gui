@@ -74,8 +74,16 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
         else
             view->zoomOut(40);
         e->accept();
+    } else if (e->modifiers() & Qt::ShiftModifier) {
+        // 获取当前视图的水平滚动距离
+        int delta = e->angleDelta().y();
+        // 使用滚轮水平滚动来调整视图范围
+        if (delta != 0) {
+            // 水平移动视图，delta/120 是标准滚轮的移动步长
+            this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta);
+        }
     } else {
-        QGraphicsView::wheelEvent(e);
+            QGraphicsView::wheelEvent(e);
     }
 }
 #endif
@@ -90,6 +98,7 @@ View::View(const QString &name, QWidget *parent)
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState); // 设置GraphicsView的优化标记为不保存Painter的状态
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate); // 设置GraphicsView的视口更新模式为智能视口更新
     graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse); // 设置GraphicsView的变换锚点为鼠标下方
+    graphicsView->setBackgroundBrush(Qt::black);//设置GraphicsView背景颜色为黑色
 
     int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize); // 获取工具栏图标的尺寸
     QSize iconSize(size, size); // 创建一个新的QSize对象，设置其宽度和高度为工具栏图标的尺寸
@@ -225,12 +234,13 @@ QGraphicsView *View::view() const
 
 void View::resetView()
 {
-    zoomSlider->setValue(250);
+//    zoomSlider->setValue(250);
     rotateSlider->setValue(0);
-    setupMatrix();
-    graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
-
-    resetButton->setEnabled(false);
+    graphicsView->fitInView(graphicsView->sceneRect(), Qt::KeepAspectRatio);
+//    setupMatrix();
+//    graphicsView->ensureVisible(QRectF(100, 0, 0, 0));
+//
+//    resetButton->setEnabled(false);
 }
 
 void View::cellLocationShow(Block* cell) {
@@ -316,13 +326,13 @@ void View::zoomIn(int level)
 {
 //    qDebug() << level;
     zoomSlider->setValue(zoomSlider->value() + level);
-    qDebug() << "zoom_size: " << zoomSlider->value();
+    // qDebug() << "[view] zoom_size: " << zoomSlider->value();
 }
 
 void View::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
-    qDebug() << "zoom_size: " << zoomSlider->value();
+    // qDebug() << "[view] zoom_size: " << zoomSlider->value();
 }
 
 void View::rotateLeft()

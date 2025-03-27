@@ -49,8 +49,7 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
         }
     });
 
-    warningLabel = new QLabel;
-    warningLabel->setStyleSheet("color: red;");
+    hintLabel = new QLabel;
 
     QGridLayout *layout = new QGridLayout(this);
     layout->addWidget(nameLabel, 0, 0);
@@ -58,7 +57,7 @@ ProjectNamePage::ProjectNamePage(QWidget *parent) : QWizardPage(parent)
     layout->addWidget(pathLabel, 1, 0);
     layout->addWidget(pathLineEdit, 1, 1);
     layout->addWidget(browseButton, 1, 2);
-    layout->addWidget(warningLabel, 2, 1);
+    layout->addWidget(hintLabel, 2, 0, 1, 2);
 }
 
 bool ProjectNamePage::isComplete() const
@@ -67,31 +66,36 @@ bool ProjectNamePage::isComplete() const
     QString projectPath = pathLineEdit->text();
 
     if (projectName.isEmpty()) {
-        warningLabel->setText("Project name is empty!");
+        hintLabel->setStyleSheet("color: red;");
+        hintLabel->setText("Project name is empty!");
         return false;
     }
 
-    if (projectPath.isEmpty() || !QDir(projectPath).exists()) {
-        warningLabel->setText("Project path is empty or does not exist!");
+    if (projectPath.isEmpty()) {
+        hintLabel->setStyleSheet("color: red;");
+        hintLabel->setText("Project path is empty!");
         return false;
     }
 
     // 检查路径下是否存在相同的名称
     QDir dir(projectPath);
     if (dir.exists(projectName)) {
-        warningLabel->setText("Same name folder already exists in the selected path!");
+        hintLabel->setStyleSheet("color: red;");
+        hintLabel->setText("Same name folder already exists in the selected path!");
         return false;
     }
 
     // 检查工程名是否合法
     bool isEnglishPath = QRegularExpression("^[a-zA-Z0-9_]+$").match(projectName).hasMatch();
     if (!isEnglishPath) {
-        warningLabel->setText("Non-English Project name");
+        hintLabel->setStyleSheet("color: red;");
+        hintLabel->setText("Non-English Project name");
         return false;
     }
 
     // 通过检查
-    warningLabel->setText("");
+    hintLabel->setStyleSheet("color: black;");
+    hintLabel->setText(QString("Project will be created at %1").arg(dir.filePath(projectName)));
     return true;
 }
 

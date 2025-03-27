@@ -59,7 +59,7 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     } else if (mode == 9) {
         qDebug() << "[TaskManager] arch " << this->arch;
         std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
-        std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+        std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map_" + this->arch.toStdString() + ".json";
         std::string pinsInfoPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/pins_info_" + this->arch.toStdString() + ".json";
         qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
         qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
@@ -403,6 +403,12 @@ void TaskManager::handleMessage(ProcessMessage &msg) {
         } else if (msg.phase == "Generate Bitstream"){
             QSettings settings(projectPath + "/runs/.works/.state", QSettings::IniFormat);
             settings.setValue(FlowPhase::GenerateBitstream, FlowState::Complete);
+            InfoWidget::instance()->updateImplItem(
+                msg.workPath,
+                msg.phase + " Complete!",
+                msg.startTime,
+                msg.elapsedTime,
+                msg.displayPartName);
             // 生成码流结束提示
             CustomMessageBox::information(MainWindow::instance(), msg.phase + " Completed", msg.phase + " successfully completed.");
         }

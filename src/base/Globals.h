@@ -24,6 +24,8 @@ static int SITE_GAP = 100;
 static int GLOBAL_SITE_BLOCK_WIDTH  = (GLOBAL_TILE_BLOCK_WIDTH - (SITE_NUB_ON_TILE+1) * SITE_GAP) / SITE_NUB_ON_TILE;
 static int GLOBAL_SITE_BLOCK_HEIGHT = GLOBAL_TILE_BLOCK_HEIGHT - 2 * SITE_GAP;
 
+static std::string COMPRESS_TOOL_KEY = "lwh123456";
+
 // 全局资源路径
 namespace GlobalConfig {
     extern QString GLOBAL_RESOURCE_PATH;

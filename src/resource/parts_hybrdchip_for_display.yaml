@@ -1,8 +1,8 @@
 MC1P110-FC484L-1:
   part: xc7a100tfgg484-1
-  device: xc7a100t
   package: fgg484
   speedgrade: '1'
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a100t
@@ -16,9 +16,9 @@ MC1P110-FC484L-1:
   pcie_count: 1
 MC1P110-FC484L-2:
   part: xc7a100tfgg484-2
-  device: xc7a100t
   package: fgg484
   speedgrade: '2'
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a100t
@@ -32,9 +32,9 @@ MC1P110-FC484L-2:
   pcie_count: 1
 MC1P110-FC484L-2L:
   part: xc7a100tfgg484-2L
-  device: xc7a100t
   package: fgg484
-  speedgrade: 2L
+  speedgrade: "2L"
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a100t
@@ -48,9 +48,9 @@ MC1P110-FC484L-2L:
   pcie_count: 1
 MC1P110-FC484L-3:
   part: xc7a100tfgg484-3
-  device: xc7a100t
   package: fgg484
   speedgrade: '3'
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a100t
@@ -64,9 +64,9 @@ MC1P110-FC484L-3:
   pcie_count: 1
 MC1P210-FC484B-1:
   part: xc7a200tfbg484-1
-  device: xc7a200t
   package: fbg484
   speedgrade: '1'
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a200t
@@ -80,9 +80,9 @@ MC1P210-FC484B-1:
   pcie_count: 1
 MC1P210-FC484B-2:
   part: xc7a200tfbg484-2
-  device: xc7a200t
   package: fbg484
   speedgrade: '2'
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a200t
@@ -96,9 +96,9 @@ MC1P210-FC484B-2:
   pcie_count: 1
 MC1P210-FC484B-2L:
   part: xc7a200tfbg484-2L
-  device: xc7a200t
   package: fbg484
-  speedgrade: 2L
+  speedgrade: "2L"
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a200t
@@ -112,9 +112,9 @@ MC1P210-FC484B-2L:
   pcie_count: 1
 MC1P210-FC484B-3:
   part: xc7a200tfbg484-3
-  device: xc7a200t
   package: fbg484
   speedgrade: '3'
+  series: artix7
   family: xc7
   family_name: MgiCubo
   archName: xc7a200t
@@ -125,4 +125,68 @@ MC1P210-FC484B-3:
   ff_count: 269200
   bram_count: 365
   dsp_count: 740
+  pcie_count: 1
+MC1P170-FC676L-1:
+  part: xc7k160tffg676-1
+  package: ffg676
+  speedgrade: '1'
+  series: kintex7
+  family: xc7
+  family_name: MgiCubo
+  archName: xc7k160t
+  arch: 160t
+  io_pin_count: 676
+  iob_count: 400
+  lut_count: 101400
+  ff_count: 202800
+  bram_count: 325
+  dsp_count: 600
+  pcie_count: 1
+MC1P170-FC676L-2:
+  part: xc7k160tffg676-2
+  package: ffg676
+  speedgrade: '2'
+  series: kintex7
+  family: xc7
+  family_name: MgiCubo
+  archName: xc7k160t
+  arch: 160t
+  io_pin_count: 676
+  iob_count: 400
+  lut_count: 101400
+  ff_count: 202800
+  bram_count: 325
+  dsp_count: 600
+  pcie_count: 1
+MC1P170-FC676L-2L:
+  part: xc7k160tffg676-2L
+  package: ffg676
+  speedgrade: '2L'
+  series: kintex7
+  family: xc7
+  family_name: MgiCubo
+  archName: xc7k160t
+  arch: 160t
+  io_pin_count: 676
+  iob_count: 400
+  lut_count: 101400
+  ff_count: 202800
+  bram_count: 325
+  dsp_count: 600
+  pcie_count: 1
+MC1P170-FC676L-3:
+  part: xc7k160tffg676-3
+  package: ffg676
+  speedgrade: '3'
+  series: kintex7
+  family: xc7
+  family_name: MgiCubo
+  archName: xc7k160t
+  arch: 160t
+  io_pin_count: 676
+  iob_count: 400
+  lut_count: 101400
+  ff_count: 202800
+  bram_count: 325
+  dsp_count: 600
   pcie_count: 1
