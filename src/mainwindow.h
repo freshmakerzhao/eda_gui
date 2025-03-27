@@ -69,6 +69,8 @@ protected:
 
     void resizeEvent(QResizeEvent *event) override;
 
+    void switchSimulationWidget(const QString &VCDJsonFilePath);
+
 private:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -109,6 +111,7 @@ private:
     QDockWidget *NavigationBar;
     QDockWidget *BottomDock;
     QDockWidget *ManagerDock;
+    QDockWidget *SimulationDock = nullptr;;
 
     ads::CDockManager *DockManager;
 
