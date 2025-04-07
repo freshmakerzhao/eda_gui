@@ -6,6 +6,10 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# 设置自己的 vcpkg 路径
+set(VCPKG_PATH "E:/workspace/vcpkg")
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_P2ATH}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+set(CMAKE_PREFIX_PATH "${VCPKG_PATH}/installed/x64-windows;${CMAKE_PREFIX_PATH}")
 # 是否需要检查 MAC 地址
 option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
 # 是否需要检查 软件有效期
@@ -90,13 +94,13 @@ link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/external/QtADS)
 
 # Include the compress_tool
-add_subdirectory(external/compress_tool/)
+# add_subdirectory(external/compress_tool/)
 # 设置 include 目录，确保主项目可以访问 compress_tool 的头文件
-include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/api)
-include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include/bit7z)
-set(COMPRESS_LIBS "")  # 初始化变量
-list(APPEND COMPRESS_LIBS ${CMAKE_SOURCE_DIR}/external/compress_tool/libs/release/libSecuArcPack.a ${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/lib/win/libSecuArc64.a)
+# include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/api)
+# include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include)
+# include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include/bit7z)
+# set(COMPRESS_LIBS "")  # 初始化变量
+# list(APPEND COMPRESS_LIBS ${CMAKE_SOURCE_DIR}/external/compress_tool/libs/release/libSecuArcPack.a ${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/lib/win/libSecuArc64.a)
 
 # Include the OpenSSL library
 set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/openssl")
@@ -201,9 +205,9 @@ add_executable(${PROJECT_NAME}
     win32.rc
 )
 
-add_dependencies(${PROJECT_NAME} create_libSecuArcPack_a create_libSecuArcPack_d_a)
+# add_dependencies(${PROJECT_NAME} create_libSecuArcPack_a create_libSecuArcPack_d_a)
 # 链接 compress_tool
-target_link_libraries(${PROJECT_NAME} ${COMPRESS_LIBS} oleaut32 uuid)
+# target_link_libraries(${PROJECT_NAME} ${COMPRESS_LIBS} oleaut32 uuid)
 
 # Link the Qt5 Widgets library and Third-Party library to the executable
 target_link_libraries(${PROJECT_NAME}
