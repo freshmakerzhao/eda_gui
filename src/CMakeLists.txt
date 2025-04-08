@@ -122,8 +122,6 @@ target_include_directories(VCDVisionLib PUBLIC
     ${VCDVISION_LIBRARY_DIR}/lib/QCustomPlot/include
 )
 
-
-
 include_directories(${TCL_INCLUDE_DIR})
 link_directories(${TCL_LIBRARY_DIR})
 
@@ -133,11 +131,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
     target_compile_options(ExScintilla PRIVATE -w)
     target_compile_options(yaml-cpp PRIVATE -w)
     target_compile_options(qt5advanceddocking PRIVATE -w)
-# elseif(MSVC)
+elseif(MSVC)
     # Use /W0 with MSVC to disable all warnings
-#     target_compile_options(ExScintilla PRIVATE /W0)
-#     target_compile_options(yaml-cpp PRIVATE /W0)
-#     target_compile_options(qt5advanceddocking PRIVATE /W0)
+    target_compile_options(ExScintilla PRIVATE /W0)
+    target_compile_options(yaml-cpp PRIVATE /W0)
+    target_compile_options(qt5advanceddocking PRIVATE /W0)
 endif()
 
 # Add source files
@@ -217,13 +215,16 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Xml
     ExScintilla
     yaml-cpp
-    qt5advanceddocking${CMAKE_SHARED_LIBRARY_SUFFIX}
-    libcrypto-1_1-x64
-    libssl-1_1-x64
+    ads::qt5advanceddocking
+    libssl
+    libcrypto
     psapi
     tcl86
     VCDVisionLib
 )
+# ${OPENSSL_LIBRARY_DIR}/libssl.lib
+# ${OPENSSL_LIBRARY_DIR}/libcrypto.lib
+# ${TCL_LIBRARY_DIR}/tcl86.lib
 
 # Specify installation paths (if required)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /opt/${PROJECT_NAME}/bin)
@@ -240,4 +241,16 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_CXX_FLAGS "-mwindows")
 endif()
 
-
+# 拷贝 libcrypto-1_1-x64.dll、tcl86.dll、libs/tcl/lib
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/libs/tcl/bin/tcl86.dll"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/libs/libcrypto-1_1-x64.dll"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/libs/tcl/lib"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/lib"
+    COMMENT "Copying required DLLs and Tcl lib directory to executable directory"
+)

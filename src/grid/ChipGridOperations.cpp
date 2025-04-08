@@ -465,7 +465,6 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     //    qDebug() << "[ChipGridOperations] JSON Parsing Error: " << e.what();
     //}
 
-    TotalSize usageSize;
     usageSize.width = 210;
     usageSize.height = 456;
 

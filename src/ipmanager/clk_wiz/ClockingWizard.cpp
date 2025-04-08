@@ -432,7 +432,7 @@ void ClockingWizard::updateOutputClockInforJson(QTableView *tableView, QStandard
     // ===================== 动态调整 开始 ==============================
     if (cur_group == "Output Freq" || cur_group == "Phase" || cur_group == "Duty Cycle"){
         // 只有当这些内容变化时，才进行计算
-        qDebug() << "动态调整 开始";
+         qDebug() << "[ClockingWizard] Dynamic adjustment";
         // Primary 输入频率
         QJsonObject primaryObject = inputJsonRoot["Primary"].toObject();
         double inputFrequency = primaryObject["input_frequency"].toDouble();

@@ -26,7 +26,7 @@ qreal GlobalConfig::SCALE_FACTOR = 1.0f;
 void GlobalConfig::initGlobalResourcePath() {
     // 打包用
     const QString PACK_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
-
+    qDebug() << "[Globals] PACK_PATH " << PACK_PATH;
     // 测试用
     const QString TEST_PATH1 = "E:/workspace/HybrdLink_test/resource_win";
     const QString TEST_PATH2 = "C:/HybrdLink/resource_win";
@@ -51,7 +51,7 @@ void GlobalConfig::initGlobalResourcePath() {
     GLOBAL_RESOURCE_PATH = PACK_PATH;
 #endif
 
-    qDebug() << GLOBAL_RESOURCE_PATH;
+    qDebug() << "[Globals] GLOBAL_RESOURCE_PATH " << GLOBAL_RESOURCE_PATH;
 }
 
 void GlobalConfig::initScaleFactor()
