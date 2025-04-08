@@ -241,6 +241,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_CXX_FLAGS "-mwindows")
 endif()
 
+# === 加载 Qt DLL 拷贝脚本 ===
+include(${CMAKE_SOURCE_DIR}/scripts/deploy_qt_dependencies.cmake)
+my_deploy_dependencies(${PROJECT_NAME})
+    
 # 拷贝 libcrypto-1_1-x64.dll、tcl86.dll、libs/tcl/lib
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
