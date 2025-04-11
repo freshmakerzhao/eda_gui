@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 设置自己的 vcpkg 路径
-set(VCPKG_PATH "E:/workspace/vcpkg")
+set(VCPKG_PATH "E:/vcpkg")
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_P2ATH}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 set(CMAKE_PREFIX_PATH "${VCPKG_PATH}/installed/x64-windows;${CMAKE_PREFIX_PATH}")
 # 是否需要检查 MAC 地址
