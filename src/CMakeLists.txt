@@ -253,6 +253,9 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/libs/tcl/lib"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/lib"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${VCPKG_PATH}/installed/x64-windows/bin/7zip.dll"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
     COMMENT "Copying required DLLs and Tcl lib directory to executable directory"
 )
 
