@@ -449,22 +449,20 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     }
 
     // 解析 JSON
-    //Tool::ArchiveTool tool;
-    //std::vector<unsigned char> buffer;
-    //tool.extractWithPassword(usageJsonPath, buffer, COMPRESS_TOOL_KEY);
-    //std::string buffer_str = tool.byte_to_string(buffer);
+    Tool::ArchiveTool tool;
+    std::vector<unsigned char> buffer;
+    tool.extractWithPassword(usageJsonPath, buffer, COMPRESS_TOOL_KEY);
+    std::string buffer_str = tool.byte_to_string(buffer);
     nlohmann::json j;
-    file >> j;
-    file.close();
-    TotalSize usageSize;
-    size_t num_elements = j.size();
-    //try {
-    //    // 解析 JSON
-    //    j = nlohmann::json::parse(buffer_str);
-    //} catch (const nlohmann::json::parse_error &e) {
-    //    qDebug() << "[ChipGridOperations] JSON Parsing Error: " << e.what();
-    //}
+    try {
+        // 解析 JSON
+        j = nlohmann::json::parse(buffer_str);
+    }
+    catch (const nlohmann::json::parse_error& e) {
+        qDebug() << "[ChipGridOperations] JSON Parsing Error: " << e.what();
+    }
 
+    TotalSize usageSize;
     usageSize.width = 210;
     usageSize.height = 456;
 

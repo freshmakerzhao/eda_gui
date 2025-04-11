@@ -27,7 +27,12 @@
         "value": "x64",
         "strategy": "external"
       },
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ENABLE_MAC_CHECK": "OFF",
+        "ENABLE_EXPIRATION_CHECK": "OFF",
+        "PACK_DEPLOYED": "OFF"
+      }
     },
     {
       "name": "x64-release",

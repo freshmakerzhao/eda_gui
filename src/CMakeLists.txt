@@ -93,15 +93,6 @@ set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_BINARY_DIR}/external/QtADS")
 link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/external/QtADS)
 
-# Include the compress_tool
-# add_subdirectory(external/compress_tool/)
-# 设置 include 目录，确保主项目可以访问 compress_tool 的头文件
-# include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/api)
-# include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include)
-# include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include/bit7z)
-# set(COMPRESS_LIBS "")  # 初始化变量
-# list(APPEND COMPRESS_LIBS ${CMAKE_SOURCE_DIR}/external/compress_tool/libs/release/libSecuArcPack.a ${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/lib/win/libSecuArc64.a)
-
 # Include the OpenSSL library
 set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/openssl")
 set(OPENSSL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
@@ -124,6 +115,8 @@ target_include_directories(VCDVisionLib PUBLIC
 
 include_directories(${TCL_INCLUDE_DIR})
 link_directories(${TCL_LIBRARY_DIR})
+
+add_subdirectory(external/compress_tool)
 
 # Disable external-library warnings
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -203,9 +196,7 @@ add_executable(${PROJECT_NAME}
     win32.rc
 )
 
-# add_dependencies(${PROJECT_NAME} create_libSecuArcPack_a create_libSecuArcPack_d_a)
-# 链接 compress_tool
-# target_link_libraries(${PROJECT_NAME} ${COMPRESS_LIBS} oleaut32 uuid)
+
 
 # Link the Qt5 Widgets library and Third-Party library to the executable
 target_link_libraries(${PROJECT_NAME}
@@ -213,6 +204,8 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     Qt5::Network
     Qt5::Xml
+    Qt5::PrintSupport
+    Qt5::OpenGL
     ExScintilla
     yaml-cpp
     ads::qt5advanceddocking
@@ -221,6 +214,10 @@ target_link_libraries(${PROJECT_NAME}
     psapi
     tcl86
     VCDVisionLib
+    # SecuArcLib
+    oleaut32
+    uuid
+    compress_tool
 )
 # ${OPENSSL_LIBRARY_DIR}/libssl.lib
 # ${OPENSSL_LIBRARY_DIR}/libcrypto.lib
@@ -258,3 +255,5 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/lib"
     COMMENT "Copying required DLLs and Tcl lib directory to executable directory"
 )
+
+message(STATUS "✅ Configuration finished for ${PROJECT_NAME}")
