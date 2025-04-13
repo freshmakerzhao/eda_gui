@@ -26,7 +26,19 @@ namespace FontsUtilities {
         QFontDatabase::addApplicationFont(":/resource/fonts/LFTEtica/no-liga-LFTEticaMono-Regular-OK.ttf");// LFT Etica Mono
 
         // Application
-        QString fontDirPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("../Fonts");
+        QString fontDirPath;
+
+#ifdef FONTS_PATH
+    // 通过编译选项设置字体路径
+    fontDirPath = QString::fromStdString(FONTS_PATH);
+#else
+    // 使用默认路径
+    fontDirPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("../Fonts");
+#endif
+#ifdef PACK_DEPLOYED
+    // 打包模式下，字体路径固定为根目录下的 Fonts
+    fontDirPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("../Fonts");
+#endif
         QDir fontDir(fontDirPath);
         if (!fontDir.exists()) {
             qWarning() << "Font directory does not exist:" << fontDirPath;
@@ -55,7 +67,7 @@ namespace FontsUtilities {
             return;
         }
 
-        qDebug() << "Loaded font:" << fontFilePath << "with family:" << loadedFontFamilies.first();
+        qDebug() << "[FontsUtilities] Loaded font:" << fontFilePath << "with family:" << loadedFontFamilies.first();
 
         QString fontName = loadedFontFamilies.first();
         if (fontName.isEmpty()) {

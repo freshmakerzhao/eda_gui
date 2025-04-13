@@ -6,9 +6,15 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 设置自己的 vcpkg 路径
-set(VCPKG_PATH "E:/vcpkg")
-set(CMAKE_TOOLCHAIN_FILE "${VCPKG_P2ATH}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+
+# 引入配置文件
+include(${CMAKE_SOURCE_DIR}/config_scripts/config.cmake)
+
+message(STATUS "VCPKG_PATH set to: ${VCPKG_PATH}")
+message(STATUS "RESOURCE_WIN_PATH set to: ${RESOURCE_WIN_PATH}")
+message(STATUS "FONTS_PATH set to: ${FONTS_PATH}")
+
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 set(CMAKE_PREFIX_PATH "${VCPKG_PATH}/installed/x64-windows;${CMAKE_PREFIX_PATH}")
 # 是否需要检查 MAC 地址
 option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
@@ -188,13 +194,22 @@ set(PROJECT_RESOURCES
         utils/MemoryUtilities.h
 )
 
-# Tell CMake to create the executable
-add_executable(${PROJECT_NAME}
-    ${PROJECT_SOURCES}
-    ${PROJECT_HEADERS}
-    ${PROJECT_RESOURCES}
-    win32.rc
-)
+# release模式下不弹出控制台
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_executable(${PROJECT_NAME} WIN32
+        ${PROJECT_SOURCES}
+        ${PROJECT_HEADERS}
+        ${PROJECT_RESOURCES}
+        win32.rc
+    )
+else()
+    add_executable(${PROJECT_NAME}
+        ${PROJECT_SOURCES}
+        ${PROJECT_HEADERS}
+        ${PROJECT_RESOURCES}
+        win32.rc
+    )
+endif()
 
 
 
@@ -214,7 +229,6 @@ target_link_libraries(${PROJECT_NAME}
     psapi
     tcl86
     VCDVisionLib
-    # SecuArcLib
     oleaut32
     uuid
     compress_tool
@@ -234,12 +248,8 @@ if (Qt5OpenGL_FOUND)
     target_link_libraries(${PROJECT_NAME} Qt5::OpenGL)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS "-mwindows")
-endif()
-
 # === 加载 Qt DLL 拷贝脚本 ===
-include(${CMAKE_SOURCE_DIR}/scripts/deploy_qt_dependencies.cmake)
+include(${CMAKE_SOURCE_DIR}/config_scripts/deploy_qt_dependencies.cmake)
 my_deploy_dependencies(${PROJECT_NAME})
     
 # 拷贝 libcrypto-1_1-x64.dll、tcl86.dll、libs/tcl/lib
