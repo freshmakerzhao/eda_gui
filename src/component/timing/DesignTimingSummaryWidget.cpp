@@ -1,9 +1,9 @@
 #include "DesignTimingSummaryWidget.h"
 
-DesignTimingSummaryWidget::DesignTimingSummaryWidget(const int &worstNegativeSlack,
-                                                     const int &totalNegativeSlack,
-                                                     const int &worstHoldSlack,
-                                                     const int &totalHoldSlack,
+DesignTimingSummaryWidget::DesignTimingSummaryWidget(const float &worstNegativeSlack,
+                                                     const float &totalNegativeSlack,
+                                                     const float &worstHoldSlack,
+                                                     const float &totalHoldSlack,
                                                      QWidget *parent)
     : QWidget(parent)
 {

@@ -3,11 +3,7 @@
 IntraClockPathTableView::IntraClockPathTableView(const json &list, const int &pathN, const IntraClockPaths &intraClockPaths, QWidget *parent)
     : QWidget(parent),
     model(new QStandardItemModel(this)),
-    _pathN(pathN),
-    worstNegativeSlack(0),
-    totalNegativeSlack(0),
-    worstHoldSlack(0),
-    totalHoldSlack(0)
+    _pathN(pathN)
 {
     model->setHorizontalHeaderLabels({"Name", "Slack", "From", "To", "Total Delay", "Logic Delay", "Net Delay"});
     tableView = new QTableView;
@@ -21,6 +17,11 @@ IntraClockPathTableView::IntraClockPathTableView(const json &list, const int &pa
     layout->setMargin(0);
     layout->addWidget(tableView);
 
+    worstNegativeSlack = std::numeric_limits<float>::max();
+    totalNegativeSlack = 0;
+    worstHoldSlack = std::numeric_limits<float>::max();
+    totalHoldSlack = 0;
+
     try {
         for (const auto &entry : list) {
             // Path
@@ -28,15 +29,15 @@ IntraClockPathTableView::IntraClockPathTableView(const json &list, const int &pa
             row.append(new QStandardItem(QString("Path%1").arg(_pathN)));
 
             // Slack
-            const auto& slack = entry["slack"].get<int>();
+            const auto& slack = entry["slack"].get<float>();
             row.append(new QStandardItem(QString::number(slack)));
             switch (intraClockPaths) {
             case IntraClockPaths::Setup:
-                worstNegativeSlack = std::max(worstNegativeSlack, slack);
+                worstNegativeSlack = std::min(worstNegativeSlack, slack);
                 totalNegativeSlack += slack;
                 break;
             case IntraClockPaths::Hold:
-                worstHoldSlack = std::max(worstHoldSlack, slack);
+                worstHoldSlack = std::min(worstHoldSlack, slack);
                 totalHoldSlack += slack;
                 break;
             default:
@@ -81,8 +82,8 @@ IntraClockPathTableView::IntraClockPathTableView(const json &list, const int &pa
     }
 }
 
-int IntraClockPathTableView::getSlack(const Slack &slack) const {
-    int value = 0;
+float IntraClockPathTableView::getSlack(const Slack &slack) const {
+    float value = 0;
     switch (slack) {
     case Slack::WorstNegativeSlack:
         value = worstNegativeSlack;

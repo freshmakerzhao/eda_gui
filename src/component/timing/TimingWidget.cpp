@@ -28,8 +28,6 @@ TimingWidget::TimingWidget(QWidget *parent)
     setupTreeView();
     setupStackedWidget();
 
-    loadDataFromJson();
-
     connect(treeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &TimingWidget::onTreeSelectionChanged);
 

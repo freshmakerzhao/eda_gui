@@ -25,7 +25,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     QString compilerString = QString("%1-%2bit").arg(compiler, QString::number(QSysInfo::WordSize));
     QString version = QApplication::applicationVersion().isEmpty() ? "unknown" : QApplication::applicationVersion();
     QString information = "<html>"
-                          "<h2>About HybrdLink</h2"
+                          "<h2>About HybrdLink</h2>"
                           "<p>Build Date Time: %1</p>"
                           "<p>Compiler: %2</p>"
                           "<p>Version: %3</p>"

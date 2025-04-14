@@ -12,6 +12,8 @@
 #include "utils/json.hpp"
 #include "MessageWidget.h"
 #include "component/timing/TimingWidget.h"
+#include "utils/ProjectManager.h"
+#include "entity/Project.h"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
@@ -294,9 +296,20 @@ void InfoWidget::initSummary(const QString phase) {
 
 void InfoWidget::generateTimingSummary()
 {
+    // 提取参数
+    QString projectPath = ProjectManager::instance().getParameter(Project::Path);
+    QString topModuleName = ProjectManager::instance().getParameter(Project::TopModule);
+
+    // 构建 timing.json 文件路径
+    QString timingResultPath = QDir(projectPath).filePath("runs/impl/" + topModuleName + "_timing.json");
+    qDebug() << "[InfoWidget generateTimingSummary] timingResultPath : " << timingResultPath;
+    // 创建 TimingWidget 并加载数据
+    TimingWidget* timingWidget = new TimingWidget;
+    timingWidget->loadDataFromJson(timingResultPath);
     onTabWidgetTabCloseRequested(5);
-    tabWidget->insertTab(5, new TimingWidget, "Timing");
+    tabWidget->insertTab(5, timingWidget, "Timing");
     tabWidget->setCurrentIndex(5);
+
 }
 
 void InfoWidget::onTabWidgetTabCloseRequested(int index)

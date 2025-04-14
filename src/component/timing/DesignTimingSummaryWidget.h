@@ -6,10 +6,10 @@
 class DesignTimingSummaryWidget : public QWidget
 {
 public:
-    DesignTimingSummaryWidget(const int &worstNegativeSlack,
-                              const int &totalNegativeSlack,
-                              const int &worstHoldSlack,
-                              const int &totalHoldSlack,
+    DesignTimingSummaryWidget(const float &worstNegativeSlack,
+                              const float &totalNegativeSlack,
+                              const float &worstHoldSlack,
+                              const float &totalHoldSlack,
                               QWidget *parent = nullptr);
 
 private:

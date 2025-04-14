@@ -26,7 +26,7 @@ class IntraClockPathTableView : public QWidget
 public:
     IntraClockPathTableView(const json &list, const int &pathN, const IntraClockPaths &intraClockPaths, QWidget *parent = nullptr);
 
-    int getSlack(const Slack &slack) const;
+    float getSlack(const Slack &slack) const;
 
 private:
     QTableView *tableView;
@@ -35,11 +35,11 @@ private:
 private:
     int _pathN;
 
-    int worstNegativeSlack;
-    int totalNegativeSlack;
+    float worstNegativeSlack;
+    float totalNegativeSlack;
 
-    int worstHoldSlack;
-    int totalHoldSlack;
+    float worstHoldSlack;
+    float totalHoldSlack;
 
 };
 

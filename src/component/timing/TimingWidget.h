@@ -9,6 +9,7 @@
 #include <QSplitter>
 #include <QLabel>
 
+#include "utils/ProjectManager.h"
 #include "utils/json.hpp"
 #include "IntraClockPathTableView.h"
 #include "DesignTimingSummaryWidget.h"
@@ -19,8 +20,7 @@ class TimingWidget : public QWidget
 public:
     TimingWidget(QWidget *parent = nullptr);
 
-private:
-    void loadDataFromJson(const QString &timingResults = "C:\\Users\\INTEL\\Documents\\WXWork\\1688855859603022\\Cache\\File\\2025-01\\timing-result.json") {
+    void loadDataFromJson(const QString &timingResults = "") {
         QFile file(timingResults);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qDebug() << "Unable to open file";
@@ -43,7 +43,7 @@ private:
             parentItem->appendRow(intraClockPathItem);
             root->appendRow(parentItem);
 
-            QStandardItem *setupPage = new QStandardItem("Steup");
+            QStandardItem *setupPage = new QStandardItem("Setup");
             QStandardItem *holdPage = new QStandardItem("Hold");
             setupPage->setData(2, Qt::UserRole);
             holdPage->setData(3, Qt::UserRole);
@@ -55,16 +55,16 @@ private:
 
 
 
-            const int worstNegativeSlack = setupIntraClockPathTableView->getSlack(Slack::WorstNegativeSlack);
-            const int totalNegativeSlack = setupIntraClockPathTableView->getSlack(Slack::TotalNegativeSlack);
+            const float worstNegativeSlack = setupIntraClockPathTableView->getSlack(Slack::WorstNegativeSlack);
+            const float totalNegativeSlack = setupIntraClockPathTableView->getSlack(Slack::TotalNegativeSlack);
 
-            const int worstHoldSlack = holdIntraClockPathTableView->getSlack(Slack::WorstHoldSlack);
-            const int totalHoldSlack = holdIntraClockPathTableView->getSlack(Slack::TotalHoldSlack);
+            const float worstHoldSlack = holdIntraClockPathTableView->getSlack(Slack::WorstHoldSlack);
+            const float totalHoldSlack = holdIntraClockPathTableView->getSlack(Slack::TotalHoldSlack);
 
             DesignTimingSummaryWidget *designTimingSummaryWidget = new DesignTimingSummaryWidget(worstNegativeSlack,
-                                                                                             totalNegativeSlack,
-                                                                                             worstHoldSlack,
-                                                                                             totalHoldSlack);
+                                                                                                 totalNegativeSlack,
+                                                                                                 worstHoldSlack,
+                                                                                                 totalHoldSlack);
 
             stackedWidget->addWidget(designTimingSummaryWidget);
             stackedWidget->addWidget(setupIntraClockPathTableView);
@@ -74,6 +74,8 @@ private:
             qDebug() << "JSON Parsing Error:" << e.what();
         }
     }
+private:
+
 
     void setupTreeView()
     {
@@ -92,7 +94,29 @@ private:
 
     void setupStackedWidget()
     {
-        stackedWidget->addWidget(new QLabel("General Information", stackedWidget));
+
+        QString topModuleName = ProjectManager::instance().getParameter(Project::TopModule);
+        QString partName = ProjectManager::instance().getParameter(Project::DisplayPart);
+        QString version = QApplication::applicationVersion().isEmpty() ? "unknown" : QApplication::applicationVersion();
+
+        QString information = QString(R"(
+        <div style="line-height: 1.5;">
+            <b>Report:</b> Timing Summary Report<br>
+            <b>Design:</b> %1<br>
+            <b>Part:</b> %2<br>
+            <b>Version:</b> %3<br>
+        </div>
+        )").arg(topModuleName, partName, version);
+
+        QLabel* label = new QLabel(information, stackedWidget);
+
+        label->setTextFormat(Qt::RichText);
+        label->setWordWrap(true); // 如果窗口变小也能换行
+        label->setAlignment(Qt::AlignTop | Qt::AlignLeft); // 左上对齐
+        label->setTextInteractionFlags(Qt::TextSelectableByMouse); // 允许复制
+        label->setMargin(10); // 增加内边距
+
+        stackedWidget->addWidget(label);
     }
 
 private slots:
