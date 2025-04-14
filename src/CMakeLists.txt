@@ -152,6 +152,7 @@ file(GLOB PROJECT_SOURCES
     ipmanager/fifo_generator/*.cpp
     component/tclconsole/*.cpp
     component/properties/*.cpp
+    component/timing/*.cpp
     settings/*.cpp
     service/*.cpp
     include/tinyxml2/*.cpp
@@ -177,6 +178,7 @@ file(GLOB PROJECT_HEADERS
     ipmanager/fifo_generator/*.h
     component/tclconsole/*.h
     component/properties/*.h
+    component/timing/*.h
     settings/*.h
     service/*.h
     include/tinyxml2/*.h

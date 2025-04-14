@@ -231,8 +231,14 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const QString placeJsonPath = dir.filePath("runs/impl/place.json");
     const QString routeJsonPath = dir.filePath("runs/impl/route.json");
     const QString fasmPath = dir.filePath("runs/impl/" + topName + ".fasm");
-    QStringList script;
+    const QString timingResultJson = dir.filePath("runs/impl/" + topName + "_timing.json");
+    const QString powerResultJson = dir.filePath("runs/impl/" + topName + "_power.json");
 
+    const QString series_name = ProjectManager::instance().getParameter(Project::Series);
+    const QString timingDataPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("bitstreamTools/hybrdlink_db/MC7F/" + series_name + "/timings/timing_info.json");
+    const QString powerDataPath = QDir(GlobalConfig::GLOBAL_RESOURCE_PATH).filePath("bitstreamTools/hybrdlink_db/MC7F/" + series_name + "/power/power_data.json");
+
+    QStringList script;
     QString info;
     // 公共部分提取为函数，避免重复代码
     auto addCommonArgs = [&script, &resultList](const QString &jsonPath,
@@ -251,7 +257,20 @@ int TclConsole::TclImplCmd(ClientData clientData, Tcl_Interp *interp, int argc, 
     const QString task = QString(argv[0]);
 
     if (task == "impl_design") {
-        addCommonArgs(synthJsonPath, routeJsonPath, {"--fasm", fasmPath, "--U", "--process_number", InitialConfig::instance().pid_str, "-l", "log_implementation.log"});
+        addCommonArgs(
+                synthJsonPath,
+                routeJsonPath,
+                {
+                    "--fasm", fasmPath,
+                    "--U",
+                    "--process_number", InitialConfig::instance().pid_str,
+                    "--junction-temp", "40.0",
+                    "--power-level", "1000",
+                    "--power-data", powerDataPath,
+                    "--power-result", powerResultJson,
+                    "--timing-data", timingDataPath,
+                    "--timing-result", timingResultJson,
+                    "-l", "log_implementation.log"});
         info = "Starting Implementation Task";
     } else if (task == "pack_design") {
         addCommonArgs(synthJsonPath, packJsonPath, {"--pack-only", "-l", "log_pack.log"});
@@ -465,7 +484,7 @@ int TclConsole::TclSimCmd(ClientData clientData, Tcl_Interp *interp, int argc, c
     //  设置路径
     ProcessManager::instance().configWorkPath(simPath);
 
-     //执行仿真:  vvp  compileFile
+    //  执行仿真:  vvp  compileFile
     scriptSimRun << "&&";
     scriptSimRun <<"%SIMULATION_RUN_PATH%" << compileFile;
 
@@ -497,7 +516,7 @@ int TclConsole::generateSimWaveConfigFilePath(const QString topName, const QStri
         QTextStream out(&onfigFile);
         out << QString( "module %1 ();").arg(moduleName) <<Qt:: endl;
         out << "initial begin" << Qt::endl;
-        out << QString( "$dumpfile( \"%1\") ;" ).arg(mWaveFileName ) <<Qt:: endl;
+        out << QString( "$dumpfile( \"%1\") ;" ).arg(mWaveFileName) <<Qt:: endl;
         out << QString("$dumpvars( %1 ) ;").arg(WaveSignalConfig) <<Qt:: endl;
         out << "end" << Qt::endl;
         out << "endmodule" << Qt::endl;
@@ -559,8 +578,8 @@ int TclConsole::TclUpdateFileSetCmd(ClientData clientData, Tcl_Interp *interp, i
 
 int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, int argc, const char *argv[]) {
     QStringList script;
+    QString series_name = ProjectManager::instance().getParameter(Project::Series);
     QString part_name = ProjectManager::instance().getParameter(Project::Part);
-    QString series = ProjectManager::instance().getParameter(Project::Series);
 
     bool enableCRC = false;
     bool enableCompress = false;
@@ -607,7 +626,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "--part";
     script << part_name;
     script << "--db-root";
-    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series + "/";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\hybrdlink_db\MC7F)";
     script << "--fn_out";
     script << framesPath;
     script << "--fn_in";
@@ -616,7 +635,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "&&";
     script << "%FRAMES2BIT%";
     script << "--part_file";
-    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series + "/" + part_name + "/part.yaml";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series_name + "/" + part_name + "part.yaml";
     script << "--part_name";
     script << part_name;
     script << "--frm_file";
