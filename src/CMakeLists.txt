@@ -153,6 +153,7 @@ file(GLOB PROJECT_SOURCES
     component/tclconsole/*.cpp
     component/properties/*.cpp
     component/timing/*.cpp
+    component/power/*.cpp
     settings/*.cpp
     service/*.cpp
     include/tinyxml2/*.cpp
@@ -179,6 +180,7 @@ file(GLOB PROJECT_HEADERS
     component/tclconsole/*.h
     component/properties/*.h
     component/timing/*.h
+    component/power/*.h
     settings/*.h
     service/*.h
     include/tinyxml2/*.h

@@ -12,6 +12,7 @@
 #include "utils/json.hpp"
 #include "MessageWidget.h"
 #include "component/timing/TimingWidget.h"
+#include "component/power/PowerWidget.h"
 #include "utils/ProjectManager.h"
 #include "entity/Project.h"
 
@@ -310,6 +311,14 @@ void InfoWidget::generateTimingSummary()
     tabWidget->insertTab(5, timingWidget, "Timing");
     tabWidget->setCurrentIndex(5);
 
+}
+
+void InfoWidget::generateReportPower()
+{
+    PowerWidget* powerWidget = new PowerWidget;
+    onTabWidgetTabCloseRequested(6);
+    tabWidget->insertTab(6, powerWidget, "Power");
+    tabWidget->setCurrentIndex(6);
 }
 
 void InfoWidget::onTabWidgetTabCloseRequested(int index)
