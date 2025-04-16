@@ -8,6 +8,8 @@
   ******************************************************************************
   */
 
+#include <QMessageBox>
+#include <iostream>
 #include "AboutDialog.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
@@ -19,9 +21,9 @@ AboutDialog::AboutDialog(QWidget *parent)
     setWindowTitle("About Software");
     QString buildDateTime = QString("%1 %2").arg(__DATE__, __TIME__);
     QString compiler = "<unknown>";
-    #if defined(Q_CC_GNU)
-        compiler = QLatin1String("GCC ") + QLatin1String(__VERSION__);
-    #endif
+#if defined(Q_CC_GNU)
+    compiler = QLatin1String("GCC ") + QLatin1String(__VERSION__);
+#endif
     QString compilerString = QString("%1-%2bit").arg(compiler, QString::number(QSysInfo::WordSize));
     QString version = QApplication::applicationVersion().isEmpty() ? "unknown" : QApplication::applicationVersion();
     QString information = "<html>"
@@ -41,11 +43,39 @@ AboutDialog::AboutDialog(QWidget *parent)
     QLabel *imageLabel = new QLabel(this);
     imageLabel->setFixedHeight(300);
     QPixmap image(":/resource/logo.png");
-    // 缩放图片到当前分辨率下的显示大小，SmoothTransformation平滑处理。
     imageLabel->setPixmap(image.scaled(400, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     imageLabel->setAlignment(Qt::AlignCenter);
+
+    int *clickCount = new int(0);
+    imageLabel->installEventFilter(this);
+
+    this->setProperty("easterEgg_clickCount", QVariant::fromValue(static_cast<void*>(clickCount)));
+    this->setProperty("easterEgg_label", QVariant::fromValue(static_cast<void*>(imageLabel)));
+
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     layout->addWidget(textLabel);
     layout->addWidget(imageLabel);
+}
+
+static QString decodeBase64(const QString &encoded) {
+    return QString::fromUtf8(QByteArray::fromBase64(encoded.toUtf8()));
+}
+
+bool AboutDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    auto imageLabel = static_cast<QLabel*>(this->property("easterEgg_label").value<void*>());
+    auto clickCount = static_cast<int*>(this->property("easterEgg_clickCount").value<void*>());
+
+    if (obj == imageLabel && event->type() == QEvent::MouseButtonPress) {
+        (*clickCount)++;
+        if (*clickCount >= 7) {
+            QString title = decodeBase64("8J+RqOKAjfCfkrsg5byA5Y+R6ICF5ZCN5Y2V");
+            QString content = decodeBase64("8J+OiSDlvanom4vop6blj5HvvIEKCvCfkaQg6LW15biFCvCfkaQg5p+v5bCa5rKF");
+            QMessageBox::information(this, title, content);
+            *clickCount = 0;
+        }
+        return true;
+    }
+    return QDialog::eventFilter(obj, event);
 }
