@@ -95,6 +95,8 @@ private:
 public slots:
     void generateTimingSummary();
 
+    void generateReportPower();
+
     void onTabWidgetTabCloseRequested(int index);
 };
 

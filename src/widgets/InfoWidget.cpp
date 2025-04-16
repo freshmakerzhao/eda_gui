@@ -12,6 +12,7 @@
 #include "utils/json.hpp"
 #include "MessageWidget.h"
 #include "component/timing/TimingWidget.h"
+#include "component/power/PowerWidget.h"
 #include "utils/ProjectManager.h"
 #include "entity/Project.h"
 
@@ -310,6 +311,21 @@ void InfoWidget::generateTimingSummary()
     tabWidget->insertTab(5, timingWidget, "Timing");
     tabWidget->setCurrentIndex(5);
 
+}
+
+void InfoWidget::generateReportPower()
+{
+    // 提取参数
+    QString projectPath = ProjectManager::instance().getParameter(Project::Path);
+    QString topModuleName = ProjectManager::instance().getParameter(Project::TopModule);
+
+    // 构建 power.json 文件路径
+    QString powerResultPath = QDir(projectPath).filePath("runs/impl/" + topModuleName + "_power.json");
+    qDebug() << "[InfoWidget generateReportPower] powerResultPath : " << powerResultPath;
+    PowerWidget* powerWidget = new PowerWidget(powerResultPath);
+    onTabWidgetTabCloseRequested(5);
+    tabWidget->insertTab(5, powerWidget, "Power");
+    tabWidget->setCurrentIndex(5);
 }
 
 void InfoWidget::onTabWidgetTabCloseRequested(int index)

@@ -138,6 +138,7 @@ public:
 
 signals:
     void timingDialogAccept();
+    void powerDialogAccept();
 };
 
 #endif // TASKMANAGER_H

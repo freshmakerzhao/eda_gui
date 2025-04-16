@@ -86,6 +86,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     reportTiming = new QTreeWidgetItem(impItem, QStringList() << "Report Timing");
     reportTiming->setIcon(0, QIcon(":/icons/resource/icons/8-icon_timing.png"));
     impPackReportItem = new QTreeWidgetItem(impItem, QStringList() << "Report");
+    reportPower = new QTreeWidgetItem(impItem, QStringList() << "Report Power");
+    reportPower->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
     // 查看 Pack 日志
     impPackReportItem->setIcon(0, QIcon(":/icons/resource/icons/6-icon_report.png"));
     impPackReportItem->setDisabled(true);
@@ -201,6 +203,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(18);
         } else if (item == reportTiming) {
             TaskManager::instance().handleTreeItemActivation(19);
+        } else if (item == reportPower) {
+            TaskManager::instance().handleTreeItemActivation(20);
         }
         clearSelection(); // 清除选中状态
     });

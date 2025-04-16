@@ -626,7 +626,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "--part";
     script << part_name;
     script << "--db-root";
-    script << GlobalConfig::GLOBAL_RESOURCE_PATH + R"(\bitstreamTools\hybrdlink_db\MC7F)";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series_name;
     script << "--fn_out";
     script << framesPath;
     script << "--fn_in";
@@ -635,7 +635,7 @@ int TclConsole::TclWriteBitstreamCmd(ClientData clientData, Tcl_Interp *interp, 
     script << "&&";
     script << "%FRAMES2BIT%";
     script << "--part_file";
-    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series_name + "/" + part_name + "part.yaml";
+    script << GlobalConfig::GLOBAL_RESOURCE_PATH + "/bitstreamTools/hybrdlink_db/MC7F/" + series_name + "/" + part_name + "/part.yaml";
     script << "--part_name";
     script << part_name;
     script << "--frm_file";
