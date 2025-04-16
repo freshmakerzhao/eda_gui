@@ -1,6 +1,6 @@
 #include "PowerWidget.h"
 
-PowerWidget::PowerWidget(QWidget *parent)
+PowerWidget::PowerWidget(const QString& file_path, QWidget *parent)
     : QWidget(parent),
     treeView(new QTreeView),
     stackedWidget(new QStackedWidget),
@@ -32,7 +32,7 @@ PowerWidget::PowerWidget(QWidget *parent)
     clockUtilizationWidget = new UtilizationWidget(Utilization::Clock);
     logicUtilizationWidget = new UtilizationWidget(Utilization::Logic);
 
-    loadDataFromJson();
+    loadDataFromJson(file_path);
     setupTreeView();
     setupStackedWidget();
 

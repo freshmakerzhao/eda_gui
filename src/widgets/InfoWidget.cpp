@@ -315,10 +315,17 @@ void InfoWidget::generateTimingSummary()
 
 void InfoWidget::generateReportPower()
 {
-    PowerWidget* powerWidget = new PowerWidget;
-    onTabWidgetTabCloseRequested(6);
-    tabWidget->insertTab(6, powerWidget, "Power");
-    tabWidget->setCurrentIndex(6);
+    // 提取参数
+    QString projectPath = ProjectManager::instance().getParameter(Project::Path);
+    QString topModuleName = ProjectManager::instance().getParameter(Project::TopModule);
+
+    // 构建 power.json 文件路径
+    QString powerResultPath = QDir(projectPath).filePath("runs/impl/" + topModuleName + "_power.json");
+    qDebug() << "[InfoWidget generateReportPower] powerResultPath : " << powerResultPath;
+    PowerWidget* powerWidget = new PowerWidget(powerResultPath);
+    onTabWidgetTabCloseRequested(5);
+    tabWidget->insertTab(5, powerWidget, "Power");
+    tabWidget->setCurrentIndex(5);
 }
 
 void InfoWidget::onTabWidgetTabCloseRequested(int index)

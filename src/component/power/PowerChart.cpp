@@ -123,6 +123,14 @@ void PowerChart::createDynamicPowerChart(QCustomPlot *customPlot) {
 
     QVector<QCPItemRect*> rectItems;
 
+    QMap<QString, Legend> legend_map = {
+        {"Clock", Legend::Clocks},
+        {"Signals", Legend::Signals},
+        {"Logic", Legend::Logic},
+        {"MMCM", Legend::MMCM},
+        {"IO", Legend::IO}
+    };
+
     // // 创建矩形
     // double start = 0.0;
     // for (int i = 0; i < values.size(); ++i) {
@@ -134,7 +142,6 @@ void PowerChart::createDynamicPowerChart(QCustomPlot *customPlot) {
     // }
 
     // 创建矩形
-    // double start = 0.0;
     double start = 0.01f;
     for (int i = 0; i < values.size(); ++i) {
         QCPItemRect *rect = new QCPItemRect(customPlot);
@@ -191,73 +198,66 @@ void PowerChart::createDynamicPowerChart(QCustomPlot *customPlot) {
         [=](QCPLegend *legend, QCPAbstractLegendItem *item, QMouseEvent *event) {
             QCPPlottableLegendItem *plItem = qobject_cast<QCPPlottableLegendItem*>(item);
             if (plItem) {
-                // 找到对应的条形
-                for (int i = 0; i < bars.size(); ++i) {
-                    if (bars[i]->name() == plItem->plottable()->name()) {
-                        qDebug() << bars[i]->name();
-                        if (bars[i]->name() == "Clock") {
-                            emit dynamicPowerLegendClick(Legend::Clocks);
-                        }
-
-                        if (bars[i]->name() == "Signals") {
-                            emit dynamicPowerLegendClick(Legend::Signals);
-                        }
-
-                        if (bars[i]->name() == "Logic") {
-                            emit dynamicPowerLegendClick(Legend::Logic);
-                        }
-
-                        if (bars[i]->name() == "MMCM") {
-                            emit dynamicPowerLegendClick(Legend::MMCM);
-                        }
-
-                        if (bars[i]->name() == "IO") {
-                            emit dynamicPowerLegendClick(Legend::IO);
-                        }
-                        break;
-                    }
-                }
-                //     customPlot->replot(); // 更新图表
-            }
+                QString name = plItem->plottable()->name();
+                if (legend_map.contains(name))
+                    emit dynamicPowerLegendClick(legend_map[name]);
+            }   
         }
-        );
+    );
 
     customPlot->setMouseTracking(true); // 启用鼠标跟踪
     customPlot->setFocusPolicy(Qt::StrongFocus); // 设置聚焦策略
 
+    QObject::connect(customPlot, &QCustomPlot::mousePress, [=](QMouseEvent *event) {
+        double x = customPlot->xAxis->pixelToCoord(event->pos().x());
+        double y = customPlot->yAxis->pixelToCoord(event->pos().y());
+        for (auto *rect : rectItems) {
+            double x1 = rect->topLeft->coords().x();
+            double y1 = rect->topLeft->coords().y();
+            double x2 = rect->bottomRight->coords().x();
+            double y2 = rect->bottomRight->coords().y();
+            if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+                QString label = rect->property("label").toString();
+                if (legend_map.contains(label)) {
+                    emit dynamicPowerLegendClick(legend_map[label]);
+                    break;
+                }
+            }
+        }
+    });
+
     QObject::connect(customPlot, &QCustomPlot::mouseMove, [=](QMouseEvent *event) {
         double x = customPlot->xAxis->pixelToCoord(event->pos().x());
         double y = customPlot->yAxis->pixelToCoord(event->pos().y());
-
+        bool needReplot = false;
         for (QCPAbstractItem *item : rectItems) {
             if (QCPItemRect *rect = qobject_cast<QCPItemRect*>(item)) {
                 double x1 = rect->topLeft->coords().x();
                 double y1 = rect->topLeft->coords().y();
                 double x2 = rect->bottomRight->coords().x();
                 double y2 = rect->bottomRight->coords().y();
-
                 // qDebug() << x << " " << y;
                 // qDebug() << x1 << "," << y1 << " " << x2 << "," << y2;
-
                 QPen pen = rect->pen();
                 if (x >= x1 && x <= x2 && y <= y2 && y >= y1) {
-                    pen.setColor(Qt::blue);
-                    pen.setWidthF(3.0f);
-                    // pen.setCapStyle(Qt::SquareCap);
-                    // pen.setJoinStyle(Qt::MiterJoin);
-                    rect->setPen(pen);
+                    if (pen.color() != Qt::blue) {
+                        pen.setColor(Qt::blue);
+                        pen.setWidthF(3.0f);
+                        rect->setPen(pen);
+                        needReplot = true;
+                    }
                     QToolTip::showText(event->globalPos(), QString(rect->property("label").toString()));
                 } else {
-                    pen.setColor(Qt::gray);
-                    pen.setWidthF(2.0f);
-                    rect->setPen(pen);
+                    if (pen.color() != Qt::gray) {
+                        pen.setColor(Qt::gray);
+                        pen.setWidthF(2.0f);
+                        rect->setPen(pen);
+                        needReplot = true;
+                    }
                 }
-
-                customPlot->replot();
+                if (needReplot) customPlot->replot();
             }
         }
-
-        // QCustomPlot::mouseMoveEvent(event);
     });
 
     // QObject::connect(customPlot, &QCustomPlot::plottableClick, [=](QCPAbstractPlottable *plottable, int dataIndex, QMouseEvent *event) {

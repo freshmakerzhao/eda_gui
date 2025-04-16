@@ -18,9 +18,10 @@ class PowerWidget : public QWidget
     Q_OBJECT
 public:
     PowerWidget(QWidget *parent = nullptr);
+    explicit PowerWidget(const QString& file_path, QWidget* parent = nullptr);
 
 private:
-    void loadDataFromJson(const QString &json_file = "D:/ReportPower/resource/gui_power_data_100t(1).json") {
+    void loadDataFromJson(const QString &json_file = "") {
         QFile file(json_file);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qDebug() << "Unable to open file";
@@ -117,6 +118,26 @@ private:
         stackedWidget->addWidget(logicUtilizationWidget);
     }
 
+    void selectTreeItemByStackIndex(int targetIndex){
+        std::function<void(QStandardItem*)> traverse;
+        traverse = [&](QStandardItem* item) {
+            if (!item) return;
+            if (item->data(Qt::UserRole).toInt() == targetIndex) {
+                QModelIndex index = item->index();
+                treeView->setCurrentIndex(index);
+                return;
+            }
+            for (int i = 0; i < item->rowCount(); ++i) {
+                traverse(item->child(i));
+            }
+        };
+
+        QStandardItem* root = _model->invisibleRootItem();
+        for (int i = 0; i < root->rowCount(); ++i) {
+            traverse(root->child(i));
+        }
+    }
+
 private slots:
     void onTreeSelectionChanged(const QModelIndex &current)
     {
@@ -137,12 +158,14 @@ private slots:
         switch (legend) {
         case Legend::Clocks:
             stackedWidget->setCurrentWidget(clockUtilizationWidget);
+            selectTreeItemByStackIndex(3);
             break;
         case Legend::Signals:
 
             break;
         case Legend::Logic:
             stackedWidget->setCurrentWidget(logicUtilizationWidget);
+            selectTreeItemByStackIndex(4);
             break;
         case Legend::MMCM:
 
