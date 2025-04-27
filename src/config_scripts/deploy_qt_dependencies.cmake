@@ -1,8 +1,6 @@
 ﻿function(my_deploy_dependencies target_name)
     message(STATUS "📦 Deploying DLLs for target: ${target_name}")
-
     
-    set(DEBUG_SUFFIX "")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(VCPKG_ROOT "${VCPKG_PATH}/installed/x64-windows/debug")
         set(DLLS_MAP
