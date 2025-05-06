@@ -22,6 +22,8 @@
 #include "settings/SettingsDialog.h"
 #include "base/Globals.h"
 #include "widgets/LogWidget.h"
+#include "component/timing/TimingSummaryDialog.h"
+#include "component/power/ReportPowerDialog.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -146,6 +148,14 @@ void TaskManager::handleTreeItemActivation(const int &mode)
     } else if (mode == 18) {
         // simulation
         TclConsole::instance()->executeTclCommand(buildSimScript());
+    } else if (mode == 19) {
+        TimingSummaryDialog dialog;
+        if (dialog.exec() == QDialog::Accepted)
+            emit timingDialogAccept();
+    } else if (mode == 20) {
+        ReportPowerDialog dialog;
+        if (dialog.exec() == QDialog::Accepted)
+            emit powerDialogAccept();
     }
 }
 
@@ -272,6 +282,8 @@ TaskManager::TaskManager()
     fileWatcher = new QFileSystemWatcher(this);
     connect(fileWatcher, &QFileSystemWatcher::fileChanged, this, &TaskManager::onFileChanged);
     connect(&ProcessManager::instance(), &ProcessManager::finishMessage, this, &TaskManager::handleMessage);
+    connect(this, &TaskManager::timingDialogAccept, InfoWidget::instance(), &InfoWidget::generateTimingSummary);
+    connect(this, &TaskManager::powerDialogAccept, InfoWidget::instance(), &InfoWidget::generateReportPower);
 }
 
 TaskManager::~TaskManager()

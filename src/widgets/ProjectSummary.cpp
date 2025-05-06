@@ -143,7 +143,7 @@ void ProjectSummary::init()
     QLabel *synthesisStatusLabel = new QLabel("Status:");
     QLabel *synthesisStatusValueLabel = synthesisStatus;
     // Synthesis Part
-    QLabel *synthesisPartLabel = new QLabel("Part");
+    QLabel *synthesisPartLabel = new QLabel("Part:");
     QLabel *synthesisPartValueLabel = synthesisPart;
 
     synthesisStatusValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
@@ -230,7 +230,7 @@ void ProjectSummary::init()
     QLabel *implementationStatusLabel = new QLabel("Status:");
     QLabel *implementationStatusValueLabel = implementationStatus;
     // implementation Part
-    QLabel *implementationPartLabel = new QLabel("Part");
+    QLabel *implementationPartLabel = new QLabel("Part:");
     QLabel *implementationPartValueLabel = implementationPart;
 
     implementationStatusValueLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);

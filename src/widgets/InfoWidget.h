@@ -91,6 +91,13 @@ private:
         {"BLK-TL-DSP48E1", &dspNumImpl},
         {"BLK-TL-BRAM_L", &bramNumImpl}
     };
+
+public slots:
+    void generateTimingSummary();
+
+    void generateReportPower();
+
+    void onTabWidgetTabCloseRequested(int index);
 };
 
 #endif // INFOWIDGET_H

@@ -11,6 +11,10 @@
 #include "LogWidget.h"
 #include "utils/json.hpp"
 #include "MessageWidget.h"
+#include "component/timing/TimingWidget.h"
+#include "component/power/PowerWidget.h"
+#include "utils/ProjectManager.h"
+#include "entity/Project.h"
 
 InfoWidget *InfoWidget::instance(QWidget *parent)
 {
@@ -224,6 +228,8 @@ InfoWidget::InfoWidget(QWidget *parent)
 {
     qDebug() << "[InfoWidget] Constructing...";
     tabWidget = new QTabWidget;
+    tabWidget->setTabsClosable(true);
+    QTabBar *tabBar = tabWidget->tabBar();
     QGridLayout *layout = new QGridLayout(this);
     layout->setMargin(0);
     layout->addWidget(tabWidget);
@@ -263,6 +269,15 @@ InfoWidget::InfoWidget(QWidget *parent)
     runsView->setColumnWidth(1, 240);
     runsView->setColumnWidth(7, 200);
     runsView->setColumnWidth(9, 200);
+
+    // -------------------------------------------------------
+    connect(tabWidget, &QTabWidget::tabCloseRequested, this, &InfoWidget::onTabWidgetTabCloseRequested);
+    tabBar->setTabButton(0, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(1, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(2, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(3, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(4, QTabBar::RightSide, nullptr);
+
 }
 
 InfoWidget::~InfoWidget()
@@ -278,6 +293,49 @@ void InfoWidget::initSummary(const QString phase) {
         // 初始化布局布线阶段资源统计数据
         lut6NumImpl = 0 , lutNumImpl = 0, muxf6NumImpl = 0 , ffNumImpl = 0 , bramNumImpl = 0 , fifo18NumImpl = 0 , ranb18NumImpl = 0 , ranb36NumImpl = 0 , dspNumImpl = 0 ,carry4NumImpl = 0;
     }
+}
+
+void InfoWidget::generateTimingSummary()
+{
+    // 提取参数
+    QString projectPath = ProjectManager::instance().getParameter(Project::Path);
+    QString topModuleName = ProjectManager::instance().getParameter(Project::TopModule);
+
+    // 构建 timing.json 文件路径
+    QString timingResultPath = QDir(projectPath).filePath("runs/impl/" + topModuleName + "_timing.json");
+    qDebug() << "[InfoWidget generateTimingSummary] timingResultPath : " << timingResultPath;
+    // 创建 TimingWidget 并加载数据
+    TimingWidget* timingWidget = new TimingWidget;
+    timingWidget->loadDataFromJson(timingResultPath);
+    onTabWidgetTabCloseRequested(5);
+    tabWidget->insertTab(5, timingWidget, "Timing");
+    tabWidget->setCurrentIndex(5);
+
+}
+
+void InfoWidget::generateReportPower()
+{
+    // 提取参数
+    QString projectPath = ProjectManager::instance().getParameter(Project::Path);
+    QString topModuleName = ProjectManager::instance().getParameter(Project::TopModule);
+
+    // 构建 power.json 文件路径
+    QString powerResultPath = QDir(projectPath).filePath("runs/impl/" + topModuleName + "_power.json");
+    qDebug() << "[InfoWidget generateReportPower] powerResultPath : " << powerResultPath;
+    PowerWidget* powerWidget = new PowerWidget(powerResultPath);
+    onTabWidgetTabCloseRequested(5);
+    tabWidget->insertTab(5, powerWidget, "Power");
+    tabWidget->setCurrentIndex(5);
+}
+
+void InfoWidget::onTabWidgetTabCloseRequested(int index)
+{
+    auto *widget = tabWidget->widget(index);
+    if (!widget)
+        return;
+
+    tabWidget->removeTab(index);
+    delete widget;
 }
 
 

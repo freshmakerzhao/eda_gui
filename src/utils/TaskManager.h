@@ -136,7 +136,9 @@ public:
     void readBackMemory(const QString &rbdFilePath);
     void readBackRegister(const QString &registerAddress);
 
-
+signals:
+    void timingDialogAccept();
+    void powerDialogAccept();
 };
 
 #endif // TASKMANAGER_H
