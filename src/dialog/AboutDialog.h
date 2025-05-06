@@ -21,6 +21,8 @@ class AboutDialog : public QDialog
     Q_OBJECT
 public:
     AboutDialog(QWidget *parent = nullptr);
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 };
 
