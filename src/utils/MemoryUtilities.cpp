@@ -57,7 +57,7 @@ void MemoryUtilities::checkMemoryUsage() {
     // 得到其子进程占用
     ListProcessChildren(_pid, curMemory);
     _curMemory = curMemory / 1024.0 / 1024.0;
-    _peakMemory = std::max(_curMemory, _peakMemory);
+    _peakMemory = _curMemory > _peakMemory ? _curMemory : _peakMemory;
 }
 
 void MemoryUtilities::GetProcessMemoryUsage(DWORD processID, SIZE_T &totalMemoryUsage) {

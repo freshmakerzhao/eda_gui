@@ -23,6 +23,10 @@ AboutDialog::AboutDialog(QWidget *parent)
     QString compiler = "<unknown>";
 #if defined(Q_CC_GNU)
     compiler = QLatin1String("GCC ") + QLatin1String(__VERSION__);
+#elif defined(Q_CC_MSVC)
+    compiler = QLatin1String("MSVC ") + QString::number(_MSC_VER);
+#else
+    compiler = QLatin1String("unknown");
 #endif
     QString compilerString = QString("%1-%2bit").arg(compiler, QString::number(QSysInfo::WordSize));
     QString version = QApplication::applicationVersion().isEmpty() ? "unknown" : QApplication::applicationVersion();

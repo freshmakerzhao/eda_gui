@@ -18,14 +18,14 @@ namespace TimeUtilities {
     // 获取当前时间点
     QString getCurTimeAndFormat(){
         // 获取当前时间点
-        auto now = std::chrono::system_clock::now();
+        std::time_t now = std::time(nullptr);
+        std::tm now_tm;
         // 转换为time_t，然后转换为tm结构
-        std::time_t now_t = std::chrono::system_clock::to_time_t(now);
-        std::tm* now_tm = std::localtime(&now_t);
+        localtime_s(&now_tm, &now);
 
         // 使用ostringstream和put_time进行格式化
         std::ostringstream oss;
-        oss << std::put_time(now_tm, "%m/%d/%y, %I:%M %p");
+        oss << std::put_time(&now_tm, "%m/%d/%y, %I:%M %p");
 
         // 将格式化的时间转换为string
         std::string formatted_time = oss.str();

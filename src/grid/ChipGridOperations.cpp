@@ -457,7 +457,8 @@ void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     try {
         // 解析 JSON
         j = nlohmann::json::parse(buffer_str);
-    } catch (const nlohmann::json::parse_error &e) {
+    }
+    catch (const nlohmann::json::parse_error& e) {
         qDebug() << "[ChipGridOperations] JSON Parsing Error: " << e.what();
     }
 

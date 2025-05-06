@@ -13,6 +13,7 @@
 
 #include <QString>
 #include <chrono>
+#include <sstream>
 
 namespace TimeUtilities {
 
