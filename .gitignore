@@ -1,5 +1,8 @@
+.vs
+.vscode
+.VSCodeCounter
+src/out
 src/resource/fonts
 .idea
 cmake-build*
-.vscode
 external

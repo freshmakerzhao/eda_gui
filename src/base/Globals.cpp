@@ -24,34 +24,20 @@ QString GlobalConfig::GLOBAL_RESOURCE_PATH = "";
 qreal GlobalConfig::SCALE_FACTOR = 1.0f;
 
 void GlobalConfig::initGlobalResourcePath() {
-    // 打包用
-    const QString PACK_PATH = QString::fromStdString(StringUtilities::concatPath({QCoreApplication::applicationDirPath().toStdString(), "resource_win"}));
 
-    // 测试用
-    const QString TEST_PATH1 = "E:/workspace/HybrdLink_test/resource_win";
-    const QString TEST_PATH2 = "C:/HybrdLink/resource_win";
-    const QString TEST_PATH3 = "C:/Users/INTEL/Desktop/Work/VMwareFileWorkspace/HybrdLink/resource_win";
-
-    QFileInfo fileInfo1(TEST_PATH1);
-    QFileInfo fileInfo2(TEST_PATH2);
-    QFileInfo fileInfo3(TEST_PATH3);
-    QFileInfo fileInfo4(PACK_PATH);
-
-    if(fileInfo1.exists()) {
-        GLOBAL_RESOURCE_PATH = TEST_PATH1;
-    } else if (fileInfo2.exists()) {
-        GLOBAL_RESOURCE_PATH = TEST_PATH2;
-    } else if (fileInfo3.exists()) {
-        GLOBAL_RESOURCE_PATH = TEST_PATH3;
-    } else if (fileInfo4.exists()) {
-        GLOBAL_RESOURCE_PATH = PACK_PATH;
-    }
-
-#ifdef PACK_DEPLOYED
-    GLOBAL_RESOURCE_PATH = PACK_PATH;
+#ifdef RESOURCE_WIN_PATH
+    // 通过编译选项设置资源路径
+    GLOBAL_RESOURCE_PATH = QString::fromStdString(RESOURCE_WIN_PATH);
+#else
+    // 使用默认路径
+    GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({ QCoreApplication::applicationDirPath().toStdString(), "resource_win" }));
 #endif
 
-    qDebug() << GLOBAL_RESOURCE_PATH;
+#ifdef PACK_DEPLOYED
+    // 打包模式下，resource_win的路径固定为根目录下的 “resource_win”
+    GLOBAL_RESOURCE_PATH = QString::fromStdString(StringUtilities::concatPath({ QCoreApplication::applicationDirPath().toStdString(), "resource_win" }));
+#endif
+    qDebug() << "[Globals] GLOBAL_RESOURCE_PATH " << GLOBAL_RESOURCE_PATH;
 }
 
 void GlobalConfig::initScaleFactor()

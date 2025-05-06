@@ -5,7 +5,7 @@
 #ifndef HYBRDLINK_MEMORYUTILITIES_H
 #define HYBRDLINK_MEMORYUTILITIES_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
 #include <tlhelp32.h>

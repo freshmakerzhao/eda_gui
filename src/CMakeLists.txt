@@ -6,6 +6,18 @@ project(HybrdLink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(MSVC)
+    # 引入配置文件
+    include(${CMAKE_SOURCE_DIR}/config_scripts/config.cmake)
+
+    message(STATUS "VCPKG_PATH set to: ${VCPKG_PATH}")
+    message(STATUS "RESOURCE_WIN_PATH set to: ${RESOURCE_WIN_PATH}")
+    message(STATUS "FONTS_PATH set to: ${FONTS_PATH}")
+
+    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+    set(CMAKE_PREFIX_PATH "${VCPKG_PATH}/installed/x64-windows;${CMAKE_PREFIX_PATH}")
+endif()
+
 # 是否需要检查 MAC 地址
 option(ENABLE_MAC_CHECK "Enable MAC address check" OFF)
 # 是否需要检查 软件有效期
@@ -89,15 +101,6 @@ set(QADVANCEDDOCK_LIBRARY_DIR "${CMAKE_BINARY_DIR}/external/QtADS")
 link_directories(${QADVANCEDDOCK_LIBRARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/external/QtADS)
 
-# Include the compress_tool
-add_subdirectory(external/compress_tool/)
-# 设置 include 目录，确保主项目可以访问 compress_tool 的头文件
-include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/api)
-include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/include/bit7z)
-set(COMPRESS_LIBS "")  # 初始化变量
-list(APPEND COMPRESS_LIBS ${CMAKE_SOURCE_DIR}/external/compress_tool/libs/release/libSecuArcPack.a ${CMAKE_SOURCE_DIR}/external/compress_tool/bit7z/lib/win/libSecuArc64.a)
-
 # Include the OpenSSL library
 set(OPENSSL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/openssl")
 set(OPENSSL_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
@@ -118,10 +121,10 @@ target_include_directories(VCDVisionLib PUBLIC
     ${VCDVISION_LIBRARY_DIR}/lib/QCustomPlot/include
 )
 
-
-
 include_directories(${TCL_INCLUDE_DIR})
 link_directories(${TCL_LIBRARY_DIR})
+
+add_subdirectory(external/compress_tool)
 
 # Disable external-library warnings
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -129,11 +132,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
     target_compile_options(ExScintilla PRIVATE -w)
     target_compile_options(yaml-cpp PRIVATE -w)
     target_compile_options(qt5advanceddocking PRIVATE -w)
-# elseif(MSVC)
+elseif(MSVC)
     # Use /W0 with MSVC to disable all warnings
-#     target_compile_options(ExScintilla PRIVATE /W0)
-#     target_compile_options(yaml-cpp PRIVATE /W0)
-#     target_compile_options(qt5advanceddocking PRIVATE /W0)
+    target_compile_options(ExScintilla PRIVATE /W0)
+    target_compile_options(yaml-cpp PRIVATE /W0)
+    target_compile_options(qt5advanceddocking PRIVATE /W0)
 endif()
 
 # Add source files
@@ -197,17 +200,35 @@ set(PROJECT_RESOURCES
         utils/MemoryUtilities.h
 )
 
-# Tell CMake to create the executable
-add_executable(${PROJECT_NAME}
-    ${PROJECT_SOURCES}
-    ${PROJECT_HEADERS}
-    ${PROJECT_RESOURCES}
-    win32.rc
-)
+# release模式下不弹出控制台
+if(MSVC)
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_executable(${PROJECT_NAME} WIN32
+            ${PROJECT_SOURCES}
+            ${PROJECT_HEADERS}
+            ${PROJECT_RESOURCES}
+            win32.rc
+        )
+    else()
+        add_executable(${PROJECT_NAME}
+            ${PROJECT_SOURCES}
+            ${PROJECT_HEADERS}
+            ${PROJECT_RESOURCES}
+            win32.rc
+        )
+    endif()
+elseif(MINGW)
+        add_executable(${PROJECT_NAME}
+            ${PROJECT_SOURCES}
+            ${PROJECT_HEADERS}
+            ${PROJECT_RESOURCES}
+            win32.rc
+        )
+        if(CMAKE_BUILD_TYPE STREQUAL "Release")
+            set(CMAKE_CXX_FLAGS "-mwindows")
+        endif()
+endif()
 
-add_dependencies(${PROJECT_NAME} create_libSecuArcPack_a create_libSecuArcPack_d_a)
-# 链接 compress_tool
-target_link_libraries(${PROJECT_NAME} ${COMPRESS_LIBS} oleaut32 uuid)
 
 # Link the Qt5 Widgets library and Third-Party library to the executable
 target_link_libraries(${PROJECT_NAME}
@@ -215,18 +236,20 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     Qt5::Network
     Qt5::Xml
+    Qt5::PrintSupport
+    Qt5::OpenGL
     ExScintilla
     yaml-cpp
-    qt5advanceddocking${CMAKE_SHARED_LIBRARY_SUFFIX}
-    libcrypto-1_1-x64
-    libssl-1_1-x64
+    ads::qt5advanceddocking
+    libssl
+    libcrypto
     psapi
     tcl86
     VCDVisionLib
+    oleaut32
+    uuid
+    compress_tool
 )
-
-# Specify installation paths (if required)
-# install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /opt/${PROJECT_NAME}/bin)
 
 if (Qt5PrintSupport_FOUND)
     target_link_libraries(${PROJECT_NAME} Qt5::PrintSupport)
@@ -236,8 +259,27 @@ if (Qt5OpenGL_FOUND)
     target_link_libraries(${PROJECT_NAME} Qt5::OpenGL)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS "-mwindows")
+
+if(MSVC)
+    # === 加载 Qt DLL 拷贝脚本 ===
+    include(${CMAKE_SOURCE_DIR}/config_scripts/deploy_qt_dependencies.cmake)
+    my_deploy_dependencies(${PROJECT_NAME})
+    
+    # 拷贝 libcrypto-1_1-x64.dll、tcl86.dll、libs/tcl/lib
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/libs/tcl/bin/tcl86.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/libs/libcrypto-1_1-x64.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/libs/tcl/lib"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/lib"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${VCPKG_PATH}/installed/x64-windows/bin/7zip.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        COMMENT "Copying required DLLs and Tcl lib directory to executable directory"
+    )
 endif()
-
-
+message(STATUS "✅ Configuration finished for ${PROJECT_NAME}")

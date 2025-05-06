@@ -180,7 +180,7 @@ void ProcessManager::executeCommand(const QString &phase, const QStringList &com
 void ProcessManager::kill()
 {
     isCancel = true;
-#if WIN32
+#if _WIN32
     qint64 pid = process->processId();
     QProcess proc;
     proc.start("taskkill", QStringList() << "/F" << "/T" << "/PID" << QString::number(pid));
