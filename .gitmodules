@@ -1,3 +1,4 @@
 [submodule "src/external/compress_tool"]
 	path = src/external/compress_tool
 	url = ssh://git@192.168.11.164:30022/eda/compress_tool.git
+	branch = master
