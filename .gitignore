@@ -5,4 +5,4 @@ src/out
 src/resource/fonts
 .idea
 cmake-build*
-external
+external/*
