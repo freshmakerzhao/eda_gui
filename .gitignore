@@ -5,3 +5,4 @@ src/out
 src/resource/fonts
 .idea
 cmake-build*
+src/config_scripts/config.cmake
