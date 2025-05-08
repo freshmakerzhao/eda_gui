@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     QVBoxLayout *vLayout = new QVBoxLayout(&dialog);
     QComboBox *comboBox = new QComboBox;
     QPushButton *button = new QPushButton("Accept");
-    comboBox->addItems(QStringList() << "100t" << "200t");
+    comboBox->addItems(QStringList() << "100t" << "160t" << "200t");
     vLayout->addWidget(comboBox);
     vLayout->addWidget(button);
     QObject::connect(button, &QPushButton::clicked, &dialog, &QDialog::accept);
@@ -61,8 +61,9 @@ int main(int argc, char *argv[])
     }
 
     std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/tilegrid_%1.json").arg(comboBox->currentText()).toStdString();
-    std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
-    FrameView gridView(tileGridPath,tileColorPath);
+    std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/tile_info_map_%1.json").arg(comboBox->currentText()).toStdString();
+    std::string chipPinPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/pins_info_%1.json").arg(comboBox->currentText()).toStdString();
+    FrameView gridView(tileGridPath, tileColorPath, chipPinPath);
     gridView.resize(1600, 1000);
     splash.finish(&gridView);
     gridView.show();
