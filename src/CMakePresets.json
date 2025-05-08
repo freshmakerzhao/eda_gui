@@ -57,6 +57,19 @@
         "ENABLE_MAC_CHECK": "ON",
         "ENABLE_EXPIRATION_CHECK": "ON"
       }
+    },
+    {
+      "name": "only-gridview",
+      "displayName": "only-gridview",
+      "description": "Target Windows (64-bit) with the Visual Studio development environment. (RelWithDebInfo)",
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ENABLE_MAC_CHECK": "OFF",
+        "ENABLE_EXPIRATION_CHECK": "OFF",
+        "PACK_DEPLOYED": "OFF",
+        "ONLY_COMPILE_GRIDVIEW": "ON"
+      }
     }
   ]
 }
