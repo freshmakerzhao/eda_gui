@@ -55,6 +55,8 @@ private:
     QTreeWidgetItem *synthRunItem;
     //! synth report
     QTreeWidgetItem *synthReportItem;
+    //! synthesized design
+    QTreeWidgetItem* synthDesignItem;
 
     // =========== Implementation ==============
     //! pack_place_route

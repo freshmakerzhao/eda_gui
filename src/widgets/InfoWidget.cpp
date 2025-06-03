@@ -13,6 +13,7 @@
 #include "MessageWidget.h"
 #include "component/timing/TimingWidget.h"
 #include "component/power/PowerWidget.h"
+#include "component/ioports/IOportsTreeWidget.h"
 #include "utils/ProjectManager.h"
 #include "entity/Project.h"
 
@@ -325,6 +326,14 @@ void InfoWidget::generateReportPower()
     PowerWidget* powerWidget = new PowerWidget(powerResultPath);
     onTabWidgetTabCloseRequested(5);
     tabWidget->insertTab(5, powerWidget, "Power");
+    tabWidget->setCurrentIndex(5);
+}
+
+void InfoWidget::generateIOports()
+{
+    IOportsTreeWidget* ioportsTreeWidget = new IOportsTreeWidget;
+    onTabWidgetTabCloseRequested(5);
+    tabWidget->insertTab(5, ioportsTreeWidget, "I/O Ports");
     tabWidget->setCurrentIndex(5);
 }
 

@@ -157,6 +157,7 @@ file(GLOB PROJECT_SOURCES
     component/properties/*.cpp
     component/timing/*.cpp
     component/power/*.cpp
+    component/ioports/*.cpp
     settings/*.cpp
     service/*.cpp
     include/tinyxml2/*.cpp
@@ -184,6 +185,7 @@ file(GLOB PROJECT_HEADERS
     component/properties/*.h
     component/timing/*.h
     component/power/*.h
+    component/ioports/*.h
     settings/*.h
     service/*.h
     include/tinyxml2/*.h
@@ -196,8 +198,6 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # Add resource files
 set(PROJECT_RESOURCES
     res.qrc
-        utils/MemoryUtilities.cpp
-        utils/MemoryUtilities.h
 )
 
 # release模式下不弹出控制台

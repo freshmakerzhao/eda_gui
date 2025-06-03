@@ -24,6 +24,7 @@
 #include "widgets/LogWidget.h"
 #include "component/timing/TimingSummaryDialog.h"
 #include "component/power/ReportPowerDialog.h"
+#include "component/ioports/SaveConstraintsDialog.h"
 
 TaskManager& TaskManager::instance()
 {
@@ -156,6 +157,10 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         ReportPowerDialog dialog;
         if (dialog.exec() == QDialog::Accepted)
             emit powerDialogAccept();
+    } else if (mode == 21) {
+        SaveConstraintsDialog dialog;
+        if (dialog.exec() == QDialog::Accepted)
+            emit ioportsDialogAccept();
     }
 }
 
@@ -284,6 +289,7 @@ TaskManager::TaskManager()
     connect(&ProcessManager::instance(), &ProcessManager::finishMessage, this, &TaskManager::handleMessage);
     connect(this, &TaskManager::timingDialogAccept, InfoWidget::instance(), &InfoWidget::generateTimingSummary);
     connect(this, &TaskManager::powerDialogAccept, InfoWidget::instance(), &InfoWidget::generateReportPower);
+    connect(this, &TaskManager::ioportsDialogAccept, InfoWidget::instance(), &InfoWidget::generateIOports);
 }
 
 TaskManager::~TaskManager()

@@ -97,6 +97,8 @@ public slots:
 
     void generateReportPower();
 
+    void generateIOports();
+
     void onTabWidgetTabCloseRequested(int index);
 };
 

@@ -79,6 +79,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
     synthReportItem = new QTreeWidgetItem(synthItem, QStringList() << "Report");
     synthReportItem->setIcon(0, QIcon(":/icons/resource/icons/6-icon_report.png"));
     synthReportItem->setDisabled(true);
+    synthDesignItem = new QTreeWidgetItem(synthItem, QStringList() << "Open Synthesized Design");
+    synthDesignItem->setIcon(0, QIcon(":/icons/resource/icons/0-icon_transparent.png"));
     // ================== imp ==================
     // pack_place_route
     impAllItem = new QTreeWidgetItem(impItem, QStringList() << "Run Implementation");
@@ -205,6 +207,8 @@ FlowNavigator::FlowNavigator(QWidget *parent)
             TaskManager::instance().handleTreeItemActivation(19);
         } else if (item == reportPower) {
             TaskManager::instance().handleTreeItemActivation(20);
+        } else if (item == synthDesignItem) {
+            TaskManager::instance().handleTreeItemActivation(21);
         }
         clearSelection(); // 清除选中状态
     });
