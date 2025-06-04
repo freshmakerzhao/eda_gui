@@ -12,36 +12,30 @@
 #include "grid/view.h"
 #include <QDialog>
 #include <QWidget>
-#include "blocks/SitesMods.h"
+#include "blocks/Sites.h"
 #include <QLabel>
 #include "grid/ChipGridOperations.h"
 #include <QApplication>
-#include <QLineEdit>
-#include <QStringListModel>
-#include <QCompleter>
-
+#include "grid/FPGAOpenGLWidget3.h"
 
 class QGraphicsScene;
 class QSplitter;
-class SearchBox;
 
 class FrameView  : public QWidget {
 Q_OBJECT
 
 public:
-    FrameView(const std::string& tileGridPath = "", const std::string& tileColorPathLocal = "", const std::string& pinsInfoPathLocal = "", QString projectImplPath = "",QWidget *parent = nullptr);
-    bool searchCell(const std::string &cell_name);
+    FrameView(const std::string& tileGridPath = "", const std::string& tileColorPathLocal = "",QString projectImplPath = "", FPGAOpenGLWidget3 *glwidget = nullptr, QWidget *parent = nullptr);
     View *view;
 private:
     void setupMatrix();
     void populateScene();
+    bool showTilesName = true;
+    bool showSites = false;
     QString tileJsonPath = "";
     QString usageJsonPath = "";
     ChipGridOperations viewer;
     QGraphicsScene *scene;
-
-    //搜索框
-    SearchBox* searchBox;
 
     // 为在槽函数中调用
     QLabel *tileTypeValue;
@@ -49,31 +43,12 @@ private:
     QLabel *rowNumValue;
     QLabel *siteNameValue;
     QLabel *siteTypeValue;
-    QLabel *NameValue;
-    QLabel *TypeValue;
-    QLabel *cellNameValue;
 
 public slots:
     void showTileInfo(int x,int y);
     void showSiteInfo(int x,int y,bool sites_visible_status,int index);
-    void showBelInfo(int x, int y, int site_index, bool bel_visible_status, int index, const std::string &bel_type, const std::string &name, const std::string &cell_name);
-    void showCell();
+
 };
 
-class SearchBox : public QLineEdit {
-public:
-    SearchBox(ChipGridOperations* view, QWidget *parent = nullptr);
-    void setWords();
-    void clearWords();
-
-//protected:
-//    void keyPressEvent(QKeyEvent *event) override;
-private:
-    QCompleter* completer;
-    QStringList wordList;
-    QStringListModel* wordListModel;
-    QString textLast = "";
-    ChipGridOperations* view;
-};
 
 #endif //GRID_VIEW_FRAMEVIEW_H

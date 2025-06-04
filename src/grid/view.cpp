@@ -49,7 +49,6 @@
 ****************************************************************************/
 
 #include "view.h"
-#include <algorithm>
 
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QtPrintSupport/qtprintsupportglobal.h>
@@ -70,20 +69,12 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() & Qt::ControlModifier) {
         if (e->angleDelta().y() > 0)
-            view->zoomIn(40);
+            view->zoomIn(6);
         else
-            view->zoomOut(40);
+            view->zoomOut(6);
         e->accept();
-    } else if (e->modifiers() & Qt::ShiftModifier) {
-        // 获取当前视图的水平滚动距离
-        int delta = e->angleDelta().y();
-        // 使用滚轮水平滚动来调整视图范围
-        if (delta != 0) {
-            // 水平移动视图，delta/120 是标准滚轮的移动步长
-            this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta);
-        }
     } else {
-            QGraphicsView::wheelEvent(e);
+        QGraphicsView::wheelEvent(e);
     }
 }
 #endif
@@ -98,7 +89,6 @@ View::View(const QString &name, QWidget *parent)
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState); // 设置GraphicsView的优化标记为不保存Painter的状态
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate); // 设置GraphicsView的视口更新模式为智能视口更新
     graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse); // 设置GraphicsView的变换锚点为鼠标下方
-    graphicsView->setBackgroundBrush(Qt::black);//设置GraphicsView背景颜色为黑色
 
     int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize); // 获取工具栏图标的尺寸
     QSize iconSize(size, size); // 创建一个新的QSize对象，设置其宽度和高度为工具栏图标的尺寸
@@ -120,9 +110,9 @@ View::View(const QString &name, QWidget *parent)
     zoomOutIcon->setIconSize(iconSize);
 
     zoomSlider = new QSlider;
-    zoomSlider->setMinimum(-250);  // 设置滑块的最小值为0
+    zoomSlider->setMinimum(0);  // 设置滑块的最小值为0
     zoomSlider->setMaximum(500); // 设置滑块的最大值为500
-    zoomSlider->setValue(-150); // 设置滑块的初始值为250
+    zoomSlider->setValue(250); // 设置滑块的初始值为250
     zoomSlider->setTickPosition(QSlider::TicksRight); // 设置滑块的刻度位置在右侧
 
     //用于放置放大和缩小按钮及滑块
@@ -234,43 +224,12 @@ QGraphicsView *View::view() const
 
 void View::resetView()
 {
-//    zoomSlider->setValue(250);
+    zoomSlider->setValue(250);
     rotateSlider->setValue(0);
-    graphicsView->fitInView(graphicsView->sceneRect(), Qt::KeepAspectRatio);
-//    setupMatrix();
-//    graphicsView->ensureVisible(QRectF(100, 0, 0, 0));
-//
-//    resetButton->setEnabled(false);
-}
-
-void View::cellLocationShow(Block* cell) {
-    qreal cellWidth = cell->getWidth();
-    qreal cellHeight = cell->getHeight();
-
-    //获取窗口的大小
-    qreal viewportWidth = graphicsView->viewport()->width();
-    qreal viewportHeight = graphicsView->viewport()->height();
-
-    //计算缩放比例，确保cell的宽度和高度均能适配到视图
-    qreal scaleX = viewportWidth / (cellWidth * 1.2);
-    qreal scaleY = viewportHeight / (cellHeight * 1.2);
-
-    //选中较小的缩放比例，确保cell能完整地显示
-    qreal scaleFactor = std::min(scaleX, scaleY);
-
-    scaleFactor = std::clamp(scaleFactor, 0.1, 5.0);
-
-    qreal zoomVale = 250 + 50 * std::log2(scaleFactor);
-    zoomVale = std::clamp(zoomVale, -250.0, 500.0);
-
-    zoomSlider->setValue(zoomVale);
-    rotateSlider->setValue(0);
-
     setupMatrix();
-    graphicsView->centerOn(cell);
+    graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
 
-    //手动触发选中
-    cell->setSelected(true);
+    resetButton->setEnabled(false);
 }
 
 void View::setResetButtonEnabled()
@@ -326,13 +285,11 @@ void View::zoomIn(int level)
 {
 //    qDebug() << level;
     zoomSlider->setValue(zoomSlider->value() + level);
-    // qDebug() << "[view] zoom_size: " << zoomSlider->value();
 }
 
 void View::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
-    // qDebug() << "[view] zoom_size: " << zoomSlider->value();
 }
 
 void View::rotateLeft()

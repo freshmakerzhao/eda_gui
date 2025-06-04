@@ -16,6 +16,7 @@
 #include <QFileSystemWatcher>
 #include "utils/ProjectManager.h"
 #include "ProcessManager.h"
+#include "grid/FPGAOpenGLWidget3.h"
 
 namespace FlowState {
     static const QString NoStarted   = QStringLiteral("NoStarted");
@@ -132,6 +133,7 @@ public:
     void downloadBit(const QString &bitstream, const QString &cable_name = "digilent_hs3");
     void downloadFlash(const QString &projectImplPath1, const QString &topName1);
     QWidget* gridView = nullptr;
+    FPGAOpenGLWidget3* glwidget3 = nullptr;
 
     void readBackMemory(const QString &rbdFilePath);
     void readBackRegister(const QString &registerAddress);

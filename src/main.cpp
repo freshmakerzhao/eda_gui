@@ -11,6 +11,7 @@
 #include "utils/LicenseUtilities.h"
 #include "utils/ProcessManager.h"
 #include "widgets/FrameView.h"
+#include "grid/FPGAOpenGLWidget3.h"
 
 int main(int argc, char *argv[])
 {
@@ -61,12 +62,12 @@ int main(int argc, char *argv[])
     }
 
     std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/tilegrid_%1.json").arg(comboBox->currentText()).toStdString();
-    std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/tile_info_map_%1.json").arg(comboBox->currentText()).toStdString();
-    std::string chipPinPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/pins_info_%1.json").arg(comboBox->currentText()).toStdString();
-    FrameView gridView(tileGridPath, tileColorPath, chipPinPath);
-    gridView.resize(1600, 1000);
+    std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
+    FPGAOpenGLWidget3 glwidget3;
+    FrameView gridView(tileGridPath, tileColorPath, "",&glwidget3);
+    glwidget3.resize(1600, 900);
     splash.finish(&gridView);
-    gridView.show();
+    glwidget3.show();
 #else
     splash.finish(MainWindow::instance()); // 启动画面结束
     MainWindow::instance()->setCentralWidget(Form::instance());

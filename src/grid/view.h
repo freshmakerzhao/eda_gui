@@ -3,7 +3,6 @@
 
 #include <QFrame>
 #include <QGraphicsView>
-#include "blocks/Block.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -35,7 +34,6 @@ public:
     explicit View(const QString &name, QWidget *parent = nullptr);
 
     QGraphicsView *view() const;
-    void cellLocationShow(Block* cell);
 
 public slots:
     void zoomIn(int level = 1);

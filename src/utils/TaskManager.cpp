@@ -59,19 +59,22 @@ void TaskManager::handleTreeItemActivation(const int &mode)
         flowTaskController(8);
     } else if (mode == 9) {
         qDebug() << "[TaskManager] arch " << this->arch;
-        std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tilegrid_" + this->arch.toStdString() + ".json";
-        std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map_" + this->arch.toStdString() + ".json";
-        std::string pinsInfoPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/pins_info_" + this->arch.toStdString() + ".json";
+        std::string tileGridPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + QString("/chip_view/maps/tilegrid_%1.json").arg(this->arch).toStdString();
+        std::string tileColorPath = GlobalConfig::GLOBAL_RESOURCE_PATH.toStdString() + "/chip_view/maps/tile_info_map.json";
         qDebug() << "[TaskManager] tileGridPath " << QString::fromStdString(tileGridPath);
         qDebug() << "[TaskManager] tileColorPath " << QString::fromStdString(tileColorPath);
-        qDebug() << "[TaskManager] pinsInfoPath " << QString::fromStdString(pinsInfoPath);
+        if (glwidget3) {
+            delete glwidget3;
+            glwidget3 = nullptr;
+        }
         if (gridView) {
             delete gridView;  // 删除现存的对象
             gridView = nullptr;  // 确保指针不再指向已删除的对象
         }
-        gridView = new FrameView(tileGridPath,tileColorPath,pinsInfoPath, projectImplPath);
-        gridView->resize(1000, 800);
-        gridView->show();
+        glwidget3 = new FPGAOpenGLWidget3;
+        gridView = new FrameView(tileGridPath, tileColorPath, "", glwidget3);
+        glwidget3->resize(1600, 900);
+        glwidget3->show();
     } else if (mode == 7) {
         // if (!frameView) {
         //     frameView = new NetlistView();

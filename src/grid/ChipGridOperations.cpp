@@ -1,84 +1,12 @@
 
 #include "ChipGridOperations.h"
 #include "view.h"
-#include "blocks/TilesBlock.h"
+#include "blocks/Tiles.h"
 #include "base/Globals.h"
 #include <iostream>
 #include <regex>
 #include <utility>
-#include <algorithm>
-#include <QDebug>
-#include "utils/ProjectManager.h"
-#include "blocks/SitesBlockFactory.h"
 // 处理tile颜色、width、height
-
-const std::unordered_set<std::basic_string<char>> SHOW_TILE = {
-    "LIOB33",
-    "LIOB33_SING",
-    "RIOB33",
-    "RIOB33_SING",
-//    "HCLK_IOB",
-    "LIOI3",
-    "LIOI3_SING",
-    "LIOI3_TBYTESRC",
-    "LIOI3_TBYTETERM",
-    "RIOI3",
-    "RIOI3_SING",
-    "RIOI3_TBYTESRC",
-    "RIOI3_TBYTETERM",
-    "HCLK_IOI3",
-    "CMT_FIFO_R",
-    "CMT_FIFO_L",
-//    "HCLK_FIFO_L",
-    "CMT_TOP_R_UPPER_T",
-    "CMT_TOP_R_UPPER_B",
-    "CMT_TOP_L_UPPER_T",
-    "CMT_TOP_L_UPPER_B",
-    "HCLK_CMT",
-    "CMT_TOP_R_LOWER_T",
-    "CMT_TOP_R_LOWER_B",
-    "CMT_TOP_L_LOWER_T",
-    "CMT_TOP_L_LOWER_B",
-    "CLBLL_L",
-    "CLBLL_R",
-    "CLBLM_L",
-    "CLBLM_R",
-//    "HCLK_CLB",
-    "BRAM_L",
-    "BRAM_R",
-//    "HCLK_BARM",
-    "DSP_R",
-    "DSP_L",
-//    "HCLK_DSP_R",
-    "MONTOR_TOP",
-    "MONTOR_MID",
-    "MONTOR_BOT",
-    "CFG_CENTER_TOP",
-    "CFG_CENTER_MID",
-//    "CFG_CENTER_BOT",
-//    "R_TERM_INT_GTX",
-    "GTP_CHANNEL_3",
-    "GTP_CHANNEL_3_MID_RIGHT",
-    "GTP_CHANNEL_3_MID_LEFT",
-    "GTP_CHANNEL_2",
-    "GTP_CHANNEL_2_MID_RIGHT",
-    "GTP_CHANNEL_2_MID_LEFT",
-    "GTP_CHANNEL_1",
-    "GTP_CHANNEL_1_MID_RIGHT",
-    "GTP_CHANNEL_1_MID_LEFT",
-    "GTP_CHANNEL_0",
-    "GTP_CHANNEL_0_MID_RIGHT",
-    "GTP_CHANNEL_0_MID_LEFT",
-    "GTP_COMMON",
-    "GTP_COMMON_MID_RIGHT",
-    "GTP_COMMON_MID_LEFT",
-    "PCIE_BOT",
-    "CLK_HROW_TOP_R",
-    "CLK_HROW_BOT_R",
-    "CLK_BUFG_TOP_R",
-    "CLK_BUFG_BOT_R"
-};
-
 std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGridOperations::buildTileInfoMap(const nlohmann::basic_json<>& colorJson){
     std::map<std::string, std::map<std::string, std::map<std::string, int>>> tile_info_map;
     try {
@@ -103,20 +31,11 @@ std::map<std::string, std::map<std::string, std::map<std::string, int>>> ChipGri
                 inner_map["size"][inner_key] = inner_value;
             }
 
-            if(it.value().contains("offset")) {
-                const nlohmann::json& offset_content = it.value()["offset"];
-                for (auto inner_it = offset_content.begin(); inner_it != offset_content.end(); ++inner_it) {
-                    const std::string& inner_key = inner_it.key(); // x/y
-                    const int& inner_value = inner_it.value(); // 内层值
-                    inner_map["offset"][inner_key] = inner_value;
-                }
-            }
-
             // 存储到外层 map
             tile_info_map[key] = inner_map;
         }
     } catch (const std::exception& e) {
-        qDebug() << "[ChipGridOperations] Failed to parse JSON: " << e.what() ;
+        qDebug() << "Failed to parse JSON: " << e.what() ;
     }
     return tile_info_map;
 }
@@ -144,32 +63,25 @@ void ChipGridOperations::setColorsToTiles(NormalTile& tile,std::map<std::string,
         tile.B = type_colors.at("B");
     } else {
         // 未找到types,用默认颜色并提示
-//        qDebug() << "[ChipGridOperations] Tile type: " << tile.types << " not found in the color map. Using default color." << std::endl;
+//        qDebug() << "Tile type: " << tile.types << " not found in the color map. Using default color." << std::endl;
     }
 }
 
-void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal, std::string pinsInfoPathLocal) {
+void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLocal, std::string tileColorPathLocal) {
     clearVector();
     this->tileColorPath = std::move(tileColorPathLocal);
     this->tileFilePath = std::move(tileFilePathLocal);
-    this->pinsInfoPath = std::move(pinsInfoPathLocal);
     std::ifstream tile_file(this->tileFilePath);
     std::ifstream color_file(this->tileColorPath);
-    std::ifstream pins_file(this->pinsInfoPath);
 
     if (!tile_file) {
-        qDebug() << "[ChipGridOperations] Could not open tile_file\n";
+        qDebug() << "Could not open tile_file\n";
         qDebug() << QString::fromStdString(this->tileFilePath);
         return;
     }
     if (!color_file) {
-        qDebug() << "[ChipGridOperations] Could not open color_file\n";
+        qDebug() << "Could not open color_file\n";
         qDebug() << QString::fromStdString(this->tileColorPath);
-        return;
-    }
-    if (!pins_file) {
-        qDebug() << "[ChipGridOperations] Could not open pins_file\n";
-        qDebug() << QString::fromStdString(this->pinsInfoPath);
         return;
     }
 
@@ -194,12 +106,6 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     totalSize.width = 0;
     totalSize.height = 0;
 
-    // ================ 获取引脚信息 ================
-
-    nlohmann::json pins_json_data;
-    pins_file >> pins_json_data;
-    pins_file.close(); // 关闭文件
-
     for (const auto& entry : tile_json_data.items()) {
         // 行列是相反的，x是列号，y是行号
         int grid_x = entry.value()["grid_x"];
@@ -215,32 +121,48 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     //  ================ 初始化grid  ================
 
     gridTypeMatrix.resize(totalSize.width, std::vector<NormalTile>(totalSize.height));
-    const std::string device = ProjectManager::instance().getParameter(Project::DisplayPart).toStdString();
 
     for (const auto& entry  : tile_json_data.items()) {
-        NormalTile item(entry.key(), entry.value(), pins_json_data[device]);
+        NormalTile item(entry.key(),entry.value());
         setColorsToTiles(item,tile_info_map);
         gridTypeMatrix[item.grid_x][item.grid_y] = item; // 位置信息与tilegrid中x,y相同
     }
+    //  ================ 跨行类型 ================
+    TYPE_TO_SIZE_FACTORS = {
+            {"CMT_FIFO_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -5}}},
+            {"CMT_TOP_R_UPPER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 13}, {"Y_GAP", -7}}},
+            {"CMT_TOP_R_UPPER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 12}, {"Y_GAP", -7}}},
+            {"CMT_TOP_R_LOWER_T", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 9}, {"Y_GAP", -7}}},
+            {"CMT_TOP_R_LOWER_B", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 16}, {"Y_GAP", -7}}},
+            {"BRAM_L", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
+            {"DSP_R", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
+            {"DSP_L", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 5}, {"Y_GAP", -4}}},
+            {"LIOB33", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"LIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"RIOB33", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"RIOI3", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"LIOI3_TBYTESRC", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}},
+            {"LIOI3_TBYTETERM", {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 2}, {"Y_GAP", -1}}}
+    };
+
+    int cur_tile_width = 0;
+    std::vector<bool> is_hide(totalSize.width, 0);
+
     //  ================ 处理grid跨行  ================
     for (int i = 0; i < totalSize.width; ++i) {
         for (int j = 0; j < totalSize.height; ++j) {
             // 获取当前 tile 的 type
             std::string types = gridTypeMatrix[i][j].types;
-            bool isMultiRows = tile_info_map.find(types) != tile_info_map.end() &&
-                               tile_info_map[types].find("offset") != tile_info_map[types].end();
+            auto it = TYPE_TO_SIZE_FACTORS.find(types);
             std::map<std::string,int> cur_factors;
-            if (isMultiRows) {
+            if (it != TYPE_TO_SIZE_FACTORS.end()) {
                 // 跨行的tile
-                cur_factors = {
-                    {"WIDTH_FACTOR", tile_info_map[types]["size"]["width"]},
-                    {"HEIGHT_FACTOR", tile_info_map[types]["size"]["height"]},
-                    {"Y_GAP", tile_info_map[types]["offset"]["y"]}
-                };
+                cur_factors = TYPE_TO_SIZE_FACTORS[types];
             } else {
                 // 普通tile
                 cur_factors = {{"WIDTH_FACTOR", 1}, {"HEIGHT_FACTOR", 1}, {"Y_GAP", 0}};
             }
+
             auto it2 = tile_info_map.find(types);
             if (it2 == tile_info_map.end()) {
                 gridTypeMatrix[i][j].height = GLOBAL_TILE_BLOCK_HEIGHT;
@@ -251,123 +173,207 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
                 gridTypeMatrix[i][j].width = tile_info_map[types]["size"]["width"] * GLOBAL_TILE_BLOCK_WIDTH;
             }
 
-                // 计算其放置在画布上的x,y坐标
+            if (QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("INT_L") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("INT_R") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("HCLK_L") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("HCLK_R") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("BRKH_INT") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("T_TERM_INT") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("B_TERM_INT")/* ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("BRKH_TERM_INT") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("BRKH_B_TERM_INT")*/
+                ) {
+                is_hide[i] = 1;
+                // gridTypeMatrix[i][j].height = GLOBAL_TILE_BLOCK_HEIGHT;
+                // gridTypeMatrix[i][j].width = GLOBAL_TILE_BLOCK_WIDTH;
+            }
+
+            // 计算其放置在画布上的x,y坐标
             if (j > 0) {  // 如果不是列首的tile
                 gridTypeMatrix[i][j].x_coordinate = gridTypeMatrix[i][j - 1].x_coordinate;
+                gridTypeMatrix[i][j].x_coordinate = gridTypeMatrix[i][0].x_coordinate;
                 // 当前tile的坐标是该列上一个y坐标+上一个tile的高度
                 gridTypeMatrix[i][j].y_coordinate = gridTypeMatrix[i][j - 1].y_coordinate + gridTypeMatrix[i][j - 1].height;
             } else {  // 如果是列首的tile
-                gridTypeMatrix[i][j].x_coordinate = i * GLOBAL_TILE_BLOCK_WIDTH;
+                if (is_hide[i] == 0) {
+                    cur_tile_width += GLOBAL_TILE_BLOCK_WIDTH;
+                }
+                gridTypeMatrix[i][j].x_coordinate = cur_tile_width - GLOBAL_TILE_BLOCK_WIDTH;
+
+                // gridTypeMatrix[i][j].x_coordinate = i * GLOBAL_TILE_BLOCK_WIDTH;
                 gridTypeMatrix[i][j].y_coordinate = 0;
             }
             // 处理跨行tile涉及的tile，由于跨行tile在tilegrid中其grid_x，grid_y描述的不是他起始位置，所以需要做处理
-            if (isMultiRows) {
+            if (it != TYPE_TO_SIZE_FACTORS.end()) {
                 int start_y = j + cur_factors["Y_GAP"]; // 计算其真正的起始y
                 // grid_type_matrix[i][start_y]位置一定为null，用当前tile将其覆盖
                 gridTypeMatrix[i][start_y] = gridTypeMatrix[i][j];
-                gridTypeMatrix[i][j].types="NULL";
                 // 跨行flag
                 gridTypeMatrix[i][start_y].is_multi_rows = true;
-                if (start_y >= 1) {
+                if (start_y>=1){
                     // 如果该列存在上一个tile
-                    gridTypeMatrix[i][start_y].y_coordinate =
-                            gridTypeMatrix[i][start_y - 1].y_coordinate + gridTypeMatrix[i][start_y - 1].height;
+                    // -------------------------------------
+                    // gridTypeMatrix[i][start_y].x_coordinate = gridTypeMatrix[i][0].x_coordinate;
+                    // -------------------------------------
+                    gridTypeMatrix[i][start_y].y_coordinate = gridTypeMatrix[i][start_y - 1].y_coordinate + gridTypeMatrix[i][start_y - 1].height;
                 } else {
                     gridTypeMatrix[i][start_y].y_coordinate = 0;
                 }
 
+
                 setSkipTile(i,start_y,cur_factors["HEIGHT_FACTOR"]);
             }
+
+            // if (QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("BRAM_L")) {
+                // qDebug() << gridTypeMatrix[i][j].x_coordinate << " " << gridTypeMatrix[i][j].y_coordinate;
+                // gridTypeMatrix[i][j].x_coordinate = 2730;
+            // }
+            // std::cout << gridTypeMatrix[i][j].x_coordinate << "," << gridTypeMatrix[i][j].y_coordinate << " ";
         }
+        // std::cout << std::endl;
     }
-    gridMatrix.resize(totalSize.width, std::vector<TilesBlock*>(totalSize.height, nullptr));
-    bool lastCowShow = true;
-    int widthCount = 0;
+    gridMatrix.resize(totalSize.width, std::vector<Blocks*>(totalSize.height, nullptr));
     for(int i = 0; i < totalSize.width; ++i)
     {
-        if(!lastCowShow)
-            widthCount += GLOBAL_TILE_BLOCK_WIDTH;
         for(int j = 0; j < totalSize.height; ++j)
         {
-//            // 遇到skip跳过
-//            if(gridTypeMatrix[i][j].types == "SKIP")
-//                continue;
-
-            //设置为空类型(不显示)的map
-            std::string type = gridTypeMatrix[i][j].types;
-            auto it = SHOW_TILE.find(type);
-            if(it == SHOW_TILE.end()) {
-                gridMatrix[i][j] = new TilesBlock(
-                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
-                        i,
-                        j,
-                        false,
-                        gridTypeMatrix[i][j]
-                );
-                if(j == 1)
-                    lastCowShow = false;
+            // 遇到skip跳过
+            if(gridTypeMatrix[i][j].types == "SKIP"){
                 continue;
+            }
+            if (QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("INT_L") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("INT_R") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("HCLK_L") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("HCLK_R") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("BRKH_INT") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("T_TERM_INT") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("B_TERM_INT")/* ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("BRKH_TERM_INT") ||
+                QString::fromStdString(gridTypeMatrix[i][j].tile_name).contains("BRKH_B_TERM_INT")*/
+                ) {
+                gridMatrix[i][j] = new Tiles(
+                    QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+                    gridTypeMatrix[i][j].loc_x,
+                    gridTypeMatrix[i][j].loc_y,
+                    i,
+                    j,
+                    0,
+                    0,
+                    gridTypeMatrix[i][j].types
+                    );
             } else {
-                gridMatrix[i][j] = new TilesBlock(
-//                        QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
-                        Qt::darkBlue,
-                        i,
-                        j,
-                        true,
-                        gridTypeMatrix[i][j]
-                );
-                gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate - widthCount, gridTypeMatrix[i][j].y_coordinate));
-                lastCowShow = true;
+                gridMatrix[i][j] = new Tiles(
+                    QColor(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B),
+                    gridTypeMatrix[i][j].loc_x,
+                    gridTypeMatrix[i][j].loc_y,
+                    i,
+                    j,
+                    gridTypeMatrix[i][j].width,
+                    gridTypeMatrix[i][j].height,
+                    gridTypeMatrix[i][j].types
+                    );
             }
-            //例化siteBlcok
-            for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
-                NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
-                SitesBlock* site_block = SitesBlockFactory::Instance().create(
-                        site.type, Qt::gray, i, j, gridTypeMatrix[i][j], site.name, site.index, site.pin
-                );
-                gridMatrix[i][j]->addSubBlock(site_block);
-                size_t pos = site.name.find("_X");
-                siteBlockMap[site.name.substr(0,pos)][site.name] = site_block;
-                // ------------------------------
-                site_type_set.insert(site.type);
-                // ------------------------------
+
+            gridMatrix[i][j]->setPos(QPointF(gridTypeMatrix[i][j].x_coordinate, gridTypeMatrix[i][j].y_coordinate));
+            // qDebug() << QPointF(gridTypeMatrix[i][j].x_coordinate, gridTypeMatrix[i][j].y_coordinate);
+
+
+            // points << QPointF(gridTypeMatrix[i][j].x_coordinate, gridTypeMatrix[i][j].y_coordinate);
+
+
+            TILE tileItem(gridMatrix[i][j]->getRectangle2D());
+            tileItem.tile_name = gridTypeMatrix[i][j].tile_name;
+
+            if (!gridTypeMatrix[i][j].is_multi_rows){
+                // 非跨行的tile增加site
+                for (size_t index = 0; index < gridTypeMatrix[i][j].cur_sites.size(); ++index) {
+                    NormalSite site = gridTypeMatrix[i][j].cur_sites[index];
+                    if (site.type == "TIEOFF") {
+                        continue;
+                    }
+                    // SitesBlock* site_block = new Sites(
+                    //     Qt::white,
+                    //     GLOBAL_SITE_BLOCK_WIDTH,
+                    //     GLOBAL_SITE_BLOCK_HEIGHT,
+                    //     i,
+                    //     j,
+                    //     site.type,
+                    //     site.name,
+                    //     site.index
+                    //     );
+                    // gridMatrix[i][j]->addSubBlock(site_block);
+                    if (site.type == "SLICEL" || site.type == "SLICEM") {
+                        SitesBlock* site_block = new Sites(
+                            Qt::white,
+                            GLOBAL_SITE_BLOCK_WIDTH,
+                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(10*(index+1) + 90*index, 10));
+                        // ------------------------------
+                        SITE siteItem(site_block->getRectangle2D());
+                        siteItem.site_name = site.name;
+                        sites_v.push_back(siteItem);
+                        tileItem.sites.push_back(siteItem);
+                        // ------------------------------
+                    } else {
+                        SitesBlock* site_block = new Sites(
+                            Qt::white,
+                            5,
+                            GLOBAL_SITE_BLOCK_HEIGHT,
+                            i,
+                            j,
+                            site.type,
+                            site.name,
+                            site.index
+                            );
+                        gridMatrix[i][j]->addSubBlock(site_block);
+                        site_block->setPos(QPointF(2*(index+1) + 6*index, 10));
+                        // ------------------------------
+                        SITE siteItem(site_block->getRectangle2D());
+                        siteItem.site_name = site.name;
+                        sites_v.push_back(siteItem);
+                        tileItem.sites.push_back(siteItem);
+                        // ------------------------------
+                    }
+                }
             }
+
+            tiles_v.push_back(tileItem);
         }
     }
-
-    // ----------------------------------------------
-//    for (auto item : site_type_set) {
-//        qDebug() << "[ChipGridOperations] "<<QString::fromStdString(item);
-//    }
-    // ----------------------------------------------
 
     // --------------------- Clock Region ----------------------------
     // Iterate over JSON object
-    for (auto& col : gridMatrix) {
-        for (auto& tile : col) {
-           if (!tile->isShow())
-               continue;
-           if (tile->info.clock_region != "NULL") {
-               std::string clockRegion = tile->info.clock_region;
-               if(clock_region_bounding_boxes.find(clockRegion) == clock_region_bounding_boxes.end()) {
-                   clock_region_bounding_boxes[clockRegion] = BoundingBox();
-               }
-               const std::unordered_set<std::string> edgesType = {
-                   "CLK_HROW_TOP_R",
-                   "CLK_HROW_BOT_R",
-                   "CLK_BUFG_TOP_R",
-                   "CLK_BUFG_BOT_R",
-               };
-               qreal x = edgesType.find(tile->getType()) != edgesType.end()
-                       ? tile->x() + tile->getWidth()
-                       : tile->x();
-               clock_region_bounding_boxes[clockRegion].x0 = std::min(clock_region_bounding_boxes[clockRegion].x0, x);
-               clock_region_bounding_boxes[clockRegion].y0 = std::min(clock_region_bounding_boxes[clockRegion].y0, tile->y());
-               clock_region_bounding_boxes[clockRegion].x1 = std::max(clock_region_bounding_boxes[clockRegion].x1, x);
-               clock_region_bounding_boxes[clockRegion].y1 = std::max(clock_region_bounding_boxes[clockRegion].y1, tile->y());
-           }
+    for (auto& [tile, tiledata] : tile_json_data.items()) {
+        int x = tiledata["grid_x"];
+        int y = tiledata["grid_y"];
+
+        // Read tile clock region info
+        std::string clock_region = tiledata.contains("clock_region") && !tiledata["clock_region"].get<std::string>().empty()
+                                       ? tiledata["clock_region"].get<std::string>()
+                                       : "NULL";
+
+        // Update clock region bounding box
+        if (clock_region != "NULL") {
+            if (clock_region_bounding_boxes.find(clock_region) == clock_region_bounding_boxes.end()) {
+                // Initialize new clock region bounding box
+                clock_region_bounding_boxes[clock_region] = BoundingBox();
+            }
+
+            // Update bounding box with min/max values
+            clock_region_bounding_boxes[clock_region].x0 = std::min(clock_region_bounding_boxes[clock_region].x0, static_cast<double>(x));
+            clock_region_bounding_boxes[clock_region].y0 = std::min(clock_region_bounding_boxes[clock_region].y0, static_cast<double>(y));
+            clock_region_bounding_boxes[clock_region].x1 = std::max(clock_region_bounding_boxes[clock_region].x1, static_cast<double>(x));
+            clock_region_bounding_boxes[clock_region].y1 = std::max(clock_region_bounding_boxes[clock_region].y1, static_cast<double>(y));
         }
     }
+
     // Print the clock region bounding boxes
     // for (const auto& region : clock_region_bounding_boxes) {
     //     std::cout << "Clock region: " << region.first
@@ -376,6 +382,12 @@ void ChipGridOperations::buildTileGridAndCellsMatrix(std::string tileFilePathLoc
     //               << ", x1: " << region.second.x1
     //               << ", y1: " << region.second.y1 << ")" << std::endl;
     // }
+
+    // glwidget->updateTiles(tiles_v);
+    // glwidget->updateSites(sites_v);
+
+    glwidget3->updateTiles(tiles_v);
+    glwidget3->updateSites(sites_v);
 }
 
 
@@ -399,115 +411,113 @@ bool ChipGridOperations::showGridView(QGraphicsScene *scene) {
     }
 
     // --------------------- Clock Region -----------------------
-    const std::vector<QColor> colors = {
-        QColor(Qt::blue),
-        QColor(Qt::green),
-        QColor(Qt::red),
-        QColor(Qt::yellow),
-        QColor(Qt::magenta),
-        QColor(Qt::red),
-        QColor(Qt::magenta),
-        QColor(Qt::blue),
-        QColor(Qt::green),
-        QColor(Qt::yellow),
-    };
-    int colorIndex = 0;
+    // const std::vector<QColor> colors = {
+    //     QColor(Qt::blue),
+    //     QColor(Qt::green),
+    //     QColor(Qt::red),
+    //     QColor(Qt::yellow),
+    //     QColor(Qt::magenta),
+    //     QColor(Qt::red),
+    //     QColor(Qt::magenta),
+    //     QColor(Qt::blue),
+    //     QColor(Qt::green),
+    //     QColor(Qt::yellow),
+    // };
+    // int colorIndex = 0;
 
-    QPen pen;
-    pen.setWidth(2);
-    pen.setCosmetic(true);
+    // QPen pen;
+    // pen.setWidth(7);
 
-    for (const auto& region : clock_region_bounding_boxes) {
-        int x0 = region.second.x0;
-        int y0 = region.second.y0;
-        int x1 = region.second.x1;
-        int y1 = region.second.y1;
+    // for (const auto& region : clock_region_bounding_boxes) {
+    //     int x0 = region.second.x0 * 210;
+    //     int y0 = region.second.y0 * 100;
+    //     int x1 = region.second.x1 * 210;
+    //     int y1 = region.second.y1 * 100;
 
-        QRect rect(x0, y0, x1 - x0 + GLOBAL_TILE_BLOCK_WIDTH, y1 - y0 + GLOBAL_TILE_BLOCK_HEIGHT);
+    //     QRect rect(x0, y0, x1 - x0 + 210, y1 - y0 + 100);
 
-        QColor currentColor = colors[colorIndex];
-        pen.setColor(currentColor);
-        colorIndex = (colorIndex + 1) % colors.size();
+    //     QColor currentColor = colors[colorIndex];
+    //     pen.setColor(currentColor);
+    //     colorIndex = (colorIndex + 1) % colors.size();
 
-        QGraphicsRectItem *rectItem = scene->addRect(rect, pen);
-        rectItem->setVisible(true);
-        clock_region_rects.insert(rectItem);
-    }
+    //     scene->addRect(rect, pen);
+    // }
 
     // --------------------- Clock Region -----------------------
     return true;
 }
 
 ChipGridOperations::ChipGridOperations(){
+
+}
+
+void ChipGridOperations::setAllTileWhite(QGraphicsScene *scene) {
+    for(int i = 0; i < totalSize.width; ++i)
+    {
+        for(int j = 0; j < totalSize.height; ++j)
+        {
+            if (gridMatrix[i][j] == nullptr) {
+                continue;
+            }
+            for (SitesBlock* item : gridMatrix[i][j]->child_items) {
+                item->setColor(QColor(Qt::white));
+            }
+            gridMatrix[i][j]->setColor(QColor(Qt::white));
+        }
+    }
+
+    for (auto &site_block : sites_v) {
+            site_block.r = 48 / 255.0;
+            site_block.g = 48 / 255.0;
+            site_block.b = 48 / 255.0;
+    }
+
+    scene->update();
 }
 
 void ChipGridOperations::buildPlaceUsageGrid(const std::string& usageJsonPath){
     std::ifstream file(QString::fromStdString(usageJsonPath).toLocal8Bit().constData());
     if (!file) {
-        qDebug() << "[ChipGridOperations] Could not open file\n";
+        qDebug() << "Could not open file\n";
         return;
     }
 
-    // 解析 JSON
-    Tool::ArchiveTool tool;
-    std::vector<unsigned char> buffer;
-    tool.extractWithPassword(usageJsonPath, buffer, COMPRESS_TOOL_KEY);
-    std::string buffer_str = tool.byte_to_string(buffer);
-    nlohmann::json j;
     try {
         // 解析 JSON
-        j = nlohmann::json::parse(buffer_str);
-    }
-    catch (const nlohmann::json::parse_error& e) {
-        qDebug() << "[ChipGridOperations] JSON Parsing Error: " << e.what();
-    }
+        nlohmann::json j;
+        file >> j;
+        file.close();
+        TotalSize usageSize;
+        size_t num_elements = j.size();
 
-    TotalSize usageSize;
-    usageSize.width = 210;
-    usageSize.height = 456;
-
-    used_site.reserve(128); // 预先分配内存
-    /*
-     * 根据 JSON 结构，可以通过提前获取多层嵌套的 JSON 引用来减少嵌套深度。
-     * 提前处理可能的错误条件（如 key 不存在）也有助于减少查找开销。
-    **/
-    const auto& modules = j["modules"];
-    for (const auto& module : modules) {
-        if (!module.contains("cells")) continue;  // 提前检查 key 是否存在
-        const auto& cells = module["cells"];
-        for (const auto& cell : cells) {
-            if (!cell.contains("attributes") || !cell["attributes"].contains("NEXTPNR_BEL")) continue;
-            const auto& bels = cell["attributes"]["NEXTPNR_BEL"];
-            for (const auto& bel : bels) {
-                const std::string &value = bel.get_ref<const std::string&>();
-                size_t pos = value.find('/');
-                if (pos != std::string::npos) {
-                    const std::string site = value.substr(0, pos);
-                    std::array<std::string , 2> belNames;
-                    belNames[0] = value;
-                    belNames[1] = "nothing";
-                    for(const auto& [key, value] : cells.items()) {
-                       if(&value == &cell) {
-                           belNames[1] = key;
-                           break;
-                       }
+        usageSize.width = 210;
+        usageSize.height = 456;
+#if NEXTPNR
+        used_site.reserve(128); // 预先分配内存
+        /*
+         * 根据 JSON 结构，可以通过提前获取多层嵌套的 JSON 引用来减少嵌套深度。
+         * 提前处理可能的错误条件（如 key 不存在）也有助于减少查找开销。
+        **/
+        const auto& modules = j["modules"];
+        for (const auto& module : modules) {
+            if (!module.contains("cells")) continue;  // 提前检查 key 是否存在
+            const auto& cells = module["cells"];
+            for (const auto& cell : cells) {
+                if (!cell.contains("attributes") || !cell["attributes"].contains("NEXTPNR_BEL")) continue;
+                const auto& bells = cell["attributes"]["NEXTPNR_BEL"];
+                for (const auto& bell : bells) {
+                    const std::string& value = bell.get_ref<const std::string&>();
+                    size_t pos = value.find('/');
+                    if (pos != std::string::npos) {
+                        used_site.insert(value.substr(0, pos));
+                    } else {
+                        used_site.insert(value);
                     }
-                    // qDebug() << "[ChipGridOperations] bel name:" << QString::fromStdString(belNames[0])
-                    //          << "| cell name: " << QString::fromStdString(belNames[1]);
-                    used_site[site].insert(belNames);
-//                } else {
-//                    used_site.insert.;
                 }
             }
         }
-    }
-}
 
-bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
-    if (!scene) {
-        return false;  // 如果 scene 为 nullptr，则返回 false
-    }
-    try {
+        // qDebug() << "set: " << used_site.size();
         for (int i = 0; i < gridTypeMatrix.size(); ++i) {
             for (int j = 0; j < gridTypeMatrix[i].size(); ++j) {
                 if (gridTypeMatrix[i][j].types == "SKIP") {
@@ -516,17 +526,102 @@ bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
                 for (auto site : gridTypeMatrix[i][j].cur_sites) {
                     if (used_site.find(site.name) != used_site.end()) {
                         for (auto item : gridMatrix[i][j]->child_items) {
-                            if (item->getName() == site.name) {
-                                //QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
-//                                item->setColor(QColor(Qt::green));
-                                item->setUsed(used_site[site.name]);
+                            if (item->getSiteName() == site.name) {
+                                // item->setColor("SteelBlue");
+                                QColor color(gridTypeMatrix[i][j].R, gridTypeMatrix[i][j].G, gridTypeMatrix[i][j].B);
+                                item->setColor(color);
+                            }
+                        }
+                        for (auto &site_block : sites_v) {
+                            if (site_block.site_name == site.name) {
+                                site_block.r = gridTypeMatrix[i][j].R / 255.0;
+                                site_block.g = gridTypeMatrix[i][j].G / 255.0;
+                                site_block.b = gridTypeMatrix[i][j].B / 255.0;
                             }
                         }
                     }
                 }
             }
         }
+        glwidget->updateSites(sites_v);
+        // sites_v.clear();
+
         used_site.clear();
+
+#else
+        // 匹配 "cluster_x" 后面的数字,表示第几列
+        std::regex rule ("cluster_x(\\d+)");
+
+        if (num_elements > 1) {
+            usageSize.width = j["size"]["width"];
+            usageSize.height = j["size"]["height"];
+            qDebug() << usageSize.width;
+            qDebug() << usageSize.height;
+        } else {
+            std::exit(1);
+        }
+        for (const auto& col  : j.items()) {
+            if (col.key()  == "size") continue; // 如果键是 "size"，就跳过当前迭代
+            std::smatch match;
+            if (std::regex_search(col.key(), match, rule) && match.size() > 1) {
+                int colIndex = std::stoi(match.str(1));
+                if(colIndex > usageSize.width ){
+                    continue;
+                }
+                for (const auto& cluster : col.value().items()) {
+                    Cluster item(cluster.value());
+                    auto sub_size = item.sub.size();
+                    for (int i = 0; i < sub_size; ++i ) {
+                        if (item.sub[i].color != "white"){
+                            // 不是white就占用了
+                            usageGrid.push_back(item.sub[i]);
+                        }
+                    }
+                }
+            }
+
+        }
+#endif
+    } catch(nlohmann::json::exception& e) {
+        QMessageBox::critical(this, "ERROR", e.what());
+    }
+
+}
+
+bool ChipGridOperations::showPlaceUsageGrid(QGraphicsScene *scene) {
+    if (!scene) {
+        return false;  // 如果 scene 为 nullptr，则返回 false
+    }
+    try {
+        auto len = usageGrid.size();
+        for (int i = 0; i < len; ++i) {
+            int x = usageGrid[i].father_x_coordinate - 1;
+            int y = usageGrid[i].father_y_coordinate - 1;
+            if (gridTypeMatrix[x][y].types == "SKIP" || gridMatrix[x][y] == nullptr || (x == 0 && y == 0)) {
+                    continue;
+            }
+
+            if (usageGrid[i].child_loc >= gridMatrix[x][y]->child_items.size()){
+                continue;
+            }
+            gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->setColor(QString::fromStdString(usageGrid[i].color));
+            qDebug() << QString::fromStdString(gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->getSiteName());
+            for (auto &site_block : sites_v) {
+                if (site_block.site_name == gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->getSiteName()) {
+                    site_block.r = QColor(QString::fromStdString(usageGrid[i].color)).redF();
+                    site_block.g = QColor(QString::fromStdString(usageGrid[i].color)).greenF();
+                    site_block.b = QColor(QString::fromStdString(usageGrid[i].color)).blueF();
+                }
+            }
+            // gridMatrix[x][y]->child_items[usageGrid[i].child_loc]->setColor(QString("gray"));
+        }
+        qDebug() << 456;
+#if NEXTPNR
+#else
+        // glwidget->updateSites(sites_v);
+        glwidget3->updateSites(sites_v);
+#endif
+        usageGrid.clear();
     }catch (...) {
         return false;  // 如果在执行过程中抛出任何异常，则返回 false
     }
@@ -541,6 +636,11 @@ NormalTile ChipGridOperations::getTileInfo(int col, int row) {
         return NormalTile();
 }
 
+void ChipGridOperations::setFPGAView3(FPGAOpenGLWidget3 *glwidget)
+{
+    this->glwidget3 = glwidget;
+}
+
 void ChipGridOperations::clearVector() {
     // 清空 grid_type_matrix
     for (auto& row : gridTypeMatrix) {
@@ -553,7 +653,38 @@ void ChipGridOperations::clearVector() {
     // 清空 grid_matrix
     for (auto& row : gridMatrix) {
         row.clear();
-        std::vector<TilesBlock*>().swap(row); // 释放内存
+        std::vector<Blocks*>().swap(row); // 释放内存
     }
     gridMatrix.clear();
+}
+
+void ChipGridOperations::updateTilesNameVisibleStatus(bool status) {
+    for(int i = 0; i < totalSize.width; ++i){
+        for(int j = 0; j < totalSize.height; ++j) {
+            // 遇到skip跳过
+            if (gridTypeMatrix[i][j].types == "SKIP") {
+                continue;
+            }
+            gridMatrix[i][j]->updateTilesNameVisibleStatus(status);
+        }
+    }
+}
+
+void ChipGridOperations::updateSitesVisibleStatus(bool sitesVisibleStatus) {
+    for(int i = 0; i < totalSize.width; ++i){
+        for(int j = 0; j < totalSize.height; ++j) {
+            // 遇到skip跳过
+            if (gridTypeMatrix[i][j].types == "SKIP") {
+                continue;
+            }
+            // 获取当前位置的子项列表
+            QVector<SitesBlock*> itemList = gridMatrix[i][j]->child_items;
+
+            // 遍历子项列表并调用方法
+            for (SitesBlock* item : itemList) {
+                // 调用子项的方法
+                item->updateSitesVisibleStatus(sitesVisibleStatus);
+            }
+        }
+    }
 }
