@@ -212,14 +212,14 @@ SitesSliceL::SitesSliceL(const QColor &color, int tile_index_x, int tile_index_y
         :SitesBlock(color, GLOBAL_SITE_BLOCK_WIDTH, GLOBAL_SITE_BLOCK_HEIGHT, tile_index_x, tile_index_y, "SLICEL", cur_name, site_index) {
     this->setPos(QPointF(SITE_GAP*(site_index+1) + GLOBAL_SITE_BLOCK_WIDTH*site_index, SITE_GAP));
 
-    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/A6LUT", 0));
+    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/D6LUT", 0));
     child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/B6LUT", 1));
-    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/C6LUT", 2));
-    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/D6LUT", 3));
+    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/B6LUT", 2));
+    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/A6LUT", 3));
 
-    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7AMUX", 4));
-    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F8AMUX", 5));
-    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7BMUX", 6));
+    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7BMUX", 4));
+    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F8MUX", 5));
+    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7AMUX", 6));
 
     child_bel_items.append(new BelsCarry4(color, tile_index_x, tile_index_y, site_index, cur_name+"/CARRY4", 7));
 
@@ -257,14 +257,14 @@ SitesSliceL::SitesSliceL(const QColor &color, int tile_index_x, int tile_index_y
 SitesSliceM::SitesSliceM(const QColor &color, int tile_index_x, int tile_index_y, NormalTile& tile, std::string &cur_name, int site_index)
         :SitesBlock(color, GLOBAL_SITE_BLOCK_WIDTH, GLOBAL_SITE_BLOCK_HEIGHT, tile_index_x, tile_index_y, "SLICEM", cur_name, site_index) {
     this->setPos(QPointF(SITE_GAP*(site_index+1) + GLOBAL_SITE_BLOCK_WIDTH*site_index, SITE_GAP));
-    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/A6LUT", 0));
-    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/B6LUT", 1));
-    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/C6LUT", 2));
-    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/D6LUT", 3));
+    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/D6LUT", 0));
+    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/C6LUT", 1));
+    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/B6LUT", 2));
+    child_bel_items.append(new BelsLUT6(color, tile_index_x, tile_index_y, site_index, cur_name+"/A6LUT", 3));
 
-    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7AMUX", 4));
-    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F8AMUX", 5));
-    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7BMUX", 6));
+    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7BMUX", 4));
+    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F8MUX", 5));
+    child_bel_items.append(new BelsSELMUX2_1(color, tile_index_x, tile_index_y, site_index, cur_name+"/F7AMUX", 6));
 
     child_bel_items.append(new BelsCarry4(color, tile_index_x, tile_index_y, site_index, cur_name+"/CARRY4", 7));
 
